@@ -8,17 +8,40 @@ import { toRLP, RLPItem } from "metashrew-as/assembly/utils/rlp";
 import { encodeHexFromBuffer, encodeHex } from "metashrew-as/assembly/utils/hex";
 import { Inscription } from "metashrew-as/assembly/blockdata/inscription";
 
-String.UTF8.encode("/inscription/bytxid/")
+const HEIGHT_TO_BLOCK_HEADER = String.UTF8.encode("/block/byheight");
+const TRANSACTION_BY_ID = String.UTF8.encode("/tx/byid");
+const OUTPOINT_TO_VALUE = String.UTF8.encode("/outpoint/tovalue");
+const HEIGHT_TO_INSCRIPTION_ID = String.UTF8.encode("/inscription/byheight");
 
 // - [ ] sat indexes
 // - [ ] satpoint indexes
 // - [ ] tx indexes
 // - [ ] inscription indexes
+// - [x] index block header by height
+// - [x] index transaction by transaction id
+// - [ ] index inscription by height
 
 class Index {
+  static keyFor(table: ArrayBuffer, key: ArrayBuffer): ArrayBuffer {
+    return Box.concat([Box.from(table), Box.from(key)]);
+  }
+
+  static indexTransaction(tx: Transaction): void {
+      // index transaction by transaction id
+      set(Index.keyFor(TRANSACTION_BY_ID, block.transactions[i].txid()), block.transactions[i].bytes.toArrayBuffer());
+
+      // index transaction outputs
+      tx.outs.forEach((output: Output, tx_offset) => {
+
+      })
+  }
   
-  static indexBlock(block: Block): void {
+  static indexBlock(block: Block, height: u32): void {
+    // index block header by height
+    set(Index.keyFor(HEIGHT_TO_BLOCK_HEADER, String.UTF8.encode(height.toString())), block.header.bytes.toArrayBuffer());
+
     for (let i = 0; i < block.transactions.length; i++) {
+
       for (let k = 0; k < block.transactions[i].ins.length; k++) {
         let _input = block.transactions[i].ins[k];
         let outpoint = _input.previousOutput();
@@ -36,8 +59,6 @@ class Index {
       }
     }
   }
-
-
 }
 
 
@@ -47,7 +68,7 @@ export function _start(): void {
   const height = parsePrimitive<u32>(box);
   const block = new Block(box);
   // console.log("got block " + height.toString(10));
-  Index.indexBlock(block);
+  Index.indexBlock(block, height);
   _flush();
 }
 
