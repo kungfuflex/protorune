@@ -95,7 +95,7 @@ describe("metashrew index", () => {
     program.on("log", (v) => console.log(v));
     async function rpcCall(method, params) {
       const response = await fetch(
-        "https://testnet.sandshrew.io/v1/154f9aaa25a986241357836c37f8d71",
+        "https://mainnet.sandshrew.io/v1/154f9aaa25a986241357836c37f8d71",
         {
           method: "POST",
           body: JSON.stringify({
@@ -118,7 +118,7 @@ describe("metashrew index", () => {
       program.setBlockHeight(i);
       await program.run("_start");
     }
-    for (let i = 1000000; i < 1000050; i++) {
+    for (let i = 772904; i < 785391; i++) {
       await runBlock(i);
     }
   });
