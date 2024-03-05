@@ -15,6 +15,7 @@ const HEIGHT_TO_BLOCK_HEADER = String.UTF8.encode("/block/byheight");
 const TRANSACTION_BY_ID = String.UTF8.encode("/tx/byid");
 const OUTPOINT_TO_VALUE = String.UTF8.encode("/outpoint/tovalue");
 const HEIGHT_TO_INSCRIPTION_ID = String.UTF8.encode("/inscription/byheight");
+const SAT_RANGE_BY_OUTPOINT = String.UTF8.encode("/satrange/byoutpoint");
 
 // - [ ] sat indexes
 // - [ ] satpoint indexes
@@ -29,40 +30,99 @@ class Index {
     return Box.concat([Box.from(table), Box.from(key)]);
   }
 
-  static indexTransaction(tx: Transaction): void {
-      // index transaction by transaction id
-      set(Index.keyFor(TRANSACTION_BY_ID, block.transactions[i].txid()), block.transactions[i].bytes.toArrayBuffer());
-
-      // index transaction outputs
-      tx.outs.forEach((output: Output, tx_offset) => {
-
-      })
+  static getOrdinalsRanges(key: ArrayBuffer): Box {
+    return Box.from(get(Index.keyFor(SAT_RANGE_BY_OUTPOINT, key)));
   }
+
 
   static indexRanges(height: u32, block: Block): void {
     console.log(`Block ${height.toString(10)} with ${block.transactions.length.toString(10)} transactions`);
     let h = new Height(height);
 
+    // declare coinbase inputs and set subsidy inputs
+    let coinbase_inputs = new Array<Array<u64>>();
+
     if (h.subsidy() > 0) {
       let start: Sat = h.startingSat();
-      console.log("coinbase input " + start.n().toString(10) + " " + (start.n() + h.subsidy()).toString(10));
+      coinbase_inputs.push([<u64>(start.n()), <u64>(start.n() + h.subsidy())]);
+      console.log("coinbase input " );
     }
 
-    for (let tx_offset = 0; tx_offset < block.transactions.length; tx_offset++) {
+    for (let tx_offset = 1; tx_offset < block.transactions.length; tx_offset++) {
       console.log(`Indexing transaction ${tx_offset.toString(10)}`);
       let tx = block.transactions[tx_offset];
 
-      for (let i = 0; i < block.transactions[tx_offset].ins.length; i++) {
+      let inputOrdinalsRange = new Array<Array<u64>>();
+
+      // enumerate transaction inputs
+      for (let i = 0; i < tx.ins.length; i++) {
         let input = tx.ins[i];
         // encode key from transaction outpoint
         let key: ArrayBuffer = input.previousOutput().toBuffer();
 
-        // TODO: check response ArrayBuffer for empty Buffer
-        // parse sat range
-        let response = get(Index.keyFor(SAT_RANGE_BY_OUTPOINT, key));
+        let response = Box.from(get(Index.keyFor(SAT_RANGE_BY_OUTPOINT, key)));
+        if (response.isEmpty()) {
+          console.log("no sat range found for outpoint");
+          continue;
+        }
 
+        let start = parsePrimitive<u64>(response);
+        let end = parsePrimitive<u64>(response);
+        inputOrdinalsRange.push([start, end])
       }
+
+      // for (let vout = 0; vout < tx.outs.length; vout++) {
+      //   let remaining = tx.outs[vout].value;
+      //
+      //   while (remaining > 0) {
+      //     if (inputOrdinalsRange.length == 0) {
+      //       break;
+      //     }
+      //
+      //     let range = inputOrdinalsRange.shift();
+      //
+      //   }
+      // }
+
     }
+
+    // index ordinals range of coinbase transactions
+    let coinbase = block.coinbase();
+    if (coinbase == null) return;
+    else {
+      console.log("coinbase");
+    }
+
+    for (let vout = 0; vout < coinbase.outs.length; vout++) {
+      let output = coinbase.outs[vout];
+      let ordinals: Array<u64> = [];
+
+      let remaining = output.value;
+
+      while (remaining > 0) {
+        let range = coinbase_inputs.shift();
+
+        let count = range[1] - range[0];
+
+
+        let assigned: Array<u64> = new Array();
+        if (count > remaining) {
+          let middle = range[0] + remaining;
+          coinbase_inputs.unshift([middle, range[1]]);
+          assigned = [range[0], middle];
+        } else {
+          assigned = range;
+        }
+
+        ordinals.push(assigned[0]);
+        ordinals.push(assigned[1]);
+
+        remaining -= assigned[1] - assigned[0];
+        
+      }
+
+    }
+    
   }
   
   static indexBlock(block: Block, height: u32): void {
