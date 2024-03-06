@@ -61,14 +61,11 @@ class Index {
         let key: ArrayBuffer = input.previousOutput().toBuffer();
 
         let response = Box.from(get(Index.keyFor(SAT_RANGE_BY_OUTPOINT, key)));
-        if (response.isEmpty()) {
-          console.log("no sat range found for outpoint");
-          continue;
+        if (!response.isEmpty()) {
+          let start = parsePrimitive<u64>(response);
+          let end = parsePrimitive<u64>(response);
+          inputOrdinalsRange.push([start, end])
         }
-
-        let start = parsePrimitive<u64>(response);
-        let end = parsePrimitive<u64>(response);
-        inputOrdinalsRange.push([start, end])
       }
 
       // for (let vout = 0; vout < tx.outs.length; vout++) {
@@ -88,9 +85,13 @@ class Index {
 
     // index ordinals range of coinbase transactions
     let coinbase = block.coinbase();
-    if (coinbase == null) return;
+
+    if (coinbase == null) {
+      console.log("Error: Coinbase Transaction is Null")
+      return;
+    }
     else {
-      console.log("coinbase");
+      console.log("Coinbase Transaction is not null");
     }
 
     for (let vout = 0; vout < coinbase.outs.length; vout++) {
@@ -118,7 +119,10 @@ class Index {
         ordinals.push(assigned[1]);
 
         remaining -= assigned[1] - assigned[0];
-        
+      }
+
+      for (let i = 0; i < ordinals.length; i++) {
+        console.log(" " + ordinals[i].toString(10));
       }
 
     }
