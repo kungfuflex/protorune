@@ -44,6 +44,7 @@ class Index {
         let input = tx.ins[i];
         // encode key from transaction outpoint
         let key: ArrayBuffer = input.previousOutput().toBuffer();
+        console.log("\tTxOffset: " + tx_offset.toString(10) + " Input: " + i.toString(10) + " Previous Outpoint: " + encodeHexFromBuffer(key));
 
         let response = get(Index.keyFor(OUTPOINT_TO_ORDINALS_RANGE, key));
         let ordinalRanges = Box.from(response);
@@ -57,12 +58,19 @@ class Index {
 
       // enumerate transaction outputs
       for (let i = 0; i < tx.outs.length; i++) {
+        console.log("BP 1");
         let output = tx.outs[i];
         let ordinals: Array<ArrayBuffer> = [];
         
         let remaining = output.value;
         while (remaining > 0) {
-          console.log("breakpoint");
+          console.log("BP 2");
+          if (inputOrdinalsRange.length == 0) {
+            console.log("Found transaction with outputs but no inputs");
+            break;
+          } else {
+            console.log("Found transaction with outputs and inputs");
+          }
           let range = inputOrdinalsRange.shift();
 
           let count = range[1] - range[0];
@@ -110,7 +118,6 @@ class Index {
     else {
     }
 
-    let key = OutPoint.from(coinbase.txid(), 0).toBuffer();
 
     for (let vout = 0; vout < coinbase.outs.length; vout++) {
       let output = coinbase.outs[vout];
@@ -118,13 +125,13 @@ class Index {
 
       let remaining = output.value;
 
-      console.log("coinbase inputs length " + coinbase_inputs.length.toString(10));
       while (remaining > 0) {
-        console.log("breakpoint");
+        if (coinbase_inputs.length == 0) {
+          break;
+        }
         let range = coinbase_inputs.shift();
 
         let count = range[1] - range[0];
-        console.log("count: " + count.toString(10));
 
 
         let assigned: Array<u64> = new Array();
@@ -149,6 +156,8 @@ class Index {
       ordinals.unshift(numOrdinals);
       let ords = concat(ordinals);
 
+      let key = OutPoint.from(coinbase.txid(), <u32>vout).toBuffer();
+      console.log("\tCoinbase Transaction: " + encodeHexFromBuffer(key));
 
       set(Index.keyFor(OUTPOINT_TO_ORDINALS_RANGE, key), ords); 
       // test
@@ -173,7 +182,6 @@ export function _start(): void {
   const box = Box.from(data);
   const height = parsePrimitive<u32>(box);
   const block = new Block(box);
-  // console.log("got block " + height.toString(10));
   Index.indexRanges(height, block);
   _flush();
 }
