@@ -1,6 +1,6 @@
 import { Box, RCBox } from "metashrew-as/assembly/utils/box"
 import { _flush, input, get, set } from "metashrew-as/assembly/indexer/index";
-import { parsePrimitive } from "metashrew-as/assembly/utils/utils";
+import { parsePrimitive, concat, primitiveToBuffer } from "metashrew-as/assembly/utils/utils";
 import { Block } from "metashrew-as/assembly/blockdata/block";
 import { Transaction, Input, Output, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
 import { console } from "metashrew-as/assembly/utils/logging";
@@ -23,11 +23,6 @@ class Index {
     return Box.concat([Box.from(table), Box.from(key)]);
   }
 
-  static getOrdinalsRanges(key: ArrayBuffer): Box {
-    return Box.from(get(Index.keyFor(SAT_RANGE_BY_OUTPOINT, key)));
-  }
-
-
   static indexRanges(height: u32, block: Block): void {
     console.log(`Block ${height.toString(10)} with ${block.transactions.length.toString(10)} transactions`);
     let h = new Height(height);
@@ -38,13 +33,10 @@ class Index {
     if (h.subsidy() > 0) {
       let start: Sat = h.startingSat();
       coinbase_inputs.push([<u64>(start.n()), <u64>(start.n() + h.subsidy())]);
-      console.log("coinbase input " );
     }
 
     for (let tx_offset = 1; tx_offset < block.transactions.length; tx_offset++) {
-      console.log(`Indexing transaction ${tx_offset.toString(10)}`);
       let tx = block.transactions[tx_offset];
-
       let inputOrdinalsRange = new Array<Array<u64>>();
 
       // enumerate transaction inputs
@@ -53,39 +45,72 @@ class Index {
         // encode key from transaction outpoint
         let key: ArrayBuffer = input.previousOutput().toBuffer();
 
-        let response = Box.from(get(Index.keyFor(SAT_RANGE_BY_OUTPOINT, key)));
-        if (!response.isEmpty()) {
-          let start = parsePrimitive<u64>(response);
-          let end = parsePrimitive<u64>(response);
+        let response = get(Index.keyFor(OUTPOINT_TO_ORDINALS_RANGE, key));
+        let ordinalRanges = Box.from(response);
+        let numOfOrdinals = parsePrimitive<u32>(ordinalRanges);
+        for ( let i = 0; i < <i32>numOfOrdinals; i++ ) {
+          let start = parsePrimitive<u64>(ordinalRanges);
+          let end = parsePrimitive<u64>(ordinalRanges);
           inputOrdinalsRange.push([start, end])
         }
       }
 
-      // for (let vout = 0; vout < tx.outs.length; vout++) {
-      //   let remaining = tx.outs[vout].value;
-      //
-      //   while (remaining > 0) {
-      //     if (inputOrdinalsRange.length == 0) {
-      //       break;
-      //     }
-      //
-      //     let range = inputOrdinalsRange.shift();
-      //
-      //   }
-      // }
+      // enumerate transaction outputs
+      for (let i = 0; i < tx.outs.length; i++) {
+        let output = tx.outs[i];
+        let ordinals: Array<ArrayBuffer> = [];
+        
+        let remaining = output.value;
+        while (remaining > 0) {
+          console.log("breakpoint");
+          let range = inputOrdinalsRange.shift();
 
+          let count = range[1] - range[0];
+          console.log("count: " + count.toString(10));
+
+
+          let assigned: Array<u64> = new Array();
+          if (count > remaining) {
+            let middle = range[0] + remaining;
+            inputOrdinalsRange.unshift([middle, range[1]]);
+            assigned = [range[0], middle];
+          } else {
+            assigned = range;
+          }
+
+          let start = primitiveToBuffer<u64>(assigned[0]);
+          let end = primitiveToBuffer<u64>(assigned[1]);
+          let ordinalRange = concat([start, end]);
+          ordinals.push(ordinalRange);
+
+          remaining -= assigned[1] - assigned[0];
+        }
+
+        let key = OutPoint.from(tx.txid(), i).toBuffer();
+        let numOrdinals = primitiveToBuffer<u32>(<u32>ordinals.length)
+        ordinals.unshift(numOrdinals);
+        let ords = concat(ordinals);
+
+
+        set(Index.keyFor(OUTPOINT_TO_ORDINALS_RANGE, key), ords); 
+      }
+
+      // extend coinbase output with fees
+      for (let i = 0; i < inputOrdinalsRange.length; i++){
+        coinbase_inputs.push(inputOrdinalsRange[i]);
+      }
     }
 
     // index ordinals range of coinbase transactions
     let coinbase = block.coinbase();
 
     if (coinbase == null) {
-      console.log("Error: Coinbase Transaction is Null")
       return;
     }
     else {
-      console.log("Coinbase Transaction is not null");
     }
+
+    let key = OutPoint.from(coinbase.txid(), 0).toBuffer();
 
     for (let vout = 0; vout < coinbase.outs.length; vout++) {
       let output = coinbase.outs[vout];
@@ -93,10 +118,13 @@ class Index {
 
       let remaining = output.value;
 
+      console.log("coinbase inputs length " + coinbase_inputs.length.toString(10));
       while (remaining > 0) {
+        console.log("breakpoint");
         let range = coinbase_inputs.shift();
 
         let count = range[1] - range[0];
+        console.log("count: " + count.toString(10));
 
 
         let assigned: Array<u64> = new Array();
@@ -108,50 +136,35 @@ class Index {
           assigned = range;
         }
 
-        // store ordinals ranges
-        let r1 = new ArrayBuffer(4);
-        let r2 = new ArrayBuffer(4);
-        store<u64>(changetype<usize>(r1), assigned[0]);
-        store<u64>(changetype<usize>(r2), assigned[1]);
-        ordinals.push(r1);
-        ordinals.push(r2);
+        let start = primitiveToBuffer<u64>(assigned[0]);
+        let end = primitiveToBuffer<u64>(assigned[1]);
+        let ordinalRange = concat([start, end]);
+        ordinals.push(ordinalRange);
 
         remaining -= assigned[1] - assigned[0];
       }
       
-      for (let i = 0; i < ordinals.length; i++) {
-        let val = parsePrimitive<u64>(Box.from(ordinals[i]));
-        console.log("value: " + val.toString(10))
-      }
+      
+      let numOrdinals = primitiveToBuffer<u32>(<u32>ordinals.length)
+      ordinals.unshift(numOrdinals);
+      let ords = concat(ordinals);
+
+
+      set(Index.keyFor(OUTPOINT_TO_ORDINALS_RANGE, key), ords); 
+      // test
+      // let data = get(Index.keyFor(OUTPOINT_TO_ORDINALS_RANGE, key));
+      // let ordBox = Box.from(data)
+      // let numOfOrdinals = parsePrimitive<u32>(ordBox);
+      // for ( let i = 0; i < <i32>numOfOrdinals; i++ ) {
+      //   let start = parsePrimitive<u64>(ordBox);
+      //   let end = parsePrimitive<u64>(ordBox);
+      //   console.log(start.toString(10) + " - " + end.toString(10));
+      // }
 
     }
     
   }
   
-  static indexBlock(block: Block, height: u32): void {
-    console.log(`indexing block ${height.toString(10)}`);
-    // index block header by height
-    set(Index.keyFor(HEIGHT_TO_BLOCK_HEADER, String.UTF8.encode(height.toString())), block.header.bytes.toArrayBuffer());
-
-    for (let i = 0; i < block.transactions.length; i++) {
-
-      for (let k = 0; k < block.transactions[i].ins.length; k++) {
-        let _input = block.transactions[i].ins[k];
-        let outpoint = _input.previousOutput();
-        if ( outpoint.isNull() ) {
-          continue;
-        } 
-
-        let inscription = _input.inscription()
-        if (inscription == null) {
-          continue;
-        }
-
-        console.log("contains inscription");
-
-      }
-    }
-  }
 }
 
 
@@ -165,7 +178,3 @@ export function _start(): void {
   _flush();
 }
 
-/// View Functions:
-export function blockcount(): void {
-
-}
