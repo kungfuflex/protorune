@@ -1,4 +1,4 @@
-import { Box } from "metashrew-as/assembly/utils/box"
+import { Box, RCBox } from "metashrew-as/assembly/utils/box"
 import { _flush, input, get, set } from "metashrew-as/assembly/indexer/index";
 import { parsePrimitive } from "metashrew-as/assembly/utils/utils";
 import { Block } from "metashrew-as/assembly/blockdata/block";
@@ -16,14 +16,7 @@ const TRANSACTION_BY_ID = String.UTF8.encode("/tx/byid");
 const OUTPOINT_TO_VALUE = String.UTF8.encode("/outpoint/tovalue");
 const HEIGHT_TO_INSCRIPTION_ID = String.UTF8.encode("/inscription/byheight");
 const SAT_RANGE_BY_OUTPOINT = String.UTF8.encode("/satrange/byoutpoint");
-
-// - [ ] sat indexes
-// - [ ] satpoint indexes
-// - [ ] tx indexes
-// - [ ] inscription indexes
-// - [x] index block header by height
-// - [x] index transaction by transaction id
-// - [ ] index inscription by height
+const OUTPOINT_TO_ORDINALS_RANGE = String.UTF8.encode("/ordinals/byoutpoint");
 
 class Index {
   static keyFor(table: ArrayBuffer, key: ArrayBuffer): ArrayBuffer {
@@ -96,7 +89,7 @@ class Index {
 
     for (let vout = 0; vout < coinbase.outs.length; vout++) {
       let output = coinbase.outs[vout];
-      let ordinals: Array<u64> = [];
+      let ordinals: Array<ArrayBuffer> = [];
 
       let remaining = output.value;
 
@@ -115,14 +108,20 @@ class Index {
           assigned = range;
         }
 
-        ordinals.push(assigned[0]);
-        ordinals.push(assigned[1]);
+        // store ordinals ranges
+        let r1 = new ArrayBuffer(4);
+        let r2 = new ArrayBuffer(4);
+        store<u64>(changetype<usize>(r1), assigned[0]);
+        store<u64>(changetype<usize>(r2), assigned[1]);
+        ordinals.push(r1);
+        ordinals.push(r2);
 
         remaining -= assigned[1] - assigned[0];
       }
-
+      
       for (let i = 0; i < ordinals.length; i++) {
-        console.log(" " + ordinals[i].toString(10));
+        let val = parsePrimitive<u64>(Box.from(ordinals[i]));
+        console.log("value: " + val.toString(10))
       }
 
     }
