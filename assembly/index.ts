@@ -36,35 +36,41 @@ class Index {
     }
 
     for (let tx_offset = 1; tx_offset < block.transactions.length; tx_offset++) {
+
       let tx = block.transactions[tx_offset];
+      console.log("locktime" + tx.locktime.toString(10));
       let inputOrdinalsRange = new Array<Array<u64>>();
 
+      console.log("Indexing transaction " + tx_offset.toString(10) + " : " + encodeHexFromBuffer(tx.txid()))
       // enumerate transaction inputs
       for (let i = 0; i < tx.ins.length; i++) {
         let input = tx.ins[i];
         // encode key from transaction outpoint
         let key: ArrayBuffer = input.previousOutput().toBuffer();
-        console.log("\tTxOffset: " + tx_offset.toString(10) + " Input: " + i.toString(10) + " Previous Outpoint: " + encodeHexFromBuffer(key));
+        console.log("\tINPUT -> TxOffset: " + tx_offset.toString(10) + " Input: " + i.toString(10) + " Previous Outpoint: " + encodeHexFromBuffer(key));
 
         let response = get(Index.keyFor(OUTPOINT_TO_ORDINALS_RANGE, key));
         let ordinalRanges = Box.from(response);
         let numOfOrdinals = parsePrimitive<u32>(ordinalRanges);
+        console.log("spending ranges" + numOfOrdinals.toString(10));
         for ( let i = 0; i < <i32>numOfOrdinals; i++ ) {
           let start = parsePrimitive<u64>(ordinalRanges);
           let end = parsePrimitive<u64>(ordinalRanges);
+          console.log("\t\tSats: " + start.toString(10) + " - " + end.toString(10));
           inputOrdinalsRange.push([start, end])
         }
       }
 
       // enumerate transaction outputs
       for (let i = 0; i < tx.outs.length; i++) {
-        console.log("BP 1");
-        let output = tx.outs[i];
         let ordinals: Array<ArrayBuffer> = [];
+        let output = tx.outs[i];
+
+        let key = OutPoint.from(tx.txid(), i).toBuffer();
+        console.log("\tOUTPUT -> TxOffset: " + tx_offset.toString(10) + " Output: " + i.toString(10) + " Outpoint: " + encodeHexFromBuffer(key));
         
         let remaining = output.value;
         while (remaining > 0) {
-          console.log("BP 2");
           if (inputOrdinalsRange.length == 0) {
             console.log("Found transaction with outputs but no inputs");
             break;
@@ -94,7 +100,6 @@ class Index {
           remaining -= assigned[1] - assigned[0];
         }
 
-        let key = OutPoint.from(tx.txid(), i).toBuffer();
         let numOrdinals = primitiveToBuffer<u32>(<u32>ordinals.length)
         ordinals.unshift(numOrdinals);
         let ords = concat(ordinals);
