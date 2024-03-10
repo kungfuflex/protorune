@@ -7,22 +7,18 @@
  (type $5 (func (param i32 i32 i32 i32) (result i32)))
  (type $6 (func (param i32 i32 i32)))
  (type $7 (func (param i32) (result i64)))
- (type $8 (func (param i32)))
- (type $9 (func (result i32)))
- (type $10 (func (param i64 i32) (result i32)))
- (type $11 (func (param i32 i32 i32 i32)))
- (type $12 (func (param i32 i64)))
- (type $13 (func (param i32 i64) (result i32)))
- (type $14 (func (param i32 i64 i32)))
- (type $15 (func (param i64) (result i32)))
- (type $16 (func (param i32 i32 i32 i32 i32) (result i32)))
- (type $17 (func (param i32 i64 i32 i32)))
- (type $18 (func (param i32 i32 i64)))
- (type $19 (func (param i32 i32) (result i64)))
+ (type $8 (func (result i32)))
+ (type $9 (func (param i32)))
+ (type $10 (func (param i32 i32 i32 i32)))
+ (type $11 (func (param i32 i64)))
+ (type $12 (func (param i32 i64) (result i32)))
+ (type $13 (func (param i32 i32 i32 i32 i32) (result i32)))
+ (type $14 (func (param i32 i32 i64)))
+ (type $15 (func (param i32 i32) (result i64)))
+ (type $16 (func (param i64) (result i32)))
  (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
  (import "env" "__host_len" (func $~lib/metashrew-as/assembly/indexer/index/__host_len (result i32)))
  (import "env" "__load_input" (func $~lib/metashrew-as/assembly/indexer/index/__load_input (param i32)))
- (import "env" "__log" (func $~lib/metashrew-as/assembly/utils/logging/__log (param i32)))
  (import "env" "__get_len" (func $~lib/metashrew-as/assembly/indexer/index/__get_len (param i32) (result i32)))
  (import "env" "__get" (func $~lib/metashrew-as/assembly/indexer/index/__get (param i32 i32)))
  (import "env" "__flush" (func $~lib/metashrew-as/assembly/indexer/index/__flush (param i32)))
@@ -109,15 +105,15 @@
  (global $~lib/metashrew-as/assembly/blockdata/sat/Sat.SUPPLY (mut i64) (i64.const 2099999997690000))
  (global $~lib/metashrew-as/assembly/blockdata/epoch/Epoch.STARTING_SATS (mut i32) (i32.const 0))
  (global $~lib/metashrew-as/assembly/blockdata/epoch/Epoch.FIRST_POST_SUBSIDY (mut i32) (i32.const 0))
- (global $assembly/index/HEIGHT_TO_BLOCK_HEADER (mut i32) (i32.const 0))
+ (global $assembly/index/HEIGHT_TO_HASH (mut i32) (i32.const 0))
+ (global $assembly/index/HASH_TO_HEIGHT (mut i32) (i32.const 0))
+ (global $assembly/index/HASH_TO_CHILDREN (mut i32) (i32.const 0))
  (global $assembly/index/TRANSACTION_BY_ID (mut i32) (i32.const 0))
  (global $assembly/index/OUTPOINT_TO_VALUE (mut i32) (i32.const 0))
  (global $assembly/index/HEIGHT_TO_INSCRIPTION_ID (mut i32) (i32.const 0))
  (global $assembly/index/SAT_RANGE_BY_OUTPOINT (mut i32) (i32.const 0))
  (global $assembly/index/OUTPOINT_TO_ORDINALS_RANGE (mut i32) (i32.const 0))
- (global $~lib/native/ASC_SHRINK_LEVEL i32 (i32.const 0))
- (global $~lib/builtins/u32.MAX_VALUE i32 (i32.const -1))
- (global $~lib/memory/__heap_base i32 (i32.const 6508))
+ (global $~lib/memory/__heap_base i32 (i32.const 3676))
  (memory $0 1 32768)
  (data $0 (i32.const 12) "\1c\02\00\00\00\00\00\00\00\00\00\00\04\00\00\00\00\02\00\00000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8d9dadbdcdddedfe0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4f5f6f7f8f9fafbfcfdfeff\00\00\00\00\00\00\00\00\00\00\00\00")
  (data $1 (i32.const 556) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\12\00\00\00/\00t\00x\00/\00b\00y\00i\00d\00/\00\00\00\00\00\00\00\00\00\00\00")
@@ -145,53 +141,28 @@
  (data $23 (i32.const 2508) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00&\00\00\00~\00l\00i\00b\00/\00s\00t\00a\00t\00i\00c\00a\00r\00r\00a\00y\00.\00t\00s\00\00\00\00\00\00\00")
  (data $24 (i32.const 2572) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\1a\00\00\00~\00l\00i\00b\00/\00a\00r\00r\00a\00y\00.\00t\00s\00\00\00")
  (data $25 (i32.const 2620) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\1e\00\00\00/\00b\00l\00o\00c\00k\00/\00b\00y\00h\00e\00i\00g\00h\00t\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $26 (i32.const 2684) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\10\00\00\00/\00t\00x\00/\00b\00y\00i\00d\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $27 (i32.const 2732) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\"\00\00\00/\00o\00u\00t\00p\00o\00i\00n\00t\00/\00t\00o\00v\00a\00l\00u\00e\00\00\00\00\00\00\00\00\00\00\00")
- (data $28 (i32.const 2796) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00*\00\00\00/\00i\00n\00s\00c\00r\00i\00p\00t\00i\00o\00n\00/\00b\00y\00h\00e\00i\00g\00h\00t\00\00\00")
- (data $29 (i32.const 2860) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00(\00\00\00/\00s\00a\00t\00r\00a\00n\00g\00e\00/\00b\00y\00o\00u\00t\00p\00o\00i\00n\00t\00\00\00\00\00")
- (data $30 (i32.const 2924) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00(\00\00\00/\00o\00r\00d\00i\00n\00a\00l\00s\00/\00b\00y\00o\00u\00t\00p\00o\00i\00n\00t\00\00\00\00\00")
- (data $31 (i32.const 2988) "|\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00^\00\00\00E\00l\00e\00m\00e\00n\00t\00 \00t\00y\00p\00e\00 \00m\00u\00s\00t\00 \00b\00e\00 \00n\00u\00l\00l\00a\00b\00l\00e\00 \00i\00f\00 \00a\00r\00r\00a\00y\00 \00i\00s\00 \00h\00o\00l\00e\00y\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $32 (i32.const 3116) "\1c\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\0c\00\00\00B\00l\00o\00c\00k\00 \00")
- (data $33 (i32.const 3148) "\1c\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\0c\00\00\00 \00w\00i\00t\00h\00 \00")
- (data $34 (i32.const 3180) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\1a\00\00\00 \00t\00r\00a\00n\00s\00a\00c\00t\00i\00o\00n\00s\00\00\00")
- (data $35 (i32.const 3228) ",\00\00\00\03\00\00\00\00\00\00\00\1a\00\00\00\14\00\00\00@\0c\00\00\00\00\00\00`\0c\00\00\00\00\00\00\80\0c\00\00\00\00\00\00\00\00\00\00")
- (data $36 (i32.const 3276) "|\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00d\00\00\00t\00o\00S\00t\00r\00i\00n\00g\00(\00)\00 \00r\00a\00d\00i\00x\00 \00a\00r\00g\00u\00m\00e\00n\00t\00 \00m\00u\00s\00t\00 \00b\00e\00 \00b\00e\00t\00w\00e\00e\00n\00 \002\00 \00a\00n\00d\00 \003\006\00\00\00\00\00\00\00\00\00")
- (data $37 (i32.const 3404) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00&\00\00\00~\00l\00i\00b\00/\00u\00t\00i\00l\00/\00n\00u\00m\00b\00e\00r\00.\00t\00s\00\00\00\00\00\00\00")
- (data $38 (i32.const 3468) "\1c\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\02\00\00\000\00\00\00\00\00\00\00\00\00\00\00")
- (data $39 (i32.const 3500) "0\000\000\001\000\002\000\003\000\004\000\005\000\006\000\007\000\008\000\009\001\000\001\001\001\002\001\003\001\004\001\005\001\006\001\007\001\008\001\009\002\000\002\001\002\002\002\003\002\004\002\005\002\006\002\007\002\008\002\009\003\000\003\001\003\002\003\003\003\004\003\005\003\006\003\007\003\008\003\009\004\000\004\001\004\002\004\003\004\004\004\005\004\006\004\007\004\008\004\009\005\000\005\001\005\002\005\003\005\004\005\005\005\006\005\007\005\008\005\009\006\000\006\001\006\002\006\003\006\004\006\005\006\006\006\007\006\008\006\009\007\000\007\001\007\002\007\003\007\004\007\005\007\006\007\007\007\008\007\009\008\000\008\001\008\002\008\003\008\004\008\005\008\006\008\007\008\008\008\009\009\000\009\001\009\002\009\003\009\004\009\005\009\006\009\007\009\008\009\009\00")
- (data $40 (i32.const 3900) "\1c\04\00\00\00\00\00\00\00\00\00\00\02\00\00\00\00\04\00\000\000\000\001\000\002\000\003\000\004\000\005\000\006\000\007\000\008\000\009\000\00a\000\00b\000\00c\000\00d\000\00e\000\00f\001\000\001\001\001\002\001\003\001\004\001\005\001\006\001\007\001\008\001\009\001\00a\001\00b\001\00c\001\00d\001\00e\001\00f\002\000\002\001\002\002\002\003\002\004\002\005\002\006\002\007\002\008\002\009\002\00a\002\00b\002\00c\002\00d\002\00e\002\00f\003\000\003\001\003\002\003\003\003\004\003\005\003\006\003\007\003\008\003\009\003\00a\003\00b\003\00c\003\00d\003\00e\003\00f\004\000\004\001\004\002\004\003\004\004\004\005\004\006\004\007\004\008\004\009\004\00a\004\00b\004\00c\004\00d\004\00e\004\00f\005\000\005\001\005\002\005\003\005\004\005\005\005\006\005\007\005\008\005\009\005\00a\005\00b\005\00c\005\00d\005\00e\005\00f\006\000\006\001\006\002\006\003\006\004\006\005\006\006\006\007\006\008\006\009\006\00a\006\00b\006\00c\006\00d\006\00e\006\00f\007\000\007\001\007\002\007\003\007\004\007\005\007\006\007\007\007\008\007\009\007\00a\007\00b\007\00c\007\00d\007\00e\007\00f\008\000\008\001\008\002\008\003\008\004\008\005\008\006\008\007\008\008\008\009\008\00a\008\00b\008\00c\008\00d\008\00e\008\00f\009\000\009\001\009\002\009\003\009\004\009\005\009\006\009\007\009\008\009\009\009\00a\009\00b\009\00c\009\00d\009\00e\009\00f\00a\000\00a\001\00a\002\00a\003\00a\004\00a\005\00a\006\00a\007\00a\008\00a\009\00a\00a\00a\00b\00a\00c\00a\00d\00a\00e\00a\00f\00b\000\00b\001\00b\002\00b\003\00b\004\00b\005\00b\006\00b\007\00b\008\00b\009\00b\00a\00b\00b\00b\00c\00b\00d\00b\00e\00b\00f\00c\000\00c\001\00c\002\00c\003\00c\004\00c\005\00c\006\00c\007\00c\008\00c\009\00c\00a\00c\00b\00c\00c\00c\00d\00c\00e\00c\00f\00d\000\00d\001\00d\002\00d\003\00d\004\00d\005\00d\006\00d\007\00d\008\00d\009\00d\00a\00d\00b\00d\00c\00d\00d\00d\00e\00d\00f\00e\000\00e\001\00e\002\00e\003\00e\004\00e\005\00e\006\00e\007\00e\008\00e\009\00e\00a\00e\00b\00e\00c\00e\00d\00e\00e\00e\00f\00f\000\00f\001\00f\002\00f\003\00f\004\00f\005\00f\006\00f\007\00f\008\00f\009\00f\00a\00f\00b\00f\00c\00f\00d\00f\00e\00f\00f\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $41 (i32.const 4956) "\\\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00H\00\00\000\001\002\003\004\005\006\007\008\009\00a\00b\00c\00d\00e\00f\00g\00h\00i\00j\00k\00l\00m\00n\00o\00p\00q\00r\00s\00t\00u\00v\00w\00x\00y\00z\00\00\00\00\00")
- (data $42 (i32.const 5052) "\1c\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $43 (i32.const 5084) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\10\00\00\00l\00o\00c\00k\00t\00i\00m\00e\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $44 (i32.const 5132) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00*\00\00\00I\00n\00d\00e\00x\00i\00n\00g\00 \00t\00r\00a\00n\00s\00a\00c\00t\00i\00o\00n\00 \00\00\00")
- (data $45 (i32.const 5196) "\1c\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\06\00\00\00 \00:\00 \00\00\00\00\00\00\00")
- (data $46 (i32.const 5228) "\1c\00\00\00\00\00\00\00\00\00\00\00\1f\00\00\00\08\00\00\00\01\00\00\00\00\00\00\00\00\00\00\00")
- (data $47 (i32.const 5260) "\1c\00\00\00\00\00\00\00\00\00\00\00 \00\00\00\08\00\00\00\02\00\00\00\00\00\00\00\00\00\00\00")
- (data $48 (i32.const 5292) "\1c\00\00\00\00\00\00\00\00\00\00\00#\00\00\00\08\00\00\00\03\00\00\00\00\00\00\00\00\00\00\00")
- (data $49 (i32.const 5324) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00(\00\00\00\t\00I\00N\00P\00U\00T\00 \00-\00>\00 \00T\00x\00O\00f\00f\00s\00e\00t\00:\00 \00\00\00\00\00")
- (data $50 (i32.const 5388) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\10\00\00\00 \00I\00n\00p\00u\00t\00:\00 \00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $51 (i32.const 5436) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00(\00\00\00 \00P\00r\00e\00v\00i\00o\00u\00s\00 \00O\00u\00t\00p\00o\00i\00n\00t\00:\00 \00\00\00\00\00")
- (data $52 (i32.const 5500) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00$\00\00\00K\00e\00y\00 \00d\00o\00e\00s\00 \00n\00o\00t\00 \00e\00x\00i\00s\00t\00\00\00\00\00\00\00\00\00")
- (data $53 (i32.const 5564) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\16\00\00\00~\00l\00i\00b\00/\00m\00a\00p\00.\00t\00s\00\00\00\00\00\00\00")
- (data $54 (i32.const 5612) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\1e\00\00\00s\00p\00e\00n\00d\00i\00n\00g\00 \00r\00a\00n\00g\00e\00s\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $55 (i32.const 5676) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\10\00\00\00\t\00\t\00S\00a\00t\00s\00:\00 \00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $56 (i32.const 5724) "\1c\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\06\00\00\00 \00-\00 \00\00\00\00\00\00\00")
- (data $57 (i32.const 5756) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $58 (i32.const 5788) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00*\00\00\00\t\00O\00U\00T\00P\00U\00T\00 \00-\00>\00 \00T\00x\00O\00f\00f\00s\00e\00t\00:\00 \00\00\00")
- (data $59 (i32.const 5852) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\12\00\00\00 \00O\00u\00t\00p\00u\00t\00:\00 \00\00\00\00\00\00\00\00\00\00\00")
- (data $60 (i32.const 5900) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\16\00\00\00 \00O\00u\00t\00p\00o\00i\00n\00t\00:\00 \00\00\00\00\00\00\00")
- (data $61 (i32.const 5948) "l\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00X\00\00\00F\00o\00u\00n\00d\00 \00t\00r\00a\00n\00s\00a\00c\00t\00i\00o\00n\00 \00w\00i\00t\00h\00 \00o\00u\00t\00p\00u\00t\00s\00 \00b\00u\00t\00 \00n\00o\00 \00i\00n\00p\00u\00t\00s\00\00\00\00\00")
- (data $62 (i32.const 6060) "l\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00R\00\00\00F\00o\00u\00n\00d\00 \00t\00r\00a\00n\00s\00a\00c\00t\00i\00o\00n\00 \00w\00i\00t\00h\00 \00o\00u\00t\00p\00u\00t\00s\00 \00a\00n\00d\00 \00i\00n\00p\00u\00t\00s\00\00\00\00\00\00\00\00\00\00\00")
- (data $63 (i32.const 6172) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\1c\00\00\00A\00r\00r\00a\00y\00 \00i\00s\00 \00e\00m\00p\00t\00y\00")
- (data $64 (i32.const 6220) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\0e\00\00\00c\00o\00u\00n\00t\00:\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $65 (i32.const 6268) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $66 (i32.const 6300) "L\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00.\00\00\00\t\00C\00o\00i\00n\00b\00a\00s\00e\00 \00T\00r\00a\00n\00s\00a\00c\00t\00i\00o\00n\00:\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $67 (i32.const 6380) "\1c\00\00\00\00\00\00\00\00\00\00\00&\00\00\00\08\00\00\00\04\00\00\00\00\00\00\00\00\00\00\00")
- (data $68 (i32.const 6412) "\1c\00\00\00\00\00\00\00\00\00\00\00\'\00\00\00\08\00\00\00\05\00\00\00\00\00\00\00\00\00\00\00")
- (data $69 (i32.const 6444) "\1c\00\00\00\00\00\00\00\00\00\00\00(\00\00\00\08\00\00\00\06\00\00\00\00\00\00\00\00\00\00\00")
- (data $70 (i32.const 6476) "\1c\00\00\00\00\00\00\00\00\00\00\00)\00\00\00\08\00\00\00\07\00\00\00\00\00\00\00\00\00\00\00")
+ (data $26 (i32.const 2684) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\1a\00\00\00/\00b\00l\00o\00c\00k\00/\00b\00y\00h\00a\00s\00h\00\00\00")
+ (data $27 (i32.const 2732) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\1e\00\00\00/\00b\00l\00o\00c\00k\00/\00c\00h\00i\00l\00d\00r\00e\00n\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data $28 (i32.const 2796) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\10\00\00\00/\00t\00x\00/\00b\00y\00i\00d\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data $29 (i32.const 2844) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\"\00\00\00/\00o\00u\00t\00p\00o\00i\00n\00t\00/\00t\00o\00v\00a\00l\00u\00e\00\00\00\00\00\00\00\00\00\00\00")
+ (data $30 (i32.const 2908) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00*\00\00\00/\00i\00n\00s\00c\00r\00i\00p\00t\00i\00o\00n\00/\00b\00y\00h\00e\00i\00g\00h\00t\00\00\00")
+ (data $31 (i32.const 2972) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00(\00\00\00/\00s\00a\00t\00r\00a\00n\00g\00e\00/\00b\00y\00o\00u\00t\00p\00o\00i\00n\00t\00\00\00\00\00")
+ (data $32 (i32.const 3036) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00(\00\00\00/\00o\00r\00d\00i\00n\00a\00l\00s\00/\00b\00y\00o\00u\00t\00p\00o\00i\00n\00t\00\00\00\00\00")
+ (data $33 (i32.const 3100) "|\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00^\00\00\00E\00l\00e\00m\00e\00n\00t\00 \00t\00y\00p\00e\00 \00m\00u\00s\00t\00 \00b\00e\00 \00n\00u\00l\00l\00a\00b\00l\00e\00 \00i\00f\00 \00a\00r\00r\00a\00y\00 \00i\00s\00 \00h\00o\00l\00e\00y\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data $34 (i32.const 3228) "\1c\00\00\00\00\00\00\00\00\00\00\00 \00\00\00\08\00\00\00\01\00\00\00\00\00\00\00\00\00\00\00")
+ (data $35 (i32.const 3260) "\1c\00\00\00\00\00\00\00\00\00\00\00!\00\00\00\08\00\00\00\02\00\00\00\00\00\00\00\00\00\00\00")
+ (data $36 (i32.const 3292) "\1c\00\00\00\00\00\00\00\00\00\00\00\"\00\00\00\08\00\00\00\03\00\00\00\00\00\00\00\00\00\00\00")
+ (data $37 (i32.const 3324) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00$\00\00\00K\00e\00y\00 \00d\00o\00e\00s\00 \00n\00o\00t\00 \00e\00x\00i\00s\00t\00\00\00\00\00\00\00\00\00")
+ (data $38 (i32.const 3388) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\16\00\00\00~\00l\00i\00b\00/\00m\00a\00p\00.\00t\00s\00\00\00\00\00\00\00")
+ (data $39 (i32.const 3436) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data $40 (i32.const 3468) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\1c\00\00\00A\00r\00r\00a\00y\00 \00i\00s\00 \00e\00m\00p\00t\00y\00")
+ (data $41 (i32.const 3516) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data $42 (i32.const 3548) "\1c\00\00\00\00\00\00\00\00\00\00\00%\00\00\00\08\00\00\00\04\00\00\00\00\00\00\00\00\00\00\00")
+ (data $43 (i32.const 3580) "\1c\00\00\00\00\00\00\00\00\00\00\00&\00\00\00\08\00\00\00\05\00\00\00\00\00\00\00\00\00\00\00")
+ (data $44 (i32.const 3612) "\1c\00\00\00\00\00\00\00\00\00\00\00\'\00\00\00\08\00\00\00\06\00\00\00\00\00\00\00\00\00\00\00")
+ (data $45 (i32.const 3644) "\1c\00\00\00\00\00\00\00\00\00\00\00(\00\00\00\08\00\00\00\07\00\00\00\00\00\00\00\00\00\00\00")
  (table $0 8 8 funcref)
- (elem $0 (i32.const 1) $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|0 $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|1 $~lib/metashrew-as/assembly/utils/utils/concat~anonymous|0 $~lib/metashrew-as/assembly/indexer/index/_flush~anonymous|0 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|0 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|1 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|2)
+ (elem $0 (i32.const 1) $~lib/metashrew-as/assembly/utils/utils/concat~anonymous|0 $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|0 $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|1 $~lib/metashrew-as/assembly/indexer/index/_flush~anonymous|0 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|0 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|1 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|2)
  (export "_start" (func $assembly/index/_start))
  (export "memory" (memory $0))
  (start $~start)
@@ -1108,12 +1079,12 @@
   call $start:~lib/metashrew-as/assembly/utils/b58
  )
  (func $start:~lib/metashrew-as/assembly/blockdata/transaction
-  call $start:~lib/metashrew-as/assembly/utils/logging
   call $start:~lib/metashrew-as/assembly/utils/sha256
   call $start:~lib/metashrew-as/assembly/utils/yabsp
   call $start:~lib/metashrew-as/assembly/blockdata/address
  )
  (func $start:~lib/metashrew-as/assembly/blockdata/block
+  call $start:~lib/metashrew-as/assembly/utils/logging
   call $start:~lib/metashrew-as/assembly/blockdata/transaction
  )
  (func $~lib/metashrew-as/assembly/blockdata/sat/Sat#set:_idx (param $this i32) (param $_idx i64)
@@ -1774,36 +1745,50 @@
   global.set $~argumentsLength
   i32.const 0
   call $~lib/string/String.UTF8.encode@varargs
-  global.set $assembly/index/HEIGHT_TO_BLOCK_HEADER
+  global.set $assembly/index/HEIGHT_TO_HASH
   i32.const 2704
   i32.const 0
   i32.const 1
   global.set $~argumentsLength
   i32.const 0
   call $~lib/string/String.UTF8.encode@varargs
-  global.set $assembly/index/TRANSACTION_BY_ID
+  global.set $assembly/index/HASH_TO_HEIGHT
   i32.const 2752
   i32.const 0
   i32.const 1
   global.set $~argumentsLength
   i32.const 0
   call $~lib/string/String.UTF8.encode@varargs
-  global.set $assembly/index/OUTPOINT_TO_VALUE
+  global.set $assembly/index/HASH_TO_CHILDREN
   i32.const 2816
   i32.const 0
   i32.const 1
   global.set $~argumentsLength
   i32.const 0
   call $~lib/string/String.UTF8.encode@varargs
+  global.set $assembly/index/TRANSACTION_BY_ID
+  i32.const 2864
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/string/String.UTF8.encode@varargs
+  global.set $assembly/index/OUTPOINT_TO_VALUE
+  i32.const 2928
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/string/String.UTF8.encode@varargs
   global.set $assembly/index/HEIGHT_TO_INSCRIPTION_ID
-  i32.const 2880
+  i32.const 2992
   i32.const 0
   i32.const 1
   global.set $~argumentsLength
   i32.const 0
   call $~lib/string/String.UTF8.encode@varargs
   global.set $assembly/index/SAT_RANGE_BY_OUTPOINT
-  i32.const 2944
+  i32.const 3056
   i32.const 0
   i32.const 1
   global.set $~argumentsLength
@@ -3367,7 +3352,7 @@
   local.get $value
   i32.eqz
   if
-   i32.const 3008
+   i32.const 3120
    i32.const 2592
    i32.const 118
    i32.const 40
@@ -3881,934 +3866,6 @@
   call $~lib/metashrew-as/assembly/blockdata/block/Block#set:bytes
   local.get $this
  )
- (func $~lib/util/number/decimalCount32 (param $value i32) (result i32)
-  local.get $value
-  i32.const 100000
-  i32.lt_u
-  if
-   local.get $value
-   i32.const 100
-   i32.lt_u
-   if
-    i32.const 1
-    local.get $value
-    i32.const 10
-    i32.ge_u
-    i32.add
-    return
-   else
-    i32.const 3
-    local.get $value
-    i32.const 10000
-    i32.ge_u
-    i32.add
-    local.get $value
-    i32.const 1000
-    i32.ge_u
-    i32.add
-    return
-   end
-   unreachable
-  else
-   local.get $value
-   i32.const 10000000
-   i32.lt_u
-   if
-    i32.const 6
-    local.get $value
-    i32.const 1000000
-    i32.ge_u
-    i32.add
-    return
-   else
-    i32.const 8
-    local.get $value
-    i32.const 1000000000
-    i32.ge_u
-    i32.add
-    local.get $value
-    i32.const 100000000
-    i32.ge_u
-    i32.add
-    return
-   end
-   unreachable
-  end
-  unreachable
- )
- (func $~lib/util/number/utoa32_dec_lut (param $buffer i32) (param $num i32) (param $offset i32)
-  (local $t i32)
-  (local $r i32)
-  (local $d1 i32)
-  (local $d2 i32)
-  (local $digits1 i64)
-  (local $digits2 i64)
-  (local $t|9 i32)
-  (local $d1|10 i32)
-  (local $digits i32)
-  (local $digits|12 i32)
-  (local $digit i32)
-  loop $while-continue|0
-   local.get $num
-   i32.const 10000
-   i32.ge_u
-   if
-    local.get $num
-    i32.const 10000
-    i32.div_u
-    local.set $t
-    local.get $num
-    i32.const 10000
-    i32.rem_u
-    local.set $r
-    local.get $t
-    local.set $num
-    local.get $r
-    i32.const 100
-    i32.div_u
-    local.set $d1
-    local.get $r
-    i32.const 100
-    i32.rem_u
-    local.set $d2
-    i32.const 3500
-    local.get $d1
-    i32.const 2
-    i32.shl
-    i32.add
-    i64.load32_u
-    local.set $digits1
-    i32.const 3500
-    local.get $d2
-    i32.const 2
-    i32.shl
-    i32.add
-    i64.load32_u
-    local.set $digits2
-    local.get $offset
-    i32.const 4
-    i32.sub
-    local.set $offset
-    local.get $buffer
-    local.get $offset
-    i32.const 1
-    i32.shl
-    i32.add
-    local.get $digits1
-    local.get $digits2
-    i64.const 32
-    i64.shl
-    i64.or
-    i64.store
-    br $while-continue|0
-   end
-  end
-  local.get $num
-  i32.const 100
-  i32.ge_u
-  if
-   local.get $num
-   i32.const 100
-   i32.div_u
-   local.set $t|9
-   local.get $num
-   i32.const 100
-   i32.rem_u
-   local.set $d1|10
-   local.get $t|9
-   local.set $num
-   local.get $offset
-   i32.const 2
-   i32.sub
-   local.set $offset
-   i32.const 3500
-   local.get $d1|10
-   i32.const 2
-   i32.shl
-   i32.add
-   i32.load
-   local.set $digits
-   local.get $buffer
-   local.get $offset
-   i32.const 1
-   i32.shl
-   i32.add
-   local.get $digits
-   i32.store
-  end
-  local.get $num
-  i32.const 10
-  i32.ge_u
-  if
-   local.get $offset
-   i32.const 2
-   i32.sub
-   local.set $offset
-   i32.const 3500
-   local.get $num
-   i32.const 2
-   i32.shl
-   i32.add
-   i32.load
-   local.set $digits|12
-   local.get $buffer
-   local.get $offset
-   i32.const 1
-   i32.shl
-   i32.add
-   local.get $digits|12
-   i32.store
-  else
-   local.get $offset
-   i32.const 1
-   i32.sub
-   local.set $offset
-   i32.const 48
-   local.get $num
-   i32.add
-   local.set $digit
-   local.get $buffer
-   local.get $offset
-   i32.const 1
-   i32.shl
-   i32.add
-   local.get $digit
-   i32.store16
-  end
- )
- (func $~lib/util/number/utoa_hex_lut (param $buffer i32) (param $num i64) (param $offset i32)
-  loop $while-continue|0
-   local.get $offset
-   i32.const 2
-   i32.ge_u
-   if
-    local.get $offset
-    i32.const 2
-    i32.sub
-    local.set $offset
-    local.get $buffer
-    local.get $offset
-    i32.const 1
-    i32.shl
-    i32.add
-    i32.const 3920
-    local.get $num
-    i32.wrap_i64
-    i32.const 255
-    i32.and
-    i32.const 2
-    i32.shl
-    i32.add
-    i32.load
-    i32.store
-    local.get $num
-    i64.const 8
-    i64.shr_u
-    local.set $num
-    br $while-continue|0
-   end
-  end
-  local.get $offset
-  i32.const 1
-  i32.and
-  if
-   local.get $buffer
-   i32.const 3920
-   local.get $num
-   i32.wrap_i64
-   i32.const 6
-   i32.shl
-   i32.add
-   i32.load16_u
-   i32.store16
-  end
- )
- (func $~lib/util/number/ulog_base (param $num i64) (param $base i32) (result i32)
-  (local $value i32)
-  (local $b64 i64)
-  (local $b i64)
-  (local $e i32)
-  block $~lib/util/number/isPowerOf2<i32>|inlined.0 (result i32)
-   local.get $base
-   local.set $value
-   local.get $value
-   i32.popcnt
-   i32.const 1
-   i32.eq
-   br $~lib/util/number/isPowerOf2<i32>|inlined.0
-  end
-  if
-   i32.const 63
-   local.get $num
-   i64.clz
-   i32.wrap_i64
-   i32.sub
-   i32.const 31
-   local.get $base
-   i32.clz
-   i32.sub
-   i32.div_u
-   i32.const 1
-   i32.add
-   return
-  end
-  local.get $base
-  i64.extend_i32_s
-  local.set $b64
-  local.get $b64
-  local.set $b
-  i32.const 1
-  local.set $e
-  loop $while-continue|0
-   local.get $num
-   local.get $b
-   i64.ge_u
-   if
-    local.get $num
-    local.get $b
-    i64.div_u
-    local.set $num
-    local.get $b
-    local.get $b
-    i64.mul
-    local.set $b
-    local.get $e
-    i32.const 1
-    i32.shl
-    local.set $e
-    br $while-continue|0
-   end
-  end
-  loop $while-continue|1
-   local.get $num
-   i64.const 1
-   i64.ge_u
-   if
-    local.get $num
-    local.get $b64
-    i64.div_u
-    local.set $num
-    local.get $e
-    i32.const 1
-    i32.add
-    local.set $e
-    br $while-continue|1
-   end
-  end
-  local.get $e
-  i32.const 1
-  i32.sub
-  return
- )
- (func $~lib/util/number/utoa64_any_core (param $buffer i32) (param $num i64) (param $offset i32) (param $radix i32)
-  (local $base i64)
-  (local $shift i64)
-  (local $mask i64)
-  (local $q i64)
-  local.get $radix
-  i64.extend_i32_s
-  local.set $base
-  local.get $radix
-  local.get $radix
-  i32.const 1
-  i32.sub
-  i32.and
-  i32.const 0
-  i32.eq
-  if
-   local.get $radix
-   i32.ctz
-   i32.const 7
-   i32.and
-   i64.extend_i32_s
-   local.set $shift
-   local.get $base
-   i64.const 1
-   i64.sub
-   local.set $mask
-   loop $do-loop|0
-    local.get $offset
-    i32.const 1
-    i32.sub
-    local.set $offset
-    local.get $buffer
-    local.get $offset
-    i32.const 1
-    i32.shl
-    i32.add
-    i32.const 4976
-    local.get $num
-    local.get $mask
-    i64.and
-    i32.wrap_i64
-    i32.const 1
-    i32.shl
-    i32.add
-    i32.load16_u
-    i32.store16
-    local.get $num
-    local.get $shift
-    i64.shr_u
-    local.set $num
-    local.get $num
-    i64.const 0
-    i64.ne
-    br_if $do-loop|0
-   end
-  else
-   loop $do-loop|1
-    local.get $offset
-    i32.const 1
-    i32.sub
-    local.set $offset
-    local.get $num
-    local.get $base
-    i64.div_u
-    local.set $q
-    local.get $buffer
-    local.get $offset
-    i32.const 1
-    i32.shl
-    i32.add
-    i32.const 4976
-    local.get $num
-    local.get $q
-    local.get $base
-    i64.mul
-    i64.sub
-    i32.wrap_i64
-    i32.const 1
-    i32.shl
-    i32.add
-    i32.load16_u
-    i32.store16
-    local.get $q
-    local.set $num
-    local.get $num
-    i64.const 0
-    i64.ne
-    br_if $do-loop|1
-   end
-  end
- )
- (func $~lib/util/number/utoa32 (param $value i32) (param $radix i32) (result i32)
-  (local $out i32)
-  (local $decimals i32)
-  (local $buffer i32)
-  (local $num i32)
-  (local $offset i32)
-  (local $decimals|7 i32)
-  (local $buffer|8 i32)
-  (local $num|9 i32)
-  (local $offset|10 i32)
-  (local $decimals|11 i32)
-  local.get $radix
-  i32.const 2
-  i32.lt_s
-  if (result i32)
-   i32.const 1
-  else
-   local.get $radix
-   i32.const 36
-   i32.gt_s
-  end
-  if
-   i32.const 3296
-   i32.const 3424
-   i32.const 350
-   i32.const 5
-   call $~lib/builtins/abort
-   unreachable
-  end
-  local.get $value
-  i32.eqz
-  if
-   i32.const 3488
-   return
-  end
-  local.get $radix
-  i32.const 10
-  i32.eq
-  if
-   local.get $value
-   call $~lib/util/number/decimalCount32
-   local.set $decimals
-   local.get $decimals
-   i32.const 1
-   i32.shl
-   i32.const 2
-   call $~lib/rt/stub/__new
-   local.set $out
-   local.get $out
-   local.set $buffer
-   local.get $value
-   local.set $num
-   local.get $decimals
-   local.set $offset
-   i32.const 0
-   i32.const 1
-   i32.ge_s
-   drop
-   local.get $buffer
-   local.get $num
-   local.get $offset
-   call $~lib/util/number/utoa32_dec_lut
-  else
-   local.get $radix
-   i32.const 16
-   i32.eq
-   if
-    i32.const 31
-    local.get $value
-    i32.clz
-    i32.sub
-    i32.const 2
-    i32.shr_s
-    i32.const 1
-    i32.add
-    local.set $decimals|7
-    local.get $decimals|7
-    i32.const 1
-    i32.shl
-    i32.const 2
-    call $~lib/rt/stub/__new
-    local.set $out
-    local.get $out
-    local.set $buffer|8
-    local.get $value
-    local.set $num|9
-    local.get $decimals|7
-    local.set $offset|10
-    i32.const 0
-    i32.const 1
-    i32.ge_s
-    drop
-    local.get $buffer|8
-    local.get $num|9
-    i64.extend_i32_u
-    local.get $offset|10
-    call $~lib/util/number/utoa_hex_lut
-   else
-    local.get $value
-    i64.extend_i32_u
-    local.get $radix
-    call $~lib/util/number/ulog_base
-    local.set $decimals|11
-    local.get $decimals|11
-    i32.const 1
-    i32.shl
-    i32.const 2
-    call $~lib/rt/stub/__new
-    local.set $out
-    local.get $out
-    local.get $value
-    i64.extend_i32_u
-    local.get $decimals|11
-    local.get $radix
-    call $~lib/util/number/utoa64_any_core
-   end
-  end
-  local.get $out
-  return
- )
- (func $~lib/number/U32#toString (param $this i32) (param $radix i32) (result i32)
-  local.get $this
-  local.get $radix
-  call $~lib/util/number/utoa32
-  return
- )
- (func $~lib/metashrew-as/assembly/blockdata/block/Block#get:transactions (param $this i32) (result i32)
-  local.get $this
-  i32.load offset=8
- )
- (func $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Transaction>#get:length (param $this i32) (result i32)
-  local.get $this
-  call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Transaction>#get:length_
-  return
- )
- (func $~lib/util/number/itoa32 (param $value i32) (param $radix i32) (result i32)
-  (local $sign i32)
-  (local $out i32)
-  (local $decimals i32)
-  (local $buffer i32)
-  (local $num i32)
-  (local $offset i32)
-  (local $decimals|8 i32)
-  (local $buffer|9 i32)
-  (local $num|10 i32)
-  (local $offset|11 i32)
-  (local $val32 i32)
-  (local $decimals|13 i32)
-  local.get $radix
-  i32.const 2
-  i32.lt_s
-  if (result i32)
-   i32.const 1
-  else
-   local.get $radix
-   i32.const 36
-   i32.gt_s
-  end
-  if
-   i32.const 3296
-   i32.const 3424
-   i32.const 373
-   i32.const 5
-   call $~lib/builtins/abort
-   unreachable
-  end
-  local.get $value
-  i32.eqz
-  if
-   i32.const 3488
-   return
-  end
-  local.get $value
-  i32.const 31
-  i32.shr_u
-  i32.const 1
-  i32.shl
-  local.set $sign
-  local.get $sign
-  if
-   i32.const 0
-   local.get $value
-   i32.sub
-   local.set $value
-  end
-  local.get $radix
-  i32.const 10
-  i32.eq
-  if
-   local.get $value
-   call $~lib/util/number/decimalCount32
-   local.set $decimals
-   local.get $decimals
-   i32.const 1
-   i32.shl
-   local.get $sign
-   i32.add
-   i32.const 2
-   call $~lib/rt/stub/__new
-   local.set $out
-   local.get $out
-   local.get $sign
-   i32.add
-   local.set $buffer
-   local.get $value
-   local.set $num
-   local.get $decimals
-   local.set $offset
-   i32.const 0
-   i32.const 1
-   i32.ge_s
-   drop
-   local.get $buffer
-   local.get $num
-   local.get $offset
-   call $~lib/util/number/utoa32_dec_lut
-  else
-   local.get $radix
-   i32.const 16
-   i32.eq
-   if
-    i32.const 31
-    local.get $value
-    i32.clz
-    i32.sub
-    i32.const 2
-    i32.shr_s
-    i32.const 1
-    i32.add
-    local.set $decimals|8
-    local.get $decimals|8
-    i32.const 1
-    i32.shl
-    local.get $sign
-    i32.add
-    i32.const 2
-    call $~lib/rt/stub/__new
-    local.set $out
-    local.get $out
-    local.get $sign
-    i32.add
-    local.set $buffer|9
-    local.get $value
-    local.set $num|10
-    local.get $decimals|8
-    local.set $offset|11
-    i32.const 0
-    i32.const 1
-    i32.ge_s
-    drop
-    local.get $buffer|9
-    local.get $num|10
-    i64.extend_i32_u
-    local.get $offset|11
-    call $~lib/util/number/utoa_hex_lut
-   else
-    local.get $value
-    local.set $val32
-    local.get $val32
-    i64.extend_i32_u
-    local.get $radix
-    call $~lib/util/number/ulog_base
-    local.set $decimals|13
-    local.get $decimals|13
-    i32.const 1
-    i32.shl
-    local.get $sign
-    i32.add
-    i32.const 2
-    call $~lib/rt/stub/__new
-    local.set $out
-    local.get $out
-    local.get $sign
-    i32.add
-    local.get $val32
-    i64.extend_i32_u
-    local.get $decimals|13
-    local.get $radix
-    call $~lib/util/number/utoa64_any_core
-   end
-  end
-  local.get $sign
-  if
-   local.get $out
-   i32.const 45
-   i32.store16
-  end
-  local.get $out
-  return
- )
- (func $~lib/number/I32#toString (param $this i32) (param $radix i32) (result i32)
-  local.get $this
-  local.get $radix
-  call $~lib/util/number/itoa32
-  return
- )
- (func $~lib/staticarray/StaticArray<~lib/string/String>#__uset (param $this i32) (param $index i32) (param $value i32)
-  local.get $this
-  local.get $index
-  i32.const 2
-  i32.shl
-  i32.add
-  local.get $value
-  i32.store
-  i32.const 1
-  drop
-  local.get $this
-  local.get $value
-  i32.const 1
-  call $~lib/rt/stub/__link
- )
- (func $~lib/staticarray/StaticArray<~lib/string/String>#get:length (param $this i32) (result i32)
-  local.get $this
-  i32.const 20
-  i32.sub
-  call $~lib/rt/common/OBJECT#get:rtSize
-  i32.const 2
-  i32.shr_u
-  return
- )
- (func $~lib/util/string/joinStringArray (param $dataStart i32) (param $length i32) (param $separator i32) (result i32)
-  (local $lastIndex i32)
-  (local $4 i32)
-  (local $estLen i32)
-  (local $value i32)
-  (local $i i32)
-  (local $offset i32)
-  (local $sepLen i32)
-  (local $result i32)
-  (local $i|11 i32)
-  (local $valueLen i32)
-  local.get $length
-  i32.const 1
-  i32.sub
-  local.set $lastIndex
-  local.get $lastIndex
-  i32.const 0
-  i32.lt_s
-  if
-   i32.const 5072
-   return
-  end
-  local.get $lastIndex
-  i32.eqz
-  if
-   local.get $dataStart
-   i32.load
-   local.tee $4
-   if (result i32)
-    local.get $4
-   else
-    i32.const 5072
-   end
-   return
-  end
-  i32.const 0
-  local.set $estLen
-  i32.const 0
-  local.set $i
-  loop $for-loop|0
-   local.get $i
-   local.get $length
-   i32.lt_s
-   if
-    local.get $dataStart
-    local.get $i
-    i32.const 2
-    i32.shl
-    i32.add
-    i32.load
-    local.set $value
-    local.get $value
-    i32.const 0
-    i32.ne
-    if
-     local.get $estLen
-     local.get $value
-     call $~lib/string/String#get:length
-     i32.add
-     local.set $estLen
-    end
-    local.get $i
-    i32.const 1
-    i32.add
-    local.set $i
-    br $for-loop|0
-   end
-  end
-  i32.const 0
-  local.set $offset
-  local.get $separator
-  call $~lib/string/String#get:length
-  local.set $sepLen
-  local.get $estLen
-  local.get $sepLen
-  local.get $lastIndex
-  i32.mul
-  i32.add
-  i32.const 1
-  i32.shl
-  i32.const 2
-  call $~lib/rt/stub/__new
-  local.set $result
-  i32.const 0
-  local.set $i|11
-  loop $for-loop|1
-   local.get $i|11
-   local.get $lastIndex
-   i32.lt_s
-   if
-    local.get $dataStart
-    local.get $i|11
-    i32.const 2
-    i32.shl
-    i32.add
-    i32.load
-    local.set $value
-    local.get $value
-    i32.const 0
-    i32.ne
-    if
-     local.get $value
-     call $~lib/string/String#get:length
-     local.set $valueLen
-     local.get $result
-     local.get $offset
-     i32.const 1
-     i32.shl
-     i32.add
-     local.get $value
-     local.get $valueLen
-     i32.const 1
-     i32.shl
-     memory.copy
-     local.get $offset
-     local.get $valueLen
-     i32.add
-     local.set $offset
-    end
-    local.get $sepLen
-    if
-     local.get $result
-     local.get $offset
-     i32.const 1
-     i32.shl
-     i32.add
-     local.get $separator
-     local.get $sepLen
-     i32.const 1
-     i32.shl
-     memory.copy
-     local.get $offset
-     local.get $sepLen
-     i32.add
-     local.set $offset
-    end
-    local.get $i|11
-    i32.const 1
-    i32.add
-    local.set $i|11
-    br $for-loop|1
-   end
-  end
-  local.get $dataStart
-  local.get $lastIndex
-  i32.const 2
-  i32.shl
-  i32.add
-  i32.load
-  local.set $value
-  local.get $value
-  i32.const 0
-  i32.ne
-  if
-   local.get $result
-   local.get $offset
-   i32.const 1
-   i32.shl
-   i32.add
-   local.get $value
-   local.get $value
-   call $~lib/string/String#get:length
-   i32.const 1
-   i32.shl
-   memory.copy
-  end
-  local.get $result
-  return
- )
- (func $~lib/staticarray/StaticArray<~lib/string/String>#join (param $this i32) (param $separator i32) (result i32)
-  i32.const 0
-  drop
-  i32.const 0
-  drop
-  i32.const 0
-  drop
-  i32.const 0
-  i32.const 1
-  i32.lt_s
-  drop
-  i32.const 1
-  drop
-  local.get $this
-  local.get $this
-  call $~lib/staticarray/StaticArray<~lib/string/String>#get:length
-  local.get $separator
-  call $~lib/util/string/joinStringArray
-  return
- )
- (func $~lib/metashrew-as/assembly/utils/logging/Console#log (param $this i32) (param $v i32)
-  local.get $v
-  i32.const 1
-  i32.const 2
-  global.set $~argumentsLength
-  i32.const 0
-  call $~lib/string/String.UTF8.encode@varargs
-  call $~lib/metashrew-as/assembly/utils/logging/__log
- )
  (func $~lib/metashrew-as/assembly/blockdata/height/Height#set:_idx (param $this i32) (param $_idx i32)
   local.get $this
   local.get $_idx
@@ -4819,7 +3876,7 @@
   i32.eqz
   if
    i32.const 4
-   i32.const 27
+   i32.const 26
    call $~lib/rt/stub/__new
    local.set $this
   end
@@ -4864,7 +3921,7 @@
   i32.eqz
   if
    i32.const 16
-   i32.const 29
+   i32.const 28
    call $~lib/rt/stub/__new
    local.set $this
   end
@@ -5009,7 +4066,7 @@
   local.get $value
   i32.eqz
   if
-   i32.const 3008
+   i32.const 3120
    i32.const 2592
    i32.const 118
    i32.const 40
@@ -5186,6 +4243,15 @@
   local.get $len
   return
  )
+ (func $~lib/metashrew-as/assembly/blockdata/block/Block#get:transactions (param $this i32) (result i32)
+  local.get $this
+  i32.load offset=8
+ )
+ (func $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Transaction>#get:length (param $this i32) (result i32)
+  local.get $this
+  call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Transaction>#get:length_
+  return
+ )
  (func $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Transaction>#__get (param $this i32) (param $index i32) (result i32)
   (local $value i32)
   local.get $index
@@ -5216,7 +4282,7 @@
   local.get $value
   i32.eqz
   if
-   i32.const 3008
+   i32.const 3120
    i32.const 2592
    i32.const 118
    i32.const 40
@@ -5226,318 +4292,314 @@
   local.get $value
   return
  )
- (func $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:locktime (param $this i32) (result i32)
+ (func $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Input>#get:length (param $this i32) (result i32)
   local.get $this
-  i32.load offset=20
+  call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Input>#get:length_
+  return
  )
- (func $~lib/string/String#concat (param $this i32) (param $other i32) (result i32)
-  (local $thisSize i32)
-  (local $otherSize i32)
-  (local $outSize i32)
-  (local $out i32)
+ (func $~lib/metashrew-as/assembly/blockdata/transaction/Input#get:hash (param $this i32) (result i32)
   local.get $this
-  call $~lib/string/String#get:length
-  i32.const 1
-  i32.shl
-  local.set $thisSize
-  local.get $other
-  call $~lib/string/String#get:length
-  i32.const 1
-  i32.shl
-  local.set $otherSize
-  local.get $thisSize
-  local.get $otherSize
-  i32.add
-  local.set $outSize
-  local.get $outSize
+  i32.load offset=4
+ )
+ (func $~lib/metashrew-as/assembly/utils/memcpy/memcpy (param $dest i32) (param $src i32) (param $len i32) (result i32)
+  local.get $dest
+  local.get $src
+  local.get $len
+  memory.copy
+  local.get $dest
+  return
+ )
+ (func $~lib/metashrew-as/assembly/utils/box/Box#toArrayBuffer (param $this i32) (result i32)
+  (local $result i32)
   i32.const 0
-  i32.eq
-  if
-   i32.const 5072
-   return
+  local.get $this
+  call $~lib/metashrew-as/assembly/utils/box/Box#get:len
+  call $~lib/arraybuffer/ArrayBuffer#constructor
+  local.set $result
+  local.get $result
+  local.get $this
+  call $~lib/metashrew-as/assembly/utils/box/Box#get:start
+  local.get $this
+  call $~lib/metashrew-as/assembly/utils/box/Box#get:len
+  call $~lib/metashrew-as/assembly/utils/memcpy/memcpy
+  drop
+  local.get $result
+  return
+ )
+ (func $~lib/metashrew-as/assembly/utils/utils/reverse (param $data i32) (result i32)
+  (local $result i32)
+  (local $i i32)
+  i32.const 0
+  local.get $data
+  call $~lib/arraybuffer/ArrayBuffer#get:byteLength
+  call $~lib/arraybuffer/ArrayBuffer#constructor
+  local.set $result
+  i32.const 0
+  local.set $i
+  loop $for-loop|0
+   local.get $i
+   local.get $result
+   call $~lib/arraybuffer/ArrayBuffer#get:byteLength
+   i32.lt_s
+   if
+    local.get $result
+    local.get $i
+    i32.add
+    local.get $data
+    local.get $result
+    call $~lib/arraybuffer/ArrayBuffer#get:byteLength
+    i32.add
+    local.get $i
+    i32.sub
+    i32.const 1
+    i32.sub
+    i32.load8_u
+    i32.store8
+    local.get $i
+    i32.const 1
+    i32.add
+    local.set $i
+    br $for-loop|0
+   end
   end
-  local.get $outSize
-  i32.const 2
-  call $~lib/rt/stub/__new
-  local.set $out
-  local.get $out
-  local.get $this
-  local.get $thisSize
-  memory.copy
-  local.get $out
-  local.get $thisSize
-  i32.add
-  local.get $other
-  local.get $otherSize
-  memory.copy
-  local.get $out
+  local.get $result
   return
  )
- (func $~lib/string/String.__concat (param $left i32) (param $right i32) (result i32)
-  local.get $left
-  local.get $right
-  call $~lib/string/String#concat
-  return
- )
- (func $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:_txid (param $this i32) (result i32)
-  local.get $this
-  i32.load offset=32
- )
- (func $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:bytes (param $this i32) (result i32)
-  local.get $this
-  i32.load
- )
- (func $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:buffer (param $this i32) (param $buffer i32)
-  local.get $this
+ (func $~lib/metashrew-as/assembly/utils/utils/primitiveToBuffer<u32> (param $value i32) (result i32)
+  (local $buffer i32)
+  i32.const 0
+  i32.const 4
+  call $~lib/arraybuffer/ArrayBuffer#constructor
+  local.set $buffer
   local.get $buffer
+  local.get $value
+  i32.store
+  local.get $buffer
+  return
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:bytes (param $this i32) (param $bytes i32)
+  local.get $this
+  local.get $bytes
   i32.store
   local.get $this
-  local.get $buffer
+  local.get $bytes
   i32.const 0
   call $~lib/rt/stub/__link
  )
- (func $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:dataStart (param $this i32) (param $dataStart i32)
+ (func $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:txid (param $this i32) (param $txid i32)
   local.get $this
-  local.get $dataStart
+  local.get $txid
   i32.store offset=4
- )
- (func $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:byteLength (param $this i32) (param $byteLength i32)
   local.get $this
-  local.get $byteLength
+  local.get $txid
+  i32.const 0
+  call $~lib/rt/stub/__link
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:index (param $this i32) (param $index i32)
+  local.get $this
+  local.get $index
   i32.store offset=8
  )
- (func $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:length_ (param $this i32) (param $length_ i32)
+ (func $~lib/metashrew-as/assembly/utils/box/Box#shrinkBack (param $this i32) (param $distance i32) (result i32)
   local.get $this
-  local.get $length_
-  i32.store offset=12
+  local.get $this
+  call $~lib/metashrew-as/assembly/utils/box/Box#get:len
+  local.get $distance
+  i32.sub
+  call $~lib/metashrew-as/assembly/utils/box/Box#set:len
+  local.get $this
+  return
  )
- (func $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#constructor (param $this i32) (param $length i32) (result i32)
-  (local $2 i32)
-  (local $3 i32)
-  (local $bufferSize i32)
-  (local $buffer i32)
+ (func $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#constructor (param $this i32) (param $bytes i32) (result i32)
   local.get $this
   i32.eqz
   if
-   i32.const 16
-   i32.const 30
+   i32.const 12
+   i32.const 29
    call $~lib/rt/stub/__new
    local.set $this
   end
   local.get $this
   i32.const 0
-  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:buffer
+  call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:bytes
   local.get $this
   i32.const 0
-  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:dataStart
+  call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:txid
   local.get $this
   i32.const 0
-  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:byteLength
+  call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:index
+  local.get $this
+  call $~lib/metashrew-as/assembly/utils/pointer/nullptr<~lib/metashrew-as/assembly/utils/box/Box>
+  call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:bytes
+  local.get $this
+  call $~lib/metashrew-as/assembly/utils/pointer/nullptr<~lib/metashrew-as/assembly/utils/box/Box>
+  call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:txid
   local.get $this
   i32.const 0
-  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:length_
-  local.get $length
-  i32.const 1073741820
-  i32.const 2
-  i32.shr_u
-  i32.gt_u
+  call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:index
+  local.get $bytes
+  call $~lib/metashrew-as/assembly/utils/box/Box#get:len
+  i32.const 36
+  i32.eq
   if
-   i32.const 1168
-   i32.const 2592
-   i32.const 70
-   i32.const 60
-   call $~lib/builtins/abort
-   unreachable
+   local.get $this
+   local.get $bytes
+   call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:bytes
+   local.get $this
+   local.get $bytes
+   i32.const 0
+   call $~lib/metashrew-as/assembly/utils/box/Box#sliceFrom
+   i32.const 4
+   call $~lib/metashrew-as/assembly/utils/box/Box#shrinkBack
+   call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:txid
+   local.get $this
+   local.get $bytes
+   i32.const 32
+   call $~lib/metashrew-as/assembly/utils/box/Box#sliceFrom
+   call $~lib/metashrew-as/assembly/utils/utils/parsePrimitive<u32>
+   call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:index
   end
-  local.get $length
-  local.tee $2
-  i32.const 8
-  local.tee $3
-  local.get $2
-  local.get $3
-  i32.gt_u
-  select
-  i32.const 2
-  i32.shl
-  local.set $bufferSize
-  local.get $bufferSize
-  i32.const 1
-  call $~lib/rt/stub/__new
-  local.set $buffer
-  i32.const 0
-  global.get $~lib/shared/runtime/Runtime.Incremental
-  i32.ne
-  drop
-  local.get $buffer
-  i32.const 0
-  local.get $bufferSize
-  memory.fill
-  local.get $this
-  local.get $buffer
-  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:buffer
-  local.get $this
-  local.get $buffer
-  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:dataStart
-  local.get $this
-  local.get $bufferSize
-  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:byteLength
-  local.get $this
-  local.get $length
-  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:length_
   local.get $this
  )
- (func $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#get:length_ (param $this i32) (result i32)
+ (func $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#get:length_ (param $this i32) (result i32)
   local.get $this
   i32.load offset=12
  )
- (func $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#get:dataStart (param $this i32) (result i32)
+ (func $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#set:length_ (param $this i32) (param $length_ i32)
+  local.get $this
+  local.get $length_
+  i32.store offset=12
+ )
+ (func $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#get:dataStart (param $this i32) (result i32)
   local.get $this
   i32.load offset=4
  )
- (func $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#push (param $this i32) (param $value i32) (result i32)
-  (local $oldLen i32)
-  (local $len i32)
+ (func $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#__set (param $this i32) (param $index i32) (param $value i32)
+  local.get $index
   local.get $this
-  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#get:length_
-  local.set $oldLen
-  local.get $oldLen
-  i32.const 1
-  i32.add
-  local.set $len
+  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#get:length_
+  i32.ge_u
+  if
+   local.get $index
+   i32.const 0
+   i32.lt_s
+   if
+    i32.const 2464
+    i32.const 2592
+    i32.const 130
+    i32.const 22
+    call $~lib/builtins/abort
+    unreachable
+   end
+   local.get $this
+   local.get $index
+   i32.const 1
+   i32.add
+   i32.const 2
+   i32.const 1
+   call $~lib/array/ensureCapacity
+   local.get $this
+   local.get $index
+   i32.const 1
+   i32.add
+   call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#set:length_
+  end
   local.get $this
-  local.get $len
-  i32.const 2
-  i32.const 1
-  call $~lib/array/ensureCapacity
-  i32.const 1
-  drop
-  local.get $this
-  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#get:dataStart
-  local.get $oldLen
+  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#get:dataStart
+  local.get $index
   i32.const 2
   i32.shl
   i32.add
   local.get $value
   i32.store
+  i32.const 1
+  drop
   local.get $this
   local.get $value
   i32.const 1
   call $~lib/rt/stub/__link
-  local.get $this
-  local.get $len
-  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:length_
-  local.get $len
+ )
+ (func $~lib/metashrew-as/assembly/utils/utils/concat~anonymous|0 (param $v i32) (param $i i32) (param $ary i32) (result i32)
+  local.get $v
+  call $~lib/metashrew-as/assembly/utils/box/Box.from
   return
  )
- (func $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:legacyInputOutputBytes (param $this i32) (result i32)
+ (func $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#get:dataStart (param $this i32) (result i32)
   local.get $this
-  i32.load offset=28
+  i32.load offset=4
  )
- (func $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#legacyBytes (param $this i32) (result i32)
-  (local $this|1 i32)
+ (func $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#map<~lib/metashrew-as/assembly/utils/box/Box> (param $this i32) (param $fn i32) (result i32)
   (local $len i32)
-  (local $this|3 i32)
-  (local $this|4 i32)
-  (local $version i32)
-  (local $this|6 i32)
-  (local $len|7 i32)
-  (local $this|8 i32)
-  (local $this|9 i32)
-  (local $locktime i32)
+  (local $out i32)
+  (local $outStart i32)
+  (local $i i32)
+  (local $6 i32)
+  (local $7 i32)
   (local $result i32)
-  (local $result|12 i32)
   local.get $this
-  call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:flag
-  if
-   block $~lib/metashrew-as/assembly/utils/pointer/Pointer#toBox|inlined.8 (result i32)
+  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#get:length_
+  local.set $len
+  local.get $len
+  i32.const 2
+  i32.const 31
+  i32.const 0
+  call $~lib/rt/__newArray
+  local.set $out
+  local.get $out
+  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#get:dataStart
+  local.set $outStart
+  i32.const 0
+  local.set $i
+  loop $for-loop|0
+   local.get $i
+   local.get $len
+   local.tee $6
+   local.get $this
+   call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#get:length_
+   local.tee $7
+   local.get $6
+   local.get $7
+   i32.lt_s
+   select
+   i32.lt_s
+   if
     local.get $this
-    call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:bytes
-    call $~lib/metashrew-as/assembly/utils/box/Box#get:start
-    call $~lib/metashrew-as/assembly/utils/pointer/toPointer
-    local.set $this|1
-    i32.const 4
-    local.set $len
-    i32.const 0
-    block $~lib/metashrew-as/assembly/utils/pointer/Pointer#asUsize|inlined.8 (result i32)
-     local.get $this|1
-     local.set $this|3
-     block $~lib/metashrew-as/assembly/utils/pointer/Pointer#asRef<usize>|inlined.8 (result i32)
-      local.get $this|3
-      local.set $this|4
-      local.get $this|4
-      br $~lib/metashrew-as/assembly/utils/pointer/Pointer#asRef<usize>|inlined.8
-     end
-     br $~lib/metashrew-as/assembly/utils/pointer/Pointer#asUsize|inlined.8
-    end
-    local.get $len
-    call $~lib/metashrew-as/assembly/utils/box/Box#constructor
-    br $~lib/metashrew-as/assembly/utils/pointer/Pointer#toBox|inlined.8
-   end
-   local.set $version
-   block $~lib/metashrew-as/assembly/utils/pointer/Pointer#toBox|inlined.9 (result i32)
-    local.get $this
-    call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:bytes
-    call $~lib/metashrew-as/assembly/utils/box/Box#get:start
-    local.get $this
-    call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:bytes
-    call $~lib/metashrew-as/assembly/utils/box/Box#get:len
+    call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#get:dataStart
+    local.get $i
+    i32.const 2
+    i32.shl
     i32.add
-    i32.const 4
-    i32.sub
-    call $~lib/metashrew-as/assembly/utils/pointer/toPointer
-    local.set $this|6
-    i32.const 4
-    local.set $len|7
-    i32.const 0
-    block $~lib/metashrew-as/assembly/utils/pointer/Pointer#asUsize|inlined.9 (result i32)
-     local.get $this|6
-     local.set $this|8
-     block $~lib/metashrew-as/assembly/utils/pointer/Pointer#asRef<usize>|inlined.9 (result i32)
-      local.get $this|8
-      local.set $this|9
-      local.get $this|9
-      br $~lib/metashrew-as/assembly/utils/pointer/Pointer#asRef<usize>|inlined.9
-     end
-     br $~lib/metashrew-as/assembly/utils/pointer/Pointer#asUsize|inlined.9
-    end
-    local.get $len|7
-    call $~lib/metashrew-as/assembly/utils/box/Box#constructor
-    br $~lib/metashrew-as/assembly/utils/pointer/Pointer#toBox|inlined.9
+    i32.load
+    local.get $i
+    local.get $this
+    i32.const 3
+    global.set $~argumentsLength
+    local.get $fn
+    i32.load
+    call_indirect (type $3)
+    local.set $result
+    local.get $outStart
+    local.get $i
+    i32.const 2
+    i32.shl
+    i32.add
+    local.get $result
+    i32.store
+    i32.const 1
+    drop
+    local.get $out
+    local.get $result
+    i32.const 1
+    call $~lib/rt/stub/__link
+    local.get $i
+    i32.const 1
+    i32.add
+    local.set $i
+    br $for-loop|0
    end
-   local.set $locktime
-   i32.const 0
-   i32.const 0
-   call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#constructor
-   local.set $result
-   local.get $result
-   local.get $version
-   call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#push
-   drop
-   local.get $result
-   local.get $this
-   call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:legacyInputOutputBytes
-   call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#push
-   drop
-   local.get $result
-   local.get $locktime
-   call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#push
-   drop
-   local.get $result
-   return
-  else
-   i32.const 0
-   i32.const 0
-   call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#constructor
-   local.set $result|12
-   local.get $result|12
-   local.get $this
-   call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:bytes
-   call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#push
-   drop
-   local.get $result|12
-   return
   end
-  unreachable
+  local.get $out
+  return
  )
  (func $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|0 (param $r i32) (param $v i32) (param $i i32) (param $ary i32) (result i32)
   local.get $r
@@ -5545,6 +4607,10 @@
   call $~lib/metashrew-as/assembly/utils/box/Box#get:len
   i32.add
   return
+ )
+ (func $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#get:length_ (param $this i32) (result i32)
+  local.get $this
+  i32.load offset=12
  )
  (func $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#reduce<i32> (param $this i32) (param $fn i32) (param $initialValue i32) (result i32)
   (local $acc i32)
@@ -5596,14 +4662,6 @@
    end
   end
   local.get $acc
-  return
- )
- (func $~lib/metashrew-as/assembly/utils/memcpy/memcpy (param $dest i32) (param $src i32) (param $len i32) (result i32)
-  local.get $dest
-  local.get $src
-  local.get $len
-  memory.copy
-  local.get $dest
   return
  )
  (func $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|1 (param $r i32) (param $v i32) (param $i i32) (param $ary i32) (result i32)
@@ -5676,18 +4734,1251 @@
   (local $result i32)
   i32.const 0
   local.get $data
-  i32.const 5248
+  i32.const 3280
   i32.const 0
   call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#reduce<i32>
   call $~lib/arraybuffer/ArrayBuffer#constructor
   local.set $result
   local.get $data
-  i32.const 5280
+  i32.const 3312
   local.get $result
   call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#reduce<usize>
   drop
   local.get $result
   return
+ )
+ (func $~lib/metashrew-as/assembly/utils/utils/concat (param $data i32) (result i32)
+  local.get $data
+  i32.const 3248
+  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#map<~lib/metashrew-as/assembly/utils/box/Box>
+  call $~lib/metashrew-as/assembly/utils/box/Box.concat
+  return
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint.from (param $txid i32) (param $offset i32) (result i32)
+  (local $index i32)
+  (local $3 i32)
+  (local $4 i32)
+  local.get $offset
+  call $~lib/metashrew-as/assembly/utils/utils/primitiveToBuffer<u32>
+  local.set $index
+  i32.const 0
+  i32.const 2
+  i32.const 2
+  i32.const 30
+  i32.const 0
+  call $~lib/rt/__newArray
+  local.set $3
+  local.get $3
+  i32.load offset=4
+  local.set $4
+  local.get $3
+  i32.const 0
+  local.get $txid
+  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#__set
+  local.get $3
+  i32.const 1
+  local.get $index
+  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#__set
+  local.get $3
+  call $~lib/metashrew-as/assembly/utils/utils/concat
+  call $~lib/metashrew-as/assembly/utils/box/Box.from
+  call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#constructor
+  return
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/transaction/Input#previousOutput (param $this i32) (result i32)
+  (local $this|1 i32)
+  (local $len i32)
+  (local $this|3 i32)
+  (local $this|4 i32)
+  (local $txid i32)
+  (local $this|6 i32)
+  (local $len|7 i32)
+  (local $this|8 i32)
+  (local $this|9 i32)
+  (local $vout i32)
+  (local $correctedTxid i32)
+  block $~lib/metashrew-as/assembly/utils/pointer/Pointer#toBox|inlined.8 (result i32)
+   local.get $this
+   call $~lib/metashrew-as/assembly/blockdata/transaction/Input#get:hash
+   call $~lib/metashrew-as/assembly/utils/box/Box#get:start
+   call $~lib/metashrew-as/assembly/utils/pointer/toPointer
+   local.set $this|1
+   i32.const 32
+   local.set $len
+   i32.const 0
+   block $~lib/metashrew-as/assembly/utils/pointer/Pointer#asUsize|inlined.8 (result i32)
+    local.get $this|1
+    local.set $this|3
+    block $~lib/metashrew-as/assembly/utils/pointer/Pointer#asRef<usize>|inlined.8 (result i32)
+     local.get $this|3
+     local.set $this|4
+     local.get $this|4
+     br $~lib/metashrew-as/assembly/utils/pointer/Pointer#asRef<usize>|inlined.8
+    end
+    br $~lib/metashrew-as/assembly/utils/pointer/Pointer#asUsize|inlined.8
+   end
+   local.get $len
+   call $~lib/metashrew-as/assembly/utils/box/Box#constructor
+   br $~lib/metashrew-as/assembly/utils/pointer/Pointer#toBox|inlined.8
+  end
+  local.set $txid
+  block $~lib/metashrew-as/assembly/utils/pointer/Pointer#toBox|inlined.9 (result i32)
+   local.get $this
+   call $~lib/metashrew-as/assembly/blockdata/transaction/Input#get:hash
+   call $~lib/metashrew-as/assembly/utils/box/Box#get:start
+   i32.const 32
+   i32.add
+   call $~lib/metashrew-as/assembly/utils/pointer/toPointer
+   local.set $this|6
+   i32.const 4
+   local.set $len|7
+   i32.const 0
+   block $~lib/metashrew-as/assembly/utils/pointer/Pointer#asUsize|inlined.9 (result i32)
+    local.get $this|6
+    local.set $this|8
+    block $~lib/metashrew-as/assembly/utils/pointer/Pointer#asRef<usize>|inlined.9 (result i32)
+     local.get $this|8
+     local.set $this|9
+     local.get $this|9
+     br $~lib/metashrew-as/assembly/utils/pointer/Pointer#asRef<usize>|inlined.9
+    end
+    br $~lib/metashrew-as/assembly/utils/pointer/Pointer#asUsize|inlined.9
+   end
+   local.get $len|7
+   call $~lib/metashrew-as/assembly/utils/box/Box#constructor
+   br $~lib/metashrew-as/assembly/utils/pointer/Pointer#toBox|inlined.9
+  end
+  local.set $vout
+  local.get $txid
+  call $~lib/metashrew-as/assembly/utils/box/Box#toArrayBuffer
+  call $~lib/metashrew-as/assembly/utils/utils/reverse
+  local.set $correctedTxid
+  local.get $correctedTxid
+  local.get $vout
+  call $~lib/metashrew-as/assembly/utils/utils/parsePrimitive<u32>
+  call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint.from
+  return
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#get:bytes (param $this i32) (result i32)
+  local.get $this
+  i32.load
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#toBuffer (param $this i32) (result i32)
+  local.get $this
+  call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#get:bytes
+  call $~lib/metashrew-as/assembly/utils/box/Box#toArrayBuffer
+  return
+ )
+ (func $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:length_ (param $this i32) (param $length_ i32)
+  local.get $this
+  local.get $length_
+  i32.store offset=12
+ )
+ (func $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#__set (param $this i32) (param $index i32) (param $value i32)
+  local.get $index
+  local.get $this
+  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#get:length_
+  i32.ge_u
+  if
+   local.get $index
+   i32.const 0
+   i32.lt_s
+   if
+    i32.const 2464
+    i32.const 2592
+    i32.const 130
+    i32.const 22
+    call $~lib/builtins/abort
+    unreachable
+   end
+   local.get $this
+   local.get $index
+   i32.const 1
+   i32.add
+   i32.const 2
+   i32.const 1
+   call $~lib/array/ensureCapacity
+   local.get $this
+   local.get $index
+   i32.const 1
+   i32.add
+   call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:length_
+  end
+  local.get $this
+  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#get:dataStart
+  local.get $index
+  i32.const 2
+  i32.shl
+  i32.add
+  local.get $value
+  i32.store
+  i32.const 1
+  drop
+  local.get $this
+  local.get $value
+  i32.const 1
+  call $~lib/rt/stub/__link
+ )
+ (func $assembly/index/Index.keyFor (param $table i32) (param $key i32) (result i32)
+  (local $2 i32)
+  (local $3 i32)
+  i32.const 2
+  i32.const 2
+  i32.const 31
+  i32.const 0
+  call $~lib/rt/__newArray
+  local.set $2
+  local.get $2
+  i32.load offset=4
+  local.set $3
+  local.get $2
+  i32.const 0
+  local.get $table
+  call $~lib/metashrew-as/assembly/utils/box/Box.from
+  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#__set
+  local.get $2
+  i32.const 1
+  local.get $key
+  call $~lib/metashrew-as/assembly/utils/box/Box.from
+  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#__set
+  local.get $2
+  call $~lib/metashrew-as/assembly/utils/box/Box.concat
+  return
+ )
+ (func $~lib/metashrew-as/assembly/utils/xxh32/xxh32 (param $key i32) (result i32)
+  (local $h i32)
+  (local $len i32)
+  (local $pos i32)
+  (local $s1 i32)
+  (local $s2 i32)
+  (local $s3 i32)
+  (local $s4 i32)
+  (local $end i32)
+  (local $h|9 i32)
+  (local $key|10 i32)
+  (local $h|11 i32)
+  (local $key|12 i32)
+  (local $h|13 i32)
+  (local $key|14 i32)
+  (local $h|15 i32)
+  (local $key|16 i32)
+  (local $end|17 i32)
+  local.get $key
+  i32.const 0
+  i32.eq
+  if
+   i32.const 0
+   return
+  end
+  local.get $key
+  call $~lib/arraybuffer/ArrayBuffer#get:byteLength
+  i32.const 1
+  i32.shl
+  local.set $h
+  local.get $h
+  local.set $len
+  local.get $key
+  local.set $pos
+  local.get $len
+  i32.const 16
+  i32.ge_u
+  if
+   i32.const 0
+   i32.const -1640531535
+   i32.add
+   i32.const -2048144777
+   i32.add
+   local.set $s1
+   i32.const 0
+   i32.const -2048144777
+   i32.add
+   local.set $s2
+   i32.const 0
+   local.set $s3
+   i32.const 0
+   i32.const -1640531535
+   i32.sub
+   local.set $s4
+   local.get $len
+   local.get $pos
+   i32.add
+   i32.const 16
+   i32.sub
+   local.set $end
+   loop $while-continue|0
+    local.get $pos
+    local.get $end
+    i32.le_u
+    if
+     block $~lib/metashrew-as/assembly/utils/xxh32/mix|inlined.0 (result i32)
+      local.get $s1
+      local.set $h|9
+      local.get $pos
+      i32.load
+      local.set $key|10
+      local.get $h|9
+      local.get $key|10
+      i32.const -2048144777
+      i32.mul
+      i32.add
+      i32.const 13
+      i32.rotl
+      i32.const -1640531535
+      i32.mul
+      br $~lib/metashrew-as/assembly/utils/xxh32/mix|inlined.0
+     end
+     local.set $s1
+     block $~lib/metashrew-as/assembly/utils/xxh32/mix|inlined.1 (result i32)
+      local.get $s2
+      local.set $h|11
+      local.get $pos
+      i32.load offset=4
+      local.set $key|12
+      local.get $h|11
+      local.get $key|12
+      i32.const -2048144777
+      i32.mul
+      i32.add
+      i32.const 13
+      i32.rotl
+      i32.const -1640531535
+      i32.mul
+      br $~lib/metashrew-as/assembly/utils/xxh32/mix|inlined.1
+     end
+     local.set $s2
+     block $~lib/metashrew-as/assembly/utils/xxh32/mix|inlined.2 (result i32)
+      local.get $s3
+      local.set $h|13
+      local.get $pos
+      i32.load offset=8
+      local.set $key|14
+      local.get $h|13
+      local.get $key|14
+      i32.const -2048144777
+      i32.mul
+      i32.add
+      i32.const 13
+      i32.rotl
+      i32.const -1640531535
+      i32.mul
+      br $~lib/metashrew-as/assembly/utils/xxh32/mix|inlined.2
+     end
+     local.set $s3
+     block $~lib/metashrew-as/assembly/utils/xxh32/mix|inlined.3 (result i32)
+      local.get $s4
+      local.set $h|15
+      local.get $pos
+      i32.load offset=12
+      local.set $key|16
+      local.get $h|15
+      local.get $key|16
+      i32.const -2048144777
+      i32.mul
+      i32.add
+      i32.const 13
+      i32.rotl
+      i32.const -1640531535
+      i32.mul
+      br $~lib/metashrew-as/assembly/utils/xxh32/mix|inlined.3
+     end
+     local.set $s4
+     local.get $pos
+     i32.const 16
+     i32.add
+     local.set $pos
+     br $while-continue|0
+    end
+   end
+   local.get $h
+   local.get $s1
+   i32.const 1
+   i32.rotl
+   local.get $s2
+   i32.const 7
+   i32.rotl
+   i32.add
+   local.get $s3
+   i32.const 12
+   i32.rotl
+   i32.add
+   local.get $s4
+   i32.const 18
+   i32.rotl
+   i32.add
+   i32.add
+   local.set $h
+  else
+   local.get $h
+   i32.const 0
+   i32.const 374761393
+   i32.add
+   i32.add
+   local.set $h
+  end
+  local.get $key
+  local.get $len
+  i32.add
+  i32.const 4
+  i32.sub
+  local.set $end|17
+  loop $while-continue|1
+   local.get $pos
+   local.get $end|17
+   i32.le_u
+   if
+    local.get $h
+    local.get $pos
+    i32.load
+    i32.const -1028477379
+    i32.mul
+    i32.add
+    local.set $h
+    local.get $h
+    i32.const 17
+    i32.rotl
+    i32.const 668265263
+    i32.mul
+    local.set $h
+    local.get $pos
+    i32.const 4
+    i32.add
+    local.set $pos
+    br $while-continue|1
+   end
+  end
+  local.get $key
+  local.get $len
+  i32.add
+  local.set $end|17
+  loop $while-continue|2
+   local.get $pos
+   local.get $end|17
+   i32.lt_u
+   if
+    local.get $h
+    local.get $pos
+    i32.load8_u
+    i32.const 374761393
+    i32.mul
+    i32.add
+    local.set $h
+    local.get $h
+    i32.const 11
+    i32.rotl
+    i32.const -1640531535
+    i32.mul
+    local.set $h
+    local.get $pos
+    i32.const 1
+    i32.add
+    local.set $pos
+    br $while-continue|2
+   end
+  end
+  local.get $h
+  local.get $h
+  i32.const 15
+  i32.shr_u
+  i32.xor
+  local.set $h
+  local.get $h
+  i32.const -2048144777
+  i32.mul
+  local.set $h
+  local.get $h
+  local.get $h
+  i32.const 13
+  i32.shr_u
+  i32.xor
+  local.set $h
+  local.get $h
+  i32.const -1028477379
+  i32.mul
+  local.set $h
+  local.get $h
+  local.get $h
+  i32.const 16
+  i32.shr_u
+  i32.xor
+  local.set $h
+  local.get $h
+  return
+ )
+ (func $~lib/util/hash/HASH<u32> (param $key i32) (result i32)
+  (local $key|1 i32)
+  (local $len i32)
+  (local $h i32)
+  i32.const 0
+  drop
+  i32.const 0
+  drop
+  i32.const 0
+  drop
+  i32.const 4
+  i32.const 4
+  i32.le_u
+  drop
+  block $~lib/util/hash/hash32|inlined.0 (result i32)
+   local.get $key
+   local.set $key|1
+   i32.const 4
+   local.set $len
+   i32.const 0
+   i32.const 374761393
+   i32.add
+   local.get $len
+   i32.add
+   local.set $h
+   local.get $h
+   local.get $key|1
+   i32.const -1028477379
+   i32.mul
+   i32.add
+   local.set $h
+   local.get $h
+   i32.const 17
+   i32.rotl
+   i32.const 668265263
+   i32.mul
+   local.set $h
+   local.get $h
+   local.get $h
+   i32.const 15
+   i32.shr_u
+   i32.xor
+   local.set $h
+   local.get $h
+   i32.const -2048144777
+   i32.mul
+   local.set $h
+   local.get $h
+   local.get $h
+   i32.const 13
+   i32.shr_u
+   i32.xor
+   local.set $h
+   local.get $h
+   i32.const -1028477379
+   i32.mul
+   local.set $h
+   local.get $h
+   local.get $h
+   i32.const 16
+   i32.shr_u
+   i32.xor
+   local.set $h
+   local.get $h
+   br $~lib/util/hash/hash32|inlined.0
+  end
+  return
+ )
+ (func $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:buckets" (param $this i32) (result i32)
+  local.get $this
+  i32.load
+ )
+ (func $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:bucketsMask" (param $this i32) (result i32)
+  local.get $this
+  i32.load offset=4
+ )
+ (func $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#get:taggedNext" (param $this i32) (result i32)
+  local.get $this
+  i32.load offset=8
+ )
+ (func $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#get:key" (param $this i32) (result i32)
+  local.get $this
+  i32.load
+ )
+ (func $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#find" (param $this i32) (param $key i32) (param $hashCode i32) (result i32)
+  (local $entry i32)
+  (local $taggedNext i32)
+  local.get $this
+  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:buckets"
+  local.get $hashCode
+  local.get $this
+  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:bucketsMask"
+  i32.and
+  i32.const 4
+  i32.mul
+  i32.add
+  i32.load
+  local.set $entry
+  loop $while-continue|0
+   local.get $entry
+   if
+    local.get $entry
+    call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#get:taggedNext"
+    local.set $taggedNext
+    local.get $taggedNext
+    i32.const 1
+    i32.and
+    i32.eqz
+    if (result i32)
+     local.get $entry
+     call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#get:key"
+     local.get $key
+     i32.eq
+    else
+     i32.const 0
+    end
+    if
+     local.get $entry
+     return
+    end
+    local.get $taggedNext
+    i32.const 1
+    i32.const -1
+    i32.xor
+    i32.and
+    local.set $entry
+    br $while-continue|0
+   end
+  end
+  i32.const 0
+  return
+ )
+ (func $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#has" (param $this i32) (param $key i32) (result i32)
+  local.get $this
+  local.get $key
+  local.get $key
+  call $~lib/util/hash/HASH<u32>
+  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#find"
+  i32.const 0
+  i32.ne
+  return
+ )
+ (func $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#set:value" (param $this i32) (param $value i32)
+  local.get $this
+  local.get $value
+  i32.store offset=4
+ )
+ (func $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entriesOffset" (param $this i32) (result i32)
+  local.get $this
+  i32.load offset=16
+ )
+ (func $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entriesCapacity" (param $this i32) (result i32)
+  local.get $this
+  i32.load offset=12
+ )
+ (func $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entriesCount" (param $this i32) (result i32)
+  local.get $this
+  i32.load offset=20
+ )
+ (func $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entries" (param $this i32) (result i32)
+  local.get $this
+  i32.load offset=8
+ )
+ (func $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#set:key" (param $this i32) (param $key i32)
+  local.get $this
+  local.get $key
+  i32.store
+ )
+ (func $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#get:value" (param $this i32) (result i32)
+  local.get $this
+  i32.load offset=4
+ )
+ (func $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#set:taggedNext" (param $this i32) (param $taggedNext i32)
+  local.get $this
+  local.get $taggedNext
+  i32.store offset=8
+ )
+ (func $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#rehash" (param $this i32) (param $newBucketsMask i32)
+  (local $newBucketsCapacity i32)
+  (local $newBuckets i32)
+  (local $newEntriesCapacity i32)
+  (local $newEntries i32)
+  (local $oldPtr i32)
+  (local $oldEnd i32)
+  (local $newPtr i32)
+  (local $oldEntry i32)
+  (local $newEntry i32)
+  (local $oldEntryKey i32)
+  (local $newBucketIndex i32)
+  (local $newBucketPtrBase i32)
+  local.get $newBucketsMask
+  i32.const 1
+  i32.add
+  local.set $newBucketsCapacity
+  i32.const 0
+  local.get $newBucketsCapacity
+  i32.const 4
+  i32.mul
+  call $~lib/arraybuffer/ArrayBuffer#constructor
+  local.set $newBuckets
+  local.get $newBucketsCapacity
+  i32.const 8
+  i32.mul
+  i32.const 3
+  i32.div_s
+  local.set $newEntriesCapacity
+  i32.const 0
+  local.get $newEntriesCapacity
+  block $"~lib/map/ENTRY_SIZE<u32,~lib/arraybuffer/ArrayBuffer>|inlined.1" (result i32)
+   i32.const 12
+   br $"~lib/map/ENTRY_SIZE<u32,~lib/arraybuffer/ArrayBuffer>|inlined.1"
+  end
+  i32.mul
+  call $~lib/arraybuffer/ArrayBuffer#constructor
+  local.set $newEntries
+  local.get $this
+  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entries"
+  local.set $oldPtr
+  local.get $oldPtr
+  local.get $this
+  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entriesOffset"
+  block $"~lib/map/ENTRY_SIZE<u32,~lib/arraybuffer/ArrayBuffer>|inlined.2" (result i32)
+   i32.const 12
+   br $"~lib/map/ENTRY_SIZE<u32,~lib/arraybuffer/ArrayBuffer>|inlined.2"
+  end
+  i32.mul
+  i32.add
+  local.set $oldEnd
+  local.get $newEntries
+  local.set $newPtr
+  loop $while-continue|0
+   local.get $oldPtr
+   local.get $oldEnd
+   i32.ne
+   if
+    local.get $oldPtr
+    local.set $oldEntry
+    local.get $oldEntry
+    call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#get:taggedNext"
+    i32.const 1
+    i32.and
+    i32.eqz
+    if
+     local.get $newPtr
+     local.set $newEntry
+     local.get $oldEntry
+     call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#get:key"
+     local.set $oldEntryKey
+     local.get $newEntry
+     local.get $oldEntryKey
+     call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#set:key"
+     local.get $newEntry
+     local.get $oldEntry
+     call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#get:value"
+     call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#set:value"
+     local.get $oldEntryKey
+     call $~lib/util/hash/HASH<u32>
+     local.get $newBucketsMask
+     i32.and
+     local.set $newBucketIndex
+     local.get $newBuckets
+     local.get $newBucketIndex
+     i32.const 4
+     i32.mul
+     i32.add
+     local.set $newBucketPtrBase
+     local.get $newEntry
+     local.get $newBucketPtrBase
+     i32.load
+     call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#set:taggedNext"
+     local.get $newBucketPtrBase
+     local.get $newPtr
+     i32.store
+     local.get $newPtr
+     block $"~lib/map/ENTRY_SIZE<u32,~lib/arraybuffer/ArrayBuffer>|inlined.3" (result i32)
+      i32.const 12
+      br $"~lib/map/ENTRY_SIZE<u32,~lib/arraybuffer/ArrayBuffer>|inlined.3"
+     end
+     i32.add
+     local.set $newPtr
+    end
+    local.get $oldPtr
+    block $"~lib/map/ENTRY_SIZE<u32,~lib/arraybuffer/ArrayBuffer>|inlined.4" (result i32)
+     i32.const 12
+     br $"~lib/map/ENTRY_SIZE<u32,~lib/arraybuffer/ArrayBuffer>|inlined.4"
+    end
+    i32.add
+    local.set $oldPtr
+    br $while-continue|0
+   end
+  end
+  local.get $this
+  local.get $newBuckets
+  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#set:buckets"
+  local.get $this
+  local.get $newBucketsMask
+  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#set:bucketsMask"
+  local.get $this
+  local.get $newEntries
+  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#set:entries"
+  local.get $this
+  local.get $newEntriesCapacity
+  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#set:entriesCapacity"
+  local.get $this
+  local.get $this
+  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entriesCount"
+  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#set:entriesOffset"
+ )
+ (func $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#set" (param $this i32) (param $key i32) (param $value i32) (result i32)
+  (local $hashCode i32)
+  (local $entry i32)
+  (local $entries i32)
+  (local $6 i32)
+  (local $bucketPtrBase i32)
+  local.get $key
+  call $~lib/util/hash/HASH<u32>
+  local.set $hashCode
+  local.get $this
+  local.get $key
+  local.get $hashCode
+  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#find"
+  local.set $entry
+  local.get $entry
+  if
+   local.get $entry
+   local.get $value
+   call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#set:value"
+   i32.const 1
+   drop
+   local.get $this
+   local.get $value
+   i32.const 1
+   call $~lib/rt/stub/__link
+  else
+   local.get $this
+   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entriesOffset"
+   local.get $this
+   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entriesCapacity"
+   i32.eq
+   if
+    local.get $this
+    local.get $this
+    call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entriesCount"
+    local.get $this
+    call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entriesCapacity"
+    i32.const 3
+    i32.mul
+    i32.const 4
+    i32.div_s
+    i32.lt_s
+    if (result i32)
+     local.get $this
+     call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:bucketsMask"
+    else
+     local.get $this
+     call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:bucketsMask"
+     i32.const 1
+     i32.shl
+     i32.const 1
+     i32.or
+    end
+    call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#rehash"
+   end
+   local.get $this
+   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entries"
+   local.set $entries
+   local.get $entries
+   local.get $this
+   local.get $this
+   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entriesOffset"
+   local.tee $6
+   i32.const 1
+   i32.add
+   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#set:entriesOffset"
+   local.get $6
+   block $"~lib/map/ENTRY_SIZE<u32,~lib/arraybuffer/ArrayBuffer>|inlined.5" (result i32)
+    i32.const 12
+    br $"~lib/map/ENTRY_SIZE<u32,~lib/arraybuffer/ArrayBuffer>|inlined.5"
+   end
+   i32.mul
+   i32.add
+   local.set $entry
+   local.get $entry
+   local.get $key
+   call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#set:key"
+   i32.const 0
+   drop
+   local.get $entry
+   local.get $value
+   call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#set:value"
+   i32.const 1
+   drop
+   local.get $this
+   local.get $value
+   i32.const 1
+   call $~lib/rt/stub/__link
+   local.get $this
+   local.get $this
+   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entriesCount"
+   i32.const 1
+   i32.add
+   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#set:entriesCount"
+   local.get $this
+   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:buckets"
+   local.get $hashCode
+   local.get $this
+   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:bucketsMask"
+   i32.and
+   i32.const 4
+   i32.mul
+   i32.add
+   local.set $bucketPtrBase
+   local.get $entry
+   local.get $bucketPtrBase
+   i32.load
+   call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#set:taggedNext"
+   local.get $bucketPtrBase
+   local.get $entry
+   i32.store
+  end
+  local.get $this
+  return
+ )
+ (func $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get" (param $this i32) (param $key i32) (result i32)
+  (local $entry i32)
+  local.get $this
+  local.get $key
+  local.get $key
+  call $~lib/util/hash/HASH<u32>
+  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#find"
+  local.set $entry
+  local.get $entry
+  i32.eqz
+  if
+   i32.const 3344
+   i32.const 3408
+   i32.const 105
+   i32.const 17
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $entry
+  call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#get:value"
+  return
+ )
+ (func $~lib/metashrew-as/assembly/indexer/index/get (param $k i32) (result i32)
+  (local $h i32)
+  (local $result i32)
+  local.get $k
+  call $~lib/metashrew-as/assembly/utils/xxh32/xxh32
+  local.set $h
+  global.get $~lib/metashrew-as/assembly/indexer/index/_updates
+  local.get $h
+  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#has"
+  i32.eqz
+  if
+   i32.const 0
+   local.get $k
+   call $~lib/metashrew-as/assembly/indexer/index/__get_len
+   call $~lib/arraybuffer/ArrayBuffer#constructor
+   local.set $result
+   local.get $k
+   local.get $result
+   call $~lib/metashrew-as/assembly/indexer/index/__get
+   global.get $~lib/metashrew-as/assembly/indexer/index/_updates
+   local.get $h
+   local.get $result
+   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#set"
+   drop
+   global.get $~lib/metashrew-as/assembly/indexer/index/_updateKeys
+   local.get $h
+   local.get $result
+   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#set"
+   drop
+   local.get $result
+   return
+  else
+   global.get $~lib/metashrew-as/assembly/indexer/index/_updates
+   local.get $h
+   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get"
+   return
+  end
+  unreachable
+ )
+ (func $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Output>#get:length (param $this i32) (result i32)
+  local.get $this
+  call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Output>#get:length_
+  return
+ )
+ (func $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Output>#__get (param $this i32) (param $index i32) (result i32)
+  (local $value i32)
+  local.get $index
+  local.get $this
+  call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Output>#get:length_
+  i32.ge_u
+  if
+   i32.const 2464
+   i32.const 2592
+   i32.const 114
+   i32.const 42
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $this
+  call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Output>#get:dataStart
+  local.get $index
+  i32.const 2
+  i32.shl
+  i32.add
+  i32.load
+  local.set $value
+  i32.const 1
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  local.get $value
+  i32.eqz
+  if
+   i32.const 3120
+   i32.const 2592
+   i32.const 118
+   i32.const 40
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $value
+  return
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:_txid (param $this i32) (result i32)
+  local.get $this
+  i32.load offset=32
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:bytes (param $this i32) (result i32)
+  local.get $this
+  i32.load
+ )
+ (func $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:buffer (param $this i32) (param $buffer i32)
+  local.get $this
+  local.get $buffer
+  i32.store
+  local.get $this
+  local.get $buffer
+  i32.const 0
+  call $~lib/rt/stub/__link
+ )
+ (func $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:dataStart (param $this i32) (param $dataStart i32)
+  local.get $this
+  local.get $dataStart
+  i32.store offset=4
+ )
+ (func $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:byteLength (param $this i32) (param $byteLength i32)
+  local.get $this
+  local.get $byteLength
+  i32.store offset=8
+ )
+ (func $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#constructor (param $this i32) (param $length i32) (result i32)
+  (local $2 i32)
+  (local $3 i32)
+  (local $bufferSize i32)
+  (local $buffer i32)
+  local.get $this
+  i32.eqz
+  if
+   i32.const 16
+   i32.const 31
+   call $~lib/rt/stub/__new
+   local.set $this
+  end
+  local.get $this
+  i32.const 0
+  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:buffer
+  local.get $this
+  i32.const 0
+  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:dataStart
+  local.get $this
+  i32.const 0
+  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:byteLength
+  local.get $this
+  i32.const 0
+  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:length_
+  local.get $length
+  i32.const 1073741820
+  i32.const 2
+  i32.shr_u
+  i32.gt_u
+  if
+   i32.const 1168
+   i32.const 2592
+   i32.const 70
+   i32.const 60
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $length
+  local.tee $2
+  i32.const 8
+  local.tee $3
+  local.get $2
+  local.get $3
+  i32.gt_u
+  select
+  i32.const 2
+  i32.shl
+  local.set $bufferSize
+  local.get $bufferSize
+  i32.const 1
+  call $~lib/rt/stub/__new
+  local.set $buffer
+  i32.const 0
+  global.get $~lib/shared/runtime/Runtime.Incremental
+  i32.ne
+  drop
+  local.get $buffer
+  i32.const 0
+  local.get $bufferSize
+  memory.fill
+  local.get $this
+  local.get $buffer
+  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:buffer
+  local.get $this
+  local.get $buffer
+  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:dataStart
+  local.get $this
+  local.get $bufferSize
+  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:byteLength
+  local.get $this
+  local.get $length
+  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:length_
+  local.get $this
+ )
+ (func $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#push (param $this i32) (param $value i32) (result i32)
+  (local $oldLen i32)
+  (local $len i32)
+  local.get $this
+  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#get:length_
+  local.set $oldLen
+  local.get $oldLen
+  i32.const 1
+  i32.add
+  local.set $len
+  local.get $this
+  local.get $len
+  i32.const 2
+  i32.const 1
+  call $~lib/array/ensureCapacity
+  i32.const 1
+  drop
+  local.get $this
+  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#get:dataStart
+  local.get $oldLen
+  i32.const 2
+  i32.shl
+  i32.add
+  local.get $value
+  i32.store
+  local.get $this
+  local.get $value
+  i32.const 1
+  call $~lib/rt/stub/__link
+  local.get $this
+  local.get $len
+  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:length_
+  local.get $len
+  return
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:legacyInputOutputBytes (param $this i32) (result i32)
+  local.get $this
+  i32.load offset=28
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#legacyBytes (param $this i32) (result i32)
+  (local $this|1 i32)
+  (local $len i32)
+  (local $this|3 i32)
+  (local $this|4 i32)
+  (local $version i32)
+  (local $this|6 i32)
+  (local $len|7 i32)
+  (local $this|8 i32)
+  (local $this|9 i32)
+  (local $locktime i32)
+  (local $result i32)
+  (local $result|12 i32)
+  local.get $this
+  call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:flag
+  if
+   block $~lib/metashrew-as/assembly/utils/pointer/Pointer#toBox|inlined.10 (result i32)
+    local.get $this
+    call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:bytes
+    call $~lib/metashrew-as/assembly/utils/box/Box#get:start
+    call $~lib/metashrew-as/assembly/utils/pointer/toPointer
+    local.set $this|1
+    i32.const 4
+    local.set $len
+    i32.const 0
+    block $~lib/metashrew-as/assembly/utils/pointer/Pointer#asUsize|inlined.10 (result i32)
+     local.get $this|1
+     local.set $this|3
+     block $~lib/metashrew-as/assembly/utils/pointer/Pointer#asRef<usize>|inlined.10 (result i32)
+      local.get $this|3
+      local.set $this|4
+      local.get $this|4
+      br $~lib/metashrew-as/assembly/utils/pointer/Pointer#asRef<usize>|inlined.10
+     end
+     br $~lib/metashrew-as/assembly/utils/pointer/Pointer#asUsize|inlined.10
+    end
+    local.get $len
+    call $~lib/metashrew-as/assembly/utils/box/Box#constructor
+    br $~lib/metashrew-as/assembly/utils/pointer/Pointer#toBox|inlined.10
+   end
+   local.set $version
+   block $~lib/metashrew-as/assembly/utils/pointer/Pointer#toBox|inlined.11 (result i32)
+    local.get $this
+    call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:bytes
+    call $~lib/metashrew-as/assembly/utils/box/Box#get:start
+    local.get $this
+    call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:bytes
+    call $~lib/metashrew-as/assembly/utils/box/Box#get:len
+    i32.add
+    i32.const 4
+    i32.sub
+    call $~lib/metashrew-as/assembly/utils/pointer/toPointer
+    local.set $this|6
+    i32.const 4
+    local.set $len|7
+    i32.const 0
+    block $~lib/metashrew-as/assembly/utils/pointer/Pointer#asUsize|inlined.11 (result i32)
+     local.get $this|6
+     local.set $this|8
+     block $~lib/metashrew-as/assembly/utils/pointer/Pointer#asRef<usize>|inlined.11 (result i32)
+      local.get $this|8
+      local.set $this|9
+      local.get $this|9
+      br $~lib/metashrew-as/assembly/utils/pointer/Pointer#asRef<usize>|inlined.11
+     end
+     br $~lib/metashrew-as/assembly/utils/pointer/Pointer#asUsize|inlined.11
+    end
+    local.get $len|7
+    call $~lib/metashrew-as/assembly/utils/box/Box#constructor
+    br $~lib/metashrew-as/assembly/utils/pointer/Pointer#toBox|inlined.11
+   end
+   local.set $locktime
+   i32.const 0
+   i32.const 0
+   call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#constructor
+   local.set $result
+   local.get $result
+   local.get $version
+   call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#push
+   drop
+   local.get $result
+   local.get $this
+   call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:legacyInputOutputBytes
+   call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#push
+   drop
+   local.get $result
+   local.get $locktime
+   call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#push
+   drop
+   local.get $result
+   return
+  else
+   i32.const 0
+   i32.const 0
+   call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#constructor
+   local.set $result|12
+   local.get $result|12
+   local.get $this
+   call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:bytes
+   call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#push
+   drop
+   local.get $result|12
+   return
+  end
+  unreachable
  )
  (func $~lib/metashrew-as/assembly/utils/sha256/init
   i32.const 1779033703
@@ -6645,45 +6936,6 @@
   local.get $output
   return
  )
- (func $~lib/metashrew-as/assembly/utils/utils/reverse (param $data i32) (result i32)
-  (local $result i32)
-  (local $i i32)
-  i32.const 0
-  local.get $data
-  call $~lib/arraybuffer/ArrayBuffer#get:byteLength
-  call $~lib/arraybuffer/ArrayBuffer#constructor
-  local.set $result
-  i32.const 0
-  local.set $i
-  loop $for-loop|0
-   local.get $i
-   local.get $result
-   call $~lib/arraybuffer/ArrayBuffer#get:byteLength
-   i32.lt_s
-   if
-    local.get $result
-    local.get $i
-    i32.add
-    local.get $data
-    local.get $result
-    call $~lib/arraybuffer/ArrayBuffer#get:byteLength
-    i32.add
-    local.get $i
-    i32.sub
-    i32.const 1
-    i32.sub
-    i32.load8_u
-    i32.store8
-    local.get $i
-    i32.const 1
-    i32.add
-    local.set $i
-    br $for-loop|0
-   end
-  end
-  local.get $result
-  return
- )
  (func $~lib/metashrew-as/assembly/utils/sha256/sha256d (param $data i32) (result i32)
   local.get $data
   call $~lib/metashrew-as/assembly/utils/sha256/sha256
@@ -6712,1872 +6964,6 @@
   call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:_txid
   return
  )
- (func $~lib/metashrew-as/assembly/utils/hex/encodeHexUTF8 (param $start i32) (param $len i32) (result i32)
-  (local $result i32)
-  (local $i i32)
-  i32.const 0
-  i32.const 2
-  local.get $len
-  i32.const 2
-  i32.mul
-  i32.add
-  call $~lib/arraybuffer/ArrayBuffer#constructor
-  local.set $result
-  local.get $result
-  i32.const 30768
-  i32.store16
-  i32.const 0
-  local.set $i
-  loop $for-loop|0
-   local.get $i
-   local.get $len
-   i32.lt_u
-   if
-    i32.const 2
-    local.get $result
-    i32.add
-    local.get $i
-    i32.const 2
-    i32.mul
-    i32.add
-    global.get $~lib/metashrew-as/assembly/utils/hex/hexLookupTable
-    i32.const 2
-    local.get $start
-    local.get $i
-    i32.add
-    i32.load8_u
-    i32.mul
-    i32.add
-    i32.load16_u
-    i32.store16
-    local.get $i
-    i32.const 1
-    i32.add
-    local.set $i
-    br $for-loop|0
-   end
-  end
-  local.get $result
-  return
- )
- (func $~lib/string/String.UTF8.decodeUnsafe (param $buf i32) (param $len i32) (param $nullTerminated i32) (result i32)
-  (local $bufOff i32)
-  (local $bufEnd i32)
-  (local $str i32)
-  (local $strOff i32)
-  (local $u0 i32)
-  (local $u1 i32)
-  (local $u2 i32)
-  (local $lo i32)
-  (local $hi i32)
-  local.get $buf
-  local.set $bufOff
-  local.get $buf
-  local.get $len
-  i32.add
-  local.set $bufEnd
-  local.get $bufEnd
-  local.get $bufOff
-  i32.ge_u
-  i32.eqz
-  if
-   i32.const 0
-   i32.const 816
-   i32.const 770
-   i32.const 7
-   call $~lib/builtins/abort
-   unreachable
-  end
-  local.get $len
-  i32.const 1
-  i32.shl
-  i32.const 2
-  call $~lib/rt/stub/__new
-  local.set $str
-  local.get $str
-  local.set $strOff
-  block $while-break|0
-   loop $while-continue|0
-    local.get $bufOff
-    local.get $bufEnd
-    i32.lt_u
-    if
-     local.get $bufOff
-     i32.load8_u
-     local.set $u0
-     local.get $bufOff
-     i32.const 1
-     i32.add
-     local.set $bufOff
-     local.get $u0
-     i32.const 128
-     i32.and
-     i32.eqz
-     if
-      local.get $nullTerminated
-      local.get $u0
-      i32.eqz
-      i32.and
-      if
-       br $while-break|0
-      end
-      local.get $strOff
-      local.get $u0
-      i32.store16
-     else
-      local.get $bufEnd
-      local.get $bufOff
-      i32.eq
-      if
-       br $while-break|0
-      end
-      local.get $bufOff
-      i32.load8_u
-      i32.const 63
-      i32.and
-      local.set $u1
-      local.get $bufOff
-      i32.const 1
-      i32.add
-      local.set $bufOff
-      local.get $u0
-      i32.const 224
-      i32.and
-      i32.const 192
-      i32.eq
-      if
-       local.get $strOff
-       local.get $u0
-       i32.const 31
-       i32.and
-       i32.const 6
-       i32.shl
-       local.get $u1
-       i32.or
-       i32.store16
-      else
-       local.get $bufEnd
-       local.get $bufOff
-       i32.eq
-       if
-        br $while-break|0
-       end
-       local.get $bufOff
-       i32.load8_u
-       i32.const 63
-       i32.and
-       local.set $u2
-       local.get $bufOff
-       i32.const 1
-       i32.add
-       local.set $bufOff
-       local.get $u0
-       i32.const 240
-       i32.and
-       i32.const 224
-       i32.eq
-       if
-        local.get $u0
-        i32.const 15
-        i32.and
-        i32.const 12
-        i32.shl
-        local.get $u1
-        i32.const 6
-        i32.shl
-        i32.or
-        local.get $u2
-        i32.or
-        local.set $u0
-       else
-        local.get $bufEnd
-        local.get $bufOff
-        i32.eq
-        if
-         br $while-break|0
-        end
-        local.get $u0
-        i32.const 7
-        i32.and
-        i32.const 18
-        i32.shl
-        local.get $u1
-        i32.const 12
-        i32.shl
-        i32.or
-        local.get $u2
-        i32.const 6
-        i32.shl
-        i32.or
-        local.get $bufOff
-        i32.load8_u
-        i32.const 63
-        i32.and
-        i32.or
-        local.set $u0
-        local.get $bufOff
-        i32.const 1
-        i32.add
-        local.set $bufOff
-       end
-       local.get $u0
-       i32.const 65536
-       i32.lt_u
-       if
-        local.get $strOff
-        local.get $u0
-        i32.store16
-       else
-        local.get $u0
-        i32.const 65536
-        i32.sub
-        local.set $u0
-        local.get $u0
-        i32.const 10
-        i32.shr_u
-        i32.const 55296
-        i32.or
-        local.set $lo
-        local.get $u0
-        i32.const 1023
-        i32.and
-        i32.const 56320
-        i32.or
-        local.set $hi
-        local.get $strOff
-        local.get $lo
-        local.get $hi
-        i32.const 16
-        i32.shl
-        i32.or
-        i32.store
-        local.get $strOff
-        i32.const 2
-        i32.add
-        local.set $strOff
-       end
-      end
-     end
-     local.get $strOff
-     i32.const 2
-     i32.add
-     local.set $strOff
-     br $while-continue|0
-    end
-   end
-  end
-  local.get $str
-  local.get $strOff
-  local.get $str
-  i32.sub
-  call $~lib/rt/stub/__renew
-  return
- )
- (func $~lib/string/String.UTF8.decode (param $buf i32) (param $nullTerminated i32) (result i32)
-  local.get $buf
-  local.get $buf
-  call $~lib/arraybuffer/ArrayBuffer#get:byteLength
-  local.get $nullTerminated
-  call $~lib/string/String.UTF8.decodeUnsafe
-  return
- )
- (func $~lib/metashrew-as/assembly/utils/hex/encodeHex (param $start i32) (param $len i32) (result i32)
-  local.get $start
-  local.get $len
-  call $~lib/metashrew-as/assembly/utils/hex/encodeHexUTF8
-  i32.const 0
-  call $~lib/string/String.UTF8.decode
-  return
- )
- (func $~lib/metashrew-as/assembly/utils/hex/encodeHexFromBuffer (param $data i32) (result i32)
-  local.get $data
-  local.get $data
-  call $~lib/arraybuffer/ArrayBuffer#get:byteLength
-  call $~lib/metashrew-as/assembly/utils/hex/encodeHex
-  return
- )
- (func $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Input>#get:length (param $this i32) (result i32)
-  local.get $this
-  call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Input>#get:length_
-  return
- )
- (func $~lib/metashrew-as/assembly/blockdata/transaction/Input#get:hash (param $this i32) (result i32)
-  local.get $this
-  i32.load offset=4
- )
- (func $~lib/metashrew-as/assembly/utils/box/Box#toArrayBuffer (param $this i32) (result i32)
-  (local $result i32)
-  i32.const 0
-  local.get $this
-  call $~lib/metashrew-as/assembly/utils/box/Box#get:len
-  call $~lib/arraybuffer/ArrayBuffer#constructor
-  local.set $result
-  local.get $result
-  local.get $this
-  call $~lib/metashrew-as/assembly/utils/box/Box#get:start
-  local.get $this
-  call $~lib/metashrew-as/assembly/utils/box/Box#get:len
-  call $~lib/metashrew-as/assembly/utils/memcpy/memcpy
-  drop
-  local.get $result
-  return
- )
- (func $~lib/metashrew-as/assembly/utils/utils/primitiveToBuffer<u32> (param $value i32) (result i32)
-  (local $buffer i32)
-  i32.const 0
-  i32.const 4
-  call $~lib/arraybuffer/ArrayBuffer#constructor
-  local.set $buffer
-  local.get $buffer
-  local.get $value
-  i32.store
-  local.get $buffer
-  return
- )
- (func $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:bytes (param $this i32) (param $bytes i32)
-  local.get $this
-  local.get $bytes
-  i32.store
-  local.get $this
-  local.get $bytes
-  i32.const 0
-  call $~lib/rt/stub/__link
- )
- (func $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:txid (param $this i32) (param $txid i32)
-  local.get $this
-  local.get $txid
-  i32.store offset=4
-  local.get $this
-  local.get $txid
-  i32.const 0
-  call $~lib/rt/stub/__link
- )
- (func $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:index (param $this i32) (param $index i32)
-  local.get $this
-  local.get $index
-  i32.store offset=8
- )
- (func $~lib/metashrew-as/assembly/utils/box/Box#shrinkBack (param $this i32) (param $distance i32) (result i32)
-  local.get $this
-  local.get $this
-  call $~lib/metashrew-as/assembly/utils/box/Box#get:len
-  local.get $distance
-  i32.sub
-  call $~lib/metashrew-as/assembly/utils/box/Box#set:len
-  local.get $this
-  return
- )
- (func $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#constructor (param $this i32) (param $bytes i32) (result i32)
-  local.get $this
-  i32.eqz
-  if
-   i32.const 12
-   i32.const 33
-   call $~lib/rt/stub/__new
-   local.set $this
-  end
-  local.get $this
-  i32.const 0
-  call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:bytes
-  local.get $this
-  i32.const 0
-  call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:txid
-  local.get $this
-  i32.const 0
-  call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:index
-  local.get $this
-  call $~lib/metashrew-as/assembly/utils/pointer/nullptr<~lib/metashrew-as/assembly/utils/box/Box>
-  call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:bytes
-  local.get $this
-  call $~lib/metashrew-as/assembly/utils/pointer/nullptr<~lib/metashrew-as/assembly/utils/box/Box>
-  call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:txid
-  local.get $this
-  i32.const 0
-  call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:index
-  local.get $bytes
-  call $~lib/metashrew-as/assembly/utils/box/Box#get:len
-  i32.const 36
-  i32.eq
-  if
-   local.get $this
-   local.get $bytes
-   call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:bytes
-   local.get $this
-   local.get $bytes
-   i32.const 0
-   call $~lib/metashrew-as/assembly/utils/box/Box#sliceFrom
-   i32.const 4
-   call $~lib/metashrew-as/assembly/utils/box/Box#shrinkBack
-   call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:txid
-   local.get $this
-   local.get $bytes
-   i32.const 32
-   call $~lib/metashrew-as/assembly/utils/box/Box#sliceFrom
-   call $~lib/metashrew-as/assembly/utils/utils/parsePrimitive<u32>
-   call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#set:index
-  end
-  local.get $this
- )
- (func $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#get:length_ (param $this i32) (result i32)
-  local.get $this
-  i32.load offset=12
- )
- (func $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#set:length_ (param $this i32) (param $length_ i32)
-  local.get $this
-  local.get $length_
-  i32.store offset=12
- )
- (func $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#get:dataStart (param $this i32) (result i32)
-  local.get $this
-  i32.load offset=4
- )
- (func $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#__set (param $this i32) (param $index i32) (param $value i32)
-  local.get $index
-  local.get $this
-  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#get:length_
-  i32.ge_u
-  if
-   local.get $index
-   i32.const 0
-   i32.lt_s
-   if
-    i32.const 2464
-    i32.const 2592
-    i32.const 130
-    i32.const 22
-    call $~lib/builtins/abort
-    unreachable
-   end
-   local.get $this
-   local.get $index
-   i32.const 1
-   i32.add
-   i32.const 2
-   i32.const 1
-   call $~lib/array/ensureCapacity
-   local.get $this
-   local.get $index
-   i32.const 1
-   i32.add
-   call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#set:length_
-  end
-  local.get $this
-  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#get:dataStart
-  local.get $index
-  i32.const 2
-  i32.shl
-  i32.add
-  local.get $value
-  i32.store
-  i32.const 1
-  drop
-  local.get $this
-  local.get $value
-  i32.const 1
-  call $~lib/rt/stub/__link
- )
- (func $~lib/metashrew-as/assembly/utils/utils/concat~anonymous|0 (param $v i32) (param $i i32) (param $ary i32) (result i32)
-  local.get $v
-  call $~lib/metashrew-as/assembly/utils/box/Box.from
-  return
- )
- (func $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#map<~lib/metashrew-as/assembly/utils/box/Box> (param $this i32) (param $fn i32) (result i32)
-  (local $len i32)
-  (local $out i32)
-  (local $outStart i32)
-  (local $i i32)
-  (local $6 i32)
-  (local $7 i32)
-  (local $result i32)
-  local.get $this
-  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#get:length_
-  local.set $len
-  local.get $len
-  i32.const 2
-  i32.const 30
-  i32.const 0
-  call $~lib/rt/__newArray
-  local.set $out
-  local.get $out
-  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#get:dataStart
-  local.set $outStart
-  i32.const 0
-  local.set $i
-  loop $for-loop|0
-   local.get $i
-   local.get $len
-   local.tee $6
-   local.get $this
-   call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#get:length_
-   local.tee $7
-   local.get $6
-   local.get $7
-   i32.lt_s
-   select
-   i32.lt_s
-   if
-    local.get $this
-    call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#get:dataStart
-    local.get $i
-    i32.const 2
-    i32.shl
-    i32.add
-    i32.load
-    local.get $i
-    local.get $this
-    i32.const 3
-    global.set $~argumentsLength
-    local.get $fn
-    i32.load
-    call_indirect (type $3)
-    local.set $result
-    local.get $outStart
-    local.get $i
-    i32.const 2
-    i32.shl
-    i32.add
-    local.get $result
-    i32.store
-    i32.const 1
-    drop
-    local.get $out
-    local.get $result
-    i32.const 1
-    call $~lib/rt/stub/__link
-    local.get $i
-    i32.const 1
-    i32.add
-    local.set $i
-    br $for-loop|0
-   end
-  end
-  local.get $out
-  return
- )
- (func $~lib/metashrew-as/assembly/utils/utils/concat (param $data i32) (result i32)
-  local.get $data
-  i32.const 5312
-  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#map<~lib/metashrew-as/assembly/utils/box/Box>
-  call $~lib/metashrew-as/assembly/utils/box/Box.concat
-  return
- )
- (func $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint.from (param $txid i32) (param $offset i32) (result i32)
-  (local $index i32)
-  (local $3 i32)
-  (local $4 i32)
-  local.get $offset
-  call $~lib/metashrew-as/assembly/utils/utils/primitiveToBuffer<u32>
-  local.set $index
-  i32.const 0
-  i32.const 2
-  i32.const 2
-  i32.const 34
-  i32.const 0
-  call $~lib/rt/__newArray
-  local.set $3
-  local.get $3
-  i32.load offset=4
-  local.set $4
-  local.get $3
-  i32.const 0
-  local.get $txid
-  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#__set
-  local.get $3
-  i32.const 1
-  local.get $index
-  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#__set
-  local.get $3
-  call $~lib/metashrew-as/assembly/utils/utils/concat
-  call $~lib/metashrew-as/assembly/utils/box/Box.from
-  call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#constructor
-  return
- )
- (func $~lib/metashrew-as/assembly/blockdata/transaction/Input#previousOutput (param $this i32) (result i32)
-  (local $this|1 i32)
-  (local $len i32)
-  (local $this|3 i32)
-  (local $this|4 i32)
-  (local $txid i32)
-  (local $this|6 i32)
-  (local $len|7 i32)
-  (local $this|8 i32)
-  (local $this|9 i32)
-  (local $vout i32)
-  (local $correctedTxid i32)
-  block $~lib/metashrew-as/assembly/utils/pointer/Pointer#toBox|inlined.10 (result i32)
-   local.get $this
-   call $~lib/metashrew-as/assembly/blockdata/transaction/Input#get:hash
-   call $~lib/metashrew-as/assembly/utils/box/Box#get:start
-   call $~lib/metashrew-as/assembly/utils/pointer/toPointer
-   local.set $this|1
-   i32.const 32
-   local.set $len
-   i32.const 0
-   block $~lib/metashrew-as/assembly/utils/pointer/Pointer#asUsize|inlined.10 (result i32)
-    local.get $this|1
-    local.set $this|3
-    block $~lib/metashrew-as/assembly/utils/pointer/Pointer#asRef<usize>|inlined.10 (result i32)
-     local.get $this|3
-     local.set $this|4
-     local.get $this|4
-     br $~lib/metashrew-as/assembly/utils/pointer/Pointer#asRef<usize>|inlined.10
-    end
-    br $~lib/metashrew-as/assembly/utils/pointer/Pointer#asUsize|inlined.10
-   end
-   local.get $len
-   call $~lib/metashrew-as/assembly/utils/box/Box#constructor
-   br $~lib/metashrew-as/assembly/utils/pointer/Pointer#toBox|inlined.10
-  end
-  local.set $txid
-  block $~lib/metashrew-as/assembly/utils/pointer/Pointer#toBox|inlined.11 (result i32)
-   local.get $this
-   call $~lib/metashrew-as/assembly/blockdata/transaction/Input#get:hash
-   call $~lib/metashrew-as/assembly/utils/box/Box#get:start
-   i32.const 32
-   i32.add
-   call $~lib/metashrew-as/assembly/utils/pointer/toPointer
-   local.set $this|6
-   i32.const 4
-   local.set $len|7
-   i32.const 0
-   block $~lib/metashrew-as/assembly/utils/pointer/Pointer#asUsize|inlined.11 (result i32)
-    local.get $this|6
-    local.set $this|8
-    block $~lib/metashrew-as/assembly/utils/pointer/Pointer#asRef<usize>|inlined.11 (result i32)
-     local.get $this|8
-     local.set $this|9
-     local.get $this|9
-     br $~lib/metashrew-as/assembly/utils/pointer/Pointer#asRef<usize>|inlined.11
-    end
-    br $~lib/metashrew-as/assembly/utils/pointer/Pointer#asUsize|inlined.11
-   end
-   local.get $len|7
-   call $~lib/metashrew-as/assembly/utils/box/Box#constructor
-   br $~lib/metashrew-as/assembly/utils/pointer/Pointer#toBox|inlined.11
-  end
-  local.set $vout
-  local.get $txid
-  call $~lib/metashrew-as/assembly/utils/box/Box#toArrayBuffer
-  call $~lib/metashrew-as/assembly/utils/utils/reverse
-  local.set $correctedTxid
-  local.get $correctedTxid
-  local.get $vout
-  call $~lib/metashrew-as/assembly/utils/utils/parsePrimitive<u32>
-  call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint.from
-  return
- )
- (func $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#get:bytes (param $this i32) (result i32)
-  local.get $this
-  i32.load
- )
- (func $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#toBuffer (param $this i32) (result i32)
-  local.get $this
-  call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#get:bytes
-  call $~lib/metashrew-as/assembly/utils/box/Box#toArrayBuffer
-  return
- )
- (func $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#__set (param $this i32) (param $index i32) (param $value i32)
-  local.get $index
-  local.get $this
-  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#get:length_
-  i32.ge_u
-  if
-   local.get $index
-   i32.const 0
-   i32.lt_s
-   if
-    i32.const 2464
-    i32.const 2592
-    i32.const 130
-    i32.const 22
-    call $~lib/builtins/abort
-    unreachable
-   end
-   local.get $this
-   local.get $index
-   i32.const 1
-   i32.add
-   i32.const 2
-   i32.const 1
-   call $~lib/array/ensureCapacity
-   local.get $this
-   local.get $index
-   i32.const 1
-   i32.add
-   call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#set:length_
-  end
-  local.get $this
-  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#get:dataStart
-  local.get $index
-  i32.const 2
-  i32.shl
-  i32.add
-  local.get $value
-  i32.store
-  i32.const 1
-  drop
-  local.get $this
-  local.get $value
-  i32.const 1
-  call $~lib/rt/stub/__link
- )
- (func $assembly/index/Index.keyFor (param $table i32) (param $key i32) (result i32)
-  (local $2 i32)
-  (local $3 i32)
-  i32.const 2
-  i32.const 2
-  i32.const 30
-  i32.const 0
-  call $~lib/rt/__newArray
-  local.set $2
-  local.get $2
-  i32.load offset=4
-  local.set $3
-  local.get $2
-  i32.const 0
-  local.get $table
-  call $~lib/metashrew-as/assembly/utils/box/Box.from
-  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#__set
-  local.get $2
-  i32.const 1
-  local.get $key
-  call $~lib/metashrew-as/assembly/utils/box/Box.from
-  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#__set
-  local.get $2
-  call $~lib/metashrew-as/assembly/utils/box/Box.concat
-  return
- )
- (func $~lib/metashrew-as/assembly/utils/xxh32/xxh32 (param $key i32) (result i32)
-  (local $h i32)
-  (local $len i32)
-  (local $pos i32)
-  (local $s1 i32)
-  (local $s2 i32)
-  (local $s3 i32)
-  (local $s4 i32)
-  (local $end i32)
-  (local $h|9 i32)
-  (local $key|10 i32)
-  (local $h|11 i32)
-  (local $key|12 i32)
-  (local $h|13 i32)
-  (local $key|14 i32)
-  (local $h|15 i32)
-  (local $key|16 i32)
-  (local $end|17 i32)
-  local.get $key
-  i32.const 0
-  i32.eq
-  if
-   i32.const 0
-   return
-  end
-  local.get $key
-  call $~lib/arraybuffer/ArrayBuffer#get:byteLength
-  i32.const 1
-  i32.shl
-  local.set $h
-  local.get $h
-  local.set $len
-  local.get $key
-  local.set $pos
-  local.get $len
-  i32.const 16
-  i32.ge_u
-  if
-   i32.const 0
-   i32.const -1640531535
-   i32.add
-   i32.const -2048144777
-   i32.add
-   local.set $s1
-   i32.const 0
-   i32.const -2048144777
-   i32.add
-   local.set $s2
-   i32.const 0
-   local.set $s3
-   i32.const 0
-   i32.const -1640531535
-   i32.sub
-   local.set $s4
-   local.get $len
-   local.get $pos
-   i32.add
-   i32.const 16
-   i32.sub
-   local.set $end
-   loop $while-continue|0
-    local.get $pos
-    local.get $end
-    i32.le_u
-    if
-     block $~lib/metashrew-as/assembly/utils/xxh32/mix|inlined.0 (result i32)
-      local.get $s1
-      local.set $h|9
-      local.get $pos
-      i32.load
-      local.set $key|10
-      local.get $h|9
-      local.get $key|10
-      i32.const -2048144777
-      i32.mul
-      i32.add
-      i32.const 13
-      i32.rotl
-      i32.const -1640531535
-      i32.mul
-      br $~lib/metashrew-as/assembly/utils/xxh32/mix|inlined.0
-     end
-     local.set $s1
-     block $~lib/metashrew-as/assembly/utils/xxh32/mix|inlined.1 (result i32)
-      local.get $s2
-      local.set $h|11
-      local.get $pos
-      i32.load offset=4
-      local.set $key|12
-      local.get $h|11
-      local.get $key|12
-      i32.const -2048144777
-      i32.mul
-      i32.add
-      i32.const 13
-      i32.rotl
-      i32.const -1640531535
-      i32.mul
-      br $~lib/metashrew-as/assembly/utils/xxh32/mix|inlined.1
-     end
-     local.set $s2
-     block $~lib/metashrew-as/assembly/utils/xxh32/mix|inlined.2 (result i32)
-      local.get $s3
-      local.set $h|13
-      local.get $pos
-      i32.load offset=8
-      local.set $key|14
-      local.get $h|13
-      local.get $key|14
-      i32.const -2048144777
-      i32.mul
-      i32.add
-      i32.const 13
-      i32.rotl
-      i32.const -1640531535
-      i32.mul
-      br $~lib/metashrew-as/assembly/utils/xxh32/mix|inlined.2
-     end
-     local.set $s3
-     block $~lib/metashrew-as/assembly/utils/xxh32/mix|inlined.3 (result i32)
-      local.get $s4
-      local.set $h|15
-      local.get $pos
-      i32.load offset=12
-      local.set $key|16
-      local.get $h|15
-      local.get $key|16
-      i32.const -2048144777
-      i32.mul
-      i32.add
-      i32.const 13
-      i32.rotl
-      i32.const -1640531535
-      i32.mul
-      br $~lib/metashrew-as/assembly/utils/xxh32/mix|inlined.3
-     end
-     local.set $s4
-     local.get $pos
-     i32.const 16
-     i32.add
-     local.set $pos
-     br $while-continue|0
-    end
-   end
-   local.get $h
-   local.get $s1
-   i32.const 1
-   i32.rotl
-   local.get $s2
-   i32.const 7
-   i32.rotl
-   i32.add
-   local.get $s3
-   i32.const 12
-   i32.rotl
-   i32.add
-   local.get $s4
-   i32.const 18
-   i32.rotl
-   i32.add
-   i32.add
-   local.set $h
-  else
-   local.get $h
-   i32.const 0
-   i32.const 374761393
-   i32.add
-   i32.add
-   local.set $h
-  end
-  local.get $key
-  local.get $len
-  i32.add
-  i32.const 4
-  i32.sub
-  local.set $end|17
-  loop $while-continue|1
-   local.get $pos
-   local.get $end|17
-   i32.le_u
-   if
-    local.get $h
-    local.get $pos
-    i32.load
-    i32.const -1028477379
-    i32.mul
-    i32.add
-    local.set $h
-    local.get $h
-    i32.const 17
-    i32.rotl
-    i32.const 668265263
-    i32.mul
-    local.set $h
-    local.get $pos
-    i32.const 4
-    i32.add
-    local.set $pos
-    br $while-continue|1
-   end
-  end
-  local.get $key
-  local.get $len
-  i32.add
-  local.set $end|17
-  loop $while-continue|2
-   local.get $pos
-   local.get $end|17
-   i32.lt_u
-   if
-    local.get $h
-    local.get $pos
-    i32.load8_u
-    i32.const 374761393
-    i32.mul
-    i32.add
-    local.set $h
-    local.get $h
-    i32.const 11
-    i32.rotl
-    i32.const -1640531535
-    i32.mul
-    local.set $h
-    local.get $pos
-    i32.const 1
-    i32.add
-    local.set $pos
-    br $while-continue|2
-   end
-  end
-  local.get $h
-  local.get $h
-  i32.const 15
-  i32.shr_u
-  i32.xor
-  local.set $h
-  local.get $h
-  i32.const -2048144777
-  i32.mul
-  local.set $h
-  local.get $h
-  local.get $h
-  i32.const 13
-  i32.shr_u
-  i32.xor
-  local.set $h
-  local.get $h
-  i32.const -1028477379
-  i32.mul
-  local.set $h
-  local.get $h
-  local.get $h
-  i32.const 16
-  i32.shr_u
-  i32.xor
-  local.set $h
-  local.get $h
-  return
- )
- (func $~lib/util/hash/HASH<u32> (param $key i32) (result i32)
-  (local $key|1 i32)
-  (local $len i32)
-  (local $h i32)
-  i32.const 0
-  drop
-  i32.const 0
-  drop
-  i32.const 0
-  drop
-  i32.const 4
-  i32.const 4
-  i32.le_u
-  drop
-  block $~lib/util/hash/hash32|inlined.0 (result i32)
-   local.get $key
-   local.set $key|1
-   i32.const 4
-   local.set $len
-   i32.const 0
-   i32.const 374761393
-   i32.add
-   local.get $len
-   i32.add
-   local.set $h
-   local.get $h
-   local.get $key|1
-   i32.const -1028477379
-   i32.mul
-   i32.add
-   local.set $h
-   local.get $h
-   i32.const 17
-   i32.rotl
-   i32.const 668265263
-   i32.mul
-   local.set $h
-   local.get $h
-   local.get $h
-   i32.const 15
-   i32.shr_u
-   i32.xor
-   local.set $h
-   local.get $h
-   i32.const -2048144777
-   i32.mul
-   local.set $h
-   local.get $h
-   local.get $h
-   i32.const 13
-   i32.shr_u
-   i32.xor
-   local.set $h
-   local.get $h
-   i32.const -1028477379
-   i32.mul
-   local.set $h
-   local.get $h
-   local.get $h
-   i32.const 16
-   i32.shr_u
-   i32.xor
-   local.set $h
-   local.get $h
-   br $~lib/util/hash/hash32|inlined.0
-  end
-  return
- )
- (func $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:buckets" (param $this i32) (result i32)
-  local.get $this
-  i32.load
- )
- (func $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:bucketsMask" (param $this i32) (result i32)
-  local.get $this
-  i32.load offset=4
- )
- (func $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#get:taggedNext" (param $this i32) (result i32)
-  local.get $this
-  i32.load offset=8
- )
- (func $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#get:key" (param $this i32) (result i32)
-  local.get $this
-  i32.load
- )
- (func $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#find" (param $this i32) (param $key i32) (param $hashCode i32) (result i32)
-  (local $entry i32)
-  (local $taggedNext i32)
-  local.get $this
-  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:buckets"
-  local.get $hashCode
-  local.get $this
-  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:bucketsMask"
-  i32.and
-  i32.const 4
-  i32.mul
-  i32.add
-  i32.load
-  local.set $entry
-  loop $while-continue|0
-   local.get $entry
-   if
-    local.get $entry
-    call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#get:taggedNext"
-    local.set $taggedNext
-    local.get $taggedNext
-    i32.const 1
-    i32.and
-    i32.eqz
-    if (result i32)
-     local.get $entry
-     call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#get:key"
-     local.get $key
-     i32.eq
-    else
-     i32.const 0
-    end
-    if
-     local.get $entry
-     return
-    end
-    local.get $taggedNext
-    i32.const 1
-    i32.const -1
-    i32.xor
-    i32.and
-    local.set $entry
-    br $while-continue|0
-   end
-  end
-  i32.const 0
-  return
- )
- (func $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#has" (param $this i32) (param $key i32) (result i32)
-  local.get $this
-  local.get $key
-  local.get $key
-  call $~lib/util/hash/HASH<u32>
-  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#find"
-  i32.const 0
-  i32.ne
-  return
- )
- (func $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#set:value" (param $this i32) (param $value i32)
-  local.get $this
-  local.get $value
-  i32.store offset=4
- )
- (func $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entriesOffset" (param $this i32) (result i32)
-  local.get $this
-  i32.load offset=16
- )
- (func $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entriesCapacity" (param $this i32) (result i32)
-  local.get $this
-  i32.load offset=12
- )
- (func $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entriesCount" (param $this i32) (result i32)
-  local.get $this
-  i32.load offset=20
- )
- (func $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entries" (param $this i32) (result i32)
-  local.get $this
-  i32.load offset=8
- )
- (func $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#set:key" (param $this i32) (param $key i32)
-  local.get $this
-  local.get $key
-  i32.store
- )
- (func $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#get:value" (param $this i32) (result i32)
-  local.get $this
-  i32.load offset=4
- )
- (func $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#set:taggedNext" (param $this i32) (param $taggedNext i32)
-  local.get $this
-  local.get $taggedNext
-  i32.store offset=8
- )
- (func $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#rehash" (param $this i32) (param $newBucketsMask i32)
-  (local $newBucketsCapacity i32)
-  (local $newBuckets i32)
-  (local $newEntriesCapacity i32)
-  (local $newEntries i32)
-  (local $oldPtr i32)
-  (local $oldEnd i32)
-  (local $newPtr i32)
-  (local $oldEntry i32)
-  (local $newEntry i32)
-  (local $oldEntryKey i32)
-  (local $newBucketIndex i32)
-  (local $newBucketPtrBase i32)
-  local.get $newBucketsMask
-  i32.const 1
-  i32.add
-  local.set $newBucketsCapacity
-  i32.const 0
-  local.get $newBucketsCapacity
-  i32.const 4
-  i32.mul
-  call $~lib/arraybuffer/ArrayBuffer#constructor
-  local.set $newBuckets
-  local.get $newBucketsCapacity
-  i32.const 8
-  i32.mul
-  i32.const 3
-  i32.div_s
-  local.set $newEntriesCapacity
-  i32.const 0
-  local.get $newEntriesCapacity
-  block $"~lib/map/ENTRY_SIZE<u32,~lib/arraybuffer/ArrayBuffer>|inlined.1" (result i32)
-   i32.const 12
-   br $"~lib/map/ENTRY_SIZE<u32,~lib/arraybuffer/ArrayBuffer>|inlined.1"
-  end
-  i32.mul
-  call $~lib/arraybuffer/ArrayBuffer#constructor
-  local.set $newEntries
-  local.get $this
-  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entries"
-  local.set $oldPtr
-  local.get $oldPtr
-  local.get $this
-  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entriesOffset"
-  block $"~lib/map/ENTRY_SIZE<u32,~lib/arraybuffer/ArrayBuffer>|inlined.2" (result i32)
-   i32.const 12
-   br $"~lib/map/ENTRY_SIZE<u32,~lib/arraybuffer/ArrayBuffer>|inlined.2"
-  end
-  i32.mul
-  i32.add
-  local.set $oldEnd
-  local.get $newEntries
-  local.set $newPtr
-  loop $while-continue|0
-   local.get $oldPtr
-   local.get $oldEnd
-   i32.ne
-   if
-    local.get $oldPtr
-    local.set $oldEntry
-    local.get $oldEntry
-    call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#get:taggedNext"
-    i32.const 1
-    i32.and
-    i32.eqz
-    if
-     local.get $newPtr
-     local.set $newEntry
-     local.get $oldEntry
-     call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#get:key"
-     local.set $oldEntryKey
-     local.get $newEntry
-     local.get $oldEntryKey
-     call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#set:key"
-     local.get $newEntry
-     local.get $oldEntry
-     call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#get:value"
-     call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#set:value"
-     local.get $oldEntryKey
-     call $~lib/util/hash/HASH<u32>
-     local.get $newBucketsMask
-     i32.and
-     local.set $newBucketIndex
-     local.get $newBuckets
-     local.get $newBucketIndex
-     i32.const 4
-     i32.mul
-     i32.add
-     local.set $newBucketPtrBase
-     local.get $newEntry
-     local.get $newBucketPtrBase
-     i32.load
-     call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#set:taggedNext"
-     local.get $newBucketPtrBase
-     local.get $newPtr
-     i32.store
-     local.get $newPtr
-     block $"~lib/map/ENTRY_SIZE<u32,~lib/arraybuffer/ArrayBuffer>|inlined.3" (result i32)
-      i32.const 12
-      br $"~lib/map/ENTRY_SIZE<u32,~lib/arraybuffer/ArrayBuffer>|inlined.3"
-     end
-     i32.add
-     local.set $newPtr
-    end
-    local.get $oldPtr
-    block $"~lib/map/ENTRY_SIZE<u32,~lib/arraybuffer/ArrayBuffer>|inlined.4" (result i32)
-     i32.const 12
-     br $"~lib/map/ENTRY_SIZE<u32,~lib/arraybuffer/ArrayBuffer>|inlined.4"
-    end
-    i32.add
-    local.set $oldPtr
-    br $while-continue|0
-   end
-  end
-  local.get $this
-  local.get $newBuckets
-  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#set:buckets"
-  local.get $this
-  local.get $newBucketsMask
-  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#set:bucketsMask"
-  local.get $this
-  local.get $newEntries
-  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#set:entries"
-  local.get $this
-  local.get $newEntriesCapacity
-  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#set:entriesCapacity"
-  local.get $this
-  local.get $this
-  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entriesCount"
-  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#set:entriesOffset"
- )
- (func $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#set" (param $this i32) (param $key i32) (param $value i32) (result i32)
-  (local $hashCode i32)
-  (local $entry i32)
-  (local $entries i32)
-  (local $6 i32)
-  (local $bucketPtrBase i32)
-  local.get $key
-  call $~lib/util/hash/HASH<u32>
-  local.set $hashCode
-  local.get $this
-  local.get $key
-  local.get $hashCode
-  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#find"
-  local.set $entry
-  local.get $entry
-  if
-   local.get $entry
-   local.get $value
-   call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#set:value"
-   i32.const 1
-   drop
-   local.get $this
-   local.get $value
-   i32.const 1
-   call $~lib/rt/stub/__link
-  else
-   local.get $this
-   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entriesOffset"
-   local.get $this
-   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entriesCapacity"
-   i32.eq
-   if
-    local.get $this
-    local.get $this
-    call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entriesCount"
-    local.get $this
-    call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entriesCapacity"
-    i32.const 3
-    i32.mul
-    i32.const 4
-    i32.div_s
-    i32.lt_s
-    if (result i32)
-     local.get $this
-     call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:bucketsMask"
-    else
-     local.get $this
-     call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:bucketsMask"
-     i32.const 1
-     i32.shl
-     i32.const 1
-     i32.or
-    end
-    call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#rehash"
-   end
-   local.get $this
-   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entries"
-   local.set $entries
-   local.get $entries
-   local.get $this
-   local.get $this
-   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entriesOffset"
-   local.tee $6
-   i32.const 1
-   i32.add
-   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#set:entriesOffset"
-   local.get $6
-   block $"~lib/map/ENTRY_SIZE<u32,~lib/arraybuffer/ArrayBuffer>|inlined.5" (result i32)
-    i32.const 12
-    br $"~lib/map/ENTRY_SIZE<u32,~lib/arraybuffer/ArrayBuffer>|inlined.5"
-   end
-   i32.mul
-   i32.add
-   local.set $entry
-   local.get $entry
-   local.get $key
-   call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#set:key"
-   i32.const 0
-   drop
-   local.get $entry
-   local.get $value
-   call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#set:value"
-   i32.const 1
-   drop
-   local.get $this
-   local.get $value
-   i32.const 1
-   call $~lib/rt/stub/__link
-   local.get $this
-   local.get $this
-   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:entriesCount"
-   i32.const 1
-   i32.add
-   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#set:entriesCount"
-   local.get $this
-   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:buckets"
-   local.get $hashCode
-   local.get $this
-   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get:bucketsMask"
-   i32.and
-   i32.const 4
-   i32.mul
-   i32.add
-   local.set $bucketPtrBase
-   local.get $entry
-   local.get $bucketPtrBase
-   i32.load
-   call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#set:taggedNext"
-   local.get $bucketPtrBase
-   local.get $entry
-   i32.store
-  end
-  local.get $this
-  return
- )
- (func $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get" (param $this i32) (param $key i32) (result i32)
-  (local $entry i32)
-  local.get $this
-  local.get $key
-  local.get $key
-  call $~lib/util/hash/HASH<u32>
-  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#find"
-  local.set $entry
-  local.get $entry
-  i32.eqz
-  if
-   i32.const 5520
-   i32.const 5584
-   i32.const 105
-   i32.const 17
-   call $~lib/builtins/abort
-   unreachable
-  end
-  local.get $entry
-  call $"~lib/map/MapEntry<u32,~lib/arraybuffer/ArrayBuffer>#get:value"
-  return
- )
- (func $~lib/metashrew-as/assembly/indexer/index/get (param $k i32) (result i32)
-  (local $h i32)
-  (local $result i32)
-  local.get $k
-  call $~lib/metashrew-as/assembly/utils/xxh32/xxh32
-  local.set $h
-  global.get $~lib/metashrew-as/assembly/indexer/index/_updates
-  local.get $h
-  call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#has"
-  i32.eqz
-  if
-   i32.const 0
-   local.get $k
-   call $~lib/metashrew-as/assembly/indexer/index/__get_len
-   call $~lib/arraybuffer/ArrayBuffer#constructor
-   local.set $result
-   local.get $k
-   local.get $result
-   call $~lib/metashrew-as/assembly/indexer/index/__get
-   global.get $~lib/metashrew-as/assembly/indexer/index/_updates
-   local.get $h
-   local.get $result
-   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#set"
-   drop
-   global.get $~lib/metashrew-as/assembly/indexer/index/_updateKeys
-   local.get $h
-   local.get $result
-   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#set"
-   drop
-   local.get $result
-   return
-  else
-   global.get $~lib/metashrew-as/assembly/indexer/index/_updates
-   local.get $h
-   call $"~lib/map/Map<u32,~lib/arraybuffer/ArrayBuffer>#get"
-   return
-  end
-  unreachable
- )
- (func $~lib/util/number/decimalCount64High (param $value i64) (result i32)
-  local.get $value
-  i64.const 1000000000000000
-  i64.lt_u
-  if
-   local.get $value
-   i64.const 1000000000000
-   i64.lt_u
-   if
-    i32.const 10
-    local.get $value
-    i64.const 100000000000
-    i64.ge_u
-    i32.add
-    local.get $value
-    i64.const 10000000000
-    i64.ge_u
-    i32.add
-    return
-   else
-    i32.const 13
-    local.get $value
-    i64.const 100000000000000
-    i64.ge_u
-    i32.add
-    local.get $value
-    i64.const 10000000000000
-    i64.ge_u
-    i32.add
-    return
-   end
-   unreachable
-  else
-   local.get $value
-   i64.const 100000000000000000
-   i64.lt_u
-   if
-    i32.const 16
-    local.get $value
-    i64.const 10000000000000000
-    i64.ge_u
-    i32.add
-    return
-   else
-    i32.const 18
-    local.get $value
-    i64.const -8446744073709551616
-    i64.ge_u
-    i32.add
-    local.get $value
-    i64.const 1000000000000000000
-    i64.ge_u
-    i32.add
-    return
-   end
-   unreachable
-  end
-  unreachable
- )
- (func $~lib/util/number/utoa64_dec_lut (param $buffer i32) (param $num i64) (param $offset i32)
-  (local $t i64)
-  (local $r i32)
-  (local $b i32)
-  (local $c i32)
-  (local $b1 i32)
-  (local $b2 i32)
-  (local $c1 i32)
-  (local $c2 i32)
-  (local $digits1 i64)
-  (local $digits2 i64)
-  loop $while-continue|0
-   local.get $num
-   i64.const 100000000
-   i64.ge_u
-   if
-    local.get $num
-    i64.const 100000000
-    i64.div_u
-    local.set $t
-    local.get $num
-    local.get $t
-    i64.const 100000000
-    i64.mul
-    i64.sub
-    i32.wrap_i64
-    local.set $r
-    local.get $t
-    local.set $num
-    local.get $r
-    i32.const 10000
-    i32.div_u
-    local.set $b
-    local.get $r
-    i32.const 10000
-    i32.rem_u
-    local.set $c
-    local.get $b
-    i32.const 100
-    i32.div_u
-    local.set $b1
-    local.get $b
-    i32.const 100
-    i32.rem_u
-    local.set $b2
-    local.get $c
-    i32.const 100
-    i32.div_u
-    local.set $c1
-    local.get $c
-    i32.const 100
-    i32.rem_u
-    local.set $c2
-    i32.const 3500
-    local.get $c1
-    i32.const 2
-    i32.shl
-    i32.add
-    i64.load32_u
-    local.set $digits1
-    i32.const 3500
-    local.get $c2
-    i32.const 2
-    i32.shl
-    i32.add
-    i64.load32_u
-    local.set $digits2
-    local.get $offset
-    i32.const 4
-    i32.sub
-    local.set $offset
-    local.get $buffer
-    local.get $offset
-    i32.const 1
-    i32.shl
-    i32.add
-    local.get $digits1
-    local.get $digits2
-    i64.const 32
-    i64.shl
-    i64.or
-    i64.store
-    i32.const 3500
-    local.get $b1
-    i32.const 2
-    i32.shl
-    i32.add
-    i64.load32_u
-    local.set $digits1
-    i32.const 3500
-    local.get $b2
-    i32.const 2
-    i32.shl
-    i32.add
-    i64.load32_u
-    local.set $digits2
-    local.get $offset
-    i32.const 4
-    i32.sub
-    local.set $offset
-    local.get $buffer
-    local.get $offset
-    i32.const 1
-    i32.shl
-    i32.add
-    local.get $digits1
-    local.get $digits2
-    i64.const 32
-    i64.shl
-    i64.or
-    i64.store
-    br $while-continue|0
-   end
-  end
-  local.get $buffer
-  local.get $num
-  i32.wrap_i64
-  local.get $offset
-  call $~lib/util/number/utoa32_dec_lut
- )
- (func $~lib/util/number/utoa64 (param $value i64) (param $radix i32) (result i32)
-  (local $out i32)
-  (local $val32 i32)
-  (local $decimals i32)
-  (local $buffer i32)
-  (local $num i32)
-  (local $offset i32)
-  (local $decimals|8 i32)
-  (local $buffer|9 i32)
-  (local $num|10 i64)
-  (local $offset|11 i32)
-  (local $decimals|12 i32)
-  (local $buffer|13 i32)
-  (local $num|14 i64)
-  (local $offset|15 i32)
-  (local $decimals|16 i32)
-  local.get $radix
-  i32.const 2
-  i32.lt_s
-  if (result i32)
-   i32.const 1
-  else
-   local.get $radix
-   i32.const 36
-   i32.gt_s
-  end
-  if
-   i32.const 3296
-   i32.const 3424
-   i32.const 401
-   i32.const 5
-   call $~lib/builtins/abort
-   unreachable
-  end
-  local.get $value
-  i64.const 0
-  i64.ne
-  i32.eqz
-  if
-   i32.const 3488
-   return
-  end
-  local.get $radix
-  i32.const 10
-  i32.eq
-  if
-   local.get $value
-   global.get $~lib/builtins/u32.MAX_VALUE
-   i64.extend_i32_u
-   i64.le_u
-   if
-    local.get $value
-    i32.wrap_i64
-    local.set $val32
-    local.get $val32
-    call $~lib/util/number/decimalCount32
-    local.set $decimals
-    local.get $decimals
-    i32.const 1
-    i32.shl
-    i32.const 2
-    call $~lib/rt/stub/__new
-    local.set $out
-    local.get $out
-    local.set $buffer
-    local.get $val32
-    local.set $num
-    local.get $decimals
-    local.set $offset
-    i32.const 0
-    i32.const 1
-    i32.ge_s
-    drop
-    local.get $buffer
-    local.get $num
-    local.get $offset
-    call $~lib/util/number/utoa32_dec_lut
-   else
-    local.get $value
-    call $~lib/util/number/decimalCount64High
-    local.set $decimals|8
-    local.get $decimals|8
-    i32.const 1
-    i32.shl
-    i32.const 2
-    call $~lib/rt/stub/__new
-    local.set $out
-    local.get $out
-    local.set $buffer|9
-    local.get $value
-    local.set $num|10
-    local.get $decimals|8
-    local.set $offset|11
-    i32.const 0
-    i32.const 1
-    i32.ge_s
-    drop
-    local.get $buffer|9
-    local.get $num|10
-    local.get $offset|11
-    call $~lib/util/number/utoa64_dec_lut
-   end
-  else
-   local.get $radix
-   i32.const 16
-   i32.eq
-   if
-    i32.const 63
-    local.get $value
-    i64.clz
-    i32.wrap_i64
-    i32.sub
-    i32.const 2
-    i32.shr_s
-    i32.const 1
-    i32.add
-    local.set $decimals|12
-    local.get $decimals|12
-    i32.const 1
-    i32.shl
-    i32.const 2
-    call $~lib/rt/stub/__new
-    local.set $out
-    local.get $out
-    local.set $buffer|13
-    local.get $value
-    local.set $num|14
-    local.get $decimals|12
-    local.set $offset|15
-    i32.const 0
-    i32.const 1
-    i32.ge_s
-    drop
-    local.get $buffer|13
-    local.get $num|14
-    local.get $offset|15
-    call $~lib/util/number/utoa_hex_lut
-   else
-    local.get $value
-    local.get $radix
-    call $~lib/util/number/ulog_base
-    local.set $decimals|16
-    local.get $decimals|16
-    i32.const 1
-    i32.shl
-    i32.const 2
-    call $~lib/rt/stub/__new
-    local.set $out
-    local.get $out
-    local.get $value
-    local.get $decimals|16
-    local.get $radix
-    call $~lib/util/number/utoa64_any_core
-   end
-  end
-  local.get $out
-  return
- )
- (func $~lib/number/U64#toString (param $this i64) (param $radix i32) (result i32)
-  local.get $this
-  local.get $radix
-  call $~lib/util/number/utoa64
-  return
- )
- (func $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Output>#get:length (param $this i32) (result i32)
-  local.get $this
-  call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Output>#get:length_
-  return
- )
- (func $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Output>#__get (param $this i32) (param $index i32) (result i32)
-  (local $value i32)
-  local.get $index
-  local.get $this
-  call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Output>#get:length_
-  i32.ge_u
-  if
-   i32.const 2464
-   i32.const 2592
-   i32.const 114
-   i32.const 42
-   call $~lib/builtins/abort
-   unreachable
-  end
-  local.get $this
-  call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Output>#get:dataStart
-  local.get $index
-  i32.const 2
-  i32.shl
-  i32.add
-  i32.load
-  local.set $value
-  i32.const 1
-  drop
-  i32.const 0
-  i32.eqz
-  drop
-  local.get $value
-  i32.eqz
-  if
-   i32.const 3008
-   i32.const 2592
-   i32.const 118
-   i32.const 40
-   call $~lib/builtins/abort
-   unreachable
-  end
-  local.get $value
-  return
- )
  (func $~lib/metashrew-as/assembly/blockdata/transaction/Output#get:value (param $this i32) (result i64)
   local.get $this
   i64.load offset=8
@@ -8599,7 +6985,7 @@
   i32.const 1
   i32.lt_s
   if
-   i32.const 6192
+   i32.const 3488
    i32.const 2592
    i32.const 330
    i32.const 18
@@ -8694,7 +7080,7 @@
   i32.eqz
   if
    i32.const 16
-   i32.const 28
+   i32.const 27
    call $~lib/rt/stub/__new
    local.set $this
   end
@@ -8940,7 +7326,7 @@
   local.get $value
   i32.eqz
   if
-   i32.const 3008
+   i32.const 3120
    i32.const 2592
    i32.const 118
    i32.const 40
@@ -8969,13 +7355,11 @@
   unreachable
  )
  (func $assembly/index/Index.indexRanges (param $height i32) (param $block i32)
-  (local $2 i32)
-  (local $3 i32)
   (local $h i32)
   (local $coinbase_inputs i32)
   (local $start i32)
-  (local $7 i32)
-  (local $8 i32)
+  (local $5 i32)
+  (local $6 i32)
   (local $tx_offset i32)
   (local $tx i32)
   (local $inputOrdinalsRange i32)
@@ -8985,80 +7369,57 @@
   (local $response i32)
   (local $ordinalRanges i32)
   (local $numOfOrdinals i32)
-  (local $i|18 i32)
-  (local $start|19 i64)
+  (local $i|16 i32)
+  (local $start|17 i64)
   (local $end i64)
-  (local $21 i32)
+  (local $19 i32)
+  (local $20 i32)
+  (local $i|21 i32)
   (local $22 i32)
-  (local $i|23 i32)
-  (local $24 i32)
-  (local $25 i32)
+  (local $23 i32)
   (local $ordinals i32)
   (local $output i32)
-  (local $key|28 i32)
+  (local $key|26 i32)
   (local $remaining i64)
   (local $range i32)
   (local $count i64)
   (local $assigned i32)
   (local $middle i64)
+  (local $32 i32)
+  (local $33 i32)
   (local $34 i32)
   (local $35 i32)
-  (local $36 i32)
-  (local $37 i32)
-  (local $start|38 i32)
-  (local $end|39 i32)
-  (local $40 i32)
-  (local $41 i32)
+  (local $start|36 i32)
+  (local $end|37 i32)
+  (local $38 i32)
+  (local $39 i32)
   (local $ordinalRange i32)
   (local $numOrdinals i32)
   (local $ords i32)
-  (local $i|45 i32)
+  (local $i|43 i32)
   (local $coinbase i32)
   (local $vout i32)
-  (local $output|48 i32)
-  (local $49 i32)
-  (local $50 i32)
-  (local $ordinals|51 i32)
-  (local $remaining|52 i64)
-  (local $range|53 i32)
-  (local $count|54 i64)
-  (local $assigned|55 i32)
-  (local $middle|56 i64)
+  (local $output|46 i32)
+  (local $47 i32)
+  (local $48 i32)
+  (local $ordinals|49 i32)
+  (local $key|50 i32)
+  (local $remaining|51 i64)
+  (local $range|52 i32)
+  (local $count|53 i64)
+  (local $assigned|54 i32)
+  (local $middle|55 i64)
+  (local $56 i32)
   (local $57 i32)
   (local $58 i32)
   (local $59 i32)
-  (local $60 i32)
-  (local $start|61 i32)
-  (local $end|62 i32)
+  (local $start|60 i32)
+  (local $end|61 i32)
+  (local $62 i32)
   (local $63 i32)
-  (local $64 i32)
-  (local $ordinalRange|65 i32)
-  (local $numOrdinals|66 i32)
-  (local $ords|67 i32)
-  (local $key|68 i32)
-  global.get $~lib/metashrew-as/assembly/utils/logging/console
-  local.get $height
-  i32.const 10
-  call $~lib/number/U32#toString
-  local.set $2
-  local.get $block
-  call $~lib/metashrew-as/assembly/blockdata/block/Block#get:transactions
-  call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Transaction>#get:length
-  i32.const 10
-  call $~lib/number/I32#toString
-  local.set $3
-  i32.const 3248
-  i32.const 1
-  local.get $2
-  call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-  i32.const 3248
-  i32.const 3
-  local.get $3
-  call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-  i32.const 3248
-  i32.const 5072
-  call $~lib/staticarray/StaticArray<~lib/string/String>#join
-  call $~lib/metashrew-as/assembly/utils/logging/Console#log
+  (local $ordinalRange|64 i32)
+  (local $numOrdinals|65 i32)
+  (local $ords|66 i32)
   i32.const 0
   local.get $height
   call $~lib/metashrew-as/assembly/blockdata/height/Height#constructor
@@ -9078,19 +7439,19 @@
    local.get $coinbase_inputs
    i32.const 2
    i32.const 3
-   i32.const 28
+   i32.const 27
    i32.const 0
    call $~lib/rt/__newArray
-   local.set $7
-   local.get $7
+   local.set $5
+   local.get $5
    i32.load offset=4
-   local.set $8
-   local.get $7
+   local.set $6
+   local.get $5
    i32.const 0
    local.get $start
    call $~lib/metashrew-as/assembly/blockdata/sat/Sat#n
    call $~lib/array/Array<u64>#__set
-   local.get $7
+   local.get $5
    i32.const 1
    local.get $start
    call $~lib/metashrew-as/assembly/blockdata/sat/Sat#n
@@ -9098,7 +7459,7 @@
    call $~lib/metashrew-as/assembly/blockdata/height/Height#subsidy
    i64.add
    call $~lib/array/Array<u64>#__set
-   local.get $7
+   local.get $5
    call $~lib/array/Array<~lib/array/Array<u64>>#push
    drop
   end
@@ -9116,31 +7477,10 @@
     local.get $tx_offset
     call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Transaction>#__get
     local.set $tx
-    global.get $~lib/metashrew-as/assembly/utils/logging/console
-    i32.const 5104
-    local.get $tx
-    call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:locktime
-    i32.const 10
-    call $~lib/number/U32#toString
-    call $~lib/string/String.__concat
-    call $~lib/metashrew-as/assembly/utils/logging/Console#log
     i32.const 0
     i32.const 0
     call $~lib/array/Array<~lib/array/Array<u64>>#constructor
     local.set $inputOrdinalsRange
-    global.get $~lib/metashrew-as/assembly/utils/logging/console
-    i32.const 5152
-    local.get $tx_offset
-    i32.const 10
-    call $~lib/number/I32#toString
-    call $~lib/string/String.__concat
-    i32.const 5216
-    call $~lib/string/String.__concat
-    local.get $tx
-    call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#txid
-    call $~lib/metashrew-as/assembly/utils/hex/encodeHexFromBuffer
-    call $~lib/string/String.__concat
-    call $~lib/metashrew-as/assembly/utils/logging/Console#log
     i32.const 0
     local.set $i
     loop $for-loop|1
@@ -9159,24 +7499,6 @@
       call $~lib/metashrew-as/assembly/blockdata/transaction/Input#previousOutput
       call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#toBuffer
       local.set $key
-      global.get $~lib/metashrew-as/assembly/utils/logging/console
-      i32.const 5344
-      local.get $tx_offset
-      i32.const 10
-      call $~lib/number/I32#toString
-      call $~lib/string/String.__concat
-      i32.const 5408
-      call $~lib/string/String.__concat
-      local.get $i
-      i32.const 10
-      call $~lib/number/I32#toString
-      call $~lib/string/String.__concat
-      i32.const 5456
-      call $~lib/string/String.__concat
-      local.get $key
-      call $~lib/metashrew-as/assembly/utils/hex/encodeHexFromBuffer
-      call $~lib/string/String.__concat
-      call $~lib/metashrew-as/assembly/utils/logging/Console#log
       global.get $assembly/index/OUTPOINT_TO_ORDINALS_RANGE
       local.get $key
       call $assembly/index/Index.keyFor
@@ -9188,64 +7510,44 @@
       local.get $ordinalRanges
       call $~lib/metashrew-as/assembly/utils/utils/parsePrimitive<u32>
       local.set $numOfOrdinals
-      global.get $~lib/metashrew-as/assembly/utils/logging/console
-      i32.const 5632
-      local.get $numOfOrdinals
-      i32.const 10
-      call $~lib/number/U32#toString
-      call $~lib/string/String.__concat
-      call $~lib/metashrew-as/assembly/utils/logging/Console#log
       i32.const 0
-      local.set $i|18
+      local.set $i|16
       loop $for-loop|2
-       local.get $i|18
+       local.get $i|16
        local.get $numOfOrdinals
        i32.lt_s
        if
         local.get $ordinalRanges
         call $~lib/metashrew-as/assembly/utils/utils/parsePrimitive<u64>
-        local.set $start|19
+        local.set $start|17
         local.get $ordinalRanges
         call $~lib/metashrew-as/assembly/utils/utils/parsePrimitive<u64>
         local.set $end
-        global.get $~lib/metashrew-as/assembly/utils/logging/console
-        i32.const 5696
-        local.get $start|19
-        i32.const 10
-        call $~lib/number/U64#toString
-        call $~lib/string/String.__concat
-        i32.const 5744
-        call $~lib/string/String.__concat
-        local.get $end
-        i32.const 10
-        call $~lib/number/U64#toString
-        call $~lib/string/String.__concat
-        call $~lib/metashrew-as/assembly/utils/logging/Console#log
         local.get $inputOrdinalsRange
         i32.const 2
         i32.const 3
-        i32.const 28
+        i32.const 27
         i32.const 0
         call $~lib/rt/__newArray
-        local.set $21
-        local.get $21
+        local.set $19
+        local.get $19
         i32.load offset=4
-        local.set $22
-        local.get $21
+        local.set $20
+        local.get $19
         i32.const 0
-        local.get $start|19
+        local.get $start|17
         call $~lib/array/Array<u64>#__set
-        local.get $21
+        local.get $19
         i32.const 1
         local.get $end
         call $~lib/array/Array<u64>#__set
-        local.get $21
+        local.get $19
         call $~lib/array/Array<~lib/array/Array<u64>>#push
         drop
-        local.get $i|18
+        local.get $i|16
         i32.const 1
         i32.add
-        local.set $i|18
+        local.set $i|16
         br $for-loop|2
        end
       end
@@ -9257,9 +7559,9 @@
      end
     end
     i32.const 0
-    local.set $i|23
+    local.set $i|21
     loop $for-loop|3
-     local.get $i|23
+     local.get $i|21
      local.get $tx
      call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:outs
      call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Output>#get:length
@@ -9267,39 +7569,21 @@
      if
       i32.const 0
       i32.const 2
-      i32.const 34
-      i32.const 5776
+      i32.const 30
+      i32.const 3456
       call $~lib/rt/__newArray
       local.set $ordinals
       local.get $tx
       call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:outs
-      local.get $i|23
+      local.get $i|21
       call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Output>#__get
       local.set $output
       local.get $tx
       call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#txid
-      local.get $i|23
+      local.get $i|21
       call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint.from
       call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#toBuffer
-      local.set $key|28
-      global.get $~lib/metashrew-as/assembly/utils/logging/console
-      i32.const 5808
-      local.get $tx_offset
-      i32.const 10
-      call $~lib/number/I32#toString
-      call $~lib/string/String.__concat
-      i32.const 5872
-      call $~lib/string/String.__concat
-      local.get $i|23
-      i32.const 10
-      call $~lib/number/I32#toString
-      call $~lib/string/String.__concat
-      i32.const 5920
-      call $~lib/string/String.__concat
-      local.get $key|28
-      call $~lib/metashrew-as/assembly/utils/hex/encodeHexFromBuffer
-      call $~lib/string/String.__concat
-      call $~lib/metashrew-as/assembly/utils/logging/Console#log
+      local.set $key|26
       local.get $output
       call $~lib/metashrew-as/assembly/blockdata/transaction/Output#get:value
       local.set $remaining
@@ -9314,14 +7598,7 @@
          i32.const 0
          i32.eq
          if
-          global.get $~lib/metashrew-as/assembly/utils/logging/console
-          i32.const 5968
-          call $~lib/metashrew-as/assembly/utils/logging/Console#log
           br $while-break|4
-         else
-          global.get $~lib/metashrew-as/assembly/utils/logging/console
-          i32.const 6080
-          call $~lib/metashrew-as/assembly/utils/logging/Console#log
          end
          local.get $inputOrdinalsRange
          call $~lib/array/Array<~lib/array/Array<u64>>#shift
@@ -9334,13 +7611,6 @@
          call $~lib/array/Array<u64>#__get
          i64.sub
          local.set $count
-         global.get $~lib/metashrew-as/assembly/utils/logging/console
-         i32.const 6240
-         local.get $count
-         i32.const 10
-         call $~lib/number/U64#toString
-         call $~lib/string/String.__concat
-         call $~lib/metashrew-as/assembly/utils/logging/Console#log
          i32.const 0
          i32.const 0
          call $~lib/array/Array<u64>#constructor
@@ -9358,7 +7628,29 @@
           local.get $inputOrdinalsRange
           i32.const 2
           i32.const 3
-          i32.const 28
+          i32.const 27
+          i32.const 0
+          call $~lib/rt/__newArray
+          local.set $32
+          local.get $32
+          i32.load offset=4
+          local.set $33
+          local.get $32
+          i32.const 0
+          local.get $middle
+          call $~lib/array/Array<u64>#__set
+          local.get $32
+          i32.const 1
+          local.get $range
+          i32.const 1
+          call $~lib/array/Array<u64>#__get
+          call $~lib/array/Array<u64>#__set
+          local.get $32
+          call $~lib/array/Array<~lib/array/Array<u64>>#unshift
+          drop
+          i32.const 2
+          i32.const 3
+          i32.const 27
           i32.const 0
           call $~lib/rt/__newArray
           local.set $34
@@ -9367,37 +7659,15 @@
           local.set $35
           local.get $34
           i32.const 0
-          local.get $middle
-          call $~lib/array/Array<u64>#__set
-          local.get $34
-          i32.const 1
-          local.get $range
-          i32.const 1
-          call $~lib/array/Array<u64>#__get
-          call $~lib/array/Array<u64>#__set
-          local.get $34
-          call $~lib/array/Array<~lib/array/Array<u64>>#unshift
-          drop
-          i32.const 2
-          i32.const 3
-          i32.const 28
-          i32.const 0
-          call $~lib/rt/__newArray
-          local.set $36
-          local.get $36
-          i32.load offset=4
-          local.set $37
-          local.get $36
-          i32.const 0
           local.get $range
           i32.const 0
           call $~lib/array/Array<u64>#__get
           call $~lib/array/Array<u64>#__set
-          local.get $36
+          local.get $34
           i32.const 1
           local.get $middle
           call $~lib/array/Array<u64>#__set
-          local.get $36
+          local.get $34
           local.set $assigned
          else
           local.get $range
@@ -9407,30 +7677,30 @@
          i32.const 0
          call $~lib/array/Array<u64>#__get
          call $~lib/metashrew-as/assembly/utils/utils/primitiveToBuffer<u64>
-         local.set $start|38
+         local.set $start|36
          local.get $assigned
          i32.const 1
          call $~lib/array/Array<u64>#__get
          call $~lib/metashrew-as/assembly/utils/utils/primitiveToBuffer<u64>
-         local.set $end|39
+         local.set $end|37
          i32.const 2
          i32.const 2
-         i32.const 34
+         i32.const 30
          i32.const 0
          call $~lib/rt/__newArray
-         local.set $40
-         local.get $40
+         local.set $38
+         local.get $38
          i32.load offset=4
-         local.set $41
-         local.get $40
+         local.set $39
+         local.get $38
          i32.const 0
-         local.get $start|38
+         local.get $start|36
          call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#__set
-         local.get $40
+         local.get $38
          i32.const 1
-         local.get $end|39
+         local.get $end|37
          call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#__set
-         local.get $40
+         local.get $38
          call $~lib/metashrew-as/assembly/utils/utils/concat
          local.set $ordinalRange
          local.get $ordinals
@@ -9463,35 +7733,35 @@
       call $~lib/metashrew-as/assembly/utils/utils/concat
       local.set $ords
       global.get $assembly/index/OUTPOINT_TO_ORDINALS_RANGE
-      local.get $key|28
+      local.get $key|26
       call $assembly/index/Index.keyFor
       local.get $ords
       call $~lib/metashrew-as/assembly/indexer/index/set
-      local.get $i|23
+      local.get $i|21
       i32.const 1
       i32.add
-      local.set $i|23
+      local.set $i|21
       br $for-loop|3
      end
     end
     i32.const 0
-    local.set $i|45
+    local.set $i|43
     loop $for-loop|5
-     local.get $i|45
+     local.get $i|43
      local.get $inputOrdinalsRange
      call $~lib/array/Array<~lib/array/Array<u64>>#get:length
      i32.lt_s
      if
       local.get $coinbase_inputs
       local.get $inputOrdinalsRange
-      local.get $i|45
+      local.get $i|43
       call $~lib/array/Array<~lib/array/Array<u64>>#__get
       call $~lib/array/Array<~lib/array/Array<u64>>#push
       drop
-      local.get $i|45
+      local.get $i|43
       i32.const 1
       i32.add
-      local.set $i|45
+      local.set $i|43
       br $for-loop|5
      end
     end
@@ -9510,7 +7780,6 @@
   i32.eq
   if
    return
-  else
   end
   i32.const 0
   local.set $vout
@@ -9525,19 +7794,25 @@
     call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:outs
     local.get $vout
     call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Output>#__get
-    local.set $output|48
+    local.set $output|46
     i32.const 0
     i32.const 2
-    i32.const 34
-    i32.const 6288
+    i32.const 30
+    i32.const 3536
     call $~lib/rt/__newArray
-    local.set $ordinals|51
-    local.get $output|48
+    local.set $ordinals|49
+    local.get $coinbase
+    call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#txid
+    local.get $vout
+    call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint.from
+    call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#toBuffer
+    local.set $key|50
+    local.get $output|46
     call $~lib/metashrew-as/assembly/blockdata/transaction/Output#get:value
-    local.set $remaining|52
+    local.set $remaining|51
     block $while-break|7
      loop $while-continue|7
-      local.get $remaining|52
+      local.get $remaining|51
       i64.const 0
       i64.gt_u
       if
@@ -9550,152 +7825,140 @@
        end
        local.get $coinbase_inputs
        call $~lib/array/Array<~lib/array/Array<u64>>#shift
-       local.set $range|53
-       local.get $range|53
+       local.set $range|52
+       local.get $range|52
        i32.const 1
        call $~lib/array/Array<u64>#__get
-       local.get $range|53
+       local.get $range|52
        i32.const 0
        call $~lib/array/Array<u64>#__get
        i64.sub
-       local.set $count|54
+       local.set $count|53
        i32.const 0
        i32.const 0
        call $~lib/array/Array<u64>#constructor
-       local.set $assigned|55
-       local.get $count|54
-       local.get $remaining|52
+       local.set $assigned|54
+       local.get $count|53
+       local.get $remaining|51
        i64.gt_u
        if
-        local.get $range|53
+        local.get $range|52
         i32.const 0
         call $~lib/array/Array<u64>#__get
-        local.get $remaining|52
+        local.get $remaining|51
         i64.add
-        local.set $middle|56
+        local.set $middle|55
         local.get $coinbase_inputs
         i32.const 2
         i32.const 3
-        i32.const 28
+        i32.const 27
         i32.const 0
         call $~lib/rt/__newArray
-        local.set $57
-        local.get $57
+        local.set $56
+        local.get $56
         i32.load offset=4
-        local.set $58
-        local.get $57
+        local.set $57
+        local.get $56
         i32.const 0
-        local.get $middle|56
+        local.get $middle|55
         call $~lib/array/Array<u64>#__set
-        local.get $57
+        local.get $56
         i32.const 1
-        local.get $range|53
+        local.get $range|52
         i32.const 1
         call $~lib/array/Array<u64>#__get
         call $~lib/array/Array<u64>#__set
-        local.get $57
+        local.get $56
         call $~lib/array/Array<~lib/array/Array<u64>>#unshift
         drop
         i32.const 2
         i32.const 3
-        i32.const 28
+        i32.const 27
         i32.const 0
         call $~lib/rt/__newArray
-        local.set $59
-        local.get $59
+        local.set $58
+        local.get $58
         i32.load offset=4
-        local.set $60
-        local.get $59
+        local.set $59
+        local.get $58
         i32.const 0
-        local.get $range|53
+        local.get $range|52
         i32.const 0
         call $~lib/array/Array<u64>#__get
         call $~lib/array/Array<u64>#__set
-        local.get $59
+        local.get $58
         i32.const 1
-        local.get $middle|56
+        local.get $middle|55
         call $~lib/array/Array<u64>#__set
-        local.get $59
-        local.set $assigned|55
+        local.get $58
+        local.set $assigned|54
        else
-        local.get $range|53
-        local.set $assigned|55
+        local.get $range|52
+        local.set $assigned|54
        end
-       local.get $assigned|55
+       local.get $assigned|54
        i32.const 0
        call $~lib/array/Array<u64>#__get
        call $~lib/metashrew-as/assembly/utils/utils/primitiveToBuffer<u64>
-       local.set $start|61
-       local.get $assigned|55
+       local.set $start|60
+       local.get $assigned|54
        i32.const 1
        call $~lib/array/Array<u64>#__get
        call $~lib/metashrew-as/assembly/utils/utils/primitiveToBuffer<u64>
-       local.set $end|62
+       local.set $end|61
        i32.const 2
        i32.const 2
-       i32.const 34
+       i32.const 30
        i32.const 0
        call $~lib/rt/__newArray
-       local.set $63
-       local.get $63
+       local.set $62
+       local.get $62
        i32.load offset=4
-       local.set $64
-       local.get $63
+       local.set $63
+       local.get $62
        i32.const 0
-       local.get $start|61
+       local.get $start|60
        call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#__set
-       local.get $63
+       local.get $62
        i32.const 1
-       local.get $end|62
+       local.get $end|61
        call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#__set
-       local.get $63
+       local.get $62
        call $~lib/metashrew-as/assembly/utils/utils/concat
-       local.set $ordinalRange|65
-       local.get $ordinals|51
-       local.get $ordinalRange|65
+       local.set $ordinalRange|64
+       local.get $ordinals|49
+       local.get $ordinalRange|64
        call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#push
        drop
-       local.get $remaining|52
-       local.get $assigned|55
+       local.get $remaining|51
+       local.get $assigned|54
        i32.const 1
        call $~lib/array/Array<u64>#__get
-       local.get $assigned|55
+       local.get $assigned|54
        i32.const 0
        call $~lib/array/Array<u64>#__get
        i64.sub
        i64.sub
-       local.set $remaining|52
+       local.set $remaining|51
        br $while-continue|7
       end
      end
     end
-    local.get $ordinals|51
+    local.get $ordinals|49
     call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#get:length
     call $~lib/metashrew-as/assembly/utils/utils/primitiveToBuffer<u32>
-    local.set $numOrdinals|66
-    local.get $ordinals|51
-    local.get $numOrdinals|66
+    local.set $numOrdinals|65
+    local.get $ordinals|49
+    local.get $numOrdinals|65
     call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#unshift
     drop
-    local.get $ordinals|51
+    local.get $ordinals|49
     call $~lib/metashrew-as/assembly/utils/utils/concat
-    local.set $ords|67
-    local.get $coinbase
-    call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#txid
-    local.get $vout
-    call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint.from
-    call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#toBuffer
-    local.set $key|68
-    global.get $~lib/metashrew-as/assembly/utils/logging/console
-    i32.const 6320
-    local.get $key|68
-    call $~lib/metashrew-as/assembly/utils/hex/encodeHexFromBuffer
-    call $~lib/string/String.__concat
-    call $~lib/metashrew-as/assembly/utils/logging/Console#log
+    local.set $ords|66
     global.get $assembly/index/OUTPOINT_TO_ORDINALS_RANGE
-    local.get $key|68
+    local.get $key|50
     call $assembly/index/Index.keyFor
-    local.get $ords|67
+    local.get $ords|66
     call $~lib/metashrew-as/assembly/indexer/index/set
     local.get $vout
     i32.const 1
@@ -9704,6 +7967,151 @@
     br $for-loop|6
    end
   end
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/block/Block#get:header (param $this i32) (result i32)
+  local.get $this
+  i32.load offset=4
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/block/Header#get:version (param $this i32) (result i32)
+  local.get $this
+  i32.load
+ )
+ (func $~lib/metashrew-as/assembly/utils/utils/primitiveToBuffer<i32> (param $value i32) (result i32)
+  (local $buffer i32)
+  i32.const 0
+  i32.const 4
+  call $~lib/arraybuffer/ArrayBuffer#constructor
+  local.set $buffer
+  local.get $buffer
+  local.get $value
+  i32.store
+  local.get $buffer
+  return
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/block/Header#get:prevBlock (param $this i32) (result i32)
+  local.get $this
+  i32.load offset=4
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/block/Header#get:merkleRoot (param $this i32) (result i32)
+  local.get $this
+  i32.load offset=8
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/block/Header#get:time (param $this i32) (result i32)
+  local.get $this
+  i32.load offset=12
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/block/Header#get:bits (param $this i32) (result i32)
+  local.get $this
+  i32.load offset=16
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/block/Header#get:nonce (param $this i32) (result i32)
+  local.get $this
+  i32.load offset=20
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/block/Header#toLeBytes (param $this i32) (result i32)
+  (local $vers i32)
+  (local $prevBlock i32)
+  (local $merkleRoot i32)
+  (local $time i32)
+  (local $bits i32)
+  (local $nonce i32)
+  (local $7 i32)
+  (local $8 i32)
+  local.get $this
+  call $~lib/metashrew-as/assembly/blockdata/block/Header#get:version
+  call $~lib/metashrew-as/assembly/utils/utils/primitiveToBuffer<i32>
+  local.set $vers
+  local.get $this
+  call $~lib/metashrew-as/assembly/blockdata/block/Header#get:prevBlock
+  call $~lib/metashrew-as/assembly/utils/box/Box#toArrayBuffer
+  local.set $prevBlock
+  local.get $this
+  call $~lib/metashrew-as/assembly/blockdata/block/Header#get:merkleRoot
+  call $~lib/metashrew-as/assembly/utils/box/Box#toArrayBuffer
+  local.set $merkleRoot
+  local.get $this
+  call $~lib/metashrew-as/assembly/blockdata/block/Header#get:time
+  call $~lib/metashrew-as/assembly/utils/utils/primitiveToBuffer<u32>
+  local.set $time
+  local.get $this
+  call $~lib/metashrew-as/assembly/blockdata/block/Header#get:bits
+  call $~lib/metashrew-as/assembly/utils/utils/primitiveToBuffer<u32>
+  local.set $bits
+  local.get $this
+  call $~lib/metashrew-as/assembly/blockdata/block/Header#get:nonce
+  call $~lib/metashrew-as/assembly/utils/utils/primitiveToBuffer<u32>
+  local.set $nonce
+  i32.const 6
+  i32.const 2
+  i32.const 30
+  i32.const 0
+  call $~lib/rt/__newArray
+  local.set $7
+  local.get $7
+  i32.load offset=4
+  local.set $8
+  local.get $7
+  i32.const 0
+  local.get $vers
+  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#__set
+  local.get $7
+  i32.const 1
+  local.get $prevBlock
+  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#__set
+  local.get $7
+  i32.const 2
+  local.get $merkleRoot
+  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#__set
+  local.get $7
+  i32.const 3
+  local.get $time
+  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#__set
+  local.get $7
+  i32.const 4
+  local.get $bits
+  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#__set
+  local.get $7
+  i32.const 5
+  local.get $nonce
+  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#__set
+  local.get $7
+  call $~lib/metashrew-as/assembly/utils/utils/concat
+  return
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/block/Block#blockhash (param $this i32) (result i32)
+  local.get $this
+  call $~lib/metashrew-as/assembly/blockdata/block/Block#get:header
+  call $~lib/metashrew-as/assembly/blockdata/block/Header#toLeBytes
+  call $~lib/metashrew-as/assembly/utils/sha256/sha256d
+  return
+ )
+ (func $assembly/index/Index.indexBlock (param $height i32) (param $block i32)
+  (local $child i32)
+  global.get $assembly/index/HEIGHT_TO_HASH
+  local.get $height
+  call $~lib/metashrew-as/assembly/utils/utils/primitiveToBuffer<u32>
+  call $assembly/index/Index.keyFor
+  local.get $block
+  call $~lib/metashrew-as/assembly/blockdata/block/Block#blockhash
+  call $~lib/metashrew-as/assembly/indexer/index/set
+  global.get $assembly/index/HASH_TO_HEIGHT
+  local.get $block
+  call $~lib/metashrew-as/assembly/blockdata/block/Block#blockhash
+  call $assembly/index/Index.keyFor
+  local.get $height
+  call $~lib/metashrew-as/assembly/utils/utils/primitiveToBuffer<u32>
+  call $~lib/metashrew-as/assembly/indexer/index/set
+  local.get $block
+  call $~lib/metashrew-as/assembly/blockdata/block/Block#get:header
+  call $~lib/metashrew-as/assembly/blockdata/block/Header#get:prevBlock
+  call $~lib/metashrew-as/assembly/utils/box/Box#toArrayBuffer
+  local.set $child
+  global.get $assembly/index/HASH_TO_CHILDREN
+  local.get $block
+  call $~lib/metashrew-as/assembly/blockdata/block/Block#blockhash
+  call $assembly/index/Index.keyFor
+  local.get $child
+  call $~lib/metashrew-as/assembly/indexer/index/set
  )
  (func $~lib/array/Array<u32>#set:buffer (param $this i32) (param $buffer i32)
   local.get $this
@@ -9958,7 +8366,7 @@
   i32.eqz
   if
    i32.const 16
-   i32.const 37
+   i32.const 36
    call $~lib/rt/stub/__new
    local.set $this
   end
@@ -10039,7 +8447,7 @@
   i32.eqz
   if
    i32.const 8
-   i32.const 36
+   i32.const 35
    call $~lib/rt/stub/__new
    local.set $this
   end
@@ -10215,7 +8623,7 @@
   local.set $len
   local.get $len
   i32.const 2
-  i32.const 34
+  i32.const 30
   i32.const 0
   call $~lib/rt/__newArray
   local.set $out
@@ -10462,11 +8870,11 @@
   if
    local.get $item
    call $~lib/metashrew-as/assembly/utils/rlp/RLPItem#asList
-   i32.const 6432
+   i32.const 3600
    call $~lib/array/Array<~lib/metashrew-as/assembly/utils/rlp/RLPItem>#map<~lib/arraybuffer/ArrayBuffer>
    local.set $list
    local.get $list
-   i32.const 6464
+   i32.const 3632
    i32.const 0
    call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#reduce<i32>
    local.set $length
@@ -10608,7 +9016,7 @@
      end
     end
     local.get $list
-    i32.const 6496
+    i32.const 3664
     local.get $result|5
     i32.const 1
     i32.add
@@ -10856,7 +9264,7 @@
   call $~lib/array/Array<~lib/metashrew-as/assembly/utils/rlp/RLPItem>#constructor
   local.set $rlpInput
   local.get $hashKeys
-  i32.const 6400
+  i32.const 3568
   local.get $rlpInput
   call $~lib/array/Array<u32>#reduce<~lib/array/Array<~lib/metashrew-as/assembly/utils/rlp/RLPItem>>
   drop
@@ -10887,6 +9295,9 @@
   local.get $height
   local.get $block
   call $assembly/index/Index.indexRanges
+  local.get $height
+  local.get $block
+  call $assembly/index/Index.indexBlock
   call $~lib/metashrew-as/assembly/indexer/index/_flush
  )
  (func $~start
