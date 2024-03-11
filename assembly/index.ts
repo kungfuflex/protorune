@@ -9,12 +9,13 @@ import { encodeHexFromBuffer, encodeHex } from "metashrew-as/assembly/utils/hex"
 import { Inscription } from "metashrew-as/assembly/blockdata/inscription";
 import { subsidy } from "metashrew-as/assembly/utils/ordinals";
 import { Height } from "metashrew-as/assembly/blockdata/height";
-import { Sat } from "metashrew-as/assembly/blockdata/sat";
+import { Sat, SatPoint } from "metashrew-as/assembly/blockdata/sat";
 
 const HEIGHT_TO_HASH = String.UTF8.encode("/block/byheight");
 const HASH_TO_HEIGHT = String.UTF8.encode("/block/byhash");
 const ORDINAL_TO_SATPOINT = String.UTF8.encode("/satpoint/byordinal");
 const ORDINAL_TO_INSCRIPTION_ID = String.UTF8.encode("/inscription/byordinal");
+const SAT_TO_SATPOINT = String.UTF8.encode("/satpoint/byordinal");
 
 const TRANSACTION_BY_ID = String.UTF8.encode("/tx/byid");
 const OUTPOINT_TO_VALUE = String.UTF8.encode("/outpoint/tovalue");
@@ -119,6 +120,7 @@ class Index {
     inputOrdinalsRange: Array<Array<u64>>,
   ): void {
     let outpointToOrdinalsRange = Table.open(OUTPOINT_TO_ORDINALS_RANGE);
+    let satToSatpoint = Table.open(SAT_TO_SATPOINT);
     // transaction outputs
     for (let i = 0; i < tx.outs.length; i++) {
       let key = OutPoint.from(txid, i).toBuffer();
@@ -131,6 +133,21 @@ class Index {
           break;
         } 
         let range = inputOrdinalsRange.shift();
+
+        // ordinal to satpoint
+
+        if (!(new Sat(range[0])).isCommon()) {
+          satToSatpoint.insert(
+            primitiveToBuffer<u64>(range[0]),
+            (new SatPoint(
+              OutPoint.from(txid, i),
+              <u32>(output.value - remaining)
+            )).toBuffer()
+          );
+        }
+
+        //
+
         let count = range[1] - range[0];
         let assigned: Array<u64> = new Array();
         if (count > remaining) {

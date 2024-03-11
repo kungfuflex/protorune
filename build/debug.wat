@@ -110,6 +110,7 @@
  (global $assembly/index/HASH_TO_HEIGHT (mut i32) (i32.const 0))
  (global $assembly/index/ORDINAL_TO_SATPOINT (mut i32) (i32.const 0))
  (global $assembly/index/ORDINAL_TO_INSCRIPTION_ID (mut i32) (i32.const 0))
+ (global $assembly/index/SAT_TO_SATPOINT (mut i32) (i32.const 0))
  (global $assembly/index/TRANSACTION_BY_ID (mut i32) (i32.const 0))
  (global $assembly/index/OUTPOINT_TO_VALUE (mut i32) (i32.const 0))
  (global $assembly/index/HEIGHT_TO_INSCRIPTION_ID (mut i32) (i32.const 0))
@@ -159,10 +160,10 @@
  (data $39 (i32.const 3452) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\16\00\00\00~\00l\00i\00b\00/\00m\00a\00p\00.\00t\00s\00\00\00\00\00\00\00")
  (data $40 (i32.const 3500) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
  (data $41 (i32.const 3532) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\1c\00\00\00A\00r\00r\00a\00y\00 \00i\00s\00 \00e\00m\00p\00t\00y\00")
- (data $42 (i32.const 3580) "\1c\00\00\00\00\00\00\00\00\00\00\00&\00\00\00\08\00\00\00\04\00\00\00\00\00\00\00\00\00\00\00")
- (data $43 (i32.const 3612) "\1c\00\00\00\00\00\00\00\00\00\00\00\'\00\00\00\08\00\00\00\05\00\00\00\00\00\00\00\00\00\00\00")
- (data $44 (i32.const 3644) "\1c\00\00\00\00\00\00\00\00\00\00\00(\00\00\00\08\00\00\00\06\00\00\00\00\00\00\00\00\00\00\00")
- (data $45 (i32.const 3676) "\1c\00\00\00\00\00\00\00\00\00\00\00)\00\00\00\08\00\00\00\07\00\00\00\00\00\00\00\00\00\00\00")
+ (data $42 (i32.const 3580) "\1c\00\00\00\00\00\00\00\00\00\00\00\'\00\00\00\08\00\00\00\04\00\00\00\00\00\00\00\00\00\00\00")
+ (data $43 (i32.const 3612) "\1c\00\00\00\00\00\00\00\00\00\00\00(\00\00\00\08\00\00\00\05\00\00\00\00\00\00\00\00\00\00\00")
+ (data $44 (i32.const 3644) "\1c\00\00\00\00\00\00\00\00\00\00\00)\00\00\00\08\00\00\00\06\00\00\00\00\00\00\00\00\00\00\00")
+ (data $45 (i32.const 3676) "\1c\00\00\00\00\00\00\00\00\00\00\00*\00\00\00\08\00\00\00\07\00\00\00\00\00\00\00\00\00\00\00")
  (table $0 8 8 funcref)
  (elem $0 (i32.const 1) $~lib/metashrew-as/assembly/utils/utils/concat~anonymous|0 $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|0 $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|1 $~lib/metashrew-as/assembly/indexer/index/_flush~anonymous|0 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|0 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|1 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|2)
  (export "_start" (func $assembly/index/_start))
@@ -1769,6 +1770,13 @@
   i32.const 0
   call $~lib/string/String.UTF8.encode@varargs
   global.set $assembly/index/ORDINAL_TO_INSCRIPTION_ID
+  i32.const 2752
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/string/String.UTF8.encode@varargs
+  global.set $assembly/index/SAT_TO_SATPOINT
   i32.const 2880
   i32.const 0
   i32.const 1
@@ -7238,6 +7246,146 @@
   local.get $value
   return
  )
+ (func $~lib/metashrew-as/assembly/blockdata/epoch/Epoch.fromSat (param $sat i32) (result i32)
+  (local $idx i32)
+  i32.const 0
+  local.set $idx
+  loop $while-continue|0
+   local.get $sat
+   call $~lib/metashrew-as/assembly/blockdata/sat/Sat#n
+   global.get $~lib/metashrew-as/assembly/blockdata/epoch/Epoch.STARTING_SATS
+   local.get $idx
+   call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/sat/Sat>#__get
+   call $~lib/metashrew-as/assembly/blockdata/sat/Sat#n
+   i64.gt_u
+   if (result i32)
+    local.get $idx
+    i32.const 33
+    i32.lt_s
+   else
+    i32.const 0
+   end
+   if
+    local.get $idx
+    i32.const 1
+    i32.add
+    local.set $idx
+    br $while-continue|0
+   end
+  end
+  i32.const 0
+  local.get $idx
+  call $~lib/metashrew-as/assembly/blockdata/epoch/Epoch#constructor
+  return
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/sat/Sat#epoch (param $this i32) (result i32)
+  local.get $this
+  call $~lib/metashrew-as/assembly/blockdata/epoch/Epoch.fromSat
+  return
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/sat/Sat#isCommon (param $this i32) (result i32)
+  (local $epoch i32)
+  local.get $this
+  call $~lib/metashrew-as/assembly/blockdata/sat/Sat#epoch
+  local.set $epoch
+  local.get $this
+  call $~lib/metashrew-as/assembly/blockdata/sat/Sat#n
+  local.get $epoch
+  call $~lib/metashrew-as/assembly/blockdata/epoch/Epoch#startingSat
+  call $~lib/metashrew-as/assembly/blockdata/sat/Sat#n
+  i64.sub
+  local.get $epoch
+  call $~lib/metashrew-as/assembly/blockdata/epoch/Epoch#subsidy
+  i64.rem_u
+  i64.const 0
+  i64.ne
+  return
+ )
+ (func $~lib/metashrew-as/assembly/utils/utils/primitiveToBuffer<u64> (param $value i64) (result i32)
+  (local $buffer i32)
+  i32.const 0
+  i32.const 8
+  call $~lib/arraybuffer/ArrayBuffer#constructor
+  local.set $buffer
+  local.get $buffer
+  local.get $value
+  i64.store
+  local.get $buffer
+  return
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/sat/SatPoint#set:outpoint (param $this i32) (param $outpoint i32)
+  local.get $this
+  local.get $outpoint
+  i32.store
+  local.get $this
+  local.get $outpoint
+  i32.const 0
+  call $~lib/rt/stub/__link
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/sat/SatPoint#set:offset (param $this i32) (param $offset i32)
+  local.get $this
+  local.get $offset
+  i32.store offset=4
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/sat/SatPoint#constructor (param $this i32) (param $outpoint i32) (param $offset i32) (result i32)
+  local.get $this
+  i32.eqz
+  if
+   i32.const 8
+   i32.const 36
+   call $~lib/rt/stub/__new
+   local.set $this
+  end
+  local.get $this
+  i32.const 0
+  call $~lib/metashrew-as/assembly/blockdata/sat/SatPoint#set:outpoint
+  local.get $this
+  i32.const 0
+  call $~lib/metashrew-as/assembly/blockdata/sat/SatPoint#set:offset
+  local.get $this
+  local.get $outpoint
+  call $~lib/metashrew-as/assembly/blockdata/sat/SatPoint#set:outpoint
+  local.get $this
+  local.get $offset
+  call $~lib/metashrew-as/assembly/blockdata/sat/SatPoint#set:offset
+  local.get $this
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/sat/SatPoint#get:outpoint (param $this i32) (result i32)
+  local.get $this
+  i32.load
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/sat/SatPoint#get:offset (param $this i32) (result i32)
+  local.get $this
+  i32.load offset=4
+ )
+ (func $~lib/metashrew-as/assembly/blockdata/sat/SatPoint#toBuffer (param $this i32) (result i32)
+  (local $1 i32)
+  (local $2 i32)
+  i32.const 2
+  i32.const 2
+  i32.const 27
+  i32.const 0
+  call $~lib/rt/__newArray
+  local.set $1
+  local.get $1
+  i32.load offset=4
+  local.set $2
+  local.get $1
+  i32.const 0
+  local.get $this
+  call $~lib/metashrew-as/assembly/blockdata/sat/SatPoint#get:outpoint
+  call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#toBuffer
+  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#__set
+  local.get $1
+  i32.const 1
+  local.get $this
+  call $~lib/metashrew-as/assembly/blockdata/sat/SatPoint#get:offset
+  call $~lib/metashrew-as/assembly/utils/utils/primitiveToBuffer<u32>
+  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#__set
+  local.get $1
+  call $~lib/metashrew-as/assembly/utils/utils/concat
+  return
+ )
  (func $~lib/array/Array<u64>#set:buffer (param $this i32) (param $buffer i32)
   local.get $this
   local.get $buffer
@@ -7373,18 +7521,6 @@
   local.get $len
   return
  )
- (func $~lib/metashrew-as/assembly/utils/utils/primitiveToBuffer<u64> (param $value i64) (result i32)
-  (local $buffer i32)
-  i32.const 0
-  i32.const 8
-  call $~lib/arraybuffer/ArrayBuffer#constructor
-  local.set $buffer
-  local.get $buffer
-  local.get $value
-  i64.store
-  local.get $buffer
-  return
- )
  (func $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#push (param $this i32) (param $value i32) (result i32)
   (local $oldLen i32)
   (local $len i32)
@@ -7468,10 +7604,11 @@
  )
  (func $assembly/index/Index.indexTransactions (param $txid i32) (param $tx i32) (param $ordinalToSatpoint i32) (param $ordinalToInscription i32) (param $inputOrdinalsRange i32)
   (local $outpointToOrdinalsRange i32)
+  (local $satToSatpoint i32)
   (local $i i32)
   (local $key i32)
-  (local $8 i32)
   (local $9 i32)
+  (local $10 i32)
   (local $ordinals i32)
   (local $output i32)
   (local $remaining i64)
@@ -7479,19 +7616,22 @@
   (local $count i64)
   (local $assigned i32)
   (local $middle i64)
-  (local $17 i32)
   (local $18 i32)
   (local $19 i32)
   (local $20 i32)
+  (local $21 i32)
   (local $start i32)
   (local $end i32)
-  (local $23 i32)
   (local $24 i32)
+  (local $25 i32)
   (local $ordinalRange i32)
   (local $ords i32)
   global.get $assembly/index/OUTPOINT_TO_ORDINALS_RANGE
   call $assembly/index/Table.open
   local.set $outpointToOrdinalsRange
+  global.get $assembly/index/SAT_TO_SATPOINT
+  call $assembly/index/Table.open
+  local.set $satToSatpoint
   i32.const 0
   local.set $i
   loop $for-loop|0
@@ -7536,6 +7676,32 @@
        local.get $inputOrdinalsRange
        call $~lib/array/Array<~lib/array/Array<u64>>#shift
        local.set $range
+       i32.const 0
+       local.get $range
+       i32.const 0
+       call $~lib/array/Array<u64>#__get
+       call $~lib/metashrew-as/assembly/blockdata/sat/Sat#constructor
+       call $~lib/metashrew-as/assembly/blockdata/sat/Sat#isCommon
+       i32.eqz
+       if
+        local.get $satToSatpoint
+        local.get $range
+        i32.const 0
+        call $~lib/array/Array<u64>#__get
+        call $~lib/metashrew-as/assembly/utils/utils/primitiveToBuffer<u64>
+        i32.const 0
+        local.get $txid
+        local.get $i
+        call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint.from
+        local.get $output
+        call $~lib/metashrew-as/assembly/blockdata/transaction/Output#get:value
+        local.get $remaining
+        i64.sub
+        i32.wrap_i64
+        call $~lib/metashrew-as/assembly/blockdata/sat/SatPoint#constructor
+        call $~lib/metashrew-as/assembly/blockdata/sat/SatPoint#toBuffer
+        call $assembly/index/Table#insert
+       end
        local.get $range
        i32.const 1
        call $~lib/array/Array<u64>#__get
@@ -7564,21 +7730,21 @@
         i32.const 32
         i32.const 0
         call $~lib/rt/__newArray
-        local.set $17
-        local.get $17
-        i32.load offset=4
         local.set $18
-        local.get $17
+        local.get $18
+        i32.load offset=4
+        local.set $19
+        local.get $18
         i32.const 0
         local.get $middle
         call $~lib/array/Array<u64>#__set
-        local.get $17
+        local.get $18
         i32.const 1
         local.get $range
         i32.const 1
         call $~lib/array/Array<u64>#__get
         call $~lib/array/Array<u64>#__set
-        local.get $17
+        local.get $18
         call $~lib/array/Array<~lib/array/Array<u64>>#unshift
         drop
         i32.const 2
@@ -7586,21 +7752,21 @@
         i32.const 32
         i32.const 0
         call $~lib/rt/__newArray
-        local.set $19
-        local.get $19
-        i32.load offset=4
         local.set $20
-        local.get $19
+        local.get $20
+        i32.load offset=4
+        local.set $21
+        local.get $20
         i32.const 0
         local.get $range
         i32.const 0
         call $~lib/array/Array<u64>#__get
         call $~lib/array/Array<u64>#__set
-        local.get $19
+        local.get $20
         i32.const 1
         local.get $middle
         call $~lib/array/Array<u64>#__set
-        local.get $19
+        local.get $20
         local.set $assigned
        else
         local.get $range
@@ -7621,19 +7787,19 @@
        i32.const 27
        i32.const 0
        call $~lib/rt/__newArray
-       local.set $23
-       local.get $23
-       i32.load offset=4
        local.set $24
-       local.get $23
+       local.get $24
+       i32.load offset=4
+       local.set $25
+       local.get $24
        i32.const 0
        local.get $start
        call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#__set
-       local.get $23
+       local.get $24
        i32.const 1
        local.get $end
        call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#__set
-       local.get $23
+       local.get $24
        call $~lib/metashrew-as/assembly/utils/utils/concat
        local.set $ordinalRange
        local.get $ordinals
@@ -8216,7 +8382,7 @@
   i32.eqz
   if
    i32.const 16
-   i32.const 37
+   i32.const 38
    call $~lib/rt/stub/__new
    local.set $this
   end
@@ -8297,7 +8463,7 @@
   i32.eqz
   if
    i32.const 8
-   i32.const 36
+   i32.const 37
    call $~lib/rt/stub/__new
    local.set $this
   end
