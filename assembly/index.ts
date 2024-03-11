@@ -13,7 +13,8 @@ import { Sat } from "metashrew-as/assembly/blockdata/sat";
 
 const HEIGHT_TO_HASH = String.UTF8.encode("/block/byheight");
 const HASH_TO_HEIGHT = String.UTF8.encode("/block/byhash");
-const HASH_TO_CHILDREN = String.UTF8.encode("/block/children");
+const ORDINAL_TO_SATPOINT = String.UTF8.encode("/satpoint/byordinal");
+const ORDINAL_TO_INSCRIPTION_ID = String.UTF8.encode("/inscription/byordinal");
 
 const TRANSACTION_BY_ID = String.UTF8.encode("/tx/byid");
 const OUTPOINT_TO_VALUE = String.UTF8.encode("/outpoint/tovalue");
@@ -21,22 +22,138 @@ const HEIGHT_TO_INSCRIPTION_ID = String.UTF8.encode("/inscription/byheight");
 const SAT_RANGE_BY_OUTPOINT = String.UTF8.encode("/satrange/byoutpoint");
 const OUTPOINT_TO_ORDINALS_RANGE = String.UTF8.encode("/ordinals/byoutpoint");
 
+class Table {
+  keyPrefix: ArrayBuffer;
+
+  constructor(name: ArrayBuffer) {
+    this.keyPrefix = name;
+  }
+
+  static open(name: ArrayBuffer): Table {
+    return new Table(name);
+  }
+
+  insert(key: ArrayBuffer, value: ArrayBuffer): void {
+    set(Index.keyFor(this.keyPrefix, key), value);
+  }
+
+  get(key: ArrayBuffer): ArrayBuffer {
+    return get(Index.keyFor(this.keyPrefix, key));
+  }
+}
+
+
 class Index {
   static keyFor(table: ArrayBuffer, key: ArrayBuffer): ArrayBuffer {
     return Box.concat([Box.from(table), Box.from(key)]);
   }
 
   static indexBlock(height: u32, block: Block): void {
-    // index height to hash
-    set(Index.keyFor(HEIGHT_TO_HASH, primitiveToBuffer<u32>(height)), block.blockhash());
-    set(Index.keyFor(HASH_TO_HEIGHT, block.blockhash()), primitiveToBuffer<u32>(height));
+    // open tables
+    let heightToHash = Table.open(HEIGHT_TO_HASH);
+    let ordinalToOutpoint = Table.open(ORDINAL_TO_SATPOINT);
+    let ordinalToInscription = Table.open(ORDINAL_TO_INSCRIPTION_ID);
 
-    let child = block.header.prevBlock.toArrayBuffer();
-    set(Index.keyFor(HASH_TO_CHILDREN, block.blockhash()), child);
+    // insert height to hash index
+    heightToHash.insert(primitiveToBuffer<u32>(height), block.blockhash());
+
+    let coinbase_inputs = new Array<Array<u64>>();
+
+    let h = new Height(height);
+    // if block subsidy is greater than 0, add range to coinbase input
+    if (h.subsidy() > 0) {
+      let start: Sat = h.startingSat();
+      coinbase_inputs.push([<u64>(start.n()), <u64>(start.n() + h.subsidy())]);
+    }
+
+    for (let tx_offset = 1; tx_offset < block.transactions.length; tx_offset++) {
+      let tx = block.transactions[tx_offset];
+      let inputOrdinalsRange = new Array<Array<u64>>();
+
+      for (let i = 0; i < tx.ins.length; i++) {
+        let input = tx.ins[i];
+        // encode key from transaction outpoint
+        let key: ArrayBuffer = input.previousOutput().toBuffer();
+
+        let response = get(Index.keyFor(OUTPOINT_TO_ORDINALS_RANGE, key));
+        let ordinalRanges = Box.from(response);
+        let numOfOrdinals = parsePrimitive<u32>(ordinalRanges);
+        for ( let i = 0; i < <i32>numOfOrdinals; i++ ) {
+          let start = parsePrimitive<u64>(ordinalRanges);
+          let end = parsePrimitive<u64>(ordinalRanges);
+          inputOrdinalsRange.push([start, end])
+        }
+      }
+
+      Index.indexTransactions(
+        tx.txid(),
+        tx,
+        ordinalToOutpoint,
+        ordinalToInscription,
+        inputOrdinalsRange
+      );
+
+      for (let i = 0; i < inputOrdinalsRange.length; i++) {
+        coinbase_inputs.push(inputOrdinalsRange[i]);
+      }
+    }
+
+    let coinbase = block.coinbase();
+    if (coinbase == null) {return};
+
+    Index.indexTransactions(
+      coinbase.txid(),
+      coinbase,
+      ordinalToOutpoint,
+      ordinalToInscription,
+      coinbase_inputs
+    );
+
   }
 
-  static indexTransactions(): void {
+  static indexTransactions(
+    txid: ArrayBuffer,
+    tx: Transaction,
+    ordinalToSatpoint: Table,
+    ordinalToInscription: Table,
+    inputOrdinalsRange: Array<Array<u64>>,
+  ): void {
+    let outpointToOrdinalsRange = Table.open(OUTPOINT_TO_ORDINALS_RANGE);
+    // transaction outputs
+    for (let i = 0; i < tx.outs.length; i++) {
+      let key = OutPoint.from(txid, i).toBuffer();
+      let ordinals: Array<ArrayBuffer> = [];
+      let output = tx.outs[i];
 
+      let remaining = output.value;
+      while (remaining > 0) {
+        if (inputOrdinalsRange.length == 0) {
+          break;
+        } 
+        let range = inputOrdinalsRange.shift();
+        let count = range[1] - range[0];
+        let assigned: Array<u64> = new Array();
+        if (count > remaining) {
+          let middle = range[0] + remaining;
+          inputOrdinalsRange.unshift([middle, range[1]]);
+          assigned = [range[0], middle];
+        } else {
+          assigned = range;
+        }
+
+        let start = primitiveToBuffer<u64>(assigned[0]);
+        let end = primitiveToBuffer<u64>(assigned[1]);
+        let ordinalRange = concat([start, end]);
+        ordinals.push(ordinalRange);
+        remaining -= assigned[1] - assigned[0];
+      }
+
+      ordinals.unshift(
+        primitiveToBuffer<u32>(<u32>ordinals.length)
+      );
+      let ords = concat(ordinals);
+      outpointToOrdinalsRange.insert(key, ords);
+    }
   }
 
   static indexRanges(height: u32, block: Block): void {
@@ -167,7 +284,7 @@ export function _start(): void {
   const box = Box.from(data);
   const height = parsePrimitive<u32>(box);
   const block = new Block(box);
-  Index.indexRanges(height, block);
+  // Index.indexRanges(height, block);
   Index.indexBlock(height, block);
   _flush();
 }
