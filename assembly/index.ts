@@ -16,6 +16,8 @@ const HASH_TO_HEIGHT = String.UTF8.encode("/block/byhash");
 const ORDINAL_TO_SATPOINT = String.UTF8.encode("/satpoint/byordinal");
 const ORDINAL_TO_INSCRIPTION_ID = String.UTF8.encode("/inscription/byordinal");
 const SAT_TO_SATPOINT = String.UTF8.encode("/satpoint/byordinal");
+const INSCRIPTION_TO_SATPOINT = String.UTF8.encode("/inscription/bysatpoint");
+const SATPOINT_TO_INSCRIPTION = String.UTF8.encode("/satpoint/byinscription");
 
 const TRANSACTION_BY_ID = String.UTF8.encode("/tx/byid");
 const OUTPOINT_TO_VALUE = String.UTF8.encode("/outpoint/tovalue");
@@ -38,6 +40,10 @@ class Table {
     set(Index.keyFor(this.keyPrefix, key), value);
   }
 
+  remove(key: ArrayBuffer): void {
+    set(Index.keyFor(this.keyPrefix, key), new ArrayBuffer(0));
+  }
+
   get(key: ArrayBuffer): ArrayBuffer {
     return get(Index.keyFor(this.keyPrefix, key));
   }
@@ -47,6 +53,50 @@ class Table {
 class Index {
   static keyFor(table: ArrayBuffer, key: ArrayBuffer): ArrayBuffer {
     return Box.concat([Box.from(table), Box.from(key)]);
+  }
+
+  static indexTransactionInscriptions(
+    tx: Transaction,
+    txid: ArrayBuffer
+  ): void {
+    let inscriptionToSatpoint = Table.open(INSCRIPTION_TO_SATPOINT);
+    let satpointToInscription = Table.open(SATPOINT_TO_INSCRIPTION);
+    let inscribed = tx.parseInscriptions();
+
+    if (inscribed.length > 0) {
+
+      let satpoint = new SatPoint(
+        OutPoint.from(txid, 0),
+        <u64>0
+      );
+
+      inscriptionToSatpoint.insert(txid, satpoint.toBuffer());
+      satpointToInscription.insert(satpoint.toBuffer(), txid);
+    }
+
+    for (let i = 0; i < tx.ins.length; i++) {
+      let outpoint = tx.ins[i].previousOutput();
+
+      for (let i: u64 = 0; i < u64.MAX_VALUE; i++) {
+        let oldSatpoint = new SatPoint(
+          outpoint,
+          i
+        );
+
+        let inscriptionId = satpointToInscription.get(oldSatpoint.toBuffer());
+
+        if (inscriptionId.byteLength == 0) { continue }
+
+        let newSatpoint = new SatPoint(
+          OutPoint.from(txid, 0),
+          <u64>0
+        );
+
+        satpointToInscription.remove(oldSatpoint.toBuffer());
+        satpointToInscription.insert(newSatpoint.toBuffer(), inscriptionId);
+        inscriptionToSatpoint.insert(inscriptionId, newSatpoint.toBuffer());
+      }
+    }
   }
 
   static indexBlock(height: u32, block: Block): void {
@@ -97,6 +147,10 @@ class Index {
       for (let i = 0; i < inputOrdinalsRange.length; i++) {
         coinbase_inputs.push(inputOrdinalsRange[i]);
       }
+
+      // index transaction inscription
+      // TODO: move to a more sensible part of the code
+      Index.indexTransactionInscriptions(tx, tx.txid()); 
     }
 
     let coinbase = block.coinbase();
@@ -141,12 +195,10 @@ class Index {
             primitiveToBuffer<u64>(range[0]),
             (new SatPoint(
               OutPoint.from(txid, i),
-              <u32>(output.value - remaining)
+              <u64>(output.value - remaining)
             )).toBuffer()
           );
         }
-
-        //
 
         let count = range[1] - range[0];
         let assigned: Array<u64> = new Array();
