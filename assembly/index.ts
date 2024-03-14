@@ -99,8 +99,8 @@ class Index {
 
   static indexInscriptions(
     tx: Transaction,
-    txid: ArrayBuffer
-    height: u32,
+    txid: ArrayBuffer,
+    height: u32
   ): void {
     let inscriptionToSatpoint = Table.open(INSCRIPTION_TO_SATPOINT);
     let satpointToInscription = Table.open(SATPOINT_TO_INSCRIPTION);
