@@ -1,6 +1,6 @@
 import { Box, RCBox } from "metashrew-as/assembly/utils/box"
 import { _flush, input, get, set } from "metashrew-as/assembly/indexer/index";
-import { parsePrimitive, concat, primitiveToBuffer } from "metashrew-as/assembly/utils/utils";
+import { parseBytes, parsePrimitive, concat, primitiveToBuffer } from "metashrew-as/assembly/utils/utils";
 import { Block } from "metashrew-as/assembly/blockdata/block";
 import { Transaction, Input, Output, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
 import { console } from "metashrew-as/assembly/utils/logging";
@@ -280,3 +280,42 @@ export function _start(): void {
   _flush();
 }
 
+export function sat(): ArrayBuffer {
+  const point = new Sat(parsePrimitive<u64>(Box.from(input())));
+  return toRLP(RLPItem.fromList([
+    RLPItem.fromValue(<usize> point.n()),
+    RLPItem.fromArrayBuffer(String.UTF8.encode(point.height().n().toString(10) + "." + point.third().toString(10))),
+    RLPItem.fromValue(<usize> point.height().n()),
+    RLPItem.fromValue(<usize> point.cycle()),
+    RLPItem.fromValue(<usize> point.epoch().n()),
+    RLPItem.fromValue(<usize> point.period()),
+    RLPItem.fromValue(<usize> point.third()),
+  ]));
+}
+
+export function inscription(): ArrayBuffer {
+  const data = input();
+  return data;
+}
+
+export function content(): ArrayBuffer {
+  const data = input();
+  return data;
+}
+
+export function inscriptionsfrom(): ArrayBuffer {
+  const data = input();
+  return data;
+}
+
+export function inscriptionsforblock(): ArrayBuffer {
+  const height = parsePrimitive<u32>(Box.from(input()));
+  return new ArrayBuffer(0);
+}
+
+export function output(): ArrayBuffer {
+  const data = Box.from(input());
+  const outpoint = parseBytes(data, 32);
+  const vout = parsePrimitive<u32>(data);
+  return new ArrayBuffer(0);
+}
