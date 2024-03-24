@@ -11,6 +11,8 @@ import { subsidy } from "metashrew-as/assembly/utils/ordinals";
 import { Height } from "metashrew-as/assembly/blockdata/height";
 import { Sat, SatPoint } from "metashrew-as/assembly/blockdata/sat";
 
+export const JUBILEE_HEIGHT = 824544;
+
 const HEIGHT_TO_BLOCKHASH = String.UTF8.encode("/block/byheight");
 const BLOCKHASH_TO_HEIGHT = String.UTF8.encode("/height/byhash");
 const SAT_TO_SATPOINT = String.UTF8.encode("/satpoint/byordinal");
@@ -20,7 +22,6 @@ const SATPOINT_TO_INSCRIPTION = String.UTF8.encode("/inscription/bysatpoint");
 const OUTPOINT_TO_SATRANGE = String.UTF8.encode("/sat/byoutpoint");
 const OUTPOINT_TO_VALUE = String.UTF8.encode("/outpoint/tovalue");
 const SEQUENCE_TO_INSCRIPTION_ID = String.UTF8.encode("/inscription/bysequence");
-
 
 class Table {
   keyPrefix: ArrayBuffer;
@@ -54,11 +55,44 @@ class Table {
   
 }
 
+const contentTypeToCount = Table.open(CONTENT_TYPE_TO_COUNT);
+const homeInscriptions = Table.open(HOME_INSCRIPTIONS);
+const idToSequenceNumber = Table.open(ID_TO_SEQUENCE_NUMBER);
+const inscriptionNumberToSequenceNumber = Table.open(INSCRIPTION_NUMBER_TO_SEQUENCE_NUMBER);
+const outpointToValue = Table.open(OUTPOINT_TO_VALUE);
+const transactionIdToTransaction = Table.open(TRANSACTION_ID_TO_TRANSACTION);
+const satToSequenceNumber = Table.open(SAT_TO_SEQUENCE_NUMBER);
+const satPointToSequenceNumber = Table.open(SATPOINT_TO_SEQUENCE_NUMBER);
+const sequenceNumberToChildren = Table.open(SEQUENCE_NUMBER_TO_CHILDREN);
+const sequenceNumberToEntry = Table.open(SEQUENCE_NUMBER_TO_ENTRY);
+const sequenceNumberToSatPoint = Table.open(SEQUENCE_NUMBER_TO_SATPOINT);
+const valueCache = Table.open(VALUE_CACHE);
+const outpointToSatRanges = Table.open(OUTPOINT_TO_SATRANGE);
+const inscriptionToSatpoint = Table.open(INSCRIPTION_TO_SATPOINT);
+const satpointToInscription = Table.open(SATPOINT_TO_INSCRIPTION);
+const hashToHeight = Table.open(BLOCKHASH_TO_HEIGHT);
+const heightToHash = Table.open(HEIGHT_TO_BLOCKHASH);
+const satToSatpoint = Table.open(SAT_TO_SATPOINT);
+const outpointToSatRanges = Table.open(OUTPOINT_TO_SATRANGE);
+const outpointToValue = Table.open(OUTPOINT_TO_VALUE);
+
 // TODO: implement `toBuffer`
 class BoxedTuple<T, U> {
   _0: T;
   _1: U;
 }
+
+class Flotsam {
+  public offset: u64;
+  public inscriptionId: ArrayBuffer;
+  public origin: SatPoint;
+  constructor(offset: u64, inscriptionId: ArrayBuffer, origin: SatPoint) {
+    this.offset = offset;
+    this.inscriptionId = inscriptionId;
+    this.origin = origin;
+  }
+}
+
 
 class Index {
   static keyFor(table: ArrayBuffer, key: ArrayBuffer): ArrayBuffer {
@@ -70,11 +104,12 @@ class Index {
     txid: ArrayBuffer,
     height: u32
   ): void {
-    let inscriptionToSatpoint = Table.open(INSCRIPTION_TO_SATPOINT);
-    let satpointToInscription = Table.open(SATPOINT_TO_INSCRIPTION);
-
-
-    let floatingInscriptions = new Array();
+    const jubilant = height >= JUBILEE_HEIGHT;
+    let totalInputValue = 0;
+    const totalOutputValue = tx.outs.reduce<u64>((r: u64, v: Output, i: i32, ary: Array<Output>): u64 => {
+      return r + v.value;
+    }, <u64>0);
+    let floatingInscriptions = new Array<();
     let idCounter = 0;
     let inscribedOffsets = new Array<Offset>();
     let totalInputValue: u64 = 0;
@@ -110,11 +145,6 @@ class Index {
 
   static indexBlock(height: u32, block: Block): void {
     // open tables
-    let hashToHeight = Table.open(BLOCKHASH_TO_HEIGHT);
-    let heightToHash = Table.open(HEIGHT_TO_BLOCKHASH);
-    let satToSatpoint = Table.open(SAT_TO_SATPOINT);
-    let outpointToSatRanges = Table.open(OUTPOINT_TO_SATRANGE);
-    let outpointToValue = Table.open(OUTPOINT_TO_VALUE);
 
 
 
@@ -162,7 +192,7 @@ class Index {
         coinbase_inputs.push(inputOrdinalsRange[i]);
       }
 
-      Index.indexInscription(tx, tx.txid(), height); 
+//      Index.indexTransactionInscription(tx, tx.txid(), height); 
     }
 
     let coinbase = block.coinbase();
@@ -181,15 +211,6 @@ class Index {
     hashToHeight.insert(block.blockhash(), primitiveToBuffer<u32>(height));
   }
 
-  static indexInscription(
-    tx: Transaction,
-    txid: ArrayBuffer,
-    height: u32
-  ): void {
-    let sequenceToInscriptionId = Table.open(SEQUENCE_TO_INSCRIPTION_ID);
-    
-  }
-
   static indexTransactions(
     txid: ArrayBuffer,
     tx: Transaction,
@@ -199,6 +220,7 @@ class Index {
     inputOrdinalsRange: Array<Array<u64>>,
   ): void {
     // transaction outputs
+    Index.indexTransactionInscriptions(tx, txid, outpointToSatRanges);
     for (let i = 0; i < tx.outs.length; i++) {
       let key = OutPoint.from(txid, i).toBuffer();
       let ordinals: Array<ArrayBuffer> = [];
@@ -250,15 +272,13 @@ class Index {
     }
   }
 
-  // *type - view function
-  // *description - view inscriptions on a given outpoint (txid, index)
-  static viewInscriptionsOnOutput(outpoint: OutPoint): Array<ArrayBuffer> {
+  static inscriptionsOnOutput(outpoint: OutPoint): Array<ArrayBuffer> {
     let satpointToInscription = Table.open(SATPOINT_TO_INSCRIPTION);
     let inscriptions = new Array<ArrayBuffer>(); 
     for (let i = 0; i < u64.MAX_VALUE; i++) {
       let sp = new SatPoint(outpoint, i);
       let inscription = satpointToInscription.get(sp.toBuffer());
-      if (emptyBuffer(inscription)) { continue }
+      if (emptyBuffer(inscription)) { break }
       inscriptions.push(inscription);
     }
     return inscriptions;
