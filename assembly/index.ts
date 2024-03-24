@@ -13,16 +13,6 @@ import { Sat, SatPoint } from "metashrew-as/assembly/blockdata/sat";
 
 export const JUBILEE_HEIGHT = 824544;
 
-const HEIGHT_TO_BLOCKHASH = String.UTF8.encode("/block/byheight");
-const BLOCKHASH_TO_HEIGHT = String.UTF8.encode("/height/byhash");
-const SAT_TO_SATPOINT = String.UTF8.encode("/satpoint/byordinal");
-const SAT_TO_INSCRIPTION_ID = String.UTF8.encode("/inscription/byordinal");
-const INSCRIPTION_TO_SATPOINT = String.UTF8.encode("/satpoint/byinscription");
-const SATPOINT_TO_INSCRIPTION = String.UTF8.encode("/inscription/bysatpoint");
-const OUTPOINT_TO_SATRANGE = String.UTF8.encode("/sat/byoutpoint");
-const OUTPOINT_TO_VALUE = String.UTF8.encode("/outpoint/tovalue");
-const SEQUENCE_TO_INSCRIPTION_ID = String.UTF8.encode("/inscription/bysequence");
-
 class Table {
   keyPrefix: ArrayBuffer;
 
