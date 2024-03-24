@@ -3,6 +3,7 @@ import { _flush, input, get, set } from "metashrew-as/assembly/indexer/index";
 import { parseBytes, parsePrimitive, concat, primitiveToBuffer } from "metashrew-as/assembly/utils/utils";
 import { Block } from "metashrew-as/assembly/blockdata/block";
 import { Transaction, Input, Output, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
+import { Table, Node } from "./tables";
 import { console } from "metashrew-as/assembly/utils/logging";
 import { toRLP, RLPItem } from "metashrew-as/assembly/utils/rlp";
 import { encodeHexFromBuffer, encodeHex } from "metashrew-as/assembly/utils/hex";
@@ -10,61 +11,30 @@ import { Inscription } from "metashrew-as/assembly/blockdata/inscription";
 import { subsidy } from "metashrew-as/assembly/utils/ordinals";
 import { Height } from "metashrew-as/assembly/blockdata/height";
 import { Sat, SatPoint } from "metashrew-as/assembly/blockdata/sat";
+import { JUBILEE_HEIGHT } from "./constants";
 
-export const JUBILEE_HEIGHT = 824544;
 
-class Table {
-  keyPrefix: ArrayBuffer;
-
-  constructor(name: ArrayBuffer) {
-    this.keyPrefix = name;
-  }
-
-  static open(name: ArrayBuffer): Table {
-    return new Table(name);
-  }
-
-  public insert(key: ArrayBuffer, value: ArrayBuffer): void {
-    set(Index.keyFor(this.keyPrefix, key), value);
-  }
-
-  public remove(key: ArrayBuffer): void {
-    set(Index.keyFor(this.keyPrefix, key), new ArrayBuffer(0));
-  }
-
-  public get(key: ArrayBuffer): ArrayBuffer {
-    return get(Index.keyFor(this.keyPrefix, key));
-  }
-
-  private __indexRow(): void {
-    // get currLen
-    let currLen = get(Index.keyFor(this.keyPrefix, String.UTF8.encode("len")));
-    set(Index.keyFor(this.keyPrefix, String.UTF8.encode("len")), )
-  }
-
-  
-}
-
-const contentTypeToCount = Table.open(CONTENT_TYPE_TO_COUNT);
-const homeInscriptions = Table.open(HOME_INSCRIPTIONS);
-const idToSequenceNumber = Table.open(ID_TO_SEQUENCE_NUMBER);
-const inscriptionNumberToSequenceNumber = Table.open(INSCRIPTION_NUMBER_TO_SEQUENCE_NUMBER);
-const outpointToValue = Table.open(OUTPOINT_TO_VALUE);
-const transactionIdToTransaction = Table.open(TRANSACTION_ID_TO_TRANSACTION);
-const satToSequenceNumber = Table.open(SAT_TO_SEQUENCE_NUMBER);
-const satPointToSequenceNumber = Table.open(SATPOINT_TO_SEQUENCE_NUMBER);
-const sequenceNumberToChildren = Table.open(SEQUENCE_NUMBER_TO_CHILDREN);
-const sequenceNumberToEntry = Table.open(SEQUENCE_NUMBER_TO_ENTRY);
-const sequenceNumberToSatPoint = Table.open(SEQUENCE_NUMBER_TO_SATPOINT);
-const valueCache = Table.open(VALUE_CACHE);
-const outpointToSatRanges = Table.open(OUTPOINT_TO_SATRANGE);
-const inscriptionToSatpoint = Table.open(INSCRIPTION_TO_SATPOINT);
-const satpointToInscription = Table.open(SATPOINT_TO_INSCRIPTION);
-const hashToHeight = Table.open(BLOCKHASH_TO_HEIGHT);
-const heightToHash = Table.open(HEIGHT_TO_BLOCKHASH);
-const satToSatpoint = Table.open(SAT_TO_SATPOINT);
-const outpointToSatRanges = Table.open(OUTPOINT_TO_SATRANGE);
-const outpointToValue = Table.open(OUTPOINT_TO_VALUE);
+import {
+  CONTENT_TYPE_TO_COUNT,
+  HOME_INSCRIPTIONS,
+  ID_TO_SEQUENCE_NUMBER,
+  INSCRIPTION_NUMBER_TO_SEQUENCE_NUMBER,
+  OUTPOINT_TO_VALUE,
+	TRANSACTION_ID_TO_TRANSACTION,
+	SAT_TO_SEQUENCE_NUMBER,
+		SATPOINT_TO_SEQUENCE_NUMBER,
+		SEQUENCE_NUMBER_TO_CHILDREN,
+		SEQUENCE_NUMBER_TO_ENTRY,
+		SEQUENCE_NUMBER_TO_SATPOINT,
+		VALUE_CACHE,
+		OUTPOINT_TO_SATRANGES,
+		INSCRIPTION_TO_SATPOINT,
+		SATPOINT_TO_INSCRIPTION,
+		BLOCKHASH_TO_HEIGHT,
+		HEIGHT_TO_BLOCKHASH,
+		SAT_TO_SATPOINT,
+		OUTPOINT_TO_VALUE
+} from "./tables";
 
 // TODO: implement `toBuffer`
 class BoxedTuple<T, U> {
@@ -95,15 +65,13 @@ class Index {
     height: u32
   ): void {
     const jubilant = height >= JUBILEE_HEIGHT;
-    let totalInputValue = 0;
     const totalOutputValue = tx.outs.reduce<u64>((r: u64, v: Output, i: i32, ary: Array<Output>): u64 => {
       return r + v.value;
     }, <u64>0);
-    let floatingInscriptions = new Array<();
+    let floatingInscriptions = new Array<Flotsam>();
     let idCounter = 0;
-    let inscribedOffsets = new Array<Offset>();
+    let inscribedOffsets = new Array<u64>();
     let totalInputValue: u64 = 0;
-    let totalOutputValue: u64 = tx.outs.reduce<u64>((acc, output) => <u64>acc + output.value, <u64>0);
 
 
     let inscriptions = tx.parseInscriptions();
@@ -120,12 +88,12 @@ class Index {
 
 
       // find existing inscriptions on inputs
-      let currentInscriptions: Array<ArrayBuffer> = Index.inscriptionsOnOutput(prevout);
+      let currentInscriptions: Array<Node> = Index.inscriptionsOnOutput(prevout);
 
       for (let i = 0; i < currentInscriptions.length; i++) {
         let inscription = currentInscriptions[i];
-        let oldSatpoint = inscription._0;
-        let oldInscriptionId = inscription._1;
+        let oldSatpoint = new SatPoint(prevout, parsePrimitive<u32>(Box.from(currentInscriptions[i].key)));
+        let oldInscriptionId = currentInscriptions[i].value;
       }
     }
 
@@ -138,7 +106,7 @@ class Index {
 
 
 
-    // insert height to hash index
+    // set height to hash index
     
 
     let coinbase_inputs = new Array<Array<u64>>();
@@ -159,7 +127,7 @@ class Index {
         // encode key from transaction outpoint
         let previousOutpoint: ArrayBuffer = input.previousOutput().toBuffer();
 
-        let response = outpointToSatRanges.get(previousOutpoint);
+        let response = OUTPOINT_TO_SATRANGES.get(previousOutpoint);
         let satRange = Box.from(response);
         let numOfOrdinals = parsePrimitive<u32>(satRange);
         for ( let i = 0; i < <i32>numOfOrdinals; i++ ) {
@@ -172,9 +140,7 @@ class Index {
       Index.indexTransactions(
         tx.txid(),
         tx,
-        satToSatpoint,
-        outpointToSatRanges,
-        outpointToValue,
+	height,
         inputOrdinalsRange
       );
 
@@ -191,26 +157,22 @@ class Index {
     Index.indexTransactions(
       coinbase.txid(),
       coinbase,
-      satToSatpoint,
-      outpointToSatRanges,
-      outpointToValue,
+      height,
       coinbase_inputs
     );
 
-    heightToHash.insert(primitiveToBuffer<u32>(height), block.blockhash());
-    hashToHeight.insert(block.blockhash(), primitiveToBuffer<u32>(height));
+    HEIGHT_TO_BLOCKHASH.set(primitiveToBuffer<u32>(height), block.blockhash());
+    BLOCKHASH_TO_HEIGHT.set(block.blockhash(), primitiveToBuffer<u32>(height));
   }
 
   static indexTransactions(
     txid: ArrayBuffer,
     tx: Transaction,
-    satToSatpoint: Table,
-    outpointToSatRanges: Table,
-    outpointToValue: Table,
+    height: u32,
     inputOrdinalsRange: Array<Array<u64>>,
   ): void {
     // transaction outputs
-    Index.indexTransactionInscriptions(tx, txid, outpointToSatRanges);
+    Index.indexTransactionInscriptions(tx, txid, height);
     for (let i = 0; i < tx.outs.length; i++) {
       let key = OutPoint.from(txid, i).toBuffer();
       let ordinals: Array<ArrayBuffer> = [];
@@ -226,7 +188,7 @@ class Index {
         // ordinal to satpoint
 
         if (!(new Sat(range[0])).isCommon()) {
-          satToSatpoint.insert(
+          SAT_TO_SATPOINT.set(
             primitiveToBuffer<u64>(range[0]),
             (new SatPoint(
               OutPoint.from(txid, i),
@@ -257,21 +219,13 @@ class Index {
       );
       let ords = concat(ordinals);
 
-      outpointToSatRanges.insert(key, ords);
-      outpointToValue.insert(key, primitiveToBuffer<u64>(output.value));
+      OUTPOINT_TO_SATRANGES.set(key, ords);
+      OUTPOINT_TO_VALUE.set(key, primitiveToBuffer<u64>(output.value));
     }
   }
 
-  static inscriptionsOnOutput(outpoint: OutPoint): Array<ArrayBuffer> {
-    let satpointToInscription = Table.open(SATPOINT_TO_INSCRIPTION);
-    let inscriptions = new Array<ArrayBuffer>(); 
-    for (let i = 0; i < u64.MAX_VALUE; i++) {
-      let sp = new SatPoint(outpoint, i);
-      let inscription = satpointToInscription.get(sp.toBuffer());
-      if (emptyBuffer(inscription)) { break }
-      inscriptions.push(inscription);
-    }
-    return inscriptions;
+  static inscriptionsOnOutput(outpoint: OutPoint): Array<Node> {
+    return SATPOINT_TO_INSCRIPTION.fromLinkedList(outpoint.toBuffer());
   }
 
 }

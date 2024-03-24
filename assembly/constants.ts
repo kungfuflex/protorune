@@ -1,2 +1,2 @@
 
-export const JUBILEE_HEIGHT = 824544;
+export const JUBILEE_HEIGHT: u32 = 824544;
