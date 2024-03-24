@@ -130,7 +130,7 @@ class Index {
 
 
       // find existing inscriptions on inputs
-      let currentInscriptions: Array<ArrayBuffer> = Index.viewInscriptionsOnOutput(prevout);
+      let currentInscriptions: Array<ArrayBuffer> = Index.inscriptionsOnOutput(prevout);
 
       for (let i = 0; i < currentInscriptions.length; i++) {
         let inscription = currentInscriptions[i];
