@@ -32,7 +32,6 @@ import {
 		OUTPOINT_TO_SATRANGES,
 		INSCRIPTION_TO_SATPOINT,
 		SATPOINT_TO_INSCRIPTION,
-		BLOCKHASH_TO_HEIGHT,
 		SAT_TO_SATPOINT,
 		OUTPOINT_TO_VALUE
 } from "./tables";
@@ -54,7 +53,8 @@ class Flotsam {
   }
 }
 
-const SAT_TO_OUTPOINT = BST.at<u64>(IndexPointer.wrap(String.UTF8.encode("/satrange/byoutpoint")));
+const SAT_TO_OUTPOINT = BST.at<u64>(IndexPointer.wrap(String.UTF8.encode("/outpoint/bysatrange")));
+const  OUTPOINT_TO_SAT = IndexPointer.wrap(String.UTF8.encode("/sat/by/outpoint"));
 const HEIGHT_TO_BLOCKHASH = IndexPointer.wrap(String.UTF8.encode("/blockhash/byheight"));
 const BLOCKHASH_TO_HEIGHT = IndexPointer.wrap(String.UTF8.encode("/height/byblockhash"));
 const STARTING_SAT = IndexPointer.wrap(String.UTF8.encode("/startingsat"));
@@ -122,38 +122,44 @@ class Index {
   }
 
   static indexBlock(height: u32, block: Block): void {
-    HEIGHT_TO_BLOCKHASH.set(primitiveToBuffer<u32>(height), block.blockhash());
-    BLOCKHASH_TO_HEIGHT.set(block.blockhash(), primitiveToBuffer<u32>(height));
+    HEIGHT_TO_BLOCKHASH.keyword("/").select(primitiveToBuffer<u32>(height)).set(block.blockhash());
+    BLOCKHASH_TO_HEIGHT.keyword("/").select(block.blockhash()).set(primitiveToBuffer<u32>(height));
     let startingSat = STARTING_SAT.getValue<u64>();
     let satNumber = startingSat;
-    for (let i: u32 = 0; i < coinbase.outs.length; i++) {
-      const outpoint = OutPoint.from(coinbase.txid(), i).toArrayBuffer();
+    const coinbase = block.coinbase();
+    for (let i: i32 = 0; i < coinbase.outs.length; i++) {
+      const outpoint = OutPoint.from(coinbase.txid(), <u32>i).toArrayBuffer();
       SAT_TO_OUTPOINT.set(satNumber, outpoint);
       OUTPOINT_TO_SAT.keyword("/").select(outpoint).setValue<u64>(satNumber);
       satNumber += coinbase.outs[i].value;
     }
     STARTING_SAT.setValue<u64>(satNumber);
-    for (let i: u32 = 1; i < block.transactions.length; i++) {
+    for (let i: i32 = 1; i < block.transactions.length; i++) {
       const tx = block.transactions[i];
-      const sats = flatten<u64>(tx.ins.map<Array<u64>>((v: Input, i: i32, ary: Array<Input>) => {
-        SAT_TO_OUTPOINT.nullify(satNumber);
-        return OUTPOINT_TO_SAT.keyword("/").select(OutPoint.from(coinbase.txid(), i).toArrayBuffer()).getListValues<u64>();
-      }));
+      const satsByInput = new Array<Array<u64>>(block.transactions[i].ins.length);
+      for (let j: i32 = 0; j < satsByInput.length; j++) {
+        let satsForInput = satsByInput[j] = OUTPOINT_TO_SAT.keyword("/").select(OutPoint.from(block.transactions[i].ins[j].hash.toArrayBuffer(), block.transactions[i].ins[j].index).toArrayBuffer()).getListValues<u64>();
+	for (let k: i32 = 0; k < satsForInput.length; k++) {
+          SAT_TO_OUTPOINT.nullify(satsForInput[k]);
+	}
+      }
+
+      const sats = flatten<u64>(satsByInput);
       let position = 0;
-      const distances = new Array(sats.length);
-      for (let satIndex: i32; satIndex < sats.length; satIndex++) {
+      const distances = new Array<u64>(sats.length);
+      for (let satIndex: i32 = 0; satIndex < sats.length; satIndex++) {
         distances[satIndex] = max(rangeLength<u64>(SAT_TO_OUTPOINT, sats[satIndex]), startingSat - sats[satIndex]);
       }
       const txid = tx.txid();
       for (let j: i32 = 0; j < tx.outs.length; j++) {
-        let remaining: i64 = <i64>tx.outs[j].value;
+        let remaining: u64 = tx.outs[j].value;
         const outpoint = OutPoint.from(txid, j).toArrayBuffer();
 	const outpointIndexPointer = OUTPOINT_TO_SAT.keyword("/").select(outpoint);
         while (remaining > 0) {
           SAT_TO_OUTPOINT.set(sats[position], outpoint);
 	  outpointIndexPointer.appendValue<u64>(sats[position]);
 	  if (distances[position] < remaining) {
-	    remaining -= distances[position]
+	    remaining -= distances[position];
             position++;
 	  } else {
             sats[position] += <u64>remaining;
