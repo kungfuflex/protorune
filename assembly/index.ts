@@ -1,5 +1,6 @@
 import { Box, RCBox } from "metashrew-as/assembly/utils/box"
 import { _flush, input, get, set } from "metashrew-as/assembly/indexer/index";
+import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
 import { parseBytes, parsePrimitive, concat, primitiveToBuffer } from "metashrew-as/assembly/utils/utils";
 import { Block } from "metashrew-as/assembly/blockdata/block";
 import { Transaction, Input, Output, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
@@ -12,6 +13,7 @@ import { subsidy } from "metashrew-as/assembly/utils/ordinals";
 import { Height } from "metashrew-as/assembly/blockdata/height";
 import { Sat, SatPoint } from "metashrew-as/assembly/blockdata/sat";
 import { JUBILEE_HEIGHT } from "./constants";
+import { BST } from "metashrew-as/assembly/indexer/bst";
 
 
 import {
@@ -31,7 +33,6 @@ import {
 		INSCRIPTION_TO_SATPOINT,
 		SATPOINT_TO_INSCRIPTION,
 		BLOCKHASH_TO_HEIGHT,
-		HEIGHT_TO_BLOCKHASH,
 		SAT_TO_SATPOINT,
 		OUTPOINT_TO_VALUE
 } from "./tables";
@@ -51,6 +52,25 @@ class Flotsam {
     this.inscriptionId = inscriptionId;
     this.origin = origin;
   }
+}
+
+const SAT_TO_OUTPOINT = BST.at<u64>(IndexPointer.wrap(String.UTF8.encode("/satrange/byoutpoint")));
+const HEIGHT_TO_BLOCKHASH = IndexPointer.wrap(String.UTF8.encode("/blockhash/byheight"));
+const BLOCKHASH_TO_HEIGHT = IndexPointer.wrap(String.UTF8.encode("/height/byblockhash"));
+const STARTING_SAT = IndexPointer.wrap(String.UTF8.encode("/startingsat"));
+
+function rangeLength<K>(bst: BST<K>, key: K): K {
+  return bst.seekGreater(key) - key;
+}
+
+function flatten<T>(ary: Array<Array<T>>): Array<T> {
+  const result: Array<T> = new Array<T>(0);
+  for (let i = 0; i < ary.length; i++) {
+    for (let j = 0; j < ary[i].length; j++) {
+      result.push(ary[i][j]);
+    }
+  }
+  return result;
 }
 
 
@@ -102,67 +122,47 @@ class Index {
   }
 
   static indexBlock(height: u32, block: Block): void {
-    // open tables
-
-
-
-    // set height to hash index
-    
-
-    let coinbase_inputs = new Array<Array<u64>>();
-
-    let h = new Height(height);
-    // if block subsidy is greater than 0, add range to coinbase input
-    if (h.subsidy() > 0) {
-      let start: Sat = h.startingSat();
-      coinbase_inputs.push([<u64>(start.n()), <u64>(start.n() + h.subsidy())]);
-    }
-
-    for (let tx_offset = 1; tx_offset < block.transactions.length; tx_offset++) {
-      let tx = block.transactions[tx_offset];
-      let inputOrdinalsRange = new Array<Array<u64>>();
-
-      for (let i = 0; i < tx.ins.length; i++) {
-        let input = tx.ins[i];
-        // encode key from transaction outpoint
-        let previousOutpoint: ArrayBuffer = input.previousOutput().toBuffer();
-
-        let response = OUTPOINT_TO_SATRANGES.get(previousOutpoint);
-        let satRange = Box.from(response);
-        let numOfOrdinals = parsePrimitive<u32>(satRange);
-        for ( let i = 0; i < <i32>numOfOrdinals; i++ ) {
-          let start = parsePrimitive<u64>(satRange);
-          let end = parsePrimitive<u64>(satRange);
-          inputOrdinalsRange.push([start, end])
-        }
-      }
-
-      Index.indexTransactions(
-        tx.txid(),
-        tx,
-	height,
-        inputOrdinalsRange
-      );
-
-      for (let i = 0; i < inputOrdinalsRange.length; i++) {
-        coinbase_inputs.push(inputOrdinalsRange[i]);
-      }
-
-//      Index.indexTransactionInscription(tx, tx.txid(), height); 
-    }
-
-    let coinbase = block.coinbase();
-    if (coinbase == null) {return};
-
-    Index.indexTransactions(
-      coinbase.txid(),
-      coinbase,
-      height,
-      coinbase_inputs
-    );
-
     HEIGHT_TO_BLOCKHASH.set(primitiveToBuffer<u32>(height), block.blockhash());
     BLOCKHASH_TO_HEIGHT.set(block.blockhash(), primitiveToBuffer<u32>(height));
+    let startingSat = STARTING_SAT.getValue<u64>();
+    let satNumber = startingSat;
+    for (let i: u32 = 0; i < coinbase.outs.length; i++) {
+      const outpoint = OutPoint.from(coinbase.txid(), i).toArrayBuffer();
+      SAT_TO_OUTPOINT.set(satNumber, outpoint);
+      OUTPOINT_TO_SAT.keyword("/").select(outpoint).setValue<u64>(satNumber);
+      satNumber += coinbase.outs[i].value;
+    }
+    STARTING_SAT.setValue<u64>(satNumber);
+    for (let i: u32 = 1; i < block.transactions.length; i++) {
+      const tx = block.transactions[i];
+      const sats = flatten<u64>(tx.ins.map<Array<u64>>((v: Input, i: i32, ary: Array<Input>) => {
+        SAT_TO_OUTPOINT.nullify(satNumber);
+        return OUTPOINT_TO_SAT.keyword("/").select(OutPoint.from(coinbase.txid(), i).toArrayBuffer()).getListValues<u64>();
+      }));
+      let position = 0;
+      const distances = new Array(sats.length);
+      for (let satIndex: i32; satIndex < sats.length; satIndex++) {
+        distances[satIndex] = max(rangeLength<u64>(SAT_TO_OUTPOINT, sats[satIndex]), startingSat - sats[satIndex]);
+      }
+      const txid = tx.txid();
+      for (let j: i32 = 0; j < tx.outs.length; j++) {
+        let remaining: i64 = <i64>tx.outs[j].value;
+        const outpoint = OutPoint.from(txid, j).toArrayBuffer();
+	const outpointIndexPointer = OUTPOINT_TO_SAT.keyword("/").select(outpoint);
+        while (remaining > 0) {
+          SAT_TO_OUTPOINT.set(sats[position], outpoint);
+	  outpointIndexPointer.appendValue<u64>(sats[position]);
+	  if (distances[position] < remaining) {
+	    remaining -= distances[position]
+            position++;
+	  } else {
+            sats[position] += <u64>remaining;
+	    distances[position] -= <u64>remaining;
+	    remaining = 0;
+	  }
+	}
+      }
+    }
   }
 
   static indexTransactions(

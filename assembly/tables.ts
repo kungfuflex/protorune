@@ -9,7 +9,7 @@ export class Node {
     this.value = value;
   }
   @inline
-  static from(key: ArrayBuffer, value: ArrayBuffer): Node {
+g static from(key: ArrayBuffer, value: ArrayBuffer): Node {
     return new Node(key, value);
   }
 }
