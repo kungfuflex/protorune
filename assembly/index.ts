@@ -4,7 +4,6 @@ import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
 import { parseBytes, parsePrimitive, concat, primitiveToBuffer } from "metashrew-as/assembly/utils/utils";
 import { Block } from "metashrew-as/assembly/blockdata/block";
 import { Transaction, Input, Output, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
-import { Table, Node } from "./tables";
 import { console } from "metashrew-as/assembly/utils/logging";
 import { toRLP, RLPItem } from "metashrew-as/assembly/utils/rlp";
 import { encodeHexFromBuffer, encodeHex } from "metashrew-as/assembly/utils/hex";
@@ -14,44 +13,6 @@ import { Height } from "metashrew-as/assembly/blockdata/height";
 import { Sat, SatPoint } from "metashrew-as/assembly/blockdata/sat";
 import { JUBILEE_HEIGHT } from "./constants";
 import { BST } from "metashrew-as/assembly/indexer/bst";
-
-
-import {
-  CONTENT_TYPE_TO_COUNT,
-  HOME_INSCRIPTIONS,
-  ID_TO_SEQUENCE_NUMBER,
-  INSCRIPTION_NUMBER_TO_SEQUENCE_NUMBER,
-  OUTPOINT_TO_VALUE,
-	TRANSACTION_ID_TO_TRANSACTION,
-	SAT_TO_SEQUENCE_NUMBER,
-		SATPOINT_TO_SEQUENCE_NUMBER,
-		SEQUENCE_NUMBER_TO_CHILDREN,
-		SEQUENCE_NUMBER_TO_ENTRY,
-		SEQUENCE_NUMBER_TO_SATPOINT,
-		VALUE_CACHE,
-		OUTPOINT_TO_SATRANGES,
-		INSCRIPTION_TO_SATPOINT,
-		SATPOINT_TO_INSCRIPTION,
-		SAT_TO_SATPOINT,
-		OUTPOINT_TO_VALUE
-} from "./tables";
-
-// TODO: implement `toBuffer`
-class BoxedTuple<T, U> {
-  _0: T;
-  _1: U;
-}
-
-class Flotsam {
-  public offset: u64;
-  public inscriptionId: ArrayBuffer;
-  public origin: SatPoint;
-  constructor(offset: u64, inscriptionId: ArrayBuffer, origin: SatPoint) {
-    this.offset = offset;
-    this.inscriptionId = inscriptionId;
-    this.origin = origin;
-  }
-}
 
 const SAT_TO_OUTPOINT = BST.at<u64>(IndexPointer.for("/outpoint/bysatrange/"));
 const OUTPOINT_TO_SAT = IndexPointer.for("/sat/by/outpoint/");
