@@ -4,6 +4,48 @@ import { EventEmitter } from "events";
 import { IndexerProgram } from "metashrew-test";
 import path from "path";
 
+const stripHexPrefix = (key: string) => {
+  if (key.substr(0, 2) === '0x') return key.substr(2);
+  return key;
+};
+
+const addHexPrefix = (s: string) => {
+  if (s.substr(0, 2) === '0x') return s;
+  return '0x' + s;
+};
+
+const split = (ary, sym) => {
+  return ary.reduce((r, v) => {
+    if (v === sym) {
+      r.push([]);
+    } else {
+      if (r.length ===0) r.push([]);
+      r[r.length - 1].push(v);
+    }
+    return r;
+  }, []);
+};
+  
+const formatKey = (key: string) => {
+  return split(Array.from(Buffer.from(stripHexPrefix(key), 'hex')), Buffer.from('/')[0]).reduce((r, v, i, ary) => {
+    const token = Buffer.from(v).toString('utf8');
+    if (!(i + v.length)) {
+      return  r + '/';
+    } else if (token.match(/^[0-9a-zA-Z]+$/)) {
+      return r + '/' + token;
+    } else {
+      return r + '/' + addHexPrefix(Buffer.from(v).toString('hex'));
+    }
+  }, '');
+};
+
+const formatKv = (kv: any) => {
+  return Object.fromEntries(Object.entries(kv).map(([key, value]) => [ formatKey(key), value ]));
+};
+
+  
+
+
 describe("metashrew index", () => {
 	/*
   it("indexes the genesis block", async () => {
@@ -118,8 +160,10 @@ describe("metashrew index", () => {
       program.setBlockHeight(i);
       await program.run("_start");
     }
-    for (let i =	767430; i < 767633; i++) {
+    for (let i = 0; i < 200; i++) {
+      console.log(`BLOCK ${i}`);
       await runBlock(i);
+    
     }
   });
 });

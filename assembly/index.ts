@@ -35,6 +35,11 @@ function rangeLength<K>(bst: BST<K>, key: K): K {
   return bst.seekGreater(key) - key;
 }
 
+function min<T>(a: T, b: T): T {
+  if (a > b) return b;
+  return a;
+}
+
 function flatten<T>(ary: Array<Array<T>>): Array<T> {
   const result: Array<T> = new Array<T>(0);
   for (let i = 0; i < ary.length; i++) {
@@ -51,10 +56,6 @@ function toID(satpoint: ArrayBuffer, index: u32): ArrayBuffer {
 }
 
 class Index {
-  static keyFor(table: ArrayBuffer, key: ArrayBuffer): ArrayBuffer {
-    return Box.concat([Box.from(table), Box.from(key)]);
-  }
-
   static indexTransactionInscriptions(
     tx: Transaction,
     txid: ArrayBuffer,
@@ -114,7 +115,7 @@ class Index {
     for (let i: i32 = 0; i < coinbase.outs.length; i++) {
       const outpoint = OutPoint.from(coinbase.txid(), <u32>i).toArrayBuffer();
       SAT_TO_OUTPOINT.set(satNumber, outpoint);
-      OUTPOINT_TO_SAT.select(outpoint).setValue<u64>(satNumber);
+      OUTPOINT_TO_SAT.select(outpoint).appendValue<u64>(satNumber);
       satNumber += coinbase.outs[i].value;
     }
     STARTING_SAT.setValue<u64>(satNumber);
@@ -122,17 +123,23 @@ class Index {
       const tx = block.transactions[i];
       const satsByInput = new Array<Array<u64>>(block.transactions[i].ins.length);
       for (let j: i32 = 0; j < satsByInput.length; j++) {
-        let satsForInput = satsByInput[j] = OUTPOINT_TO_SAT.select(OutPoint.from(block.transactions[i].ins[j].hash.toArrayBuffer(), block.transactions[i].ins[j].index).toArrayBuffer()).getListValues<u64>();
-	for (let k: i32 = 0; k < satsForInput.length; k++) {
-          SAT_TO_OUTPOINT.nullify(satsForInput[k]);
-	}
+        const outpoint = block.transactions[i].ins[j].previousOutput().toArrayBuffer();
+        satsByInput[j] = OUTPOINT_TO_SAT.select(outpoint).getListValues<u64>();
       }
-
       const sats = flatten<u64>(satsByInput);
       let position = 0;
       const distances = new Array<u64>(sats.length);
       for (let satIndex: i32 = 0; satIndex < sats.length; satIndex++) {
-        distances[satIndex] = max(rangeLength<u64>(SAT_TO_OUTPOINT, sats[satIndex]), startingSat - sats[satIndex]);
+        distances[satIndex] = min(rangeLength<u64>(SAT_TO_OUTPOINT, sats[satIndex]), startingSat - sats[satIndex]);
+      }
+      for (let j: i32 = 0; j < satsByInput.length; j++) {
+        const outpoint = block.transactions[i].ins[j].previousOutput().toArrayBuffer();
+        let satsForInput = satsByInput[j] = OUTPOINT_TO_SAT.select(outpoint).getListValues<u64>();
+	for (let k: i32 = 0; k < satsForInput.length; k++) {
+          console.log("nullify");
+	  console.log(satsForInput[k].toString(10));
+          SAT_TO_OUTPOINT.nullify(satsForInput[k]);
+	}
       }
       const txid = tx.txid();
       for (let j: i32 = 0; j < tx.outs.length; j++) {
@@ -142,6 +149,9 @@ class Index {
         while (remaining > 0) {
           SAT_TO_OUTPOINT.set(sats[position], outpoint);
 	  outpointIndexPointer.appendValue<u64>(sats[position]);
+	  console.log("SATRANGE");
+	  console.log(sats[position].toString(10));
+	  console.log(distances[position].toString(10));
 	  if (distances[position] < remaining) {
 	    remaining -= distances[position];
             position++;
@@ -152,7 +162,8 @@ class Index {
 	  }
 	}
       }
-      Index.indexTransactionInscriptions(tx, txid, height);
+//      Index.indexTransactionInscriptions(tx, txid, height);
+//      */
     }
   }
 }
