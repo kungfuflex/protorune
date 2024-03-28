@@ -53,11 +53,22 @@ class Flotsam {
   }
 }
 
-const SAT_TO_OUTPOINT = BST.at<u64>(IndexPointer.wrap(String.UTF8.encode("/outpoint/bysatrange")));
-const  OUTPOINT_TO_SAT = IndexPointer.wrap(String.UTF8.encode("/sat/by/outpoint"));
-const HEIGHT_TO_BLOCKHASH = IndexPointer.wrap(String.UTF8.encode("/blockhash/byheight"));
-const BLOCKHASH_TO_HEIGHT = IndexPointer.wrap(String.UTF8.encode("/height/byblockhash"));
-const STARTING_SAT = IndexPointer.wrap(String.UTF8.encode("/startingsat"));
+const SAT_TO_OUTPOINT = BST.at<u64>(IndexPointer.for("/outpoint/bysatrange/"));
+const OUTPOINT_TO_SAT = IndexPointer.for("/sat/by/outpoint/");
+const OUTPOINT_TO_SEQUENCE_NUMBERS = IndexPointer.for("/sequencenumbers/byoutpoint");
+const HEIGHT_TO_BLOCKHASH = IndexPointer.for("/blockhash/byheight/");
+const BLOCKHASH_TO_HEIGHT = IndexPointer.for("/height/byblockhash/");
+const STARTING_SAT = IndexPointer.for("/startingsat");
+const INSCRIPTION_ID_TO_INSCRIPTION = IndexPointer.for("/inscription/byid/");
+const SATPOINT_TO_INSCRIPTION_ID = IndexPointer.for("/inscriptionid/bysatpoint");
+const SATPOINT_TO_SAT = IndexPointer.for("/sat/bysatpoint");
+const INSCRIPTION_ID_TO_SATPOINT = IndexPointer.for("/satpoint/byinscriptionid/");
+const INSCRIPTION_ID_TO_BLOCKHEIGHT = IndexPointer.for("/height/byinscription/");
+const HEIGHT_TO_INSCRIPTION_IDS = IndexPointer.for("/inscriptionids/byheight/")
+const NEXT_SEQUENCE_NUMBER = IndexPointer.for("/nextsequence");
+const SEQUENCE_NUMBER_TO_INSCRIPTION_ID = IndexPointer.for("/inscriptionid/bysequence/");
+const INSCRIPTION_ID_TO_SEQUENCE_NUMBER = IndexPointer.for("/sequence/byinscriptionid/");
+
 
 function rangeLength<K>(bst: BST<K>, key: K): K {
   return bst.seekGreater(key) - key;
@@ -74,6 +85,10 @@ function flatten<T>(ary: Array<Array<T>>): Array<T> {
 }
 
 
+function toID(satpoint: ArrayBuffer, index: u32): ArrayBuffer {
+  return Box.concat([ Box.from(satpoint), Box.from(primitiveToBuffer<u32>(index)) ]);
+}
+
 class Index {
   static keyFor(table: ArrayBuffer, key: ArrayBuffer): ArrayBuffer {
     return Box.concat([Box.from(table), Box.from(key)]);
@@ -85,52 +100,60 @@ class Index {
     height: u32
   ): void {
     const jubilant = height >= JUBILEE_HEIGHT;
-    const totalOutputValue = tx.outs.reduce<u64>((r: u64, v: Output, i: i32, ary: Array<Output>): u64 => {
-      return r + v.value;
-    }, <u64>0);
-    let floatingInscriptions = new Array<Flotsam>();
-    let idCounter = 0;
-    let inscribedOffsets = new Array<u64>();
-    let totalInputValue: u64 = 0;
-
-
-    let inscriptions = tx.parseInscriptions();
-    if (inscriptions.length == 0) { return }
-
-    for ( let i = 0; i < tx.ins.length; i++ ) {
-      let input = tx.ins[i];
-      let prevout = input.previousOutput();
-
-      if (prevout.isNull()) {
-        totalInputValue += new Height(height).subsidy();
-        continue;
-      }
-
-
-      // find existing inscriptions on inputs
-      let currentInscriptions: Array<Node> = Index.inscriptionsOnOutput(prevout);
-
-      for (let i = 0; i < currentInscriptions.length; i++) {
-        let inscription = currentInscriptions[i];
-        let oldSatpoint = new SatPoint(prevout, parsePrimitive<u32>(Box.from(currentInscriptions[i].key)));
-        let oldInscriptionId = currentInscriptions[i].value;
+    let total = 0;
+    let offset: u64 = 0;
+    let outputIndex: i32 = 0;
+    for (let i = 0; i < tx.ins.length; i++) {
+      const inscription = tx.ins[i].inscription();
+      if (inscription !== null) {
+        const sequenceNumber = NEXT_SEQUENCE_NUMBER.getValue<u64>();
+	const outpoint = OutPoint.from(txid, <u32>outputIndex).toArrayBuffer();
+	const satpoint = SatPoint.from(outpoint, <u64>offset).toArrayBuffer();
+	offset++;
+	if (offset >= tx.outs[outputIndex].value) {
+          outputIndex++;
+	  offset = 0;
+	}
+	const sat = OUTPOINT_TO_SAT.selectIndex(0).getValue<u64>();
+	const inscriptionId = toID(satpoint, 0);
+	SATPOINT_TO_SAT.select(satpoint).setValue<u64>(sat);
+	SATPOINT_TO_INSCRIPTION_ID.select(satpoint).set(inscriptionId);
+	INSCRIPTION_ID_TO_SATPOINT.select(inscriptionId).set(satpoint);
+        INSCRIPTION_ID_TO_BLOCKHEIGHT.select(inscriptionId).setValue<u32>(height);
+	HEIGHT_TO_INSCRIPTION_IDS.selectValue<u32>(height).append(inscriptionId);
+	SEQUENCE_NUMBER_TO_INSCRIPTION_ID.selectValue<u64>(sequenceNumber).set(inscriptionId);
+	INSCRIPTION_ID_TO_SEQUENCE_NUMBER.select(inscriptionId).setValue<u64>(sequenceNumber);
+	INSCRIPTION_ID_TO_INSCRIPTION.select(inscriptionId).set(inscription.toArrayBuffer());
+	OUTPOINT_TO_SEQUENCE_NUMBERS.select(outpoint).appendValue<u64>(sequenceNumber);
+      } else {
+        const previousOutput = tx.ins[i].previousOutput().toArrayBuffer();
+        const inscriptionsForOutpoint = OUTPOINT_TO_SEQUENCE_NUMBERS.select(previousOutput).getListValues<u64>();
+        for (let j = 0; j < inscriptionsForOutpoint.length; j++) {
+          const inscriptionId = SEQUENCE_NUMBER_TO_INSCRIPTION_ID.selectValue<u64>(inscriptionsForOutpoint[j]).get();
+	  const outpoint = OutPoint.from(txid, <u32>outputIndex).toArrayBuffer();
+          const satpoint = SatPoint.from(outpoint, <u64>offset).toArrayBuffer();
+	  SATPOINT_TO_INSCRIPTION_ID.select(satpoint).set(inscriptionId);
+	  INSCRIPTION_ID_TO_SATPOINT.select(inscriptionId).set(satpoint);
+          offset++;
+	  if (offset >= tx.outs[outputIndex].value) {
+            outputIndex++;
+	    offset = 0;
+          }
+	}
       }
     }
-
-    // TODO: handle inscripion transfers
-    // `get` inscriptions on previousOutput's 
   }
 
   static indexBlock(height: u32, block: Block): void {
-    HEIGHT_TO_BLOCKHASH.keyword("/").select(primitiveToBuffer<u32>(height)).set(block.blockhash());
-    BLOCKHASH_TO_HEIGHT.keyword("/").select(block.blockhash()).set(primitiveToBuffer<u32>(height));
+    HEIGHT_TO_BLOCKHASH.selectValue<u32>(height).set(block.blockhash());
+    BLOCKHASH_TO_HEIGHT.select(block.blockhash()).setValue<u32>(height);
     let startingSat = STARTING_SAT.getValue<u64>();
     let satNumber = startingSat;
     const coinbase = block.coinbase();
     for (let i: i32 = 0; i < coinbase.outs.length; i++) {
       const outpoint = OutPoint.from(coinbase.txid(), <u32>i).toArrayBuffer();
       SAT_TO_OUTPOINT.set(satNumber, outpoint);
-      OUTPOINT_TO_SAT.keyword("/").select(outpoint).setValue<u64>(satNumber);
+      OUTPOINT_TO_SAT.select(outpoint).setValue<u64>(satNumber);
       satNumber += coinbase.outs[i].value;
     }
     STARTING_SAT.setValue<u64>(satNumber);
@@ -138,7 +161,7 @@ class Index {
       const tx = block.transactions[i];
       const satsByInput = new Array<Array<u64>>(block.transactions[i].ins.length);
       for (let j: i32 = 0; j < satsByInput.length; j++) {
-        let satsForInput = satsByInput[j] = OUTPOINT_TO_SAT.keyword("/").select(OutPoint.from(block.transactions[i].ins[j].hash.toArrayBuffer(), block.transactions[i].ins[j].index).toArrayBuffer()).getListValues<u64>();
+        let satsForInput = satsByInput[j] = OUTPOINT_TO_SAT.select(OutPoint.from(block.transactions[i].ins[j].hash.toArrayBuffer(), block.transactions[i].ins[j].index).toArrayBuffer()).getListValues<u64>();
 	for (let k: i32 = 0; k < satsForInput.length; k++) {
           SAT_TO_OUTPOINT.nullify(satsForInput[k]);
 	}
@@ -154,7 +177,7 @@ class Index {
       for (let j: i32 = 0; j < tx.outs.length; j++) {
         let remaining: u64 = tx.outs[j].value;
         const outpoint = OutPoint.from(txid, j).toArrayBuffer();
-	const outpointIndexPointer = OUTPOINT_TO_SAT.keyword("/").select(outpoint);
+	const outpointIndexPointer = OUTPOINT_TO_SAT.select(outpoint);
         while (remaining > 0) {
           SAT_TO_OUTPOINT.set(sats[position], outpoint);
 	  outpointIndexPointer.appendValue<u64>(sats[position]);
@@ -168,76 +191,9 @@ class Index {
 	  }
 	}
       }
+      Index.indexTransactionInscriptions(tx, txid, height);
     }
   }
-
-  static indexTransactions(
-    txid: ArrayBuffer,
-    tx: Transaction,
-    height: u32,
-    inputOrdinalsRange: Array<Array<u64>>,
-  ): void {
-    // transaction outputs
-    Index.indexTransactionInscriptions(tx, txid, height);
-    for (let i = 0; i < tx.outs.length; i++) {
-      let key = OutPoint.from(txid, i).toBuffer();
-      let ordinals: Array<ArrayBuffer> = [];
-      let output = tx.outs[i];
-
-      let remaining = output.value;
-      while (remaining > 0) {
-        if (inputOrdinalsRange.length == 0) {
-          break;
-        } 
-        let range = inputOrdinalsRange.shift();
-
-        // ordinal to satpoint
-
-        if (!(new Sat(range[0])).isCommon()) {
-          SAT_TO_SATPOINT.set(
-            primitiveToBuffer<u64>(range[0]),
-            (new SatPoint(
-              OutPoint.from(txid, i),
-              <u64>(output.value - remaining)
-            )).toBuffer()
-          );
-        }
-
-        let count = range[1] - range[0];
-        let assigned: Array<u64> = new Array();
-        if (count > remaining) {
-          let middle = range[0] + remaining;
-          inputOrdinalsRange.unshift([middle, range[1]]);
-          assigned = [range[0], middle];
-        } else {
-          assigned = range;
-        }
-
-        let start = primitiveToBuffer<u64>(assigned[0]);
-        let end = primitiveToBuffer<u64>(assigned[1]);
-        let ordinalRange = concat([start, end]);
-        ordinals.push(ordinalRange);
-        remaining -= assigned[1] - assigned[0];
-      }
-
-      ordinals.unshift(
-        primitiveToBuffer<u32>(<u32>ordinals.length)
-      );
-      let ords = concat(ordinals);
-
-      OUTPOINT_TO_SATRANGES.set(key, ords);
-      OUTPOINT_TO_VALUE.set(key, primitiveToBuffer<u64>(output.value));
-    }
-  }
-
-  static inscriptionsOnOutput(outpoint: OutPoint): Array<Node> {
-    return SATPOINT_TO_INSCRIPTION.fromLinkedList(outpoint.toBuffer());
-  }
-
-}
-
-function emptyBuffer(a: ArrayBuffer): boolean {
-  return a.byteLength == 0;
 }
 
 
