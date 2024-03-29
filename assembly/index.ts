@@ -136,8 +136,6 @@ class Index {
         const outpoint = block.transactions[i].ins[j].previousOutput().toArrayBuffer();
         let satsForInput = satsByInput[j] = OUTPOINT_TO_SAT.select(outpoint).getListValues<u64>();
 	for (let k: i32 = 0; k < satsForInput.length; k++) {
-          console.log("nullify");
-	  console.log(satsForInput[k].toString(10));
           SAT_TO_OUTPOINT.nullify(satsForInput[k]);
 	}
       }
@@ -149,9 +147,6 @@ class Index {
         while (remaining > 0) {
           SAT_TO_OUTPOINT.set(sats[position], outpoint);
 	  outpointIndexPointer.appendValue<u64>(sats[position]);
-	  console.log("SATRANGE");
-	  console.log(sats[position].toString(10));
-	  console.log(distances[position].toString(10));
 	  if (distances[position] < remaining) {
 	    remaining -= distances[position];
             position++;
@@ -162,8 +157,7 @@ class Index {
 	  }
 	}
       }
-//      Index.indexTransactionInscriptions(tx, txid, height);
-//      */
+      Index.indexTransactionInscriptions(tx, txid, height);
     }
   }
 }
