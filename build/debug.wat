@@ -13,9 +13,9 @@
  (type $11 (func (param i32 i64) (result i32)))
  (type $12 (func (param i64 i32) (result i32)))
  (type $13 (func (param i32 i64 i32)))
- (type $14 (func (param i32 i32 i32 i32)))
- (type $15 (func (param i32 i32 i32 i32 i32) (result i32)))
- (type $16 (func (param i32 i64) (result i64)))
+ (type $14 (func (param i32 i64) (result i64)))
+ (type $15 (func (param i32 i32 i32 i32)))
+ (type $16 (func (param i32 i32 i32 i32 i32) (result i32)))
  (type $17 (func (param i64 i32 i32)))
  (type $18 (func (param i64) (result i64)))
  (type $19 (func (param i32 i32 i64)))
@@ -11490,6 +11490,236 @@
   call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/inscription/Field>#reduce<~lib/arraybuffer/ArrayBuffer>
   return
  )
+ (func $~lib/metashrew-as/assembly/indexer/bst/maskLowerThan (param $v i32) (param $position i32)
+  (local $ary i32)
+  (local $byteSelected i32)
+  (local $bitSelected i32)
+  (local $i i32)
+  (local $i|6 i32)
+  i32.const 0
+  i32.const 4
+  call $~lib/array/Array<u64>#constructor
+  local.set $ary
+  local.get $ary
+  i32.const 0
+  local.get $v
+  i64.load
+  call $~lib/polyfills/bswap<u64>
+  call $~lib/array/Array<u64>#__set
+  local.get $ary
+  i32.const 1
+  local.get $v
+  i32.const 8
+  i32.add
+  i64.load
+  call $~lib/polyfills/bswap<u64>
+  call $~lib/array/Array<u64>#__set
+  local.get $ary
+  i32.const 2
+  local.get $v
+  i32.const 2
+  i32.const 8
+  i32.mul
+  i32.add
+  i64.load
+  call $~lib/polyfills/bswap<u64>
+  call $~lib/array/Array<u64>#__set
+  local.get $ary
+  i32.const 3
+  local.get $v
+  i32.const 3
+  i32.const 8
+  i32.mul
+  i32.add
+  i64.load
+  call $~lib/polyfills/bswap<u64>
+  call $~lib/array/Array<u64>#__set
+  local.get $position
+  i32.const 255
+  i32.and
+  i32.const 64
+  i32.div_u
+  local.set $byteSelected
+  local.get $position
+  i32.const 255
+  i32.and
+  i32.const 64
+  i32.rem_u
+  local.set $bitSelected
+  local.get $ary
+  local.get $byteSelected
+  local.get $ary
+  local.get $byteSelected
+  call $~lib/array/Array<u64>#__get
+  i64.const 1
+  local.get $bitSelected
+  i64.extend_i32_u
+  i64.shl
+  i64.const 1
+  i64.sub
+  i64.const 64
+  local.get $bitSelected
+  i64.extend_i32_u
+  i64.sub
+  i64.shl
+  i64.and
+  call $~lib/array/Array<u64>#__set
+  local.get $byteSelected
+  i32.const 1
+  i32.add
+  local.set $i
+  loop $for-loop|0
+   local.get $i
+   i32.const 255
+   i32.and
+   i32.const 4
+   i32.lt_u
+   if
+    local.get $ary
+    local.get $i
+    i32.const 255
+    i32.and
+    i64.const 0
+    call $~lib/array/Array<u64>#__set
+    local.get $i
+    i32.const 1
+    i32.add
+    local.set $i
+    br $for-loop|0
+   end
+  end
+  i32.const 0
+  local.set $i|6
+  loop $for-loop|1
+   local.get $i|6
+   i32.const 4
+   i32.lt_s
+   if
+    local.get $v
+    local.get $i|6
+    i32.const 8
+    i32.mul
+    i32.add
+    local.get $ary
+    local.get $i|6
+    call $~lib/array/Array<u64>#__get
+    call $~lib/polyfills/bswap<u64>
+    i64.store
+    local.get $i|6
+    i32.const 1
+    i32.add
+    local.set $i|6
+    br $for-loop|1
+   end
+  end
+ )
+ (func $~lib/metashrew-as/assembly/indexer/bst/BST<u64>#seekLower (param $this i32) (param $start i64) (result i64)
+  (local $partialKey i32)
+  (local $thisKey i32)
+  (local $mask i32)
+  (local $symbol i32)
+  (local $6 i32)
+  (local $7 i32)
+  i32.const 0
+  i32.const 8
+  call $~lib/arraybuffer/ArrayBuffer#constructor
+  local.set $partialKey
+  local.get $partialKey
+  local.get $start
+  call $~lib/polyfills/bswap<u64>
+  i64.store
+  loop $do-loop|0
+   local.get $partialKey
+   call $~lib/metashrew-as/assembly/utils/box/Box.from
+   i32.const 1
+   call $~lib/metashrew-as/assembly/utils/box/Box#shrinkBack
+   call $~lib/metashrew-as/assembly/utils/box/Box#toArrayBuffer
+   local.set $thisKey
+   local.get $this
+   local.get $thisKey
+   call $~lib/metashrew-as/assembly/indexer/bst/BST<u64>#getMaskPointer
+   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#get
+   local.set $mask
+   local.get $mask
+   call $~lib/arraybuffer/ArrayBuffer#get:byteLength
+   i32.const 0
+   i32.ne
+   if
+    local.get $mask
+    local.get $partialKey
+    local.get $thisKey
+    call $~lib/arraybuffer/ArrayBuffer#get:byteLength
+    call $~lib/metashrew-as/assembly/indexer/bst/byteAt<i32>
+    call $~lib/metashrew-as/assembly/indexer/bst/maskLowerThan
+    local.get $mask
+    i32.const 0
+    call $~lib/metashrew-as/assembly/indexer/bst/binarySearchU256
+    local.set $symbol
+    local.get $symbol
+    i32.const -1
+    i32.ne
+    if
+     local.get $this
+     i32.const 2
+     i32.const 2
+     i32.const 27
+     i32.const 0
+     call $~lib/rt/__newArray
+     local.set $6
+     local.get $6
+     i32.load offset=4
+     local.set $7
+     local.get $6
+     i32.const 0
+     local.get $thisKey
+     call $~lib/metashrew-as/assembly/utils/box/Box.from
+     call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#__set
+     local.get $6
+     i32.const 1
+     local.get $symbol
+     call $~lib/metashrew-as/assembly/indexer/bst/toBuffer<u8>
+     call $~lib/metashrew-as/assembly/utils/box/Box.from
+     call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#__set
+     local.get $6
+     call $~lib/metashrew-as/assembly/utils/box/Box.concat
+     i32.const 0
+     call $~lib/metashrew-as/assembly/indexer/bst/BST<u64>#_findBoundaryFromPartial
+     return
+    end
+   end
+   local.get $thisKey
+   local.set $partialKey
+   local.get $partialKey
+   call $~lib/arraybuffer/ArrayBuffer#get:byteLength
+   i32.const 0
+   i32.ne
+   br_if $do-loop|0
+  end
+  i64.const 0
+  i64.const -1
+  i64.xor
+  return
+ )
+ (func $~lib/metashrew-as/assembly/indexer/bst/BST<u64>#get (param $this i32) (param $k i64) (result i32)
+  (local $key i64)
+  (local $keyBytes i32)
+  local.get $k
+  call $~lib/polyfills/bswap<u64>
+  local.set $key
+  i32.const 0
+  i32.const 8
+  call $~lib/arraybuffer/ArrayBuffer#constructor
+  local.set $keyBytes
+  local.get $keyBytes
+  local.get $key
+  i64.store
+  local.get $this
+  call $~lib/metashrew-as/assembly/indexer/bst/BST<u64>#get:ptr
+  local.get $keyBytes
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#get
+  return
+ )
  (func $assembly/index/Index.indexTransactionInscriptions (param $tx i32) (param $txid i32) (param $height i32)
   (local $jubilant i32)
   (local $total i32)
@@ -11500,14 +11730,18 @@
   (local $sequenceNumber i64)
   (local $outpoint i32)
   (local $satpoint i32)
+  (local $value i64)
   (local $sat i64)
   (local $inscriptionId i32)
   (local $previousOutput i32)
   (local $inscriptionsForOutpoint i32)
   (local $j i32)
-  (local $inscriptionId|17 i32)
-  (local $outpoint|18 i32)
-  (local $satpoint|19 i32)
+  (local $inscriptionId|18 i32)
+  (local $previousSatPoint i32)
+  (local $sat|20 i64)
+  (local $startingSat i64)
+  (local $outpoint|22 i32)
+  (local $satpoint|23 i32)
   local.get $height
   global.get $assembly/constants/JUBILEE_HEIGHT
   i32.ge_u
@@ -11550,8 +11784,18 @@
      call $~lib/metashrew-as/assembly/blockdata/sat/SatPoint.from
      call $~lib/metashrew-as/assembly/blockdata/sat/SatPoint#toArrayBuffer
      local.set $satpoint
+     global.get $assembly/index/OUTPOINT_TO_VALUE
+     local.get $tx
+     call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:ins
+     local.get $i
+     call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Input>#__get
+     call $~lib/metashrew-as/assembly/blockdata/transaction/Input#previousOutput
+     call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#toArrayBuffer
+     call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
+     call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#getValue<u64>
+     local.set $value
      local.get $offset
-     i64.const 1
+     local.get $value
      i64.add
      local.set $offset
      local.get $offset
@@ -11651,46 +11895,56 @@
        call $~lib/array/Array<u64>#__get
        call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#selectValue<u64>
        call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#get
-       local.set $inscriptionId|17
-       local.get $txid
-       local.get $outputIndex
-       call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint.from
-       call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#toArrayBuffer
-       local.set $outpoint|18
-       local.get $outpoint|18
-       local.get $offset
-       call $~lib/metashrew-as/assembly/blockdata/sat/SatPoint.from
-       call $~lib/metashrew-as/assembly/blockdata/sat/SatPoint#toArrayBuffer
-       local.set $satpoint|19
-       global.get $assembly/index/SATPOINT_TO_INSCRIPTION_ID
-       local.get $satpoint|19
-       call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
-       local.get $inscriptionId|17
-       call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
+       local.set $inscriptionId|18
        global.get $assembly/index/INSCRIPTION_ID_TO_SATPOINT
-       local.get $inscriptionId|17
+       local.get $inscriptionId|18
        call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
-       local.get $satpoint|19
-       call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
-       local.get $offset
+       call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#get
+       local.set $previousSatPoint
+       global.get $assembly/index/SATPOINT_TO_SAT
+       local.get $previousSatPoint
+       call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
+       call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#getValue<u64>
+       local.set $sat|20
+       global.get $assembly/index/SAT_TO_OUTPOINT
+       local.get $sat|20
        i64.const 1
        i64.add
-       local.set $offset
-       local.get $offset
-       local.get $tx
-       call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:outs
-       local.get $outputIndex
-       call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Output>#__get
-       call $~lib/metashrew-as/assembly/blockdata/transaction/Output#get:value
-       i64.ge_u
-       if
-        local.get $outputIndex
-        i32.const 1
-        i32.add
-        local.set $outputIndex
-        i64.const 0
-        local.set $offset
-       end
+       call $~lib/metashrew-as/assembly/indexer/bst/BST<u64>#seekLower
+       local.set $startingSat
+       global.get $assembly/index/SAT_TO_OUTPOINT
+       local.get $startingSat
+       call $~lib/metashrew-as/assembly/indexer/bst/BST<u64>#get
+       local.set $outpoint|22
+       local.get $outpoint|22
+       local.get $sat|20
+       local.get $startingSat
+       i64.sub
+       call $~lib/metashrew-as/assembly/blockdata/sat/SatPoint.from
+       call $~lib/metashrew-as/assembly/blockdata/sat/SatPoint#toArrayBuffer
+       local.set $satpoint|23
+       global.get $assembly/index/SATPOINT_TO_SAT
+       local.get $satpoint|23
+       call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
+       local.get $sat|20
+       call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u64>
+       global.get $assembly/index/SATPOINT_TO_INSCRIPTION_ID
+       local.get $satpoint|23
+       call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
+       local.get $inscriptionId|18
+       call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
+       global.get $assembly/index/INSCRIPTION_ID_TO_SATPOINT
+       local.get $inscriptionId|18
+       call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
+       local.get $satpoint|23
+       call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
+       global.get $assembly/index/OUTPOINT_TO_SEQUENCE_NUMBERS
+       local.get $outpoint|22
+       call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
+       local.get $inscriptionsForOutpoint
+       local.get $j
+       call $~lib/array/Array<u64>#__get
+       call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#appendValue<u64>
        local.get $j
        i32.const 1
        i32.add

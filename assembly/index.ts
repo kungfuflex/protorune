@@ -167,7 +167,8 @@ class Index {
         const sequenceNumber = NEXT_SEQUENCE_NUMBER.getValue<u64>();
 	const outpoint = OutPoint.from(txid, <u32>outputIndex).toArrayBuffer();
 	const satpoint = SatPoint.from(outpoint, <u64>offset).toArrayBuffer();
-	offset++;
+	const value = OUTPOINT_TO_VALUE.select(tx.ins[i].previousOutput().toArrayBuffer()).getValue<u64>();
+	offset += value;
 	if (offset >= tx.outs[outputIndex].value) {
           outputIndex++;
 	  offset = 0;
@@ -188,15 +189,15 @@ class Index {
         const inscriptionsForOutpoint = OUTPOINT_TO_SEQUENCE_NUMBERS.select(previousOutput).getListValues<u64>();
         for (let j = 0; j < inscriptionsForOutpoint.length; j++) {
           const inscriptionId = SEQUENCE_NUMBER_TO_INSCRIPTION_ID.selectValue<u64>(inscriptionsForOutpoint[j]).get();
-	  const outpoint = OutPoint.from(txid, <u32>outputIndex).toArrayBuffer();
-          const satpoint = SatPoint.from(outpoint, <u64>offset).toArrayBuffer();
+	  const previousSatPoint = INSCRIPTION_ID_TO_SATPOINT.select(inscriptionId).get();
+	  const sat = SATPOINT_TO_SAT.select(previousSatPoint).getValue<u64>();
+	  const startingSat = SAT_TO_OUTPOINT.seekLower(sat + 1);
+	  const outpoint = SAT_TO_OUTPOINT.get(startingSat);
+	  const satpoint = SatPoint.from(outpoint, sat - startingSat).toArrayBuffer();
+	  SATPOINT_TO_SAT.select(satpoint).setValue<u64>(sat);
 	  SATPOINT_TO_INSCRIPTION_ID.select(satpoint).set(inscriptionId);
 	  INSCRIPTION_ID_TO_SATPOINT.select(inscriptionId).set(satpoint);
-          offset++;
-	  if (offset >= tx.outs[outputIndex].value) {
-            outputIndex++;
-	    offset = 0;
-          }
+	  OUTPOINT_TO_SEQUENCE_NUMBERS.select(outpoint).appendValue<u64>(inscriptionsForOutpoint[j]);
 	}
       }
     }
