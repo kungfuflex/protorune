@@ -70,8 +70,14 @@ class SatRanges {
     }
     return new SatRanges(sats, distances);
   }
-  static fromInputs(inputs: Array<Input>): SatRanges {
-    return SatRanges.fromSats(flatten(inputs.map<Array<u64>>((v: Input) => OUTPOINT_TO_SAT.select(v.previousOutput().toArrayBuffer()).getListValues<u64>())));
+  pull(): SatRanges {
+    this.sats.forEach((v: u64, i: i32, ary: Array<u64>) => {
+      SAT_TO_OUTPOINT.nullify(v);
+    });
+    return this;
+  }
+  static fromTransaction(tx: Transaction): SatRanges {
+    return SatRanges.fromSats(flatten(tx.ins.map<Array<u64>>((v: Input) => OUTPOINT_TO_SAT.select(v.previousOutput().toArrayBuffer()).getListValues<u64>())));
   }
 }
 
@@ -82,11 +88,15 @@ class SatSource {
   constructor(ranges: SatRanges) {
     this.ranges = ranges;
   }
-  static fromInputs(inputs: Array<Input>): SatSource {
-    return new SatSource(SatRanges.fromInputs(inputs));
+  static fromTransaction(tx: Transaction): SatSource {
+    return new SatSource(SatRanges.fromTransaction(tx));
   }
   consumed(): boolean {
     return this.pointer >= this.ranges.sats.length || this.pointer === this.ranges.sats.length - 1 && this.offset >= this.ranges.distances[this.ranges.distances.length - 1];
+  }
+  pull(): SatSource {
+    this.ranges.pull();
+    return this;
   }
   static range(sat: u64, distance: u64): SatSource {
     const sats = new Array<u64>(1);
@@ -241,7 +251,7 @@ class Index {
     for (let i: i32 = 1; i < block.transactions.length; i++) {
       const tx = block.transactions[i];
       const transactionSink = SatSink.fromTransaction(tx);
-      const transactionSource = SatSource.fromInputs(tx.ins);
+      const transactionSource = SatSource.fromTransaction(tx).pull();
       transactionSink.consume(transactionSource);
       const txid = tx.txid();
       if (!transactionSource.consumed()) coinbaseSink.consume(transactionSource);
