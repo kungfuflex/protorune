@@ -134,6 +134,7 @@ describe("metashrew index", () => {
         ),
       ).buffer,
     );
+//    program.kv = require(path.join(__dirname, 'snapshot-1295'));
     program.on("log", (v) => console.log(v));
     async function rpcCall(method, params) {
       const response = await fetch(
@@ -160,10 +161,9 @@ describe("metashrew index", () => {
       program.setBlockHeight(i);
       await program.run("_start");
     }
-    for (let i = 0; i < 200; i++) {
+    for (let i = 0; i < 2000; i++) {
       console.log(`BLOCK ${i}`);
       await runBlock(i);
-    
     }
   });
 });
