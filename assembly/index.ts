@@ -245,7 +245,7 @@ class Index {
       transactionSink.consume(transactionSource);
       const txid = tx.txid();
       if (!transactionSource.consumed()) coinbaseSink.consume(transactionSource);
-      Index.indexTransactionInscriptions(tx, txid, height);
+//      Index.indexTransactionInscriptions(tx, txid, height);
     }
   }
 }
