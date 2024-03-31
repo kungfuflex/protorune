@@ -904,7 +904,7 @@ memorystream@^0.3.1:
 
 "metashrew-as@https://github.com/sandshrewmetaprotocols/metashrew-as":
   version "0.1.0"
-  resolved "https://github.com/sandshrewmetaprotocols/metashrew-as#12c0e7af32fee086b983e17a2c4437ff454a45ed"
+  resolved "https://github.com/sandshrewmetaprotocols/metashrew-as#ee56fa0cc6136521f87f7d8acc4711ceb6be0e17"
   dependencies:
     lodash "^4.17.21"
 
