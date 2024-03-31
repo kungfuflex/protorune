@@ -32,6 +32,12 @@ const SEQUENCE_NUMBER_TO_INSCRIPTION_ID = IndexPointer.for("/inscriptionid/byseq
 const INSCRIPTION_ID_TO_SEQUENCE_NUMBER = IndexPointer.for("/sequence/byinscriptionid/");
 
 
+// Tables we add that are not in the canonical ord
+
+const OUTPOINT_TO_OWNER = IndexPointer.for("/owner/foroutpoint/");
+const OWNER_TO_SAT = IndexPointer.for("/sat/byowner/");
+const INSCRIPTION_OWNER_HISTORY = IndexPointer.for("/history/forinscription/");
+
 function rangeLength<K>(bst: BST<K>, key: K): K {
   return bst.seekGreater(key) - key;
 }
@@ -163,6 +169,7 @@ class Index {
     let outputIndex: i32 = 0;
     for (let i = 0; i < tx.ins.length; i++) {
       const inscription = tx.ins[i].inscription();
+      const output = tx.outs[outputIndex];
       if (inscription !== null) {
         const sequenceNumber = NEXT_SEQUENCE_NUMBER.getValue<u64>();
 	const outpoint = OutPoint.from(txid, <u32>outputIndex).toArrayBuffer();
@@ -184,6 +191,8 @@ class Index {
 	INSCRIPTION_ID_TO_SEQUENCE_NUMBER.select(inscriptionId).setValue<u64>(sequenceNumber);
 	INSCRIPTION_ID_TO_INSCRIPTION.select(inscriptionId).set(inscription.toArrayBuffer());
 	OUTPOINT_TO_SEQUENCE_NUMBERS.select(outpoint).appendValue<u64>(sequenceNumber);
+        const address = output.intoAddress();
+        BST.at<u32>(INSCRIPTION_OWNER_HISTORY.selectValue<u64>(sequenceNumber)).set(height, address !== null ? address : new ArrayBuffer(32));
       } else {
         const previousOutput = tx.ins[i].previousOutput().toArrayBuffer();
         const inscriptionsForOutpoint = OUTPOINT_TO_SEQUENCE_NUMBERS.select(previousOutput).getListValues<u64>();
@@ -197,7 +206,10 @@ class Index {
 	  SATPOINT_TO_SAT.select(satpoint).setValue<u64>(sat);
 	  SATPOINT_TO_INSCRIPTION_ID.select(satpoint).set(inscriptionId);
 	  INSCRIPTION_ID_TO_SATPOINT.select(inscriptionId).set(satpoint);
+	  const sequenceNumber = INSCRIPTION_ID_TO_SEQUENCE_NUMBER.select(inscriptionId).getValue<u64>();
 	  OUTPOINT_TO_SEQUENCE_NUMBERS.select(outpoint).appendValue<u64>(inscriptionsForOutpoint[j]);
+          const address = output.intoAddress();
+          BST.at<u32>(INSCRIPTION_OWNER_HISTORY.selectValue<u64>(sequenceNumber)).set(height, address !== null ? address : new ArrayBuffer(32));
 	}
       }
     }
@@ -229,7 +241,26 @@ class Index {
   static indexOutputValuesForTransaction(tx: Transaction): void {
     const txid = tx.txid();
     for (let i = 0; i < tx.outs.length; i++) {
-      OUTPOINT_TO_VALUE.select(OutPoint.from(txid, i).toArrayBuffer()).setValue(tx.outs[i].value);
+      const outpoint = OutPoint.from(txid, i).toArrayBuffer();
+      OUTPOINT_TO_VALUE.select(outpoint).setValue(tx.outs[i].value);
+    }
+  }
+  static indexOwnershipForTransaction(tx: Transaction): void {
+    const txid = tx.txid();
+    for (let i = 0; i < tx.ins.length; i++) {
+      const outpoint = tx.ins[i].previousOutput().toArrayBuffer();
+      const address = OUTPOINT_TO_OWNER.select(outpoint).get();
+      if (address.byteLength !== 0) {
+        BST.at<u64>(OWNER_TO_SAT.select(address)).nullify(OUTPOINT_TO_SAT.selectIndex(0).getValue<u64>());
+      }
+    }
+    for (let i = 0; i < tx.outs.length; i++) {
+      const address = tx.outs[i].intoAddress();
+      if (address !== null) {
+        const outpoint = OutPoint.from(txid, i).toArrayBuffer();
+        OUTPOINT_TO_OWNER.select(outpoint).set(address);
+        BST.at<u64>(OWNER_TO_SAT.select(address)).set(OUTPOINT_TO_SAT.selectIndex(0).getValue<u64>(), new ArrayBuffer(1));
+      }
     }
   }
   static indexOutputValuesForBlock(block: Block): void {
@@ -256,6 +287,7 @@ class Index {
       transactionSink.consume(transactionSource);
       const txid = tx.txid();
       if (!transactionSource.consumed()) coinbaseSink.consume(transactionSource);
+      Index.indexOwnershipForTransaction(tx);
       Index.indexTransactionInscriptions(tx, txid, height);
     }
   }
