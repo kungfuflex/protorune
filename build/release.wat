@@ -4215,8 +4215,8 @@
  )
  (func $assembly/index/Index.indexBlock (param $0 i32) (param $1 i32)
   (local $2 i32)
-  (local $3 i32)
-  (local $4 i64)
+  (local $3 i64)
+  (local $4 i32)
   (local $5 i32)
   (local $6 i32)
   (local $7 i32)
@@ -4226,26 +4226,26 @@
   local.set $2
   i32.const 4
   call $~lib/arraybuffer/ArrayBuffer#constructor
-  local.tee $3
+  local.tee $5
   local.get $0
   i64.extend_i32_u
-  local.tee $4
+  local.tee $3
   i64.const 8
   i64.shr_u
   i64.const 71777214294589695
   i64.and
-  local.get $4
+  local.get $3
   i64.const 71777214294589695
   i64.and
   i64.const 8
   i64.shl
   i64.or
-  local.tee $4
+  local.tee $3
   i64.const 16
   i64.shr_u
   i64.const 281470681808895
   i64.and
-  local.get $4
+  local.get $3
   i64.const 281470681808895
   i64.and
   i64.const 16
@@ -4255,7 +4255,7 @@
   i64.rotr
   i64.store32
   local.get $2
-  local.get $3
+  local.get $5
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
   local.get $1
   i32.load offset=4
@@ -4271,16 +4271,14 @@
   local.set $2
   i32.const 4
   call $~lib/arraybuffer/ArrayBuffer#constructor
-  local.tee $3
+  local.tee $5
   local.get $0
   i32.store
   local.get $2
-  local.get $3
+  local.get $5
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
-  i32.const 1
-  local.set $3
   loop $for-loop|0
-   local.get $3
+   local.get $4
    local.get $1
    i32.load offset=8
    local.tee $0
@@ -4289,7 +4287,7 @@
    if
     block $__inlined_func$assembly/index/RunesTransaction#runestoneOutput$498 (result i32)
      local.get $0
-     local.get $3
+     local.get $4
      call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Input>#__get
      local.set $2
      i32.const 0
@@ -4592,10 +4590,10 @@
       drop
      end
     end
-    local.get $3
+    local.get $4
     i32.const 1
     i32.add
-    local.set $3
+    local.set $4
     br $for-loop|0
    end
   end

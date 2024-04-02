@@ -7000,7 +7000,7 @@
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
   local.get $height
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u32>
-  i32.const 1
+  i32.const 0
   local.set $i
   loop $for-loop|0
    local.get $i

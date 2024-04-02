@@ -91,7 +91,7 @@ class Index {
   static indexBlock(height: u32, block: Block): void {
     HEIGHT_TO_BLOCKHASH.selectValue<u32>(height).set(block.blockhash());
     BLOCKHASH_TO_HEIGHT.select(block.blockhash()).setValue<u32>(height);
-    for (let i: i32 = 1; i < block.transactions.length; i++) {
+    for (let i: i32 = 0; i < block.transactions.length; i++) {
       const tx = RunesTransaction.from(block.transactions[i]);
       const runestoneOutput = tx.runestoneOutput();
       if (runestoneOutput !== null) {
