@@ -43,87 +43,7 @@ const formatKv = (kv: any) => {
   return Object.fromEntries(Object.entries(kv).map(([key, value]) => [ formatKey(key), value ]));
 };
 
-  
-
-
-describe("metashrew index", () => {
-	/*
-  it("indexes the genesis block", async () => {
-    const program = new IndexerProgram(
-      new Uint8Array(
-        Array.from(
-          await fs.readFile(
-            path.join(__dirname, "..", "build", "release.wasm"),
-          ),
-        ),
-      ).buffer,
-    );
-    program.setBlock(
-      await fs.readFile(path.join(__dirname, "genesis.hex"), "utf8"),
-    );
-    program.setBlockHeight(0);
-    program.on("log", (v) => console.log(v));
-    await program.run("_start");
-    // console.log(program.kv);
-  });
-  it("indexes the first inscription", async () => {
-    const program = new IndexerProgram(
-      new Uint8Array(
-        Array.from(
-          await fs.readFile(
-            path.join(__dirname, "..", "build", "release.wasm"),
-          ),
-        ),
-      ).buffer,
-    );
-    program.setBlock(
-      await fs.readFile(path.join(__dirname, "ordinal-genesis.hex"), "utf8"),
-    );
-    program.setBlockHeight(767430);
-    program.on("log", (v) => console.log(v));
-    const ms = await program.run("_start");
-    // console.log(program.kv);
-    // console.log(String(ms) + "ms");
-  });
-  it("indexes block 785391", async () => {
-    const program = new IndexerProgram(
-      new Uint8Array(
-        Array.from(
-          await fs.readFile(
-            path.join(__dirname, "..", "build", "release.wasm"),
-          ),
-        ),
-      ).buffer,
-    );
-    program.setBlock(
-      await fs.readFile(path.join(__dirname, "785391.hex"), "utf8"),
-    );
-    program.setBlockHeight(785391);
-    program.on("log", (v) => console.log(v));
-    const ms = await program.run("_start");
-    // console.log(program.kv);
-    // console.log(String(ms) + "ms");
-  });
-  it("indexes block 772904", async () => {
-    const program = new IndexerProgram(
-      new Uint8Array(
-        Array.from(
-          await fs.readFile(
-            path.join(__dirname, "..", "build", "release.wasm"),
-          ),
-        ),
-      ).buffer,
-    );
-    program.setBlock(
-      await fs.readFile(path.join(__dirname, "772904.hex"), "utf8"),
-    );
-    program.setBlockHeight(772904);
-    prograom.on("log", (v) => console.log(v));
-    const mos = await program.run("_start");
-    // console.log(program.kv);
-    // console.log(String(ms) + "ms");
-  });
-  */
+describe("metashrew-runes", () => {
   it("indexes a range of blocks", async () => {
     const program = new IndexerProgram(
       new Uint8Array(
@@ -134,7 +54,6 @@ describe("metashrew index", () => {
         ),
       ).buffer,
     );
-//    program.kv = require(path.join(__dirname, 'snapshot-1295'));
     program.on("log", (v) => console.log(v));
     async function rpcCall(method, params) {
       const response = await fetch(
@@ -161,7 +80,7 @@ describe("metashrew index", () => {
       program.setBlockHeight(i);
       await program.run("_start");
     }
-    for (let i = 0; i < 2000; i++) {
+    for (let i = 0; i < 10; i++) {
       console.log(`BLOCK ${i}`);
       await runBlock(i);
     }
