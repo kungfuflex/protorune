@@ -1,18 +1,14 @@
-import { Box, RCBox } from "metashrew-as/assembly/utils/box"
+import { Box } from "metashrew-as/assembly/utils/box"
 import { _flush, input, get, set } from "metashrew-as/assembly/indexer/index";
 import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
-import { parseBytes, parsePrimitive, concat, primitiveToBuffer } from "metashrew-as/assembly/utils/utils";
 import { scriptParse } from "metashrew-as/assembly/utils/yabsp";
 import { Block } from "metashrew-as/assembly/blockdata/block";
-import { Transaction, Input, Output, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
+import { parsePrimitive } from "metashrew-as/assembly/utils/utils";
+import { Transaction, Output } from "metashrew-as/assembly/blockdata/transaction";
 import { console } from "metashrew-as/assembly/utils/logging";
 import { toRLP, RLPItem } from "metashrew-as/assembly/utils/rlp";
-import { encodeHexFromBuffer, encodeHex } from "metashrew-as/assembly/utils/hex";
-import { Inscription } from "metashrew-as/assembly/blockdata/inscription";
-import { subsidy } from "metashrew-as/assembly/utils/ordinals";
-import { Height } from "metashrew-as/assembly/blockdata/height";
-import { Sat, SatPoint } from "metashrew-as/assembly/blockdata/sat";
 import { BST } from "metashrew-as/assembly/indexer/bst";
+import { readULEB128ToU64 } from "./leb128";
 
 const HEIGHT_TO_BLOCKHASH = IndexPointer.for("/blockhash/byheight/");
 const BLOCKHASH_TO_HEIGHT = IndexPointer.for("/height/byblockhash/");
@@ -72,19 +68,57 @@ function toBits(words: Array<u8>): StaticArray<u8> {
   }
 }
 
-function decodeU128Sequence(input: Box, output: VarIntOutput): void {
-  const values = new StaticArray<u8>(8);
-  const result = new Array<VarIntOutput>(0);
-  let bytes = new Array<u8>(input.len);
+class HeapU64 {
+  public value: u64;
+  constructor(v: u64) {
+    this.value = v;
+  }
+  get(): u64 {
+    return this.value;
+  }
+}
+
+class RunestoneMessage {
+  public fields: Map<u64, Array<u64>>;
+  public edicts: Array<StaticArray<u64>>;
+  constructor(fields: Map<u64, Array<u64>>, edicts: Array<StaticArray<u64>>) {
+    this.fields = fields;
+    this.edicts = edicts;
+  }
+}
+
+function parseRunestoneMessage(data: ArrayBuffer): RunestoneMessage {
+  const input = Box.from(data);
+  let fields = new Map<u64, Array<u64>>();
+  let edicts = new Array<StaticArray<u64>>(0);
   while (input.len > 0) {
-    const thisByte = load<u8>(input.start);
-    bytes.push(thisByte);
-    input.shrinkFront(1);
-    if (thisByte & 0x80 === 0) {
-      
+    const fieldKeyHeap = new HeapU64(0);
+    input.shrinkFront(readULEB128ToU64(input, changetype<usize>(fieldKeyHeap)));
+    const fieldKey = fieldKeyHeap.get();
+    if (fieldKey === 0) {
+      while (input.len > 0) {
+        const edict = new StaticArray<u64>(4);
+        for (let i = 0; i < 4; i++) {
+          const edictInt = new HeapU64(0);
+          input.shrinkFront(readULEB128ToU64(input, changetype<usize>(edictInt)));
+	  edict[i] = edictInt.get();
+	}
+	edicts.push(edict);
+      }
+    } else {
+      const value = new HeapU64(0);
+      input.shrinkFront(readULEB128ToU64(input, changetype<usize>(value)));
+      let field: Array<u64> = changetype<Array<u64>>(0);
+      if (!fields.has(fieldKey)) {
+        field = new Array<u64>(0);
+	fields.set(fieldKey, field);
+      } else {
+        field = fields.get(fieldKey);
+      }
+      field.push(value.get());
     }
   }
-
+  return new RunestoneMessage(fields, edicts);
 }
 
 class Index {
@@ -100,6 +134,8 @@ class Index {
           return v.start === usize.MAX_VALUE;
 	}) !== -1) continue; // non-data push: cenotaph
 	const payload = Box.concat(parsed);
+	const message = parseRunestoneMessage(payload);
+	console.log(message.edicts.length.toString(10));
 
       }
     }
