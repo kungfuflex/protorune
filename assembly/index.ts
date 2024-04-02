@@ -36,6 +36,19 @@ function flatten<T>(ary: Array<Array<T>>): Array<T> {
   return result;
 }
 
+@final
+class RunesTransaction extends Transaction {
+  runestoneOutput(): Output | null {
+    for (let i = 0; i < this.outs.length; i++) {
+      if (load<u16>(this.outs[i].script.start) === RUNESTONE_TAG) return this.outs[i];
+    }
+    return null;
+  }
+  static from(tx: Transaction): RunesTransaction {
+    return changetype<RunesTransaction>(tx);
+  }
+}
+
 const RUNESTONE_TAG: u16 = 0x5f6a;
 
 class VarIntOutput {
@@ -75,18 +88,12 @@ function decodeU128Sequence(input: Box, output: VarIntOutput): void {
 }
 
 class Index {
-  static runestoneOutput(tx: Transaction): Output | null {
-    for (let i = 0; i < tx.outs.length; i++) {
-      if (load<u16>(tx.outs[i].script.start) === RUNESTONE_TAG) return tx.outs[i];
-    }
-    return null;
-  }
   static indexBlock(height: u32, block: Block): void {
     HEIGHT_TO_BLOCKHASH.selectValue<u32>(height).set(block.blockhash());
     BLOCKHASH_TO_HEIGHT.select(block.blockhash()).setValue<u32>(height);
     for (let i: i32 = 1; i < block.transactions.length; i++) {
-      const tx = block.transactions[i];
-      const runestoneOutput = Index.runestoneOutput(tx);
+      const tx = RunesTransaction.from(block.transactions[i]);
+      const runestoneOutput = tx.runestoneOutput();
       if (runestoneOutput !== null) {
         const parsed = scriptParse(runestoneOutput.script).slice(2);
         if (parsed.findIndex((v: Box, i: i32, ary: Array<Box>) => {

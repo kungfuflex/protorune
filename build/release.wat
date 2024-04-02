@@ -100,21 +100,21 @@
  (data $24 (i32.const 3612) "\1c")
  (data $24.1 (i32.const 3624) "\1e\00\00\00\08\00\00\00\03")
  (data $25 (i32.const 3644) "\1c")
- (data $25.1 (i32.const 3656) "\1f\00\00\00\08\00\00\00\04")
+ (data $25.1 (i32.const 3656) " \00\00\00\08\00\00\00\04")
  (data $26 (i32.const 3676) "<")
  (data $26.1 (i32.const 3688) "\02\00\00\00$\00\00\00K\00e\00y\00 \00d\00o\00e\00s\00 \00n\00o\00t\00 \00e\00x\00i\00s\00t")
  (data $27 (i32.const 3740) ",")
  (data $27.1 (i32.const 3752) "\02\00\00\00\16\00\00\00~\00l\00i\00b\00/\00m\00a\00p\00.\00t\00s")
  (data $28 (i32.const 3788) "\1c")
- (data $28.1 (i32.const 3800) "#\00\00\00\08\00\00\00\05")
+ (data $28.1 (i32.const 3800) "$\00\00\00\08\00\00\00\05")
  (data $29 (i32.const 3820) "\1c")
- (data $29.1 (i32.const 3832) "$\00\00\00\08\00\00\00\06")
+ (data $29.1 (i32.const 3832) "%\00\00\00\08\00\00\00\06")
  (data $30 (i32.const 3852) "\1c")
- (data $30.1 (i32.const 3864) "%\00\00\00\08\00\00\00\07")
+ (data $30.1 (i32.const 3864) "&\00\00\00\08\00\00\00\07")
  (data $31 (i32.const 3884) "\1c")
- (data $31.1 (i32.const 3896) "&\00\00\00\08\00\00\00\08")
+ (data $31.1 (i32.const 3896) "\'\00\00\00\08\00\00\00\08")
  (data $32 (i32.const 3916) "\1c")
- (data $32.1 (i32.const 3928) "&\00\00\00\08\00\00\00\t")
+ (data $32.1 (i32.const 3928) "\'\00\00\00\08\00\00\00\t")
  (table $0 10 10 funcref)
  (elem $0 (i32.const 1) $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|0 $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|1 $~lib/metashrew-as/assembly/utils/utils/concat~anonymous|0 $assembly/index/Index.indexBlock~anonymous|0 $~lib/metashrew-as/assembly/indexer/index/_flush~anonymous|0 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|0 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|1 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|2 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|2)
  (export "_start" (func $assembly/index/_start))
@@ -3676,14 +3676,14 @@
     if (result i32)
      i32.const 0
     else
-     block $__inlined_func$~lib/string/String.__eq$496 (result i32)
+     block $__inlined_func$~lib/string/String.__eq$497 (result i32)
       i32.const 1
       local.get $5
       i32.load
       local.tee $2
       local.get $1
       i32.eq
-      br_if $__inlined_func$~lib/string/String.__eq$496
+      br_if $__inlined_func$~lib/string/String.__eq$497
       drop
       i32.const 0
       local.get $1
@@ -3691,7 +3691,7 @@
       local.get $2
       i32.eqz
       i32.or
-      br_if $__inlined_func$~lib/string/String.__eq$496
+      br_if $__inlined_func$~lib/string/String.__eq$497
       drop
       i32.const 0
       local.get $2
@@ -3708,7 +3708,7 @@
       i32.const 1
       i32.shr_u
       i32.ne
-      br_if $__inlined_func$~lib/string/String.__eq$496
+      br_if $__inlined_func$~lib/string/String.__eq$497
       drop
       local.get $1
       local.set $3
@@ -4287,7 +4287,7 @@
    i32.load offset=12
    i32.lt_s
    if
-    block $__inlined_func$assembly/index/Index.runestoneOutput$497 (result i32)
+    block $__inlined_func$assembly/index/RunesTransaction#runestoneOutput$498 (result i32)
      local.get $0
      local.get $3
      call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Input>#__get
@@ -4315,7 +4315,7 @@
         i32.load offset=16
         local.get $0
         call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Input>#__get
-        br $__inlined_func$assembly/index/Index.runestoneOutput$497
+        br $__inlined_func$assembly/index/RunesTransaction#runestoneOutput$498
        end
        local.get $0
        i32.const 1
@@ -4328,7 +4328,7 @@
     end
     local.tee $0
     if
-     block $__inlined_func$~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#findIndex$454 (result i32)
+     block $__inlined_func$~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#findIndex$455 (result i32)
       i32.const 0
       local.set $2
       local.get $0
@@ -4573,7 +4573,7 @@
         i32.const 3664
         i32.load
         call_indirect (type $3)
-        br_if $__inlined_func$~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#findIndex$454
+        br_if $__inlined_func$~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#findIndex$455
         drop
         local.get $2
         i32.const 1
@@ -4622,7 +4622,7 @@
  (func $~lib/metashrew-as/assembly/utils/rlp/RLPItem#constructor (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   i32.const 8
-  i32.const 33
+  i32.const 34
   call $~lib/rt/stub/__new
   local.tee $2
   i32.const 0
@@ -4847,24 +4847,24 @@
      end
     end
    else
-    block $__inlined_func$~lib/metashrew-as/assembly/utils/rlp/byteLengthForLength$334 (result i32)
+    block $__inlined_func$~lib/metashrew-as/assembly/utils/rlp/byteLengthForLength$335 (result i32)
      i32.const 4
      local.get $1
      i32.const 24
      i32.shr_s
-     br_if $__inlined_func$~lib/metashrew-as/assembly/utils/rlp/byteLengthForLength$334
+     br_if $__inlined_func$~lib/metashrew-as/assembly/utils/rlp/byteLengthForLength$335
      drop
      i32.const 3
      local.get $1
      i32.const 16
      i32.shr_s
-     br_if $__inlined_func$~lib/metashrew-as/assembly/utils/rlp/byteLengthForLength$334
+     br_if $__inlined_func$~lib/metashrew-as/assembly/utils/rlp/byteLengthForLength$335
      drop
      i32.const 2
      local.get $1
      i32.const 8
      i32.shr_s
-     br_if $__inlined_func$~lib/metashrew-as/assembly/utils/rlp/byteLengthForLength$334
+     br_if $__inlined_func$~lib/metashrew-as/assembly/utils/rlp/byteLengthForLength$335
      drop
      i32.const 1
     end
@@ -5076,24 +5076,24 @@
     memory.copy
    else
     local.get $1
-    block $__inlined_func$~lib/metashrew-as/assembly/utils/rlp/byteLengthForLength$340 (result i32)
+    block $__inlined_func$~lib/metashrew-as/assembly/utils/rlp/byteLengthForLength$341 (result i32)
      i32.const 4
      local.get $1
      i32.const 24
      i32.shr_s
-     br_if $__inlined_func$~lib/metashrew-as/assembly/utils/rlp/byteLengthForLength$340
+     br_if $__inlined_func$~lib/metashrew-as/assembly/utils/rlp/byteLengthForLength$341
      drop
      i32.const 3
      local.get $1
      i32.const 16
      i32.shr_s
-     br_if $__inlined_func$~lib/metashrew-as/assembly/utils/rlp/byteLengthForLength$340
+     br_if $__inlined_func$~lib/metashrew-as/assembly/utils/rlp/byteLengthForLength$341
      drop
      i32.const 2
      local.get $1
      i32.const 8
      i32.shr_s
-     br_if $__inlined_func$~lib/metashrew-as/assembly/utils/rlp/byteLengthForLength$340
+     br_if $__inlined_func$~lib/metashrew-as/assembly/utils/rlp/byteLengthForLength$341
      drop
      i32.const 1
     end
@@ -5212,7 +5212,7 @@
   i32.load offset=16
   local.set $4
   i32.const 16
-  i32.const 32
+  i32.const 33
   call $~lib/rt/stub/__new
   local.tee $2
   i32.const 0
@@ -5305,7 +5305,7 @@
   local.get $0
   i32.store offset=12
   i32.const 16
-  i32.const 34
+  i32.const 35
   call $~lib/rt/stub/__new
   local.tee $1
   i32.const 0

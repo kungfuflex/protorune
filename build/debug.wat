@@ -128,14 +128,14 @@
  (data $22 (i32.const 2524) "\1c\00\00\00\00\00\00\00\00\00\00\00\1b\00\00\00\08\00\00\00\01\00\00\00\00\00\00\00\00\00\00\00")
  (data $23 (i32.const 2556) "\1c\00\00\00\00\00\00\00\00\00\00\00\1c\00\00\00\08\00\00\00\02\00\00\00\00\00\00\00\00\00\00\00")
  (data $24 (i32.const 2588) "\1c\00\00\00\00\00\00\00\00\00\00\00\1e\00\00\00\08\00\00\00\03\00\00\00\00\00\00\00\00\00\00\00")
- (data $25 (i32.const 2620) "\1c\00\00\00\00\00\00\00\00\00\00\00\1f\00\00\00\08\00\00\00\04\00\00\00\00\00\00\00\00\00\00\00")
+ (data $25 (i32.const 2620) "\1c\00\00\00\00\00\00\00\00\00\00\00 \00\00\00\08\00\00\00\04\00\00\00\00\00\00\00\00\00\00\00")
  (data $26 (i32.const 2652) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00$\00\00\00K\00e\00y\00 \00d\00o\00e\00s\00 \00n\00o\00t\00 \00e\00x\00i\00s\00t\00\00\00\00\00\00\00\00\00")
  (data $27 (i32.const 2716) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\16\00\00\00~\00l\00i\00b\00/\00m\00a\00p\00.\00t\00s\00\00\00\00\00\00\00")
- (data $28 (i32.const 2764) "\1c\00\00\00\00\00\00\00\00\00\00\00#\00\00\00\08\00\00\00\05\00\00\00\00\00\00\00\00\00\00\00")
- (data $29 (i32.const 2796) "\1c\00\00\00\00\00\00\00\00\00\00\00$\00\00\00\08\00\00\00\06\00\00\00\00\00\00\00\00\00\00\00")
- (data $30 (i32.const 2828) "\1c\00\00\00\00\00\00\00\00\00\00\00%\00\00\00\08\00\00\00\07\00\00\00\00\00\00\00\00\00\00\00")
- (data $31 (i32.const 2860) "\1c\00\00\00\00\00\00\00\00\00\00\00&\00\00\00\08\00\00\00\08\00\00\00\00\00\00\00\00\00\00\00")
- (data $32 (i32.const 2892) "\1c\00\00\00\00\00\00\00\00\00\00\00&\00\00\00\08\00\00\00\t\00\00\00\00\00\00\00\00\00\00\00")
+ (data $28 (i32.const 2764) "\1c\00\00\00\00\00\00\00\00\00\00\00$\00\00\00\08\00\00\00\05\00\00\00\00\00\00\00\00\00\00\00")
+ (data $29 (i32.const 2796) "\1c\00\00\00\00\00\00\00\00\00\00\00%\00\00\00\08\00\00\00\06\00\00\00\00\00\00\00\00\00\00\00")
+ (data $30 (i32.const 2828) "\1c\00\00\00\00\00\00\00\00\00\00\00&\00\00\00\08\00\00\00\07\00\00\00\00\00\00\00\00\00\00\00")
+ (data $31 (i32.const 2860) "\1c\00\00\00\00\00\00\00\00\00\00\00\'\00\00\00\08\00\00\00\08\00\00\00\00\00\00\00\00\00\00\00")
+ (data $32 (i32.const 2892) "\1c\00\00\00\00\00\00\00\00\00\00\00\'\00\00\00\08\00\00\00\t\00\00\00\00\00\00\00\00\00\00\00")
  (table $0 10 10 funcref)
  (elem $0 (i32.const 1) $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|0 $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|1 $~lib/metashrew-as/assembly/utils/utils/concat~anonymous|0 $assembly/index/Index.indexBlock~anonymous|0 $~lib/metashrew-as/assembly/indexer/index/_flush~anonymous|0 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|0 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|1 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|2 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|3)
  (export "_start" (func $assembly/index/_start))
@@ -6443,6 +6443,10 @@
   local.get $value
   return
  )
+ (func $assembly/index/RunesTransaction.from (param $tx i32) (result i32)
+  local.get $tx
+  return
+ )
  (func $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Output>#get:length (param $this i32) (result i32)
   local.get $this
   call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Output>#get:length_
@@ -6492,18 +6496,18 @@
   local.get $this
   i32.load offset=16
  )
- (func $assembly/index/Index.runestoneOutput (param $tx i32) (result i32)
+ (func $assembly/index/RunesTransaction#runestoneOutput (param $this i32) (result i32)
   (local $i i32)
   i32.const 0
   local.set $i
   loop $for-loop|0
    local.get $i
-   local.get $tx
+   local.get $this
    call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:outs
    call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Output>#get:length
    i32.lt_s
    if
-    local.get $tx
+    local.get $this
     call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:outs
     local.get $i
     call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Output>#__get
@@ -6513,7 +6517,7 @@
     global.get $assembly/index/RUNESTONE_TAG
     i32.eq
     if
-     local.get $tx
+     local.get $this
      call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:outs
      local.get $i
      call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Output>#__get
@@ -7010,9 +7014,10 @@
      call $~lib/metashrew-as/assembly/blockdata/block/Block#get:transactions
      local.get $i
      call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Transaction>#__get
+     call $assembly/index/RunesTransaction.from
      local.set $tx
      local.get $tx
-     call $assembly/index/Index.runestoneOutput
+     call $assembly/index/RunesTransaction#runestoneOutput
      local.set $runestoneOutput
      local.get $runestoneOutput
      i32.const 0
@@ -7081,7 +7086,7 @@
   i32.eqz
   if
    i32.const 16
-   i32.const 32
+   i32.const 33
    call $~lib/rt/stub/__new
    local.set $this
   end
@@ -7309,7 +7314,7 @@
   i32.eqz
   if
    i32.const 16
-   i32.const 34
+   i32.const 35
    call $~lib/rt/stub/__new
    local.set $this
   end
@@ -7412,7 +7417,7 @@
   i32.eqz
   if
    i32.const 8
-   i32.const 33
+   i32.const 34
    call $~lib/rt/stub/__new
    local.set $this
   end
