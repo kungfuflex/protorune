@@ -78,6 +78,11 @@ arrify@^1.0.0:
   resolved "https://registry.yarnpkg.com/arrify/-/arrify-1.0.1.tgz#898508da2226f380df904728456849c1501a4b0d"
   integrity sha512-3CYzex9M9FGQjCGMGyi6/31c8GJbgb0qGyrx5HWxPd0aCwh4cB2YjMb2Xf9UuoogrMrlO9cTqnB5rI5GHZTcUA==
 
+as-bignum@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/as-bignum/-/as-bignum-0.3.0.tgz#6d5489a423a5a8f12b4f9c9cc95e8f77e8ee2215"
+  integrity sha512-zbedAmhYWe3VRcd7gVQ5JqquySAo/xjhISWN2m3WZL7flBmKFjE9WykCXOQ0ePRyPDu7GEdxCzCG6b0G6Z5pnQ==
+
 assemblyscript-prettier@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/assemblyscript-prettier/-/assemblyscript-prettier-3.0.1.tgz#e0322f680655b96330c1252a966dc368ad9364d9"
