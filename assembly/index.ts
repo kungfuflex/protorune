@@ -46,6 +46,12 @@ class RunesTransaction extends Transaction {
     if (i === -1) return null;
     else return this.outs[i];
   }
+  defaultOutput(): i32 {
+    for (let i = 0; i < this.outs.length; i++) {
+      if (load<u8>(this.outs[i].script.start) !== OP_RETURN) return i;
+    }
+    return -1;
+  }
   static from(tx: Transaction): RunesTransaction {
     return changetype<RunesTransaction>(tx);
   }
@@ -69,9 +75,11 @@ class RunesBlock extends Block {
   getTransaction(index: i32): RunesTransaction {
     return changetype<RunesTransaction>(this.transactions[index]);
   }
+
 }
 
 const RUNESTONE_TAG: u16 = 0x5f6a;
+const OP_RETURN: u8 = 0x6a;
 
 @final
 @unmanaged
@@ -119,6 +127,10 @@ class RunestoneMessage {
   }
   isEtching(): bool {
     return this.getFlag(Flags.ETCHING);
+  }
+  mintTo(): ArrayBuffer {
+    if (!this.fields.has(Fields.MINT)) return changetype<ArrayBuffer>(0);
+    return Box.from(changetype<ArrayBuffer>(this.fields.get(Fields.MINT).toBytes())).toArrayBuffer();
   }
   static parse(data: ArrayBuffer): RunestoneMessage {
   const input = Box.from(data);
@@ -169,6 +181,9 @@ class Edict {
     this.transactionIndex = transactionIndex;
     this.amount = amount;
     this.output = output;
+  }
+  runeId(): RuneId {
+    return new RuneId(this.block.toU64(), this.transactionIndex.toU32());
   }
   static zero(): Edict {
     return new Edict(u128.from(0), u128.from(0), u128.from(0), u128.from(0));
@@ -290,12 +305,19 @@ class BalanceSheet {
     a.pipe(balanceSheet);
     b.pipe(balanceSheet);
   }
+  static concat(ary: Array<BalanceSheet>): BalanceSheet {
+    return ary.reduce<BalanceSheet>((r: BalanceSheet, v: BalanceSheet, i: i32, ary: Array<BalanceSheet>) => {
+      return BalanceSheet.merge(r, v);
+    }, new BalanceSheet());
+  }
   save(ptr: IndexPointer): void {
     const runesPtr = ptr.keyword("/runes").
     const balancesPtr = ptr.keyword("/balances");
     for (let i = 0; i < this.runes.length; i++) {
-      runesPtr.append(this.runes[i]);
-      balancesPtr.append(Box.from(changetype<ArrayBuffer>(this.balances[i].toBytes())).toArrayBuffer());
+      if (this.balances[i] !== 0) {
+        runesPtr.append(this.runes[i]);
+        balancesPtr.append(Box.from(changetype<ArrayBuffer>(this.balances[i].toBytes())).toArrayBuffer());
+      }
     }
   }
   static load(ptr: IndexPointer): BalanceSheet {
@@ -356,14 +378,37 @@ class Index {
 	const payload = Box.concat(parsed);
 	const message = RunestoneMessage.parse(payload);
 	const edicts = Edict.fromDeltaSeries(message.edicts);
+	let etchingBalanceSheet = changetype<BalanceSheet>(0);
+	let balanceSheet = BalanceSheet.concat(tx.ins.map<BalanceSheet>((v: Input, i: i32, ary: Array<Input>) => BalanceSheet.load(OUTPOINT_TO_RUNES.select(v.previousOutput().toArrayBuffer()))));
+	const mintTo = message.mintTo();
+	if (changetype<usize>(mintTo) !== 0) {
+           const name = RUNE_ID_TO_ETCHING.select(runeId).get();
+	   const remaining = u128.fromBytesLE(MINTS_REMAINING.select(name).get());
+	   if (remaining !== 0) {
+	     const heightStart = HEIGHTSTART.keyword(name).getValue<u64>();
+	     const heightEnd = HEIGHTEND.keyword(name).getValue<u64>();
+	     const offsetStart = OFFSETSTART.keyword(name).getValue<u64>();
+	     const offsetEnd = OFFSETEND.keyword(name).getValue<u64>();
+	     const etchingHeight = RUNE_ID_TO_HEIGHT.keyword(runeId).getValue<u32>();
+	     if ((heightStart === 0 || height >= heightStart) && (heightEnd === 0 || height < heightEnd) && (offsetStart === 0 || height >= offsetStart + etchingHeight) && (offsetEnd === 0 || height < ethingHeight + offsetEnd)) {
+               MINTS_REMAINING.select(name).set(Box.from(changetype<ArrayBuffer>((remaining - u128.from(1)).toBytes())).toArrayBuffer());
+	       balanceSheet.increase(mintTo, u128.fromBytesLE(AMOUNT.keyword(name).get()));
+	     }
+	   }
+	}
 	if (message.isEtching()) {
           const name = stripNullRight(Box.from(changetype<ArrayBuffer>(message.fields.get(Fields.RUNE).toBytes())).toArrayBuffer());
 	  if (ETCHING_TO_RUNE_ID.select(name).get() || !Index.findCommitment(tx, name, height)) continue; // already taken / commitment not found
 	  const runeId = new RuneId(<u64>height, <u32>i).toBytes();
 	  RUNE_ID_TO_ETCHING.select(runeId).set(name);
 	  ETCHING_TO_RUNE_ID.select(name).set(runeId);
+	  RUNE_ID_TO_HEIGHT.select(runeId).setValue<u32>(height);
 	  DIVISIBILITY.keyword(name).setValue<u8>(message.fields.get(Fields.DIVISIBILITY).toU8());
-          if (message.fields.has(Fields.PREMINE)) PREMINE.keyword(name).set(Box.from(changetype<ArrayBuffer>(message.fields.get(Fields.PREMINE).toBytes())).toArrayBuffer()); // use Box to copy to cache
+          if (message.fields.has(Fields.PREMINE)) {
+            const premine = message.fields.get(Fields.PREMINE);
+	    new BalanceSheet([ runeId ], [ premine ]).pipe(balanceSheet);
+            PREMINE.keyword(name).set(Box.from(changetype<ArrayBuffer>(premine.toBytes())).toArrayBuffer());
+	  }
 	  MINTS_REMAINING.keyword(name).set(Box.from(changetype<ArrayBuffer>(message.fields.get(Fields.CAP).toBytes())).toArrayBuffer());
 	  if (message.getFlag(Flag.TERMS)) {
             if (message.fields.has(Fields.AMOUNT)) AMOUNT.keyword(name).set(Box.from(changetype<ArrayBuffer>(message.fields.get(Fields.AMOUNT).toBytes())).toArrayBuffer());
@@ -375,6 +420,28 @@ class Index {
 	  }
 	  if (message.fields.has(Fields.SPACERS)) SPACERS.keyword(name).setValue<u32>(message.fields.get(Fields.SPACERS).toU32());
 	  if (message.fields.has(Fields.SYMBOL)) SYMBOL.keyword(name).setValue<u8>(message.fields.get(Fields.SYMBOL).toU8());
+	}
+	const balancesByOutput = new Map<u32, BalanceSheet>();
+	for (let i = 0; i < edicts.length; i++) {
+          const edict = edicts[i];
+	  const runeId = editct.runeId().toBytes();
+	  let outputBalanceSheet = changetype<BalanceSheet>(0);
+	  if (!balancesByOutput.has(edict.output)) {
+            balancesByOutput.set(edict.output, (outputBalanceSheet = new BalanceSheet()));
+	  } else outputBalanceSheet = balanceSheet.get(edict.output);
+	  const amount = min(edict.amount, balanceSheet.get(runeId));
+	  balanceSheet.decrease(runeId, amount);
+	  outputBalanceSheet.increase(runeId, amount);
+	}
+	const unallocatedTo = message.fields.has(Fields.POINTER) ? message.fields.get(Fields.POINTER).toU32() : <u32>tx.defaultOutput();
+	if (balancesByOutput.has(unallocatedTo)) {
+          balanceSheet.pipe(balancesByOutput.get(unallocatedTo));
+	} else {
+          balancesByOutput.set(unallocatedTo, balanceSheet);
+	}
+	const runesToOutputs = balancesByOutput.keys();
+	for (let i = 0; i < runesToOutputs.length; i++) {
+          balancesByOutput.save(OUTPOINT_TO_RUNES.select(OutPoint.from(txid, runesToOutputs[i]).toArrayBuffer()))
 	}
       }
     }
