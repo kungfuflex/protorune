@@ -38,23 +38,10 @@ const RUNE_ID_TO_ETCHING = IndexPointer.for("/etching/byruneid/");
 const ETCHING_TO_RUNE_ID = IndexPointer.for("/runeid/byetching/");
 
 
-function rangeLength<K>(bst: BST<K>, key: K): K {
-  return bst.seekGreater(key) - key;
-}
 
 function min<T>(a: T, b: T): T {
   if (a > b) return b;
   return a;
-}
-
-function flatten<T>(ary: Array<Array<T>>): Array<T> {
-  const result: Array<T> = new Array<T>(0);
-  for (let i = 0; i < ary.length; i++) {
-    for (let j = 0; j < ary[i].length; j++) {
-      result.push(ary[i][j]);
-    }
-  }
-  return result;
 }
 
 @final
