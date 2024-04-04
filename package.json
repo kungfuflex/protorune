@@ -8,7 +8,7 @@
     "build:debug:preloader": "npm run asbuild:preloader --sharedMemory",
     "prettier:assemblyscript": "prettier --write ./assembly/**/*.ts",
     "prettier:ts": "prettier --write ./src.ts/**/*.ts",
-    "prettier": "npm-run-all prettier:assemblyscript prettier:ts",
+    "prettier": "npm-run-all prettier:assemblyscript",
     "test": "ts-mocha --timeout 0 ./tests/**.spec.ts"
   },
   "dependencies": {},
