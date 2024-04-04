@@ -1,10 +1,13 @@
-import { Box } from "metashrew-as/assembly/utils/box"
+import { Box } from "metashrew-as/assembly/utils/box";
 import { _flush, input, get, set } from "metashrew-as/assembly/indexer/index";
 import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
 import { scriptParse } from "metashrew-as/assembly/utils/yabsp";
 import { Block } from "metashrew-as/assembly/blockdata/block";
 import { parsePrimitive } from "metashrew-as/assembly/utils/utils";
-import { Transaction, Output } from "metashrew-as/assembly/blockdata/transaction";
+import {
+  Transaction,
+  Output,
+} from "metashrew-as/assembly/blockdata/transaction";
 import { console } from "metashrew-as/assembly/utils/logging";
 import { toRLP, RLPItem } from "metashrew-as/assembly/utils/rlp";
 import { BST } from "metashrew-as/assembly/indexer/bst";
@@ -56,7 +59,7 @@ class RunesTransaction extends Transaction {
     return changetype<RunesTransaction>(tx);
   }
   outpoint(vout: i32): ArrayBuffer {
-    return OutPoint.from(this.txid(), <u32>vout);;
+    return OutPoint.from(this.txid(), <u32>vout);
   }
 }
 
@@ -75,7 +78,6 @@ class RunesBlock extends Block {
   getTransaction(index: i32): RunesTransaction {
     return changetype<RunesTransaction>(this.transactions[index]);
   }
-
 }
 
 const RUNESTONE_TAG: u16 = 0x5f6a;
@@ -113,7 +115,6 @@ class Flag {
   constructor() {}
 }
 
-
 class RunestoneMessage {
   public fields: Map<u64, Array<u128>>;
   public edicts: Array<StaticArray<u128>>;
@@ -130,41 +131,43 @@ class RunestoneMessage {
   }
   mintTo(): ArrayBuffer {
     if (!this.fields.has(Fields.MINT)) return changetype<ArrayBuffer>(0);
-    return Box.from(changetype<ArrayBuffer>(this.fields.get(Fields.MINT).toBytes())).toArrayBuffer();
+    return Box.from(
+      changetype<ArrayBuffer>(this.fields.get(Fields.MINT).toBytes()),
+    ).toArrayBuffer();
   }
   static parse(data: ArrayBuffer): RunestoneMessage {
-  const input = Box.from(data);
-  let fields = new Map<u64, Array<u128>>();
-  let edicts = new Array<StaticArray<u128>>(0);
-  while (input.len > 0) {
-    const fieldKeyHeap = u128.from(0);
-    input.shrinkFront(readULEB128ToU128(input, fieldKeyHeap));
-    const fieldKey = fieldKeyHeap.toU64();
-    if (fieldKey === 0) {
-      while (input.len > 0) {
-        const edict = new StaticArray<u128>(4);
-        for (let i = 0; i < 4; i++) {
-          const edictInt = u128.from(0);
-          input.shrinkFront(readULEB128ToU128(input, edictInt));
-	  edict[i] = edictInt;
-	}
-	edicts.push(edict);
-      }
-    } else {
-      const value = u128.from(0);
-      input.shrinkFront(readULEB128ToU128(input, value));
-      let field: Array<u128> = changetype<Array<u128>>(0);
-      if (!fields.has(fieldKey)) {
-        field = new Array<u128>(0);
-	fields.set(fieldKey, field);
+    const input = Box.from(data);
+    let fields = new Map<u64, Array<u128>>();
+    let edicts = new Array<StaticArray<u128>>(0);
+    while (input.len > 0) {
+      const fieldKeyHeap = u128.from(0);
+      input.shrinkFront(readULEB128ToU128(input, fieldKeyHeap));
+      const fieldKey = fieldKeyHeap.toU64();
+      if (fieldKey === 0) {
+        while (input.len > 0) {
+          const edict = new StaticArray<u128>(4);
+          for (let i = 0; i < 4; i++) {
+            const edictInt = u128.from(0);
+            input.shrinkFront(readULEB128ToU128(input, edictInt));
+            edict[i] = edictInt;
+          }
+          edicts.push(edict);
+        }
       } else {
-        field = fields.get(fieldKey);
+        const value = u128.from(0);
+        input.shrinkFront(readULEB128ToU128(input, value));
+        let field: Array<u128> = changetype<Array<u128>>(0);
+        if (!fields.has(fieldKey)) {
+          field = new Array<u128>(0);
+          fields.set(fieldKey, field);
+        } else {
+          field = fields.get(fieldKey);
+        }
+        field.push(value);
       }
-      field.push(value);
     }
+    return new RunestoneMessage(fields, edicts);
   }
-  return new RunestoneMessage(fields, edicts);
-}
 }
 
 function fromU128Pair(lo: u128, hi: u128): u256 {
@@ -189,7 +192,12 @@ class Edict {
     return new Edict(u128.from(0), u128.from(0), u128.from(0), u128.from(0));
   }
   static diff(previous: Edict, values: StaticArray<u128>): Edict {
-    return new Edict(previous.block + values[0], values[0] == 0 ? values[1] : previous.transactionIndex + values[1], values[2], values[3]);
+    return new Edict(
+      previous.block + values[0],
+      values[0] == 0 ? values[1] : previous.transactionIndex + values[1],
+      values[2],
+      values[3],
+    );
   }
   static fromDeltaSeries(deltas: Array<StaticArray<u128>>): Array<Edict> {
     let last = Edict.zero();
@@ -214,8 +222,7 @@ function stripNullRight(data: ArrayBuffer): ArrayBuffer {
   while (box.len > 0) {
     if (load<u8>(box.start + box.len - <usize>1) === 0x00) {
       box.len--;
-    }
-    else break;
+    } else break;
   }
   return box.toArrayBuffer();
 }
@@ -223,7 +230,10 @@ function stripNullRight(data: ArrayBuffer): ArrayBuffer {
 function isEqualArrayBuffer(a: ArrayBuffer, b: ArrayBuffer): bool {
   if (a.byteLength !== b.byteLength) return false;
   for (let i = 0; i < a.byteLength; i++) {
-    if (load<u8>(changetype<usize>(a) + i) !== load<u8>(changetype<usize>(b) + i)) return false;
+    if (
+      load<u8>(changetype<usize>(a) + i) !== load<u8>(changetype<usize>(b) + i)
+    )
+      return false;
   }
   return true;
 }
@@ -234,7 +244,9 @@ class RuneId {
     this.tx = tx;
   }
   txid() {
-    return HEIGHT_TO_TRANSACTION_IDS.selectValue<u32>(<u32>block).selectIndex(this.tx).get();
+    return HEIGHT_TO_TRANSACTION_IDS.selectValue<u32>(<u32>block)
+      .selectIndex(this.tx)
+      .get();
   }
   toU128() {
     return new u128(<u64>this.tx, this.block);
@@ -243,7 +255,7 @@ class RuneId {
     return this.toU128().toBytes();
   }
   static fromBytes(ary: ArrayBuffer) {
-    const v = u128.fromBytesLE(ary)
+    const v = u128.fromBytesLE(ary);
     return RuneId.fromU128(v);
   }
   static fromU128(v: u128): RuneId {
@@ -256,7 +268,7 @@ class RuneId {
 class BalanceSheet {
   public runes: Array<ArrayBuffer>;
   public balances: Array<u128>;
-  public index: Map<string, i32>
+  public index: Map<string, i32>;
   constructor() {
     this.index = new Map<string, i32>();
   }
@@ -306,54 +318,83 @@ class BalanceSheet {
     b.pipe(balanceSheet);
   }
   static concat(ary: Array<BalanceSheet>): BalanceSheet {
-    return ary.reduce<BalanceSheet>((r: BalanceSheet, v: BalanceSheet, i: i32, ary: Array<BalanceSheet>) => {
-      return BalanceSheet.merge(r, v);
-    }, new BalanceSheet());
+    return ary.reduce<BalanceSheet>(
+      (r: BalanceSheet, v: BalanceSheet, i: i32, ary: Array<BalanceSheet>) => {
+        return BalanceSheet.merge(r, v);
+      },
+      new BalanceSheet(),
+    );
   }
   save(ptr: IndexPointer): void {
-    const runesPtr = ptr.keyword("/runes").
+    const runesPtr = ptr.keyword("/runes");
     const balancesPtr = ptr.keyword("/balances");
     for (let i = 0; i < this.runes.length; i++) {
       if (this.balances[i] !== 0) {
         runesPtr.append(this.runes[i]);
-        balancesPtr.append(Box.from(changetype<ArrayBuffer>(this.balances[i].toBytes())).toArrayBuffer());
+        balancesPtr.append(
+          Box.from(
+            changetype<ArrayBuffer>(this.balances[i].toBytes()),
+          ).toArrayBuffer(),
+        );
       }
     }
   }
   static load(ptr: IndexPointer): BalanceSheet {
-     const runesPtr = ptr.keyword("/runes");
-     const balancesPtr = ptr.keyword("/balances");
-     const length = runesPtr.lengthKey().getValue<u32>();
-     const result = new BalanceSheet();
-     for (let i: u32 = 0; i < length; i++) {
-       result.set(runesPtr.selectIndex(i).get(), u128.fromBytesLE(balancesPtr.selectIndex(i).get()));
-     }
-     return result;
+    const runesPtr = ptr.keyword("/runes");
+    const balancesPtr = ptr.keyword("/balances");
+    const length = runesPtr.lengthKey().getValue<u32>();
+    const result = new BalanceSheet();
+    for (let i: u32 = 0; i < length; i++) {
+      result.set(
+        runesPtr.selectIndex(i).get(),
+        u128.fromBytesLE(balancesPtr.selectIndex(i).get()),
+      );
+    }
+    return result;
   }
 }
 
-
 class Index {
-  static indexOutpoints(tx: RunesTransaction, txid: ArrayBuffer, height: u32): void {
+  static indexOutpoints(
+    tx: RunesTransaction,
+    txid: ArrayBuffer,
+    height: u32,
+  ): void {
     for (let i: i32 = 0; i < tx.outs.length; i++) {
-      OUTPOINT_TO_HEIGHT.select(OutPoint.from(txid, <u32>i).toArrayBuffer()).setValue<u32>(height);
+      OUTPOINT_TO_HEIGHT.select(
+        OutPoint.from(txid, <u32>i).toArrayBuffer(),
+      ).setValue<u32>(height);
     }
   }
-  static findCommitment(tx: RunesTransaction, name: ArrayBuffer, height: u32): ArrayBuffer {
+  static findCommitment(
+    tx: RunesTransaction,
+    name: ArrayBuffer,
+    height: u32,
+  ): ArrayBuffer {
     for (let i = 0; i < tx.ins.length; i++) {
       const input = tx.ins[i];
       if (changetype<usize>(input.witness) !== 0) {
         const tapscript = input.witness.tapscript();
-	if (changetype<usize>(tapscript) !== 0) {
+        if (changetype<usize>(tapscript) !== 0) {
           const components = scriptParse(tapscript);
-	  if (components.length > 1 && intoString(components[0]) === "OP_RETURN" && components[1].start !== usize.MAX_VALUE) { // check that there is 1 data push
+          if (
+            components.length > 1 &&
+            intoString(components[0]) === "OP_RETURN" &&
+            components[1].start !== usize.MAX_VALUE
+          ) {
+            // check that there is 1 data push
             const previousOutpoint = tx.ins[i].previousOutpoint();
-	    if (height - OUTPOINT_TO_HEIGHT.select(previousOutpoint).getValue<u32>() >= 6) { // check the commitment has at least 6 confirmations
+            if (
+              height -
+                OUTPOINT_TO_HEIGHT.select(previousOutpoint).getValue<u32>() >=
+              6
+            ) {
+              // check the commitment has at least 6 confirmations
               let commitment = components[i].toArrayBuffer();
-              if (isEqualArrayBuffer(name, commitment)) return commitment
-	    }
-	  }
-	}
+              if (isEqualArrayBuffer(name, commitment)) return commitment;
+            }
+          }
+        }
       }
     }
     return changetype<ArrayBuffer>(0);
@@ -370,84 +411,168 @@ class Index {
       const index = tx.runestoneOutputIndex();
       if (runestoneOutputIndex !== -1) {
         const runestoneOutput = tx.outs[runestoneOutputIndex];
-	const outpoint = tx.outpoint(runestoneOutputIndex);
+        const outpoint = tx.outpoint(runestoneOutputIndex);
         const parsed = scriptParse(runestoneOutput.script).slice(2);
-        if (parsed.findIndex((v: Box, i: i32, ary: Array<Box>) => {
-          return v.start === usize.MAX_VALUE;
-	}) !== -1) continue; // non-data push: cenotaph
-	const payload = Box.concat(parsed);
-	const message = RunestoneMessage.parse(payload);
-	const edicts = Edict.fromDeltaSeries(message.edicts);
-	let etchingBalanceSheet = changetype<BalanceSheet>(0);
-	let balanceSheet = BalanceSheet.concat(tx.ins.map<BalanceSheet>((v: Input, i: i32, ary: Array<Input>) => BalanceSheet.load(OUTPOINT_TO_RUNES.select(v.previousOutput().toArrayBuffer()))));
-	const mintTo = message.mintTo();
-	if (changetype<usize>(mintTo) !== 0) {
-           const name = RUNE_ID_TO_ETCHING.select(runeId).get();
-	   const remaining = u128.fromBytesLE(MINTS_REMAINING.select(name).get());
-	   if (remaining !== 0) {
-	     const heightStart = HEIGHTSTART.keyword(name).getValue<u64>();
-	     const heightEnd = HEIGHTEND.keyword(name).getValue<u64>();
-	     const offsetStart = OFFSETSTART.keyword(name).getValue<u64>();
-	     const offsetEnd = OFFSETEND.keyword(name).getValue<u64>();
-	     const etchingHeight = RUNE_ID_TO_HEIGHT.keyword(runeId).getValue<u32>();
-	     if ((heightStart === 0 || height >= heightStart) && (heightEnd === 0 || height < heightEnd) && (offsetStart === 0 || height >= offsetStart + etchingHeight) && (offsetEnd === 0 || height < ethingHeight + offsetEnd)) {
-               MINTS_REMAINING.select(name).set(Box.from(changetype<ArrayBuffer>((remaining - u128.from(1)).toBytes())).toArrayBuffer());
-	       balanceSheet.increase(mintTo, u128.fromBytesLE(AMOUNT.keyword(name).get()));
-	     }
-	   }
-	}
-	if (message.isEtching()) {
-          const name = stripNullRight(Box.from(changetype<ArrayBuffer>(message.fields.get(Fields.RUNE).toBytes())).toArrayBuffer());
-	  if (ETCHING_TO_RUNE_ID.select(name).get() || !Index.findCommitment(tx, name, height)) continue; // already taken / commitment not found
-	  const runeId = new RuneId(<u64>height, <u32>i).toBytes();
-	  RUNE_ID_TO_ETCHING.select(runeId).set(name);
-	  ETCHING_TO_RUNE_ID.select(name).set(runeId);
-	  RUNE_ID_TO_HEIGHT.select(runeId).setValue<u32>(height);
-	  DIVISIBILITY.keyword(name).setValue<u8>(message.fields.get(Fields.DIVISIBILITY).toU8());
+        if (
+          parsed.findIndex((v: Box, i: i32, ary: Array<Box>) => {
+            return v.start === usize.MAX_VALUE;
+          }) !== -1
+        )
+          continue; // non-data push: cenotaph
+        const payload = Box.concat(parsed);
+        const message = RunestoneMessage.parse(payload);
+        const edicts = Edict.fromDeltaSeries(message.edicts);
+        let etchingBalanceSheet = changetype<BalanceSheet>(0);
+        let balanceSheet = BalanceSheet.concat(
+          tx.ins.map<BalanceSheet>((v: Input, i: i32, ary: Array<Input>) =>
+            BalanceSheet.load(
+              OUTPOINT_TO_RUNES.select(v.previousOutput().toArrayBuffer()),
+            ),
+          ),
+        );
+        const mintTo = message.mintTo();
+        if (changetype<usize>(mintTo) !== 0) {
+          const name = RUNE_ID_TO_ETCHING.select(runeId).get();
+          const remaining = u128.fromBytesLE(
+            MINTS_REMAINING.select(name).get(),
+          );
+          if (remaining !== 0) {
+            const heightStart = HEIGHTSTART.keyword(name).getValue<u64>();
+            const heightEnd = HEIGHTEND.keyword(name).getValue<u64>();
+            const offsetStart = OFFSETSTART.keyword(name).getValue<u64>();
+            const offsetEnd = OFFSETEND.keyword(name).getValue<u64>();
+            const etchingHeight =
+              RUNE_ID_TO_HEIGHT.keyword(runeId).getValue<u32>();
+            if (
+              (heightStart === 0 || height >= heightStart) &&
+              (heightEnd === 0 || height < heightEnd) &&
+              (offsetStart === 0 || height >= offsetStart + etchingHeight) &&
+              (offsetEnd === 0 || height < ethingHeight + offsetEnd)
+            ) {
+              MINTS_REMAINING.select(name).set(
+                Box.from(
+                  changetype<ArrayBuffer>((remaining - u128.from(1)).toBytes()),
+                ).toArrayBuffer(),
+              );
+              balanceSheet.increase(
+                mintTo,
+                u128.fromBytesLE(AMOUNT.keyword(name).get()),
+              );
+            }
+          }
+        }
+        if (message.isEtching()) {
+          const name = stripNullRight(
+            Box.from(
+              changetype<ArrayBuffer>(
+                message.fields.get(Fields.RUNE).toBytes(),
+              ),
+            ).toArrayBuffer(),
+          );
+          if (
+            ETCHING_TO_RUNE_ID.select(name).get() ||
+            !Index.findCommitment(tx, name, height)
+          )
+            continue; // already taken / commitment not found
+          const runeId = new RuneId(<u64>height, <u32>i).toBytes();
+          RUNE_ID_TO_ETCHING.select(runeId).set(name);
+          ETCHING_TO_RUNE_ID.select(name).set(runeId);
+          RUNE_ID_TO_HEIGHT.select(runeId).setValue<u32>(height);
+          DIVISIBILITY.keyword(name).setValue<u8>(
+            message.fields.get(Fields.DIVISIBILITY).toU8(),
+          );
           if (message.fields.has(Fields.PREMINE)) {
             const premine = message.fields.get(Fields.PREMINE);
-	    new BalanceSheet([ runeId ], [ premine ]).pipe(balanceSheet);
-            PREMINE.keyword(name).set(Box.from(changetype<ArrayBuffer>(premine.toBytes())).toArrayBuffer());
-	  }
-	  MINTS_REMAINING.keyword(name).set(Box.from(changetype<ArrayBuffer>(message.fields.get(Fields.CAP).toBytes())).toArrayBuffer());
-	  if (message.getFlag(Flag.TERMS)) {
-            if (message.fields.has(Fields.AMOUNT)) AMOUNT.keyword(name).set(Box.from(changetype<ArrayBuffer>(message.fields.get(Fields.AMOUNT).toBytes())).toArrayBuffer());
-            if (message.fields.has(Fields.CAP)) CAP.keyword(name).set(Box.from(changetype<ArrayBuffer>(message.fields.get(Fields.CAP).toBytes()).toArrayBuffer()));
-	    if (message.fields.has(Fields.HEIGHTSTART)) HEIGHTSTART.keyword(name).setValue<u64>(message.fields.get(Fields.HEIGHTSTART).toU64());
-	    if (message.fields.has(Fields.HEIGHTEND)) HEIGHTEND.keyword(name).setValue<u64>(message.fields.get(Fields.HEIGHTEND).toU64());
-	    if (message.fields.has(Fields.OFFSETSTART)) OFFSETSTART.keyword(name).setValue<u64>(message.fields.get(Fields.OFFSETSTART).toU64());
-	    if (message.fields.has(Fields.OFFSETEND)) OFFSETEND.keyword(name).setValue<u64>(message.fields.get(Fields.OFFSETEND).toU64());
-	  }
-	  if (message.fields.has(Fields.SPACERS)) SPACERS.keyword(name).setValue<u32>(message.fields.get(Fields.SPACERS).toU32());
-	  if (message.fields.has(Fields.SYMBOL)) SYMBOL.keyword(name).setValue<u8>(message.fields.get(Fields.SYMBOL).toU8());
-	}
-	const balancesByOutput = new Map<u32, BalanceSheet>();
-	for (let i = 0; i < edicts.length; i++) {
+            new BalanceSheet([runeId], [premine]).pipe(balanceSheet);
+            PREMINE.keyword(name).set(
+              Box.from(
+                changetype<ArrayBuffer>(premine.toBytes()),
+              ).toArrayBuffer(),
+            );
+          }
+          MINTS_REMAINING.keyword(name).set(
+            Box.from(
+              changetype<ArrayBuffer>(message.fields.get(Fields.CAP).toBytes()),
+            ).toArrayBuffer(),
+          );
+          if (message.getFlag(Flag.TERMS)) {
+            if (message.fields.has(Fields.AMOUNT))
+              AMOUNT.keyword(name).set(
+                Box.from(
+                  changetype<ArrayBuffer>(
+                    message.fields.get(Fields.AMOUNT).toBytes(),
+                  ),
+                ).toArrayBuffer(),
+              );
+            if (message.fields.has(Fields.CAP))
+              CAP.keyword(name).set(
+                Box.from(
+                  changetype<ArrayBuffer>(
+                    message.fields.get(Fields.CAP).toBytes(),
+                  ).toArrayBuffer(),
+                ),
+              );
+            if (message.fields.has(Fields.HEIGHTSTART))
+              HEIGHTSTART.keyword(name).setValue<u64>(
+                message.fields.get(Fields.HEIGHTSTART).toU64(),
+              );
+            if (message.fields.has(Fields.HEIGHTEND))
+              HEIGHTEND.keyword(name).setValue<u64>(
+                message.fields.get(Fields.HEIGHTEND).toU64(),
+              );
+            if (message.fields.has(Fields.OFFSETSTART))
+              OFFSETSTART.keyword(name).setValue<u64>(
+                message.fields.get(Fields.OFFSETSTART).toU64(),
+              );
+            if (message.fields.has(Fields.OFFSETEND))
+              OFFSETEND.keyword(name).setValue<u64>(
+                message.fields.get(Fields.OFFSETEND).toU64(),
+              );
+          }
+          if (message.fields.has(Fields.SPACERS))
+            SPACERS.keyword(name).setValue<u32>(
+              message.fields.get(Fields.SPACERS).toU32(),
+            );
+          if (message.fields.has(Fields.SYMBOL))
+            SYMBOL.keyword(name).setValue<u8>(
+              message.fields.get(Fields.SYMBOL).toU8(),
+            );
+        }
+        const balancesByOutput = new Map<u32, BalanceSheet>();
+        for (let i = 0; i < edicts.length; i++) {
           const edict = edicts[i];
-	  const runeId = editct.runeId().toBytes();
-	  let outputBalanceSheet = changetype<BalanceSheet>(0);
-	  if (!balancesByOutput.has(edict.output)) {
-            balancesByOutput.set(edict.output, (outputBalanceSheet = new BalanceSheet()));
-	  } else outputBalanceSheet = balanceSheet.get(edict.output);
-	  const amount = min(edict.amount, balanceSheet.get(runeId));
-	  balanceSheet.decrease(runeId, amount);
-	  outputBalanceSheet.increase(runeId, amount);
-	}
-	const unallocatedTo = message.fields.has(Fields.POINTER) ? message.fields.get(Fields.POINTER).toU32() : <u32>tx.defaultOutput();
-	if (balancesByOutput.has(unallocatedTo)) {
+          const runeId = editct.runeId().toBytes();
+          let outputBalanceSheet = changetype<BalanceSheet>(0);
+          if (!balancesByOutput.has(edict.output)) {
+            balancesByOutput.set(
+              edict.output,
+              (outputBalanceSheet = new BalanceSheet()),
+            );
+          } else outputBalanceSheet = balanceSheet.get(edict.output);
+          const amount = min(edict.amount, balanceSheet.get(runeId));
+          balanceSheet.decrease(runeId, amount);
+          outputBalanceSheet.increase(runeId, amount);
+        }
+        const unallocatedTo = message.fields.has(Fields.POINTER)
+          ? message.fields.get(Fields.POINTER).toU32()
+          : <u32>tx.defaultOutput();
+        if (balancesByOutput.has(unallocatedTo)) {
           balanceSheet.pipe(balancesByOutput.get(unallocatedTo));
-	} else {
+        } else {
           balancesByOutput.set(unallocatedTo, balanceSheet);
-	}
-	const runesToOutputs = balancesByOutput.keys();
-	for (let i = 0; i < runesToOutputs.length; i++) {
-          balancesByOutput.save(OUTPOINT_TO_RUNES.select(OutPoint.from(txid, runesToOutputs[i]).toArrayBuffer()))
-	}
+        }
+        const runesToOutputs = balancesByOutput.keys();
+        for (let i = 0; i < runesToOutputs.length; i++) {
+          balancesByOutput.save(
+            OUTPOINT_TO_RUNES.select(
+              OutPoint.from(txid, runesToOutputs[i]).toArrayBuffer(),
+            ),
+          );
+        }
       }
     }
   }
 }
-
 
 export function _start(): void {
   const data = input();

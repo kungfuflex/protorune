@@ -1,4 +1,4 @@
-import { Box } from "metashrew-as/assembly/utils/box"
+import { Box } from "metashrew-as/assembly/utils/box";
 import { u128 } from "as-bignum/assembly";
 export function readULEB128ToU128(buf: Box, to: u128): usize {
   const slice = buf.sliceFrom(0);
@@ -11,7 +11,7 @@ export function readULEB128ToU128(buf: Box, to: u128): usize {
     }
     byte = load<u8>(slice.start);
     slice.shrinkFront(1);
-    result |= (u128.from(byte & 0x7f) << shift)
+    result |= u128.from(byte & 0x7f) << shift;
     if ((byte & 0x80) === 0) break;
     shift += 7;
   }
