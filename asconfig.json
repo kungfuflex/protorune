@@ -1,7 +1,6 @@
 {
   "options": {
     "runtime": "stub",
-    "maximumMemory": 65335,
     "sourceMap": true,
     "explicitStart": true,
     "measure": true,
