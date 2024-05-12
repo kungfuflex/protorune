@@ -16,6 +16,8 @@ import { BST } from "metashrew-as/assembly/indexer/bst";
 import { readULEB128ToU128 } from "./leb128";
 import { u256, u128 } from "as-bignum/assembly";
 
+export function trap(): void { unreachable(); }
+
 const HEIGHT_TO_BLOCKHASH = IndexPointer.for("/blockhash/byheight/");
 const BLOCKHASH_TO_HEIGHT = IndexPointer.for("/height/byblockhash/");
 const OUTPOINT_TO_RUNES = IndexPointer.for("/height/byblockhash/");

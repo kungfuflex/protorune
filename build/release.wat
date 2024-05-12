@@ -6,8 +6,8 @@
  (type $4 (func (result i32)))
  (type $5 (func (param i32 i32 i32)))
  (type $6 (func (param i32 i32)))
- (type $7 (func (param i32)))
- (type $8 (func))
+ (type $7 (func))
+ (type $8 (func (param i32)))
  (type $9 (func (param i32 i32 i32 i32)))
  (type $10 (func (param i32) (result i64)))
  (type $11 (func (param i32 i64) (result i32)))
@@ -223,6 +223,7 @@
  (data $74.1 (i32.const 7576) ":\00\00\00\08\00\00\00\r")
  (table $0 14 14 funcref)
  (elem $0 (i32.const 1) $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|0 $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|1 $~lib/metashrew-as/assembly/utils/utils/concat~anonymous|0 $assembly/index/Index.indexBlock~anonymous|0 $assembly/index/Edict.fromDeltaSeries~anonymous|0 $assembly/index/Index.indexBlock~anonymous|1 $assembly/index/BalanceSheet.concat~anonymous|0 $assembly/index/fieldToArrayBuffer~anonymous|0 $~lib/metashrew-as/assembly/indexer/index/_flush~anonymous|0 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|0 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|1 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|2 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|2)
+ (export "trap" (func $assembly/index/trap))
  (export "_start" (func $assembly/index/_start))
  (export "memory" (memory $0))
  (start $~start)
@@ -657,6 +658,9 @@
    end
   end
   local.get $2
+ )
+ (func $assembly/index/trap
+  unreachable
  )
  (func $~lib/metashrew-as/assembly/utils/box/Box#constructor (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
@@ -4777,7 +4781,7 @@
   i32.add
   i32.load
   local.set $3
-  block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$972"
+  block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$973"
    loop $while-continue|0
     local.get $3
     if
@@ -4794,7 +4798,7 @@
       local.get $1
       i64.eq
      end
-     br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$972"
+     br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$973"
      local.get $4
      i32.const -2
      i32.and
@@ -5065,7 +5069,7 @@
   i32.add
   i32.load
   local.set $0
-  block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$973"
+  block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$974"
    loop $while-continue|0
     local.get $0
     if
@@ -5082,7 +5086,7 @@
       local.get $1
       i64.eq
      end
-     br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$973"
+     br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$974"
      local.get $2
      i32.const -2
      i32.and
@@ -5367,7 +5371,7 @@
      i32.add
      i32.load
      local.set $0
-     block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$980"
+     block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$981"
       loop $while-continue|01
        local.get $0
        if
@@ -5384,7 +5388,7 @@
          i64.load
          i64.eq
         end
-        br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$980"
+        br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$981"
         local.get $6
         i32.const -2
         i32.and
@@ -7565,7 +7569,7 @@
        i32.const -1
        i32.eq
        if
-        block $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/intoString$1034 (result i32)
+        block $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/intoString$1035 (result i32)
          local.get $3
          i32.load offset=4
          local.tee $3
@@ -7582,60 +7586,60 @@
           i32.sub
           call $~lib/util/number/utoa32
           call $~lib/string/String.__concat
-          br $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/intoString$1034
+          br $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/intoString$1035
          end
          i32.const 7040
          local.get $3
          i32.const 76
          i32.eq
-         br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/intoString$1034
+         br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/intoString$1035
          drop
          i32.const 7088
          local.get $3
          i32.const 77
          i32.eq
-         br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/intoString$1034
+         br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/intoString$1035
          drop
          i32.const 7136
          local.get $3
          i32.const 78
          i32.eq
-         br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/intoString$1034
+         br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/intoString$1035
          drop
          i32.const 7184
          local.get $3
          i32.eqz
-         br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/intoString$1034
+         br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/intoString$1035
          drop
          i32.const 7232
          local.get $3
          i32.const 81
          i32.eq
-         br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/intoString$1034
+         br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/intoString$1035
          drop
          i32.const 7280
          local.get $3
          i32.const 99
          i32.eq
-         br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/intoString$1034
+         br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/intoString$1035
          drop
          i32.const 7312
          local.get $3
          i32.const 106
          i32.eq
-         br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/intoString$1034
+         br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/intoString$1035
          drop
          i32.const 7360
          local.get $3
          i32.const 169
          i32.eq
-         br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/intoString$1034
+         br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/intoString$1035
          drop
          i32.const 7408
          local.get $3
          i32.const 172
          i32.eq
-         br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/intoString$1034
+         br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/intoString$1035
          drop
          i32.const 6624
         end
@@ -7912,7 +7916,7 @@
   i32.add
   i32.load
   local.set $1
-  block $"__inlined_func$~lib/map/Map<u32,assembly/index/BalanceSheet>#find$1044"
+  block $"__inlined_func$~lib/map/Map<u32,assembly/index/BalanceSheet>#find$1045"
    loop $while-continue|0
     local.get $1
     if
@@ -7929,7 +7933,7 @@
       local.get $3
       i32.eq
      end
-     br_if $"__inlined_func$~lib/map/Map<u32,assembly/index/BalanceSheet>#find$1044"
+     br_if $"__inlined_func$~lib/map/Map<u32,assembly/index/BalanceSheet>#find$1045"
      local.get $4
      i32.const -2
      i32.and
@@ -8176,7 +8180,7 @@
   i32.add
   i32.load
   local.set $0
-  block $"__inlined_func$~lib/map/Map<u32,assembly/index/BalanceSheet>#find$1045"
+  block $"__inlined_func$~lib/map/Map<u32,assembly/index/BalanceSheet>#find$1046"
    loop $while-continue|0
     local.get $0
     if
@@ -8193,7 +8197,7 @@
       local.get $1
       i32.eq
      end
-     br_if $"__inlined_func$~lib/map/Map<u32,assembly/index/BalanceSheet>#find$1045"
+     br_if $"__inlined_func$~lib/map/Map<u32,assembly/index/BalanceSheet>#find$1046"
      local.get $2
      i32.const -2
      i32.and
@@ -8365,7 +8369,7 @@
     end
     i32.const 0
     local.set $2
-    block $__inlined_func$assembly/index/RunesTransaction#runestoneOutputIndex$1141
+    block $__inlined_func$assembly/index/RunesTransaction#runestoneOutputIndex$1142
      loop $for-loop|02
       local.get $2
       local.get $9
@@ -8382,7 +8386,7 @@
        i32.load16_u
        i32.const 24426
        i32.eq
-       br_if $__inlined_func$assembly/index/RunesTransaction#runestoneOutputIndex$1141
+       br_if $__inlined_func$assembly/index/RunesTransaction#runestoneOutputIndex$1142
        local.get $2
        i32.const 1
        i32.add
@@ -8484,7 +8488,7 @@
       local.get $10
       i32.load offset=12
       local.set $2
-      block $__inlined_func$~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#findIndex$1055
+      block $__inlined_func$~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#findIndex$1056
        loop $for-loop|002
         local.get $1
         local.get $2
@@ -8513,7 +8517,7 @@
          i32.const 6656
          i32.load
          call_indirect (type $3)
-         br_if $__inlined_func$~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#findIndex$1055
+         br_if $__inlined_func$~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#findIndex$1056
          local.get $1
          i32.const 1
          i32.add
@@ -8838,7 +8842,7 @@
       i32.add
       i32.load
       local.set $1
-      block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1024"
+      block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1025"
        loop $while-continue|01
         local.get $1
         if
@@ -8855,7 +8859,7 @@
           i64.const 20
           i64.eq
          end
-         br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1024"
+         br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1025"
          local.get $2
          i32.const -2
          i32.and
@@ -9162,7 +9166,7 @@
        i32.add
        i32.load
        local.set $1
-       block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1059"
+       block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1060"
         loop $while-continue|015
          local.get $1
          if
@@ -9179,7 +9183,7 @@
            i64.const 6
            i64.eq
           end
-          br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1059"
+          br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1060"
           local.get $12
           i32.const -2
           i32.and
@@ -9282,7 +9286,7 @@
         i32.add
         i32.load
         local.set $1
-        block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1061"
+        block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1062"
          loop $while-continue|03
           local.get $1
           if
@@ -9299,7 +9303,7 @@
             i64.const 10
             i64.eq
            end
-           br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1061"
+           br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1062"
            local.get $5
            i32.const -2
            i32.and
@@ -9337,7 +9341,7 @@
         i32.add
         i32.load
         local.set $1
-        block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1062"
+        block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1063"
          loop $while-continue|04
           local.get $1
           if
@@ -9354,7 +9358,7 @@
             i64.const 8
             i64.eq
            end
-           br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1062"
+           br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1063"
            local.get $5
            i32.const -2
            i32.and
@@ -9392,7 +9396,7 @@
         i32.add
         i32.load
         local.set $1
-        block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1063"
+        block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1064"
          loop $while-continue|05
           local.get $1
           if
@@ -9409,7 +9413,7 @@
             i64.const 12
             i64.eq
            end
-           br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1063"
+           br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1064"
            local.get $5
            i32.const -2
            i32.and
@@ -9456,7 +9460,7 @@
         i32.add
         i32.load
         local.set $1
-        block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1065"
+        block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1066"
          loop $while-continue|06
           local.get $1
           if
@@ -9473,7 +9477,7 @@
             i64.const 14
             i64.eq
            end
-           br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1065"
+           br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1066"
            local.get $5
            i32.const -2
            i32.and
@@ -9520,7 +9524,7 @@
         i32.add
         i32.load
         local.set $1
-        block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1067"
+        block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1068"
          loop $while-continue|07
           local.get $1
           if
@@ -9537,7 +9541,7 @@
             i64.const 16
             i64.eq
            end
-           br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1067"
+           br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1068"
            local.get $5
            i32.const -2
            i32.and
@@ -9584,7 +9588,7 @@
         i32.add
         i32.load
         local.set $1
-        block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1069"
+        block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1070"
          loop $while-continue|08
           local.get $1
           if
@@ -9601,7 +9605,7 @@
             i64.const 18
             i64.eq
            end
-           br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1069"
+           br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1070"
            local.get $5
            i32.const -2
            i32.and
@@ -9649,7 +9653,7 @@
        i32.add
        i32.load
        local.set $1
-       block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1071"
+       block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1072"
         loop $while-continue|09
          local.get $1
          if
@@ -9666,7 +9670,7 @@
            i64.const 3
            i64.eq
           end
-          br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1071"
+          br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1072"
           local.get $5
           i32.const -2
           i32.and
@@ -9714,7 +9718,7 @@
        i32.add
        i32.load
        local.set $1
-       block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1073"
+       block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1074"
         loop $while-continue|010
          local.get $1
          if
@@ -9731,7 +9735,7 @@
            i64.const 5
            i64.eq
           end
-          br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1073"
+          br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1074"
           local.get $5
           i32.const -2
           i32.and
@@ -9870,7 +9874,7 @@
         i32.add
         i32.load
         local.set $1
-        block $"__inlined_func$~lib/map/Map<u32,assembly/index/BalanceSheet>#find$1041"
+        block $"__inlined_func$~lib/map/Map<u32,assembly/index/BalanceSheet>#find$1042"
          loop $while-continue|00
           local.get $1
           if
@@ -9887,7 +9891,7 @@
             local.get $15
             i32.eq
            end
-           br_if $"__inlined_func$~lib/map/Map<u32,assembly/index/BalanceSheet>#find$1041"
+           br_if $"__inlined_func$~lib/map/Map<u32,assembly/index/BalanceSheet>#find$1042"
            local.get $5
            i32.const -2
            i32.and
@@ -10018,7 +10022,7 @@
       i32.add
       i32.load
       local.set $1
-      block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1080"
+      block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1081"
        loop $while-continue|011
         local.get $1
         if
@@ -10035,7 +10039,7 @@
           i64.const 22
           i64.eq
          end
-         br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1080"
+         br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1081"
          local.get $2
          i32.const -2
          i32.and
@@ -10058,7 +10062,7 @@
        i32.wrap_i64
        local.set $1
       else
-       block $__inlined_func$assembly/index/RunesTransaction#defaultOutput$1145
+       block $__inlined_func$assembly/index/RunesTransaction#defaultOutput$1146
         i32.const 0
         local.set $2
         loop $for-loop|034
@@ -10078,7 +10082,7 @@
           i32.load8_u
           i32.const 106
           i32.ne
-          br_if $__inlined_func$assembly/index/RunesTransaction#defaultOutput$1145
+          br_if $__inlined_func$assembly/index/RunesTransaction#defaultOutput$1146
           local.get $1
           i32.const 1
           i32.add
@@ -10128,7 +10132,7 @@
       i32.add
       i32.load
       local.set $2
-      block $"__inlined_func$~lib/map/Map<u32,assembly/index/BalanceSheet>#find$10410"
+      block $"__inlined_func$~lib/map/Map<u32,assembly/index/BalanceSheet>#find$10420"
        loop $while-continue|012
         local.get $2
         if
@@ -10145,7 +10149,7 @@
           local.get $1
           i32.eq
          end
-         br_if $"__inlined_func$~lib/map/Map<u32,assembly/index/BalanceSheet>#find$10410"
+         br_if $"__inlined_func$~lib/map/Map<u32,assembly/index/BalanceSheet>#find$10420"
          local.get $5
          i32.const -2
          i32.and

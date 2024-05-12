@@ -3,8 +3,8 @@
  (type $1 (func (param i32 i32)))
  (type $2 (func (param i32 i32) (result i32)))
  (type $3 (func (param i32 i32 i32) (result i32)))
- (type $4 (func (param i32 i32 i32)))
- (type $5 (func))
+ (type $4 (func))
+ (type $5 (func (param i32 i32 i32)))
  (type $6 (func (param i32 i32 i32 i32) (result i32)))
  (type $7 (func (param i32) (result i64)))
  (type $8 (func (param i32 i64)))
@@ -209,6 +209,7 @@
  (data $74 (i32.const 6540) "\1c\00\00\00\00\00\00\00\00\00\00\00:\00\00\00\08\00\00\00\r\00\00\00\00\00\00\00\00\00\00\00")
  (table $0 14 14 funcref)
  (elem $0 (i32.const 1) $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|0 $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|1 $~lib/metashrew-as/assembly/utils/utils/concat~anonymous|0 $assembly/index/Index.indexBlock~anonymous|0 $assembly/index/Edict.fromDeltaSeries~anonymous|0 $assembly/index/Index.indexBlock~anonymous|1 $assembly/index/BalanceSheet.concat~anonymous|0 $assembly/index/fieldToArrayBuffer~anonymous|0 $~lib/metashrew-as/assembly/indexer/index/_flush~anonymous|0 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|0 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|1 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|2 $~lib/metashrew-as/assembly/utils/rlp/toRLP~anonymous|3)
+ (export "trap" (func $assembly/index/trap))
  (export "_start" (func $assembly/index/_start))
  (export "memory" (memory $0))
  (start $~start)
@@ -1165,6 +1166,9 @@
   i32.const 3296
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer.for
   global.set $assembly/index/ETCHING_TO_RUNE_ID
+ )
+ (func $assembly/index/trap
+  unreachable
  )
  (func $~lib/metashrew-as/assembly/indexer/index/input (result i32)
   (local $data i32)
@@ -17026,6 +17030,8 @@
   i32.const 0
   call $"~lib/map/Map<~lib/string/String,~lib/arraybuffer/ArrayBuffer>#set:entriesCount"
  )
+ (func $~lib/rt/stub/__collect
+ )
  (func $~lib/metashrew-as/assembly/indexer/index/_flush
   (local $hashKeys i32)
   (local $rlpInput i32)
@@ -17050,6 +17056,7 @@
   call $"~lib/map/Map<~lib/string/String,~lib/arraybuffer/ArrayBuffer>#clear"
   local.get $buffer
   call $~lib/metashrew-as/assembly/indexer/index/__flush
+  call $~lib/rt/stub/__collect
  )
  (func $assembly/index/_start
   (local $data i32)
