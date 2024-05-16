@@ -46,57 +46,18 @@ const formatKv = (kv: any) => {
 const ln = (v) => { console.log(v); return v; };
 
 describe("metashrew-runes", () => {
-  it("indexes a range of blocks", async () => {
+  it("indexes the genesis rune", async () => {
     const program = new IndexerProgram(
       new Uint8Array(
         Array.from(
           await fs.readFile(
-            path.join(__dirname, "..", "build", "release.wasm"),
+            path.join(__dirname, "..", "build", "debug.wasm"),
           ),
         ),
       ).buffer,
     );
     program.on("log", (v) => console.log(v));
-    async function rpcCall(method, params) {
-      const response = await fetch(
-        "https://testnet.sandshrew.io/v1/154f9aaa25a986241357836c37f8d71",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            method,
-            params,
-            jsonrpc: "2.0",
-            id: Date.now(),
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-      return ln(await response.json()).result;
-    }
-    async function buildBlock(ary: Array<string>): string {
-      const result = [];
-      for (let i = 0; i < ary.length; i++) {
-        result.push(((v) => console.log(v))(await rpcCall("gettransaction", [ ary[i] ])));
-      }
-      return result;
-    }
-    const block = await buildBlock([
-      "db58ef3b9b05658c145c1dfeb54b98fce61f08bb323836eb027676e2a2c6c6ff",
-      "df858e723f991905d28b7774a6633ded169f335791d5c7290e6c80246d98cb04"
-    ]);
-    console.log(block);
-    async function runBlock(i: number) {
-      program.setBlock(
-        await rpcCall("getblock", [await rpcCall("getblockhash", [i]), 0]),
-      );
-      program.setBlockHeight(i);
-      await program.run("_start");
-    }
-    for (let i = 0; i < 10; i++) {
-      console.log(`BLOCK ${i}`);
-      await runBlock(i);
-    }
+    await program.run("test_indexEtching");
+    console.log(program.kv);
   });
 });
