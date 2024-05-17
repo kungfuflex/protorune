@@ -144,6 +144,28 @@ class RunestoneMessage {
     this.fields = fields;
     this.edicts = edicts;
   }
+  inspect(): string {
+    let result = "RunestoneMessage {\n";
+    let fieldInts = this.fields.keys();
+    for (let i = 0; i < fieldInts.length; i++) {
+      result += "  " + fieldInts[i].toString(10) + ": [\n";
+      const ary = this.fields.get(fieldInts[i]);
+      for (let j = 0; j < ary.length; j++) {
+        result += "    " + u128ToHex(ary[j]) + ",\n"
+      }
+      result += "  ]\n";
+    }
+    result += "  edicts: [";
+    for (let i = 0; i < this.edicts.length; i++) {
+      result += "    ";
+      for (let j = 0; j < this.edicts[i].length; j++) {
+        result += u128ToHex(this.edicts[i][j]); 
+      }
+      if (i !== this.edicts.length - 1) result += ", ";
+    }
+    result += "]\n}";
+    return result;
+  }
   getFlag(position: u64): bool {
     const flags = fieldToU128(this.fields.get(Field.FLAGS));
     return !u128.and(flags, u128.from(1) << <i32>position).isZero();
@@ -183,7 +205,6 @@ class RunestoneMessage {
         } else {
           field = fields.get(fieldKey);
         }
-	console.log(u128ToHex(value));
         field.push(value);
       }
     }
@@ -232,7 +253,6 @@ class Edict {
     });
     for (let i: i32 = 0; i < deltas.length; i++) {
       last = Edict.diff(last, deltas[i]);
-      console.log(last.toString());
       result.push(last);
     }
     return result;
@@ -440,28 +460,17 @@ class Index {
   ): ArrayBuffer {
     for (let i = 0; i < tx.ins.length; i++) {
       const input = tx.ins[i];
-      if (changetype<usize>(input.witness) !== 0) {
-        const tapscript = input.witness.tapscript();
-        if (changetype<usize>(tapscript) !== 0) {
-          const components = scriptParse(tapscript);
-          if (
-            components.length > 1 &&
-            intoString(components[0]) === "OP_RETURN" &&
-            components[1].start !== usize.MAX_VALUE
-          ) {
-            // check that there is 1 data push
-            const previousOutpoint = tx.ins[i].previousOutput().toArrayBuffer();
-            if (
-              height -
-                OUTPOINT_TO_HEIGHT.select(previousOutpoint).getValue<u32>() >=
-              6
-            ) {
-              // check the commitment has at least 6 confirmations
-              let commitment = components[i].toArrayBuffer();
-              if (isEqualArrayBuffer(name, commitment)) return commitment;
-            }
-          }
-        }
+      // check that there is 1 data push
+      const inscription = input.inscription();
+      if (changetype<usize>(inscription) === 0) continue;
+      const commitment = inscription.body();
+      if (!commitment) continue;
+      const previousOutpoint = tx.ins[i].previousOutput().toArrayBuffer();
+      if (
+        height -
+        OUTPOINT_TO_HEIGHT.select(previousOutpoint).getValue<u32>() >= 6) {
+        // check the commitment has at least 6 confirmations
+        if (isEqualArrayBuffer(name, commitment)) return commitment;
       }
     }
     return changetype<ArrayBuffer>(0);
@@ -526,16 +535,18 @@ class Index {
           const name = stripNullRight(
             fieldToArrayBuffer(message.fields.get(Field.RUNE)),
           );
+	  /*
           if (
-            ETCHING_TO_RUNE_ID.select(name).get() ||
+            ETCHING_TO_RUNE_ID.select(name).get().byteLength !== 0 ||
             !Index.findCommitment(tx, name, height)
           )
-            continue; // already taken / commitment not found
+            continue; // already taken / commitment not foun
+	   */
           const runeId = new RuneId(<u64>height, <u32>i).toBytes();
           RUNE_ID_TO_ETCHING.select(runeId).set(name);
           ETCHING_TO_RUNE_ID.select(name).set(runeId);
           RUNE_ID_TO_HEIGHT.select(runeId).setValue<u32>(height);
-          DIVISIBILITY.select(name).setValue<u8>(
+          if (message.fields.has(Field.DIVISIBILITY)) DIVISIBILITY.select(name).setValue<u8>(
             fieldTo<u8>(message.fields.get(Field.DIVISIBILITY)),
           );
           if (message.fields.has(Field.PREMINE)) {
@@ -543,18 +554,19 @@ class Index {
             BalanceSheet.fromPairs([runeId], [premine]).pipe(balanceSheet);
             PREMINE.select(name).set(toArrayBuffer(premine));
           }
-          MINTS_REMAINING.select(name).set(
-            fieldToArrayBuffer(message.fields.get(Field.CAP)),
-          );
           if (message.getFlag(Flag.TERMS)) {
             if (message.fields.has(Field.AMOUNT))
               AMOUNT.select(name).set(
                 toArrayBuffer(fieldToU128(message.fields.get(Field.AMOUNT))),
               );
-            if (message.fields.has(Field.CAP))
+            if (message.fields.has(Field.CAP)) {
               CAP.select(name).set(
                 toArrayBuffer(fieldToU128(message.fields.get(Field.CAP))),
               );
+	      MINTS_REMAINING.select(name).set(
+	        fieldToArrayBuffer(message.fields.get(Field.CAP)),
+	      );
+	    }
             if (message.fields.has(Field.HEIGHTSTART))
               HEIGHTSTART.select(name).setValue<u64>(
                 fieldTo<u64>(message.fields.get(Field.HEIGHTSTART)),
@@ -641,6 +653,6 @@ export function test_indexEtching(): void {
   const block = new Block(Box.from(decodeHex("0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c0101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff4d04ffff001d0104455468652054696d65732030332f4a616e2f32303039204368616e63656c6c6f72206f6e206272696e6b206f66207365636f6e64206261696c6f757420666f722062616e6b73ffffffff0100f2052a01000000434104678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5fac00000000")));
   block.transactions = new Array<Transaction>(1);
   block.transactions[0] = new Transaction(Box.from(decodeHex('0200000000010281763d607e7599dde732fa2c3e7b53ff4c3d097ce89287fc276d8dfe9e886492020000000005000000df9c57a83f900c09faae93686bdf662d9ccb5eab22c9b3184a071664eb18e8650000000000050000000578030000000000002251201a020509bff496a0eef4b9444f804e24c9394a043e8e71965baa200abbc4d09578030000000000002251208f442570a0db90e5b3455573212c8edf9425cb05bd6194e70766aa17c49b3c0c1027000000000000225120e3a2c44155e80bbb791f0121893392b02f804aa07360a22b18861b9b8dd135e100000000000000001f6a5d1c020104c4a1a8e18bbd8af58c830103880805c8530680a4ca9d4e1602204e00000000000022512000b9665e3d564a99f0f20d7829f58f2a43e0a60cc40921d8b32d1985c0b7b4e70140436f259ca43dcb558885856e9fe3bedee5bdec75b714a79c5445ed3bb56dc414baf209ad40ee43a80115c4c763911597b34e9c1a49bfc9d52eb344bd8b1764c50340251d46d96914b732154ca9c1278529e3ca14714770e6a07a2c6d5f5b9d51f9b6e63101a2c875d42a8446fa2f66aac279e25fad797447d670eb7cc111c9e06b0d8120ed247313597e5eadc95a09e6c34643fd4f6edd4dad046cc155d5609c05a81611ac0063036f726401032181763d607e7599dde732fa2c3e7b53ff4c3d097ce89287fc276d8dfe9e88649201010b2064ec82c41727c6dba0d9d61559436a657ae62cdb94462056c297331e868004d40102027803010d09c4102abce829ea8c416821c0ed247313597e5eadc95a09e6c34643fd4f6edd4dad046cc155d5609c05a816113fd10c00')));
-  Index.indexBlock(0, block);
+  Index.indexBlock(6, block);
   _flush();
 }
