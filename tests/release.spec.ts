@@ -45,19 +45,46 @@ const formatKv = (kv: any) => {
 
 const ln = (v) => { console.log(v); return v; };
 
-describe("metashrew-runes", () => {
-  it("indexes the genesis rune", async () => {
-    const program = new IndexerProgram(
-      new Uint8Array(
-        Array.from(
-          await fs.readFile(
-            path.join(__dirname, "..", "build", "debug.wasm"),
-          ),
+const runTest = (s) => it(s, async () => {
+  const program = new IndexerProgram(
+    new Uint8Array(
+      Array.from(
+        await fs.readFile(
+          path.join(__dirname, "..", "build", "debug.wasm"),
         ),
-      ).buffer,
-    );
-    program.on("log", (v) => console.log(v));
-    await program.run("test_indexEtching");
-    console.log(program.kv);
+      ),
+    ).buffer,
+  );
+  program.on("log", (v) => console.log(v));
+  await program.run(s);
+  return program;
+});
+
+describe("metashrew-runes", () => {
+  [
+    "test_indexEtching",
+    "test_genesisTransaction",
+    "test_secondTransaction",
+    "test_oneFortyEight",
+    "test_fifteen"
+  ].map((v) => runTest(v));
+  /*
+  it('should run runes genesis block', async () => {
+  const program = new IndexerProgram(
+    new Uint8Array(
+      Array.from(
+        await fs.readFile(
+          path.join(__dirname, "..", "build", "debug.wasm"),
+        ),
+      ),
+    ).buffer,
+  );
+  program.on("log", (v) => console.log(v));
+  program.setBlock(await fs.readFile(path.join(__dirname, 'runes-genesis.hex'), 'utf8'));
+  program.setBlockHeight(840000);
+  await program.run('_start');
+  return program;
+    
   });
+  */
 });
