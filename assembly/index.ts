@@ -186,21 +186,27 @@ class RunestoneMessage {
     let edicts = new Array<StaticArray<u128>>(0);
     while (input.len > 0) {
       const fieldKeyHeap = u128.from(0);
-      input.shrinkFront(readULEB128ToU128(input, fieldKeyHeap));
+      const size = readULEB128ToU128(input, fieldKeyHeap);
+      if (size === usize.MAX_VALUE) return changetype<RunestoneMessage>(0);
+      input.shrinkFront(size);
       const fieldKey = fieldKeyHeap.lo;
       if (fieldKey === 0) {
         while (input.len > 0) {
           const edict = new StaticArray<u128>(4);
           for (let i = 0; i < 4; i++) {
             const edictInt = u128.from(0);
-            input.shrinkFront(readULEB128ToU128(input, edictInt));
+	    const size = readULEB128ToU128(input, edictInt);
+	    if (usize.MAX_VALUE === size) return changetype<RunestoneMessage>(0);
+            input.shrinkFront(size);
             edict[i] = edictInt;
           }
           edicts.push(edict);
         }
       } else {
         const value = u128.from(0);
-        input.shrinkFront(readULEB128ToU128(input, value));
+	const size = readULEB128ToU128(input, value);
+	if (usize.MAX_VALUE === size) return changetype<RunestoneMessage>(0);
+        input.shrinkFront(size);
         let field: Array<u128> = changetype<Array<u128>>(0);
         if (!fields.has(fieldKey)) {
           field = new Array<u128>(0);
@@ -504,6 +510,7 @@ class Index {
           continue; // non-data push: cenotaph
         const payload = Box.concat(parsed);
         const message = RunestoneMessage.parse(payload);
+	if (changetype<usize>(message) === 0) continue;
         const edicts = Edict.fromDeltaSeries(message.edicts);
         let etchingBalanceSheet = changetype<BalanceSheet>(0);
         let balanceSheet = BalanceSheet.concat(

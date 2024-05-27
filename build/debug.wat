@@ -8126,22 +8126,30 @@
   local.set $result
   i32.const 0
   local.set $byte
+  local.get $slice
+  call $~lib/metashrew-as/assembly/utils/box/Box#get:len
+  i32.const 0
+  i32.eq
+  if
+   i32.const 0
+   return
+  end
   block $while-break|0
    loop $while-continue|0
     i32.const 1
     if
      local.get $slice
+     call $~lib/metashrew-as/assembly/utils/box/Box#get:start
+     i32.load8_u
+     local.set $byte
+     local.get $slice
      call $~lib/metashrew-as/assembly/utils/box/Box#get:len
      i32.const 0
      i32.eq
      if
-      i32.const 0
+      global.get $~lib/builtins/usize.MAX_VALUE
       return
      end
-     local.get $slice
-     call $~lib/metashrew-as/assembly/utils/box/Box#get:start
-     i32.load8_u
-     local.set $byte
      local.get $slice
      i32.const 1
      call $~lib/metashrew-as/assembly/utils/box/Box#shrinkFront
@@ -9070,15 +9078,18 @@
   (local $value i32)
   (local $value|5 i64)
   (local $fieldKeyHeap i32)
+  (local $size i32)
   (local $fieldKey i64)
   (local $edict i32)
   (local $i i32)
-  (local $value|10 i32)
-  (local $value|11 i64)
+  (local $value|11 i32)
+  (local $value|12 i64)
   (local $edictInt i32)
-  (local $value|13 i32)
-  (local $value|14 i64)
+  (local $size|14 i32)
   (local $value|15 i32)
+  (local $value|16 i64)
+  (local $value|17 i32)
+  (local $size|18 i32)
   (local $field i32)
   local.get $data
   call $~lib/metashrew-as/assembly/utils/box/Box.from
@@ -9127,9 +9138,18 @@
     end
     local.set $fieldKeyHeap
     local.get $input
-    local.get $input
     local.get $fieldKeyHeap
     call $assembly/leb128/readULEB128ToU128
+    local.set $size
+    local.get $size
+    global.get $~lib/builtins/usize.MAX_VALUE
+    i32.eq
+    if
+     i32.const 0
+     return
+    end
+    local.get $input
+    local.get $size
     call $~lib/metashrew-as/assembly/utils/box/Box#shrinkFront
     drop
     local.get $fieldKeyHeap
@@ -9158,7 +9178,7 @@
         if
          block $~lib/as-bignum/assembly/integer/u128/u128.from<i32>|inlined.3 (result i32)
           i32.const 0
-          local.set $value|10
+          local.set $value|11
           i32.const 0
           drop
           i32.const 0
@@ -9172,12 +9192,12 @@
           i32.const 1
           drop
           block $~lib/as-bignum/assembly/integer/u128/u128.fromI64|inlined.3 (result i32)
-           local.get $value|10
+           local.get $value|11
            i64.extend_i32_s
-           local.set $value|11
+           local.set $value|12
            i32.const 0
-           local.get $value|11
-           local.get $value|11
+           local.get $value|12
+           local.get $value|12
            i64.const 63
            i64.shr_s
            call $~lib/as-bignum/assembly/integer/u128/u128#constructor
@@ -9187,9 +9207,18 @@
          end
          local.set $edictInt
          local.get $input
-         local.get $input
          local.get $edictInt
          call $assembly/leb128/readULEB128ToU128
+         local.set $size|14
+         global.get $~lib/builtins/usize.MAX_VALUE
+         local.get $size|14
+         i32.eq
+         if
+          i32.const 0
+          return
+         end
+         local.get $input
+         local.get $size|14
          call $~lib/metashrew-as/assembly/utils/box/Box#shrinkFront
          drop
          local.get $edict
@@ -9213,7 +9242,7 @@
     else
      block $~lib/as-bignum/assembly/integer/u128/u128.from<i32>|inlined.4 (result i32)
       i32.const 0
-      local.set $value|13
+      local.set $value|15
       i32.const 0
       drop
       i32.const 0
@@ -9227,12 +9256,12 @@
       i32.const 1
       drop
       block $~lib/as-bignum/assembly/integer/u128/u128.fromI64|inlined.4 (result i32)
-       local.get $value|13
+       local.get $value|15
        i64.extend_i32_s
-       local.set $value|14
+       local.set $value|16
        i32.const 0
-       local.get $value|14
-       local.get $value|14
+       local.get $value|16
+       local.get $value|16
        i64.const 63
        i64.shr_s
        call $~lib/as-bignum/assembly/integer/u128/u128#constructor
@@ -9240,11 +9269,20 @@
       end
       br $~lib/as-bignum/assembly/integer/u128/u128.from<i32>|inlined.4
      end
-     local.set $value|15
+     local.set $value|17
      local.get $input
-     local.get $input
-     local.get $value|15
+     local.get $value|17
      call $assembly/leb128/readULEB128ToU128
+     local.set $size|18
+     global.get $~lib/builtins/usize.MAX_VALUE
+     local.get $size|18
+     i32.eq
+     if
+      i32.const 0
+      return
+     end
+     local.get $input
+     local.get $size|18
      call $~lib/metashrew-as/assembly/utils/box/Box#shrinkFront
      drop
      i32.const 0
@@ -9270,7 +9308,7 @@
       local.set $field
      end
      local.get $field
-     local.get $value|15
+     local.get $value|17
      call $~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>#push
      drop
     end
@@ -14691,6 +14729,12 @@
       local.get $payload
       call $assembly/index/RunestoneMessage.parse
       local.set $message
+      local.get $message
+      i32.const 0
+      i32.eq
+      if
+       br $for-continue|0
+      end
       local.get $message
       call $assembly/index/RunestoneMessage#get:edicts
       call $assembly/index/Edict.fromDeltaSeries
