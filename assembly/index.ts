@@ -39,8 +39,6 @@ const RUNE_ID_TO_HEIGHT = IndexPointer.for("/height/byruneid/");
 const RUNE_ID_TO_ETCHING = IndexPointer.for("/etching/byruneid/");
 const ETCHING_TO_RUNE_ID = IndexPointer.for("/runeid/byetching/");
 
-
-
 function min<T>(a: T, b: T): T {
   if (a > b) return b;
   return a;
@@ -269,6 +267,10 @@ class Edict {
   toString(): string {
     return "Edict {\n  block: 0x" + u128ToHex(this.block) + ",  \ntransactionIndex: 0x" + u128ToHex(this.transactionIndex) + ",  \namount: 0x" + u128ToHex(this.amount) + ",  output: " + u128ToHex(this.output) + "}";
   }
+}
+
+function inspectEdicts(ary: Array<Edict>): string {
+  return "[\n" + ary.map<string>((v: Edict, i: i32, ary: Array<Edict>) => "  " + v.toString()).join('\n') + "\n]";
 }
 
 function stripNullRight(data: ArrayBuffer): ArrayBuffer {
@@ -511,7 +513,9 @@ class Index {
         const payload = Box.concat(parsed);
         const message = RunestoneMessage.parse(payload);
 	if (changetype<usize>(message) === 0) continue;
+	console.log(message.inspect());
         const edicts = Edict.fromDeltaSeries(message.edicts);
+	if (edicts.length !== 0) console.log(inspectEdicts(edicts));
         let etchingBalanceSheet = changetype<BalanceSheet>(0);
         let balanceSheet = BalanceSheet.concat(
           tx.ins.map<BalanceSheet>((v: Input, i: i32, ary: Array<Input>) =>
