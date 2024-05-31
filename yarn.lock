@@ -955,7 +955,7 @@ memorystream@^0.3.1:
 
 "metashrew-as@https://github.com/sandshrewmetaprotocols/metashrew-as":
   version "0.1.0"
-  resolved "https://github.com/sandshrewmetaprotocols/metashrew-as#0065287fd7032229a29c62df9835217eb4dc60a3"
+  resolved "https://github.com/sandshrewmetaprotocols/metashrew-as#8034f7724c4109a348045ef3c1560e3da193e439"
   dependencies:
     fast-sha256-as "https://github.com/sandshrewmetaprotocols/fast-sha256-as"
     lodash "^4.17.21"
