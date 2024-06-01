@@ -6,6 +6,7 @@
     "asbuild:release": "asc assembly/index.ts --target release --config asconfig.json",
     "build": "npm-run-all asbuild:debug asbuild:release",
     "build:debug:preloader": "npm run asbuild:preloader --sharedMemory",
+    "build:protoc": "protoc --plugin=./node_modules/.bin/protoc-gen-as --as_out=assembly/proto --as_opt targetFileName=metashrew.ts proto/metashrew.proto",
     "prettier:assemblyscript": "prettier --write ./assembly/**/*.ts",
     "prettier:ts": "prettier --write ./src.ts/**/*.ts",
     "prettier": "npm-run-all prettier:assemblyscript",
@@ -13,6 +14,7 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "@protobuf-ts/protoc": "^2.9.4",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.10.6",
     "as-bignum": "^0.3.0",
@@ -26,6 +28,7 @@
     "nice-repl": "^0.1.2",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.1.1",
+    "protobuf-as": "https://github.com/sandshrewmetaprotocols/protobuf-as",
     "rlp": "^3.0.0",
     "ts-mocha": "^10.0.0",
     "typescript": "^5.3.3"

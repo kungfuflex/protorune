@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package metashrew-runes;
+
+message RuneId {}
+
+message Outpoint {
+  bytes pkscript = 1;
+  bytes wallet_addr = 2;
+  bytes output = 3;
+  repeated RuneId rune_ids = 4;
+  repeated bytes balances = 5; 
+  bool spent = 6;
+  repeated bytes symbol = 7;
+
+}
+

@@ -36,3 +36,4 @@ export function _start(): void {
 }
 
 export * from "./tests";
+export * from "./view";
