@@ -12690,7 +12690,7 @@
   call $~lib/metashrew-as/assembly/utils/box/Box#constructor
   call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#constructor
   call $~lib/array/Array<~lib/string/String>#__set
-  i32.const 0
+  i32.const 840000
   local.get $1
   call $assembly/indexer/index/Index.indexBlock
   call $~lib/metashrew-as/assembly/indexer/index/_flush

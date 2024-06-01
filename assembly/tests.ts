@@ -4,6 +4,8 @@ import { Block } from "metashrew-as/assembly/blockdata/block";
 import { Transaction } from "metashrew-as/assembly/blockdata/transaction";
 import { Box } from "metashrew-as/assembly/utils/box";
 import { decodeHex } from "./utils";
+import { console } from "metashrew-as/assembly/utils/logging";
+import { GENESIS } from "./indexer/constants";
 
 function testTransaction(hex: string): void {
   const block = new Block(
@@ -15,7 +17,7 @@ function testTransaction(hex: string): void {
   );
   block.transactions = new Array<Transaction>(1);
   block.transactions[0] = new Transaction(Box.from(decodeHex(hex)));
-  Index.indexBlock(0, block);
+  Index.indexBlock(GENESIS, block);
   _flush();
 }
 

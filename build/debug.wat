@@ -18229,7 +18229,7 @@
   call $~lib/metashrew-as/assembly/utils/box/Box.from
   call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#constructor
   call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Transaction>#__set
-  i32.const 0
+  global.get $assembly/indexer/constants/GENESIS
   local.get $block
   call $assembly/indexer/index/Index.indexBlock
   call $~lib/metashrew-as/assembly/indexer/index/_flush

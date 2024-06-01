@@ -13,6 +13,7 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "@types/mocha": "^10.0.6",
     "@types/node": "^20.10.6",
     "as-bignum": "^0.3.0",
     "assemblyscript": "^0.27.22",
