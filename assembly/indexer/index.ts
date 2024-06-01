@@ -7,6 +7,7 @@ import { RunestoneMessage } from "./RunestoneMessage";
 import { RunesTransaction } from "./RunesTransaction";
 import { Block } from "metashrew-as/assembly/blockdata/block";
 import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
+import { console } from "metashrew-as/assembly/utils/logging";
 import { intoString, scriptParse } from "metashrew-as/assembly/utils/yabsp";
 import { Flag } from "./Flag";
 import { Field } from "./Field";

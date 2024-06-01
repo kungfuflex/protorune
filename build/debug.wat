@@ -32,7 +32,7 @@
  (import "env" "__flush" (func $~lib/metashrew-as/assembly/indexer/index/__flush (param i32)))
  (import "env" "__get_len" (func $~lib/metashrew-as/assembly/indexer/index/__get_len (param i32) (result i32)))
  (import "env" "__get" (func $~lib/metashrew-as/assembly/indexer/index/__get (param i32 i32)))
- (import "env" "console.log" (func $~lib/bindings/dom/console.log (param i32)))
+ (import "env" "__log" (func $~lib/metashrew-as/assembly/utils/logging/__log (param i32)))
  (global $~lib/metashrew-as/assembly/utils/hex/hexLookupTable i32 (i32.const 32))
  (global $~lib/rt/stub/startOffset (mut i32) (i32.const 0))
  (global $~lib/rt/stub/offset (mut i32) (i32.const 0))
@@ -11724,9 +11724,14 @@
   local.get $result
   return
  )
- (func $~lib/console/console.log (param $message i32)
-  local.get $message
-  call $~lib/bindings/dom/console.log
+ (func $~lib/metashrew-as/assembly/utils/logging/Console#log (param $this i32) (param $v i32)
+  local.get $v
+  i32.const 1
+  i32.const 2
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/string/String.UTF8.encode@varargs
+  call $~lib/metashrew-as/assembly/utils/logging/__log
  )
  (func $assembly/indexer/Edict/Edict#set:block (param $this i32) (param $block i32)
   local.get $this
@@ -17020,9 +17025,10 @@
       if
        br $for-continue|0
       end
+      global.get $~lib/metashrew-as/assembly/utils/logging/console
       local.get $message
       call $assembly/indexer/RunestoneMessage/RunestoneMessage#inspect
-      call $~lib/console/console.log
+      call $~lib/metashrew-as/assembly/utils/logging/Console#log
       local.get $message
       call $assembly/indexer/RunestoneMessage/RunestoneMessage#get:edicts
       call $assembly/indexer/Edict/Edict.fromDeltaSeries
@@ -17032,9 +17038,10 @@
       i32.const 0
       i32.ne
       if
+       global.get $~lib/metashrew-as/assembly/utils/logging/console
        local.get $edicts
        call $assembly/utils/inspectEdicts
-       call $~lib/console/console.log
+       call $~lib/metashrew-as/assembly/utils/logging/Console#log
       end
       i32.const 0
       local.set $etchingBalanceSheet
