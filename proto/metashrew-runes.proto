@@ -1,8 +1,16 @@
 syntax = "proto3";
 
-package metashrew-runes;
+package metashrew_runes;
 
-message RuneId {}
+message RuneId {
+  uint64 block = 1;
+  uint32 tx = 2;
+}
+
+message OutPointTest {
+  uint32 divisibility = 1;
+  repeated bytes balances = 2;
+}
 
 message Outpoint {
   bytes pkscript = 1;
@@ -11,7 +19,8 @@ message Outpoint {
   repeated RuneId rune_ids = 4;
   repeated bytes balances = 5; 
   bool spent = 6;
-  repeated bytes symbol = 7;
-
+  bytes symbol = 7;
+  bytes cap = 8;
+  bytes divisibility = 9;
 }
 
