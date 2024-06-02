@@ -9,19 +9,30 @@ import {
   RUNE_ID_TO_ETCHING,
   DIVISIBILITY,
   OUTPOINT_TO_HEIGHT,
+  HEIGHT_TO_BLOCKHASH,
 } from "./indexer/constants";
 import { OutPoint } from "metashrew-as/assembly/blockdata/transaction";
 import { metashrew_runes } from "./proto/metashrew-runes";
 import { u256, u128 } from "as-bignum/assembly";
+import { encodeHexFromBuffer } from "metashrew-as/assembly/utils/hex";
+import { console } from "metashrew-as/assembly/utils/logging";
 
 export function outpoint(): ArrayBuffer {
-  const outpoint_raw = String.UTF8.decode(input()).split(":");
+  const inputString = input();
 
-  const txid = String.UTF8.encode(outpoint_raw[0]);
-  const k = <u32>parseInt(outpoint_raw[1]);
+  const txid = inputString.slice(0, inputString.byteLength - 1);
+  const k = <u32>(
+    parseInt(encodeHexFromBuffer(inputString.slice(inputString.byteLength - 1)))
+  );
+
+  console.log(
+    encodeHexFromBuffer(HEIGHT_TO_BLOCKHASH.selectValue<u32>(840967).get())
+  );
   const outpoint = OutPoint.from(txid, k).toArrayBuffer();
 
   const height = OUTPOINT_TO_HEIGHT.select(outpoint).getValue<u32>();
+
+  console.log(height.toString());
 
   const balanceSheet = BalanceSheet.load(OUTPOINT_TO_RUNES.select(outpoint));
   const runeId = new RuneId(<u64>height, k).toBytes();
@@ -36,6 +47,8 @@ export function outpoint(): ArrayBuffer {
       return d.toBytes();
     }
   );
+
+  console.log(divisibility.toString());
 
   return message.encode();
 }
