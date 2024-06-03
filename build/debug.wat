@@ -18836,6 +18836,7 @@
   (local $inputString i32)
   (local $txid i32)
   (local $k i32)
+  (local $i i32)
   (local $outpoint i32)
   (local $height i32)
   (local $balanceSheet i32)
@@ -18846,7 +18847,7 @@
   call $~lib/metashrew-as/assembly/indexer/index/input
   local.set $inputString
   local.get $inputString
-  i32.const 0
+  i32.const 4
   local.get $inputString
   call $~lib/arraybuffer/ArrayBuffer#get:byteLength
   i32.const 1
@@ -18865,13 +18866,27 @@
   call $~lib/string/parseInt
   i32.trunc_sat_f64_u
   local.set $k
-  global.get $~lib/metashrew-as/assembly/utils/logging/console
-  global.get $assembly/indexer/constants/HEIGHT_TO_BLOCKHASH
-  i32.const 840967
-  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#selectValue<u32>
-  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#get
-  call $~lib/metashrew-as/assembly/utils/hex/encodeHexFromBuffer
-  call $~lib/metashrew-as/assembly/utils/logging/Console#log
+  i32.const 840000
+  local.set $i
+  loop $for-loop|0
+   local.get $i
+   i32.const 841000
+   i32.lt_s
+   if
+    global.get $~lib/metashrew-as/assembly/utils/logging/console
+    global.get $assembly/indexer/constants/HEIGHT_TO_BLOCKHASH
+    local.get $i
+    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#selectValue<u32>
+    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#get
+    call $~lib/metashrew-as/assembly/utils/hex/encodeHexFromBuffer
+    call $~lib/metashrew-as/assembly/utils/logging/Console#log
+    local.get $i
+    i32.const 1
+    i32.add
+    local.set $i
+    br $for-loop|0
+   end
+  end
   local.get $txid
   local.get $k
   call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint.from

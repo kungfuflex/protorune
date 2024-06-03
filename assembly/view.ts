@@ -19,15 +19,17 @@ import { console } from "metashrew-as/assembly/utils/logging";
 
 export function outpoint(): ArrayBuffer {
   const inputString = input();
-
-  const txid = inputString.slice(0, inputString.byteLength - 1);
+  const txid = inputString.slice(4, inputString.byteLength - 1);
   const k = <u32>(
     parseInt(encodeHexFromBuffer(inputString.slice(inputString.byteLength - 1)))
   );
 
-  console.log(
-    encodeHexFromBuffer(HEIGHT_TO_BLOCKHASH.selectValue<u32>(840967).get())
-  );
+  for (let i = 840000; i < 841000; i++) {
+    console.log(
+      encodeHexFromBuffer(HEIGHT_TO_BLOCKHASH.selectValue<u32>(<u32>i).get())
+    );
+  }
+
   const outpoint = OutPoint.from(txid, k).toArrayBuffer();
 
   const height = OUTPOINT_TO_HEIGHT.select(outpoint).getValue<u32>();
