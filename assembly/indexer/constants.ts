@@ -7,7 +7,7 @@ export const GENESIS: u32 = 840000;
 
 export const HEIGHT_TO_BLOCKHASH = IndexPointer.for("/blockhash/byheight/");
 export const BLOCKHASH_TO_HEIGHT = IndexPointer.for("/height/byblockhash/");
-export const OUTPOINT_TO_RUNES = IndexPointer.for("/height/byblockhash/");
+export const OUTPOINT_TO_RUNES = IndexPointer.for("/runes/byoutpoint/");
 export const OUTPOINT_TO_HEIGHT = IndexPointer.for("/height/byoutpoint/");
 export const HEIGHT_TO_TRANSACTION_IDS = IndexPointer.for(
   "/transactionids/byheight"
@@ -26,3 +26,4 @@ export const DIVISIBILITY = IndexPointer.for("/runes/divisibility/");
 export const RUNE_ID_TO_HEIGHT = IndexPointer.for("/height/byruneid/");
 export const RUNE_ID_TO_ETCHING = IndexPointer.for("/etching/byruneid/");
 export const ETCHING_TO_RUNE_ID = IndexPointer.for("/runeid/byetching/");
+export const TX_ID_TO_INDEX = IndexPointer.for("/transactions/ids/");

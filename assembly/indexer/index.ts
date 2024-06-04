@@ -44,6 +44,7 @@ import {
   CAP,
   AMOUNT,
   SPACERS,
+  TX_ID_TO_INDEX,
 } from "./constants";
 import {
   Transaction,
@@ -160,6 +161,7 @@ export class Index {
           )
             continue; // already taken / commitment not foun
 	   */
+          TX_ID_TO_INDEX.select(txid).setValue<u32>(i);
           const runeId = new RuneId(<u64>height, <u32>i).toBytes();
           RUNE_ID_TO_ETCHING.select(runeId).set(name);
           ETCHING_TO_RUNE_ID.select(name).set(runeId);
