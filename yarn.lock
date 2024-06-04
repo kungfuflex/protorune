@@ -1213,7 +1213,7 @@ memorystream@^0.3.1:
 
 "metashrew-as@https://github.com/sandshrewmetaprotocols/metashrew-as":
   version "0.1.0"
-  resolved "https://github.com/sandshrewmetaprotocols/metashrew-as#25867657a55682c372a5bf75268b0c486c35ca0f"
+  resolved "https://github.com/sandshrewmetaprotocols/metashrew-as#ef5c1852e03bcf398a29435ec1a42debe546baa7"
   dependencies:
     fast-sha256-as "https://github.com/sandshrewmetaprotocols/fast-sha256-as"
     lodash "^4.17.21"

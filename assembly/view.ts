@@ -24,25 +24,17 @@ export function outpoint(): ArrayBuffer {
   const k = <u32>(
     parseInt(encodeHexFromBuffer(inputString.slice(inputString.byteLength - 1)))
   );
-  const idx = TX_ID_TO_INDEX.select(txid).getValue<u32>();
-  console.log(idx.toString());
-  console.log(k.toString());
+
+  console.log("outpoint: " + encodeHexFromBuffer(txid) + "," + k.toString());
+  console.log(TX_ID_TO_INDEX.select(txid).getValue<u32>().toString());
   const outpoint = OutPoint.from(txid, k).toArrayBuffer();
-  const outpoint2 = new RuneId(<u64>840303, <u32>3192).toBytes();
-  const txid2 = HEIGHT_TO_TRANSACTION_IDS.selectValue<u32>(840002)
-    .selectIndex(0)
-    .get();
-  console.log(encodeHexFromBuffer(txid2));
-  console.log(OUTPOINT_TO_HEIGHT.select(outpoint).getValue<u32>().toString());
+  const height = OUTPOINT_TO_HEIGHT.select(outpoint).getValue<u32>();
+  console.log(height.toString());
   const rune = OUTPOINT_TO_RUNES.select(outpoint);
   const balances = rune.keyword("/runes");
-  console.log(rune.get().byteLength.toString());
   const balanceSheet = BalanceSheet.load(rune);
-  console.log(balanceSheet.runes.length.toString());
   // const runeId = new RuneId(<u64>height, i).toBytes();
-  const name = RUNE_ID_TO_ETCHING.select(outpoint2).get();
-  const divisibility = DIVISIBILITY.select(name).getValue<u8>();
-  console.log(divisibility.toString());
+  //const divisibility = DIVISIBILITY.select(name).getValue<u8>();
 
   const message = new metashrew_runes.OutPointTest();
 
