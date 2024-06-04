@@ -9,12 +9,8 @@ import { HEIGHT_TO_TRANSACTION_IDS } from "./constants";
 export class RunesBlock extends Block {
   saveTransactions(height: u32): void {
     const ptr = HEIGHT_TO_TRANSACTION_IDS.selectValue<u32>(height);
-    console.log(String.UTF8.decode(changetype<ArrayBuffer>(ptr)));
     for (let i: i32 = 0; i < this.transactions.length; i++) {
       ptr.append(this.getTransaction(i).txid());
-      if (i == 0) {
-        console.log(encodeHexFromBuffer(this.getTransaction(i).txid()));
-      }
     }
   }
   @inline

@@ -18,12 +18,12 @@
  (type $16 (func (param i32 i64 i32)))
  (type $17 (func (param i64 i32) (result i32)))
  (type $18 (func (param i32 i64 i32 i32)))
- (type $19 (func (param i64) (result i64)))
- (type $20 (func (param i32 i64 i64) (result i32)))
- (type $21 (func (param i64) (result i32)))
- (type $22 (func (param i32 i64 i64 i64 i64) (result i32)))
- (type $23 (func (param i32 i32 i32 i32 i32)))
- (type $24 (func (param i32 i32 i32 i32 i32 i32)))
+ (type $19 (func (param i32 i64 i64) (result i32)))
+ (type $20 (func (param i64) (result i32)))
+ (type $21 (func (param i32 i64 i64 i64 i64) (result i32)))
+ (type $22 (func (param i32 i32 i32 i32 i32)))
+ (type $23 (func (param i32 i32 i32 i32 i32 i32)))
+ (type $24 (func (param i64) (result i64)))
  (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
  (import "env" "__host_len" (func $~lib/metashrew-as/assembly/indexer/index/__host_len (result i32)))
  (import "env" "__load_input" (func $~lib/metashrew-as/assembly/indexer/index/__load_input (param i32)))
@@ -5543,61 +5543,32 @@
   call $~lib/string/String.UTF8.encode@varargs
   call $~lib/metashrew-as/assembly/utils/logging/__log
  )
- (func $~lib/polyfills/bswap<u64> (param $value i64) (result i64)
-  (local $a i64)
-  (local $b i64)
-  (local $v i64)
+ (func $~lib/polyfills/bswap<u32> (param $value i32) (result i32)
   i32.const 1
   drop
-  i32.const 8
+  i32.const 4
   i32.const 1
   i32.eq
   drop
-  i32.const 8
+  i32.const 4
   i32.const 2
   i32.eq
   drop
-  i32.const 8
+  i32.const 4
   i32.const 4
   i32.eq
   drop
-  i32.const 8
-  i32.const 8
-  i32.eq
-  drop
   local.get $value
-  i64.const 8
-  i64.shr_u
-  i64.const 71777214294589695
-  i64.and
-  local.set $a
+  i32.const -16711936
+  i32.and
+  i32.const 8
+  i32.rotl
   local.get $value
-  i64.const 71777214294589695
-  i64.and
-  i64.const 8
-  i64.shl
-  local.set $b
-  local.get $a
-  local.get $b
-  i64.or
-  local.set $v
-  local.get $v
-  i64.const 16
-  i64.shr_u
-  i64.const 281470681808895
-  i64.and
-  local.set $a
-  local.get $v
-  i64.const 281470681808895
-  i64.and
-  i64.const 16
-  i64.shl
-  local.set $b
-  local.get $a
-  local.get $b
-  i64.or
-  i64.const 32
-  i64.rotr
+  i32.const 16711935
+  i32.and
+  i32.const 8
+  i32.rotr
+  i32.or
   return
  )
  (func $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#unwrap (param $this i32) (result i32)
@@ -5867,6 +5838,7 @@
  (func $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select (param $this i32) (param $key i32) (result i32)
   (local $2 i32)
   (local $3 i32)
+  (local $res i32)
   i32.const 2
   i32.const 2
   i32.const 29
@@ -5889,6 +5861,8 @@
   call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#__set
   local.get $2
   call $~lib/metashrew-as/assembly/utils/box/Box.concat
+  local.set $res
+  local.get $res
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer.wrap
   return
  )
@@ -5900,9 +5874,8 @@
   local.set $keyBytes
   local.get $keyBytes
   local.get $key
-  i64.extend_i32_u
-  call $~lib/polyfills/bswap<u64>
-  i64.store32
+  call $~lib/polyfills/bswap<u32>
+  i32.store
   local.get $this
   local.get $keyBytes
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
@@ -8725,85 +8698,15 @@
   local.get $v
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
  )
- (func $~lib/metashrew-as/assembly/utils/hex/encodeHexUTF8 (param $start i32) (param $len i32) (result i32)
-  (local $result i32)
-  (local $i i32)
-  i32.const 0
-  i32.const 2
-  local.get $len
-  i32.const 2
-  i32.mul
-  i32.add
-  call $~lib/arraybuffer/ArrayBuffer#constructor
-  local.set $result
-  local.get $result
-  i32.const 30768
-  i32.store16
-  i32.const 0
-  local.set $i
-  loop $for-loop|0
-   local.get $i
-   local.get $len
-   i32.lt_u
-   if
-    i32.const 2
-    local.get $result
-    i32.add
-    local.get $i
-    i32.const 2
-    i32.mul
-    i32.add
-    global.get $~lib/metashrew-as/assembly/utils/hex/hexLookupTable
-    i32.const 2
-    local.get $start
-    local.get $i
-    i32.add
-    i32.load8_u
-    i32.mul
-    i32.add
-    i32.load16_u
-    i32.store16
-    local.get $i
-    i32.const 1
-    i32.add
-    local.set $i
-    br $for-loop|0
-   end
-  end
-  local.get $result
-  return
- )
- (func $~lib/metashrew-as/assembly/utils/hex/encodeHex (param $start i32) (param $len i32) (result i32)
-  local.get $start
-  local.get $len
-  call $~lib/metashrew-as/assembly/utils/hex/encodeHexUTF8
-  i32.const 0
-  call $~lib/string/String.UTF8.decode
-  return
- )
- (func $~lib/metashrew-as/assembly/utils/hex/encodeHexFromBuffer (param $data i32) (result i32)
-  local.get $data
-  local.get $data
-  call $~lib/arraybuffer/ArrayBuffer#get:byteLength
-  call $~lib/metashrew-as/assembly/utils/hex/encodeHex
-  return
- )
  (func $assembly/indexer/RunesBlock/RunesBlock#saveTransactions (param $this i32) (param $height i32)
   (local $ptr i32)
   (local $i i32)
   (local $this|4 i32)
   (local $index i32)
-  (local $this|6 i32)
-  (local $index|7 i32)
   global.get $assembly/indexer/constants/HEIGHT_TO_TRANSACTION_IDS
   local.get $height
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#selectValue<u32>
   local.set $ptr
-  global.get $~lib/metashrew-as/assembly/utils/logging/console
-  local.get $ptr
-  i32.const 0
-  call $~lib/string/String.UTF8.decode
-  call $~lib/metashrew-as/assembly/utils/logging/Console#log
   i32.const 0
   local.set $i
   loop $for-loop|0
@@ -8827,26 +8730,6 @@
     end
     call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#txid
     call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#append
-    local.get $i
-    i32.const 0
-    i32.eq
-    if
-     global.get $~lib/metashrew-as/assembly/utils/logging/console
-     block $assembly/indexer/RunesBlock/RunesBlock#getTransaction|inlined.1 (result i32)
-      local.get $this
-      local.set $this|6
-      local.get $i
-      local.set $index|7
-      local.get $this|6
-      call $~lib/metashrew-as/assembly/blockdata/block/Block#get:transactions
-      local.get $index|7
-      call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Transaction>#__get
-      br $assembly/indexer/RunesBlock/RunesBlock#getTransaction|inlined.1
-     end
-     call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#txid
-     call $~lib/metashrew-as/assembly/utils/hex/encodeHexFromBuffer
-     call $~lib/metashrew-as/assembly/utils/logging/Console#log
-    end
     local.get $i
     i32.const 1
     i32.add
@@ -14119,6 +14002,63 @@
   local.get $out
   return
  )
+ (func $~lib/polyfills/bswap<u64> (param $value i64) (result i64)
+  (local $a i64)
+  (local $b i64)
+  (local $v i64)
+  i32.const 1
+  drop
+  i32.const 8
+  i32.const 1
+  i32.eq
+  drop
+  i32.const 8
+  i32.const 2
+  i32.eq
+  drop
+  i32.const 8
+  i32.const 4
+  i32.eq
+  drop
+  i32.const 8
+  i32.const 8
+  i32.eq
+  drop
+  local.get $value
+  i64.const 8
+  i64.shr_u
+  i64.const 71777214294589695
+  i64.and
+  local.set $a
+  local.get $value
+  i64.const 71777214294589695
+  i64.and
+  i64.const 8
+  i64.shl
+  local.set $b
+  local.get $a
+  local.get $b
+  i64.or
+  local.set $v
+  local.get $v
+  i64.const 16
+  i64.shr_u
+  i64.const 281470681808895
+  i64.and
+  local.set $a
+  local.get $v
+  i64.const 281470681808895
+  i64.and
+  i64.const 16
+  i64.shl
+  local.set $b
+  local.get $a
+  local.get $b
+  i64.or
+  i64.const 32
+  i64.rotr
+  return
+ )
  (func $assembly/utils/toArrayBuffer (param $data i32) (result i32)
   (local $this i32)
   (local $bigEndian i32)
@@ -15932,7 +15872,7 @@
    i32.lt_s
    if
     block $for-continue|0
-     block $assembly/indexer/RunesBlock/RunesBlock#getTransaction|inlined.2 (result i32)
+     block $assembly/indexer/RunesBlock/RunesBlock#getTransaction|inlined.1 (result i32)
       local.get $block
       local.set $this
       local.get $i
@@ -15941,7 +15881,7 @@
       call $~lib/metashrew-as/assembly/blockdata/block/Block#get:transactions
       local.get $index
       call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Transaction>#__get
-      br $assembly/indexer/RunesBlock/RunesBlock#getTransaction|inlined.2
+      br $assembly/indexer/RunesBlock/RunesBlock#getTransaction|inlined.1
      end
      local.set $tx
      local.get $tx
@@ -17312,6 +17252,69 @@
   local.get $outSize
   memory.copy
   local.get $out
+  return
+ )
+ (func $~lib/metashrew-as/assembly/utils/hex/encodeHexUTF8 (param $start i32) (param $len i32) (result i32)
+  (local $result i32)
+  (local $i i32)
+  i32.const 0
+  i32.const 2
+  local.get $len
+  i32.const 2
+  i32.mul
+  i32.add
+  call $~lib/arraybuffer/ArrayBuffer#constructor
+  local.set $result
+  local.get $result
+  i32.const 30768
+  i32.store16
+  i32.const 0
+  local.set $i
+  loop $for-loop|0
+   local.get $i
+   local.get $len
+   i32.lt_u
+   if
+    i32.const 2
+    local.get $result
+    i32.add
+    local.get $i
+    i32.const 2
+    i32.mul
+    i32.add
+    global.get $~lib/metashrew-as/assembly/utils/hex/hexLookupTable
+    i32.const 2
+    local.get $start
+    local.get $i
+    i32.add
+    i32.load8_u
+    i32.mul
+    i32.add
+    i32.load16_u
+    i32.store16
+    local.get $i
+    i32.const 1
+    i32.add
+    local.set $i
+    br $for-loop|0
+   end
+  end
+  local.get $result
+  return
+ )
+ (func $~lib/metashrew-as/assembly/utils/hex/encodeHex (param $start i32) (param $len i32) (result i32)
+  local.get $start
+  local.get $len
+  call $~lib/metashrew-as/assembly/utils/hex/encodeHexUTF8
+  i32.const 0
+  call $~lib/string/String.UTF8.decode
+  return
+ )
+ (func $~lib/metashrew-as/assembly/utils/hex/encodeHexFromBuffer (param $data i32) (result i32)
+  local.get $data
+  local.get $data
+  call $~lib/arraybuffer/ArrayBuffer#get:byteLength
+  call $~lib/metashrew-as/assembly/utils/hex/encodeHex
   return
  )
  (func $~lib/util/number/itoa32 (param $value i32) (param $radix i32) (result i32)
