@@ -9,9 +9,7 @@ export const HEIGHT_TO_BLOCKHASH = IndexPointer.for("/blockhash/byheight/");
 export const BLOCKHASH_TO_HEIGHT = IndexPointer.for("/height/byblockhash/");
 export const OUTPOINT_TO_RUNES = IndexPointer.for("/runes/byoutpoint/");
 export const OUTPOINT_TO_HEIGHT = IndexPointer.for("/height/byoutpoint/");
-export const HEIGHT_TO_TRANSACTION_IDS = IndexPointer.for(
-  "/transactionids/byheight"
-);
+export const HEIGHT_TO_TRANSACTION_IDS = IndexPointer.for("/txids/byheight");
 export const SYMBOL = IndexPointer.for("/runes/symbol/");
 export const CAP = IndexPointer.for("/runes/cap/");
 export const SPACERS = IndexPointer.for("/runes/spaces/");

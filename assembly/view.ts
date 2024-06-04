@@ -24,10 +24,16 @@ export function outpoint(): ArrayBuffer {
   const k = <u32>(
     parseInt(encodeHexFromBuffer(inputString.slice(inputString.byteLength - 1)))
   );
+  const idx = TX_ID_TO_INDEX.select(txid).getValue<u32>();
+  console.log(idx.toString());
   console.log(k.toString());
-  console.log(encodeHexFromBuffer(txid));
   const outpoint = OutPoint.from(txid, k).toArrayBuffer();
   const outpoint2 = new RuneId(<u64>840303, <u32>3192).toBytes();
+  const txid2 = HEIGHT_TO_TRANSACTION_IDS.selectValue<u32>(840002)
+    .selectIndex(0)
+    .get();
+  console.log(encodeHexFromBuffer(txid2));
+  console.log(OUTPOINT_TO_HEIGHT.select(outpoint).getValue<u32>().toString());
   const rune = OUTPOINT_TO_RUNES.select(outpoint);
   const balances = rune.keyword("/runes");
   console.log(rune.get().byteLength.toString());

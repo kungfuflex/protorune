@@ -93,11 +93,12 @@ export class Index {
     console.log("METASHREW_RUNES_LOG::indexing block: " + height.toString());
     HEIGHT_TO_BLOCKHASH.selectValue<u32>(height).set(block.blockhash());
     BLOCKHASH_TO_HEIGHT.select(block.blockhash()).setValue<u32>(height);
-    block.saveTransactions(HEIGHT_TO_TRANSACTION_IDS.selectValue<u32>(height));
+    block.saveTransactions(height);
     for (let i: i32 = 0; i < block.transactions.length; i++) {
       const tx = block.getTransaction(i);
       const txid = tx.txid();
       Index.indexOutpoints(tx, txid, height);
+      TX_ID_TO_INDEX.select(txid).setValue<u32>(i);
       const runestoneOutputIndex = tx.runestoneOutputIndex();
       if (height >= GENESIS && runestoneOutputIndex !== -1) {
         const runestoneOutput = tx.outs[runestoneOutputIndex];
@@ -112,9 +113,9 @@ export class Index {
         const payload = Box.concat(parsed);
         const message = RunestoneMessage.parse(payload);
         if (changetype<usize>(message) === 0) continue;
-        console.log(message.inspect());
+        //console.log(message.inspect());
         const edicts = Edict.fromDeltaSeries(message.edicts);
-        if (edicts.length !== 0) console.log(inspectEdicts(edicts));
+        //if (edicts.length !== 0) console.log(inspectEdicts(edicts));
         let etchingBalanceSheet = changetype<BalanceSheet>(0);
         let balanceSheet = BalanceSheet.concat(
           tx.ins.map<BalanceSheet>((v: Input, i: i32, ary: Array<Input>) =>
@@ -161,7 +162,6 @@ export class Index {
           )
             continue; // already taken / commitment not foun
 	   */
-          TX_ID_TO_INDEX.select(txid).setValue<u32>(i);
           const runeId = new RuneId(<u64>height, <u32>i).toBytes();
           RUNE_ID_TO_ETCHING.select(runeId).set(name);
           ETCHING_TO_RUNE_ID.select(name).set(runeId);
