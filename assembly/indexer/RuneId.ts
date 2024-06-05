@@ -1,7 +1,6 @@
 import { HEIGHT_TO_TRANSACTION_IDS } from "./constants";
 import { toArrayBuffer } from "../utils";
 import { u128 } from "as-bignum/assembly";
-import { console } from "metashrew-as/assembly/utils/logging";
 
 export class RuneId {
   public block: u64;
@@ -24,6 +23,16 @@ export class RuneId {
   inspect(): string {
     return this.block.toString() + ":" + this.tx.toString();
   }
+  static fromBytesU128(ary: ArrayBuffer): RuneId {
+    const _ary = Uint8Array.wrap(ary);
+
+    const parsed = _ary.reduce<Array<u8>>((acc, c, i, init) => {
+      acc[i] = c;
+      return acc;
+    }, new Array<u8>(_ary.byteLength));
+    const rid = u128.fromBytes(parsed);
+    return new RuneId(rid.lo, <u32>rid.hi);
+  }
   static fromBytes(ary: ArrayBuffer): RuneId {
     const _ary = Uint8Array.wrap(ary);
 
@@ -31,7 +40,6 @@ export class RuneId {
       acc[i] = c;
       return acc;
     }, new Array<u8>(_ary.byteLength));
-    console.log(parsed.length.toString());
     const block = u128.fromBytes(parsed.slice(0, 16)).toU64();
     const tx = u128.fromBytes(parsed.slice(16)).toU32();
     return new RuneId(block, tx);

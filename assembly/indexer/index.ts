@@ -12,6 +12,8 @@ import { intoString, scriptParse } from "metashrew-as/assembly/utils/yabsp";
 import { Flag } from "./Flag";
 import { Field } from "./Field";
 import { u256, u128 } from "as-bignum/assembly";
+import { Script } from "metashrew-as/assembly/utils/yabsp";
+import { Address } from "metashrew-as/assembly/blockdata/address";
 import {
   fieldTo,
   toPrimitive,
@@ -45,7 +47,6 @@ import {
   CAP,
   AMOUNT,
   SPACERS,
-  TX_ID_TO_INDEX,
 } from "./constants";
 import {
   Transaction,
@@ -101,7 +102,6 @@ export class Index {
       const tx = block.getTransaction(i);
       const txid = tx.txid();
       Index.indexOutpoints(tx, txid, height);
-      TX_ID_TO_INDEX.select(txid).setValue<u32>(i);
       const runestoneOutputIndex = tx.runestoneOutputIndex();
       if (height >= GENESIS && runestoneOutputIndex !== -1) {
         const runestoneOutput = tx.outs[runestoneOutputIndex];
@@ -153,20 +153,9 @@ export class Index {
               );
             }
           }
-          if (height == 840003 && i == 4807) {
-            console.log(remaining.toString());
-            console.log(balanceSheet.inspect());
-            trap();
-          }
         }
         if (message.isEtching()) {
           const name = fieldToArrayBuffer(message.fields.get(Field.RUNE));
-          if (i == 22) {
-            console.log(height.toString() + ":" + i.toString());
-            console.log(fieldToName(fromArrayBuffer(name)));
-            console.log(fromArrayBuffer(name).toString());
-            console.log(message.inspect());
-          }
           // if (
           //   ETCHING_TO_RUNE_ID.select(name).get().byteLength !== 0 ||
           //   !Index.findCommitment(tx, name, height)
@@ -174,11 +163,6 @@ export class Index {
           //   continue; // already taken / commitment not foun
           const runeId = new RuneId(<u64>height, <u32>i).toBytes();
           const ar = Uint8Array.wrap(runeId);
-          if (i == 22) {
-            for (let ix = 0; ix < ar.byteLength; ix++) {
-              console.log(ix.toString() + ": " + ar[ix].toString());
-            }
-          }
           RUNE_ID_TO_ETCHING.select(runeId).set(name);
           ETCHING_TO_RUNE_ID.select(name).set(runeId);
           RUNE_ID_TO_HEIGHT.select(runeId).setValue<u32>(height);
@@ -249,6 +233,7 @@ export class Index {
         const unallocatedTo = message.fields.has(Field.POINTER)
           ? fieldTo<u32>(message.fields.get(Field.POINTER))
           : <u32>tx.defaultOutput();
+
         if (balancesByOutput.has(unallocatedTo)) {
           balanceSheet.pipe(balancesByOutput.get(unallocatedTo));
         } else {
@@ -256,14 +241,11 @@ export class Index {
         }
         const runesToOutputs = balancesByOutput.keys();
 
-        for (let i = 0; i < runesToOutputs.length; i++) {
-          const sheet = balancesByOutput.get(runesToOutputs[i]);
-          if (height == 840003 && i == 4807) {
-            console.log(sheet.inspect());
-          }
+        for (let x = 0; x < runesToOutputs.length; x++) {
+          const sheet = balancesByOutput.get(runesToOutputs[x]);
           sheet.save(
             OUTPOINT_TO_RUNES.select(
-              OutPoint.from(txid, runesToOutputs[i]).toArrayBuffer()
+              OutPoint.from(txid, runesToOutputs[x]).toArrayBuffer()
             )
           );
         }

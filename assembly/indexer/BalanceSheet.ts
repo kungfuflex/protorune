@@ -3,6 +3,7 @@ import { Box } from "metashrew-as/assembly/utils/box";
 import { u256, u128 } from "as-bignum/assembly";
 import { console } from "metashrew-as/assembly/utils/logging";
 import { fromArrayBuffer, inspectRunes } from "../utils";
+import { RuneId } from "./RuneId";
 
 export class BalanceSheet {
   public runes: Array<ArrayBuffer>;
@@ -14,15 +15,14 @@ export class BalanceSheet {
     this.runes = new Array<ArrayBuffer>(0);
   }
   inspect(): string {
-    console.log(
-      "rune length: " +
-        this.runes.length.toString() +
-        "balance length:" +
-        this.balances.length.toString()
-    );
-    let base = "runes: " + inspectRunes(this.runes) + "balances: [\n]";
+    let base = "runes: [\n";
+    for (let i = 0; i < this.runes.length; i++) {
+      base += "  " + RuneId.fromBytesU128(this.runes[i], true).inspect() + "\n";
+    }
+
+    base += "]\nbalances: [\n";
     for (let i = 0; i < this.balances.length; i++)
-      base += this.balances[i].toString() + "\n";
+      base += "  " + this.balances[i].toString() + "\n";
     base += "]";
 
     return base;
@@ -96,7 +96,7 @@ export class BalanceSheet {
     const balancesPtr = ptr.keyword("/balances");
     inspectRunes(this.runes);
     for (let i = 0; i < this.runes.length; i++) {
-      if (this.balances[i] == u128.from(0)) {
+      if (this.balances[i] != u128.from(0)) {
         runesPtr.append(this.runes[i]);
         balancesPtr.append(
           Box.from(
@@ -111,8 +111,7 @@ export class BalanceSheet {
     const balancesPtr = ptr.keyword("/balances");
     const length = runesPtr.lengthKey().getValue<u32>();
     const result = new BalanceSheet();
-    if (log) {
-    }
+
     for (let i: u32 = 0; i < length; i++) {
       result.set(
         runesPtr.selectIndex(i).get(),

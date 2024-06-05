@@ -24,4 +24,3 @@ export const DIVISIBILITY = IndexPointer.for("/runes/divisibility/");
 export const RUNE_ID_TO_HEIGHT = IndexPointer.for("/height/byruneid/");
 export const RUNE_ID_TO_ETCHING = IndexPointer.for("/etching/byruneid/");
 export const ETCHING_TO_RUNE_ID = IndexPointer.for("/runeid/byetching/");
-export const TX_ID_TO_INDEX = IndexPointer.for("/transactions/ids/");
