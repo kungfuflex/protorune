@@ -2,6 +2,8 @@ import { Box } from "metashrew-as/assembly/utils/box";
 import { u256, u128 } from "as-bignum/assembly";
 import { Edict } from "./indexer/Edict";
 
+import { console } from "metashrew-as/assembly/utils/logging";
+
 export function decodeHex(hex: string): ArrayBuffer {
   const result = new ArrayBuffer(hex.length / 2);
   for (let i = 0; i < hex.length; i += 2) {
@@ -44,6 +46,10 @@ export function inspectEdicts(ary: Array<Edict>): string {
   );
 }
 
+export function inspectRunes(ary: Array<ArrayBuffer>): string {
+  return "[\n" + "\n]";
+}
+
 export function stripNullRight(data: ArrayBuffer): ArrayBuffer {
   const box = Box.from(data);
   while (box.len > 0) {
@@ -71,6 +77,23 @@ export function toPrimitive<T>(v: u128): T {
 
 export function fieldTo<T>(data: Array<u128>): T {
   return toPrimitive<T>(data[0]);
+}
+
+export function fieldToName(data: u128): string {
+  let v = data;
+  const ts = u128.from(26);
+  let str = "";
+  while (true) {
+    const y = (v % ts).toU32();
+    str += String.fromCharCode(65 + y);
+    if (v > ts) {
+      v /= ts;
+    } else {
+      str += String.fromCharCode(65 + v.toU32());
+      break;
+    }
+  }
+  return str;
 }
 
 export function fieldToU128(data: Array<u128>): u128 {

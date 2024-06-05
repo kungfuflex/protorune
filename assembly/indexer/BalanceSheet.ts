@@ -1,7 +1,7 @@
 import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
 import { Box } from "metashrew-as/assembly/utils/box";
 import { u256, u128 } from "as-bignum/assembly";
-import { fromArrayBuffer } from "../utils";
+import { fromArrayBuffer, inspectRunes } from "../utils";
 
 export class BalanceSheet {
   public runes: Array<ArrayBuffer>;
@@ -11,6 +11,14 @@ export class BalanceSheet {
     this.index = new Map<string, i32>();
     this.balances = new Array<u128>(0);
     this.runes = new Array<ArrayBuffer>(0);
+  }
+  inspect(): string {
+    let base = "runes: " + inspectRunes(this.runes) + "balances: [\n]";
+    for (let i = 0; i < this.balances.length; i++)
+      base += this.balances[i].toString() + "\n";
+    base += "]";
+
+    return base;
   }
   static fromPairs(
     runes: Array<ArrayBuffer>,
@@ -79,6 +87,7 @@ export class BalanceSheet {
   save(ptr: IndexPointer): void {
     const runesPtr = ptr.keyword("/runes");
     const balancesPtr = ptr.keyword("/balances");
+    inspectRunes(this.runes);
     for (let i = 0; i < this.runes.length; i++) {
       if (this.balances[i] == u128.from(0)) {
         runesPtr.append(this.runes[i]);
@@ -90,12 +99,13 @@ export class BalanceSheet {
       }
     }
   }
-  static load(ptr: IndexPointer): BalanceSheet {
+  static load(ptr: IndexPointer, log: bool = false): BalanceSheet {
     const runesPtr = ptr.keyword("/runes");
     const balancesPtr = ptr.keyword("/balances");
     const length = runesPtr.lengthKey().getValue<u32>();
     const result = new BalanceSheet();
-
+    if (log) {
+    }
     for (let i: u32 = 0; i < length; i++) {
       result.set(
         runesPtr.selectIndex(i).get(),
