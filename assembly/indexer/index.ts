@@ -54,6 +54,7 @@ import {
   OutPoint,
 } from "metashrew-as/assembly/blockdata/transaction";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils/hex";
+import { trap } from "../";
 
 export class Index {
   static indexOutpoints(
@@ -124,21 +125,12 @@ export class Index {
             )
           )
         );
-        const mintTo = message.mintTo();
-        if (height == 840003 && i == 4807) {
-          console.log(changetype<usize>(mintTo).toString());
-        }
+        let mintTo = message.mintTo();
         if (changetype<usize>(mintTo) != 0) {
+          mintTo = RuneId.fromBytes(mintTo).toBytes();
           const name = RUNE_ID_TO_ETCHING.select(mintTo).get();
 
           const remaining = fromArrayBuffer(MINTS_REMAINING.select(name).get());
-          if (height == 840003 && i == 4807) {
-            const rid = RuneId.fromBytes(mintTo);
-            console.log(fieldToName(fromArrayBuffer(name)));
-            console.log(rid.inspect());
-            console.log(balanceSheet.inspect());
-            console.log(runestoneOutputIndex.toString());
-          }
           if (!remaining.isZero()) {
             const heightStart = HEIGHTSTART.select(name).getValue<u64>();
             const heightEnd = HEIGHTEND.select(name).getValue<u64>();
@@ -161,6 +153,11 @@ export class Index {
               );
             }
           }
+          if (height == 840003 && i == 4807) {
+            console.log(remaining.toString());
+            console.log(balanceSheet.inspect());
+            trap();
+          }
         }
         if (message.isEtching()) {
           const name = fieldToArrayBuffer(message.fields.get(Field.RUNE));
@@ -176,6 +173,12 @@ export class Index {
           // )
           //   continue; // already taken / commitment not foun
           const runeId = new RuneId(<u64>height, <u32>i).toBytes();
+          const ar = Uint8Array.wrap(runeId);
+          if (i == 22) {
+            for (let ix = 0; ix < ar.byteLength; ix++) {
+              console.log(ix.toString() + ": " + ar[ix].toString());
+            }
+          }
           RUNE_ID_TO_ETCHING.select(runeId).set(name);
           ETCHING_TO_RUNE_ID.select(name).set(runeId);
           RUNE_ID_TO_HEIGHT.select(runeId).setValue<u32>(height);

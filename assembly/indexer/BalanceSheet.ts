@@ -1,6 +1,7 @@
 import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
 import { Box } from "metashrew-as/assembly/utils/box";
 import { u256, u128 } from "as-bignum/assembly";
+import { console } from "metashrew-as/assembly/utils/logging";
 import { fromArrayBuffer, inspectRunes } from "../utils";
 
 export class BalanceSheet {
@@ -13,6 +14,12 @@ export class BalanceSheet {
     this.runes = new Array<ArrayBuffer>(0);
   }
   inspect(): string {
+    console.log(
+      "rune length: " +
+        this.runes.length.toString() +
+        "balance length:" +
+        this.balances.length.toString()
+    );
     let base = "runes: " + inspectRunes(this.runes) + "balances: [\n]";
     for (let i = 0; i < this.balances.length; i++)
       base += this.balances[i].toString() + "\n";

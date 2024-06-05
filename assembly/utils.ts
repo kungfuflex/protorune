@@ -83,7 +83,6 @@ export function fieldToName(data: u128): string {
   let v = data + u128.from(1);
   const ts = u128.from(26);
   let str = "";
-  console.log("begin: " + v.toString());
   while (!v.isZero()) {
     const y = (v % ts).toU32();
     str = String.fromCharCode(64 + y) + str;
