@@ -126,7 +126,6 @@ export class Index {
         );
         const mintTo = message.mintTo();
         if (height == 840003 && i == 4807) {
-          console.log(message.inspect());
           console.log(changetype<usize>(mintTo).toString());
         }
         if (changetype<usize>(mintTo) != 0) {
@@ -165,10 +164,12 @@ export class Index {
         }
         if (message.isEtching()) {
           const name = fieldToArrayBuffer(message.fields.get(Field.RUNE));
-          console.log(height.toString() + ":" + i.toString());
-          console.log(fieldToName(name));
-          console.log(fromArrayBuffer(name).toString());
-
+          if (i == 22) {
+            console.log(height.toString() + ":" + i.toString());
+            console.log(fieldToName(fromArrayBuffer(name)));
+            console.log(fromArrayBuffer(name).toString());
+            console.log(message.inspect());
+          }
           // if (
           //   ETCHING_TO_RUNE_ID.select(name).get().byteLength !== 0 ||
           //   !Index.findCommitment(tx, name, height)

@@ -80,18 +80,15 @@ export function fieldTo<T>(data: Array<u128>): T {
 }
 
 export function fieldToName(data: u128): string {
-  let v = data;
+  let v = data + u128.from(1);
   const ts = u128.from(26);
   let str = "";
-  while (true) {
+  console.log("begin: " + v.toString());
+  while (!v.isZero()) {
     const y = (v % ts).toU32();
-    str += String.fromCharCode(65 + y);
-    if (v > ts) {
-      v /= ts;
-    } else {
-      str += String.fromCharCode(65 + v.toU32());
-      break;
-    }
+    str = String.fromCharCode(64 + y) + str;
+    v--;
+    v = v / ts;
   }
   return str;
 }

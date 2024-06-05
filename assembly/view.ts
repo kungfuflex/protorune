@@ -18,7 +18,7 @@ import { metashrew_runes } from "./proto/metashrew-runes";
 import { u256, u128 } from "as-bignum/assembly";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils/hex";
 import { console } from "metashrew-as/assembly/utils/logging";
-import { toArrayBuffer, fieldToU128 } from "./utils";
+import { toArrayBuffer, fieldToU128, fieldToName } from "./utils";
 
 export function outpoint(): ArrayBuffer {
   const inputString = input();
@@ -29,6 +29,7 @@ export function outpoint(): ArrayBuffer {
   const i = TX_ID_TO_INDEX.select(txid).getValue<u32>();
   console.log("outpoint: " + encodeHexFromBuffer(txid) + "," + k.toString());
   console.log(i.toString());
+  console.log(fieldToName(u128.from(52)));
   const outpoint = OutPoint.from(txid, k).toArrayBuffer();
   const height = OUTPOINT_TO_HEIGHT.select(outpoint).getValue<u32>();
   console.log(height.toString());
