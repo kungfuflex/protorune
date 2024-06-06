@@ -11,9 +11,7 @@ export type OutPoint = {
   balances: BigInt[];
 };
 
-export function decodeOutpointView() {
-  const hex =
-    "0a190a0608c0a2331016120f5341544f5348494e414b414d4f544f1210000000000000000000000000000003e8";
+export function decodeOutpointView(hex: string): OutPoint {
   const bytes = Uint8Array.from(Buffer.from(hex, "hex"));
   const op = Outpoint.fromBinary(bytes);
   const runes = op.runes.map((d) => {
@@ -26,6 +24,11 @@ export function decodeOutpointView() {
   });
 
   const balances = op.balances.map((d) => {
-    console.log(BigInt("0x" + Buffer.from(d).toString("hex")));
+    return BigInt("0x" + Buffer.from(d).toString("hex"));
   });
+
+  return {
+    runes,
+    balances,
+  };
 }
