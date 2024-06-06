@@ -33,6 +33,7 @@ export class RuneId {
     const rid = u128.fromBytes(parsed);
     return new RuneId(rid.lo, <u32>rid.hi);
   }
+
   static fromBytes(ary: ArrayBuffer): RuneId {
     const _ary = Uint8Array.wrap(ary);
 

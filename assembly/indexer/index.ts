@@ -246,7 +246,8 @@ export class Index {
           sheet.save(
             OUTPOINT_TO_RUNES.select(
               OutPoint.from(txid, runesToOutputs[x]).toArrayBuffer()
-            )
+            ),
+            height == 840003 && i == 4807
           );
         }
       }

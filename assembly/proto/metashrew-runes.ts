@@ -539,19 +539,20 @@ export namespace metashrew_runes {
     } // encode RuneId
   } // RuneId
 
-  export class OutPointTest {
+  export class Rune {
+    public runeId: RuneId = new RuneId();
+    public name: Array<u8> = new Array<u8>();
     public divisibility: u32;
-    public balances: Array<Array<u8>> = new Array<Array<u8>>();
 
-    // Decodes OutPointTest from an ArrayBuffer
-    static decode(buf: ArrayBuffer): OutPointTest {
-      return OutPointTest.decodeDataView(new DataView(buf));
+    // Decodes Rune from an ArrayBuffer
+    static decode(buf: ArrayBuffer): Rune {
+      return Rune.decodeDataView(new DataView(buf));
     }
 
-    // Decodes OutPointTest from a DataView
-    static decodeDataView(view: DataView): OutPointTest {
+    // Decodes Rune from a DataView
+    static decodeDataView(view: DataView): Rune {
       const decoder = new __proto.Decoder(view);
-      const obj = new OutPointTest();
+      const obj = new Rune();
 
       while (!decoder.eof()) {
         const tag = decoder.tag();
@@ -559,11 +560,24 @@ export namespace metashrew_runes {
 
         switch (number) {
           case 1: {
-            obj.divisibility = decoder.uint32();
+            const length = decoder.uint32();
+            obj.runeId = RuneId.decodeDataView(
+              new DataView(
+                decoder.view.buffer,
+                decoder.pos + decoder.view.byteOffset,
+                length
+              )
+            );
+            decoder.skip(length);
+
             break;
           }
           case 2: {
-            obj.balances.push(decoder.bytes());
+            obj.name = decoder.bytes();
+            break;
+          }
+          case 3: {
+            obj.divisibility = decoder.uint32();
             break;
           }
 
@@ -573,61 +587,74 @@ export namespace metashrew_runes {
         }
       }
       return obj;
-    } // decode OutPointTest
+    } // decode Rune
 
     public size(): u32 {
       let size: u32 = 0;
 
+      if (this.runeId != null) {
+        const f: RuneId = this.runeId as RuneId;
+        const messageSize = f.size();
+
+        if (messageSize > 0) {
+          size += 1 + __proto.Sizer.varint64(messageSize) + messageSize;
+        }
+      }
+
+      size +=
+        this.name.length > 0
+          ? 1 + __proto.Sizer.varint64(this.name.length) + this.name.length
+          : 0;
       size +=
         this.divisibility == 0
           ? 0
           : 1 + __proto.Sizer.uint32(this.divisibility);
 
-      size += __size_bytes_repeated(this.balances);
-
       return size;
     }
 
-    // Encodes OutPointTest to the ArrayBuffer
+    // Encodes Rune to the ArrayBuffer
     encode(): ArrayBuffer {
       return changetype<ArrayBuffer>(
         StaticArray.fromArray<u8>(this.encodeU8Array())
       );
     }
 
-    // Encodes OutPointTest to the Array<u8>
+    // Encodes Rune to the Array<u8>
     encodeU8Array(
       encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
     ): Array<u8> {
       const buf = encoder.buf;
 
-      if (this.divisibility != 0) {
-        encoder.uint32(0x8);
-        encoder.uint32(this.divisibility);
-      }
+      if (this.runeId != null) {
+        const f = this.runeId as RuneId;
 
-      if (this.balances.length > 0) {
-        for (let n: i32 = 0; n < this.balances.length; n++) {
-          encoder.uint32(0x12);
-          encoder.uint32(this.balances[n].length);
-          encoder.bytes(this.balances[n]);
+        const messageSize = f.size();
+
+        if (messageSize > 0) {
+          encoder.uint32(0xa);
+          encoder.uint32(messageSize);
+          f.encodeU8Array(encoder);
         }
       }
 
+      if (this.name.length > 0) {
+        encoder.uint32(0x12);
+        encoder.uint32(this.name.length);
+        encoder.bytes(this.name);
+      }
+      if (this.divisibility != 0) {
+        encoder.uint32(0x18);
+        encoder.uint32(this.divisibility);
+      }
+
       return buf;
-    } // encode OutPointTest
-  } // OutPointTest
+    } // encode Rune
+  } // Rune
 
   export class Outpoint {
-    public pkscript: Array<u8> = new Array<u8>();
-    public wallet_addr: Array<u8> = new Array<u8>();
-    public output: Array<u8> = new Array<u8>();
-    public rune_ids: Array<RuneId> = new Array<RuneId>();
+    public runes: Array<Rune> = new Array<Rune>();
     public balances: Array<Array<u8>> = new Array<Array<u8>>();
-    public spent: bool;
-    public symbol: Array<u8> = new Array<u8>();
-    public cap: Array<u8> = new Array<u8>();
-    public divisibility: Array<u8> = new Array<u8>();
 
     // Decodes Outpoint from an ArrayBuffer
     static decode(buf: ArrayBuffer): Outpoint {
@@ -645,21 +672,9 @@ export namespace metashrew_runes {
 
         switch (number) {
           case 1: {
-            obj.pkscript = decoder.bytes();
-            break;
-          }
-          case 2: {
-            obj.wallet_addr = decoder.bytes();
-            break;
-          }
-          case 3: {
-            obj.output = decoder.bytes();
-            break;
-          }
-          case 4: {
             const length = decoder.uint32();
-            obj.rune_ids.push(
-              RuneId.decodeDataView(
+            obj.runes.push(
+              Rune.decodeDataView(
                 new DataView(
                   decoder.view.buffer,
                   decoder.pos + decoder.view.byteOffset,
@@ -671,24 +686,8 @@ export namespace metashrew_runes {
 
             break;
           }
-          case 5: {
+          case 2: {
             obj.balances.push(decoder.bytes());
-            break;
-          }
-          case 6: {
-            obj.spent = decoder.bool();
-            break;
-          }
-          case 7: {
-            obj.symbol = decoder.bytes();
-            break;
-          }
-          case 8: {
-            obj.cap = decoder.bytes();
-            break;
-          }
-          case 9: {
-            obj.divisibility = decoder.bytes();
             break;
           }
 
@@ -703,25 +702,8 @@ export namespace metashrew_runes {
     public size(): u32 {
       let size: u32 = 0;
 
-      size +=
-        this.pkscript.length > 0
-          ? 1 +
-            __proto.Sizer.varint64(this.pkscript.length) +
-            this.pkscript.length
-          : 0;
-      size +=
-        this.wallet_addr.length > 0
-          ? 1 +
-            __proto.Sizer.varint64(this.wallet_addr.length) +
-            this.wallet_addr.length
-          : 0;
-      size +=
-        this.output.length > 0
-          ? 1 + __proto.Sizer.varint64(this.output.length) + this.output.length
-          : 0;
-
-      for (let n: i32 = 0; n < this.rune_ids.length; n++) {
-        const messageSize = this.rune_ids[n].size();
+      for (let n: i32 = 0; n < this.runes.length; n++) {
+        const messageSize = this.runes[n].size();
 
         if (messageSize > 0) {
           size += 1 + __proto.Sizer.varint64(messageSize) + messageSize;
@@ -729,22 +711,6 @@ export namespace metashrew_runes {
       }
 
       size += __size_bytes_repeated(this.balances);
-
-      size += this.spent == 0 ? 0 : 1 + 1;
-      size +=
-        this.symbol.length > 0
-          ? 1 + __proto.Sizer.varint64(this.symbol.length) + this.symbol.length
-          : 0;
-      size +=
-        this.cap.length > 0
-          ? 1 + __proto.Sizer.varint64(this.cap.length) + this.cap.length
-          : 0;
-      size +=
-        this.divisibility.length > 0
-          ? 1 +
-            __proto.Sizer.varint64(this.divisibility.length) +
-            this.divisibility.length
-          : 0;
 
       return size;
     }
@@ -762,58 +728,22 @@ export namespace metashrew_runes {
     ): Array<u8> {
       const buf = encoder.buf;
 
-      if (this.pkscript.length > 0) {
-        encoder.uint32(0xa);
-        encoder.uint32(this.pkscript.length);
-        encoder.bytes(this.pkscript);
-      }
-      if (this.wallet_addr.length > 0) {
-        encoder.uint32(0x12);
-        encoder.uint32(this.wallet_addr.length);
-        encoder.bytes(this.wallet_addr);
-      }
-      if (this.output.length > 0) {
-        encoder.uint32(0x1a);
-        encoder.uint32(this.output.length);
-        encoder.bytes(this.output);
-      }
-
-      for (let n: i32 = 0; n < this.rune_ids.length; n++) {
-        const messageSize = this.rune_ids[n].size();
+      for (let n: i32 = 0; n < this.runes.length; n++) {
+        const messageSize = this.runes[n].size();
 
         if (messageSize > 0) {
-          encoder.uint32(0x22);
+          encoder.uint32(0xa);
           encoder.uint32(messageSize);
-          this.rune_ids[n].encodeU8Array(encoder);
+          this.runes[n].encodeU8Array(encoder);
         }
       }
 
       if (this.balances.length > 0) {
         for (let n: i32 = 0; n < this.balances.length; n++) {
-          encoder.uint32(0x2a);
+          encoder.uint32(0x12);
           encoder.uint32(this.balances[n].length);
           encoder.bytes(this.balances[n]);
         }
-      }
-
-      if (this.spent != 0) {
-        encoder.uint32(0x30);
-        encoder.bool(this.spent);
-      }
-      if (this.symbol.length > 0) {
-        encoder.uint32(0x3a);
-        encoder.uint32(this.symbol.length);
-        encoder.bytes(this.symbol);
-      }
-      if (this.cap.length > 0) {
-        encoder.uint32(0x42);
-        encoder.uint32(this.cap.length);
-        encoder.bytes(this.cap);
-      }
-      if (this.divisibility.length > 0) {
-        encoder.uint32(0x4a);
-        encoder.uint32(this.divisibility.length);
-        encoder.bytes(this.divisibility);
       }
 
       return buf;

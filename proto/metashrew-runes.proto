@@ -7,20 +7,15 @@ message RuneId {
   uint32 tx = 2;
 }
 
-message OutPointTest {
-  uint32 divisibility = 1;
-  repeated bytes balances = 2;
+message Rune {
+  RuneId runeId = 1;
+  bytes name = 2;
+  uint32 divisibility = 3;
 }
 
+
 message Outpoint {
-  bytes pkscript = 1;
-  bytes wallet_addr = 2;
-  bytes output = 3;
-  repeated RuneId rune_ids = 4;
-  repeated bytes balances = 5; 
-  bool spent = 6;
-  bytes symbol = 7;
-  bytes cap = 8;
-  bytes divisibility = 9;
+  repeated Rune runes = 1;
+  repeated bytes balances = 2; 
 }
 

@@ -91,18 +91,18 @@ export class BalanceSheet {
       new BalanceSheet()
     );
   }
-  save(ptr: IndexPointer): void {
+  save(ptr: IndexPointer, log: bool = false): void {
     const runesPtr = ptr.keyword("/runes");
     const balancesPtr = ptr.keyword("/balances");
-    inspectRunes(this.runes);
     for (let i = 0; i < this.runes.length; i++) {
       if (this.balances[i] != u128.from(0)) {
         runesPtr.append(this.runes[i]);
-        balancesPtr.append(
-          Box.from(
-            changetype<ArrayBuffer>(this.balances[i].toBytes())
-          ).toArrayBuffer()
-        );
+
+        const buf = changetype<Uint8Array>(this.balances[i].toBytes()).buffer;
+        if (log) {
+          console.log(fromArrayBuffer(buf).toString());
+        }
+        balancesPtr.append(buf);
       }
     }
   }

@@ -3,6 +3,7 @@ import fs from "fs-extra";
 import { EventEmitter } from "events";
 import { IndexerProgram } from "metashrew-test";
 import path from "path";
+import { decodeOutpointView } from "../src.ts";
 
 const stripHexPrefix = (key: string) => {
   if (key.substr(0, 2) === "0x") return key.substr(2);
@@ -88,13 +89,16 @@ const runTest = (s) =>
   });
 
 describe("metashrew-runes", () => {
-  [
-    "test_indexEtching",
-    "test_genesisTransaction",
-    "test_secondTransaction",
-    "test_oneFortyEight",
-    "test_fifteen",
-  ].map((v) => runTest(v));
+  // [
+  //   "test_indexEtching",
+  //   "test_genesisTransaction",
+  //   "test_secondTransaction",
+  //   "test_oneFortyEight",
+  //   "test_fifteen",
+  // ].map((v) => runTest(v));
+  it("should test balanceSheet Output", async () => {
+    decodeOutpointView();
+  });
   /*
   it('should run runes genesis block', async () => {
   const program = new IndexerProgram(

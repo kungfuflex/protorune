@@ -117,6 +117,6 @@ export function fromBox(data: Box): u128 {
 
 export function fromArrayBuffer(data: ArrayBuffer): u128 {
   if (data.byteLength === 0) return u128.from(0);
-  const result = u128.fromBytesLE(changetype<u8[]>(Uint8Array.wrap(data)));
+  const result = u128.fromBytes(changetype<u8[]>(Uint8Array.wrap(data)));
   return result;
 }

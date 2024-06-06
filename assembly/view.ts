@@ -11,13 +11,14 @@ import {
   OUTPOINT_TO_HEIGHT,
   HEIGHT_TO_BLOCKHASH,
   CAP,
+  SPACERS,
 } from "./indexer/constants";
 import { OutPoint } from "metashrew-as/assembly/blockdata/transaction";
 import { metashrew_runes } from "./proto/metashrew-runes";
 import { u256, u128 } from "as-bignum/assembly";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils/hex";
 import { console } from "metashrew-as/assembly/utils/logging";
-import { toArrayBuffer, fieldToU128, fieldToName } from "./utils";
+import { fromArrayBuffer, fieldToU128, fieldToName } from "./utils";
 
 export function outpoint(): ArrayBuffer {
   const inputString = input();
@@ -28,13 +29,36 @@ export function outpoint(): ArrayBuffer {
   const outpoint = OutPoint.from(txid, k).toArrayBuffer();
   const op = OUTPOINT_TO_RUNES.select(outpoint);
   const balanceSheet = BalanceSheet.load(op);
-  console.log(balanceSheet.inspect());
-  const message = new metashrew_runes.OutPointTest();
+  const runes = balanceSheet.runes.reduce<Array<metashrew_runes.Rune>>(
+    (a, d, i, init) => {
+      const _runeId = RuneId.fromBytesU128(d);
+      const name = RUNE_ID_TO_ETCHING.select(d).get();
+      const spacers = SPACERS.select(name);
+      const divisibility = <u32>DIVISIBILITY.select(name).getValue<u8>();
+      const rune = new metashrew_runes.Rune();
+      const runeId = new metashrew_runes.RuneId();
+      runeId.block = _runeId.block;
+      runeId.tx = _runeId.tx;
+      rune.runeId = runeId;
+      rune.name = Uint8Array.wrap(
+        String.UTF8.encode(fieldToName(fromArrayBuffer(name)))
+      ).reduce<Array<u8>>((a, d) => {
+        a.push(d);
+        return a;
+      }, new Array<u8>());
+      rune.divisibility = divisibility;
+      a.push(rune);
+      return a;
+    },
+    new Array<metashrew_runes.Rune>()
+  );
+  const message = new metashrew_runes.Outpoint();
+  message.runes = runes;
 
-  message.divisibility = 0;
   message.balances = balanceSheet.balances.map<Array<u8>>(
     (d, i, ary: Array<u128>) => {
-      return d.toBytes();
+      console.log(d.toString());
+      return d.toBytes(true);
     }
   );
 
