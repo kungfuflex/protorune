@@ -98,8 +98,9 @@ describe("metashrew-runes", () => {
   // ].map((v) => runTest(v));
   it("should test balanceSheet Output", async () => {
     const hex =
-      "0a190a0608c0a2331016120f5341544f5348494e414b414d4f544f1210000000000000000000000000000003e8";
-    decodeOutpointView(hex);
+      "0a1b0a0608c0a2331016120f5341544f5348494e414b414d4f544f18081210000000000000000000000002540be400";
+    const outpoint = decodeOutpointView(hex);
+    console.log(outpoint);
   });
   /*
   it('should run runes genesis block', async () => {
