@@ -128,19 +128,15 @@ export class Index {
         );
         let mintTo = message.mintTo();
 
-        if (changetype<usize>(mintTo) != 0 && mintTo.byteLength == 32) {
+        const balancesByOutput = new Map<u32, BalanceSheet>();
+        const isMinting =
+          changetype<usize>(mintTo) != 0 && mintTo.byteLength == 32;
+        if (isMinting) {
           mintTo = RuneId.fromBytes(mintTo).toBytes();
           const name = RUNE_ID_TO_ETCHING.select(mintTo).get();
 
           const remaining = fromArrayBuffer(MINTS_REMAINING.select(name).get());
           if (!remaining.isZero()) {
-            if (height == 840003 && i == 4807) {
-              console.log(
-                fromArrayBuffer(AMOUNT.select(name).get(), true).toString()
-              );
-              console.log(fromArrayBuffer(name).toString());
-              trap();
-            }
             const heightStart = HEIGHTSTART.select(name).getValue<u64>();
             const heightEnd = HEIGHTEND.select(name).getValue<u64>();
             const offsetStart = OFFSETSTART.select(name).getValue<u64>();
@@ -163,13 +159,10 @@ export class Index {
             }
           }
         }
-        if (message.isEtching()) {
+        const isEtching = message.isEtching();
+        if (isEtching) {
           const name = fieldToArrayBuffer(message.fields.get(Field.RUNE));
-          // if (
-          //   ETCHING_TO_RUNE_ID.select(name).get().byteLength !== 0 ||
-          //   !Index.findCommitment(tx, name, height)
-          // )
-          //   continue; // already taken / commitment not foun
+          if (ETCHING_TO_RUNE_ID.select(name).get().byteLength !== 0) continue; // already taken / commitment not foun
           const runeId = new RuneId(<u64>height, <u32>i).toBytes();
           const ar = Uint8Array.wrap(runeId);
           RUNE_ID_TO_ETCHING.select(runeId).set(name);
@@ -190,15 +183,6 @@ export class Index {
                 toArrayBuffer(fieldToU128(message.fields.get(Field.AMOUNT)))
               );
 
-            if (height == 840000 && i == 22) {
-              console.log(
-                fieldToU128(message.fields.get(Field.AMOUNT)).toString()
-              );
-              console.log(fromArrayBuffer(name).toString());
-              console.log(
-                fromArrayBuffer(AMOUNT.select(name).get(), true).toString()
-              );
-            }
             if (message.fields.has(Field.CAP)) {
               CAP.select(name).set(
                 toArrayBuffer(fieldToU128(message.fields.get(Field.CAP)))
@@ -233,7 +217,16 @@ export class Index {
               fieldTo<u8>(message.fields.get(Field.SYMBOL))
             );
         }
-        const balancesByOutput = new Map<u32, BalanceSheet>();
+        if (isMinting || isEtching) {
+          const unallocatedTo = message.fields.has(Field.POINTER)
+            ? fieldTo<u32>(message.fields.get(Field.POINTER))
+            : <u32>tx.defaultOutput();
+          if (balancesByOutput.has(unallocatedTo)) {
+            balanceSheet.pipe(balancesByOutput.get(unallocatedTo));
+          } else {
+            balancesByOutput.set(unallocatedTo, balanceSheet);
+          }
+        }
         for (let e = 0; e < edicts.length; e++) {
           const edict = edicts[e];
           const edictOutput = toPrimitive<u32>(edict.output);
@@ -253,20 +246,15 @@ export class Index {
           balanceSheet.decrease(runeId, amount);
           outputBalanceSheet.increase(runeId, amount);
         }
-        const unallocatedTo = message.fields.has(Field.POINTER)
-          ? fieldTo<u32>(message.fields.get(Field.POINTER))
-          : <u32>tx.defaultOutput();
 
-        if (balancesByOutput.has(unallocatedTo)) {
-          balanceSheet.pipe(balancesByOutput.get(unallocatedTo));
-        } else {
-          balancesByOutput.set(unallocatedTo, balanceSheet);
-        }
         const runesToOutputs = balancesByOutput.keys();
 
         for (let x = 0; x < runesToOutputs.length; x++) {
           const sheet = balancesByOutput.get(runesToOutputs[x]);
-          if (height == 840013 && i == 3952) console.log(sheet.inspect());
+          if (height == 840013 && i == 3952) {
+            console.log(runesToOutputs[x].toString());
+            console.log(sheet.inspect());
+          }
           sheet.save(
             OUTPOINT_TO_RUNES.select(
               OutPoint.from(txid, runesToOutputs[x]).toArrayBuffer()

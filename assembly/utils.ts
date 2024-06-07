@@ -114,14 +114,8 @@ export function fromBox(data: Box): u128 {
   );
 }
 
-export function fromArrayBuffer(data: ArrayBuffer, log: bool = false): u128 {
+export function fromArrayBuffer(data: ArrayBuffer): u128 {
   if (data.byteLength === 0) return u128.from(0);
-  if (log) {
-    const ary = Uint8Array.wrap(data);
-    for (let i = 0; i < ary.byteLength; i++) {
-      console.log(i.toString() + ": " + ary[i].toString());
-    }
-  }
   const result = u128.fromBytes(changetype<u8[]>(Uint8Array.wrap(data)));
   return result;
 }
