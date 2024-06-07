@@ -14,6 +14,7 @@ import { Field } from "./Field";
 import { u256, u128 } from "as-bignum/assembly";
 import { Script } from "metashrew-as/assembly/utils/yabsp";
 import { Address } from "metashrew-as/assembly/blockdata/address";
+import { console } from "metashrew-as/assembly/utils/logging";
 import {
   fieldTo,
   toPrimitive,
@@ -126,12 +127,20 @@ export class Index {
           )
         );
         let mintTo = message.mintTo();
-        if (changetype<usize>(mintTo) != 0) {
+
+        if (changetype<usize>(mintTo) != 0 && mintTo.byteLength == 32) {
           mintTo = RuneId.fromBytes(mintTo).toBytes();
           const name = RUNE_ID_TO_ETCHING.select(mintTo).get();
 
           const remaining = fromArrayBuffer(MINTS_REMAINING.select(name).get());
           if (!remaining.isZero()) {
+            if (height == 840003 && i == 4807) {
+              console.log(
+                fromArrayBuffer(AMOUNT.select(name).get(), true).toString()
+              );
+              console.log(fromArrayBuffer(name).toString());
+              trap();
+            }
             const heightStart = HEIGHTSTART.select(name).getValue<u64>();
             const heightEnd = HEIGHTEND.select(name).getValue<u64>();
             const offsetStart = OFFSETSTART.select(name).getValue<u64>();
@@ -180,6 +189,16 @@ export class Index {
               AMOUNT.select(name).set(
                 toArrayBuffer(fieldToU128(message.fields.get(Field.AMOUNT)))
               );
+
+            if (height == 840000 && i == 22) {
+              console.log(
+                fieldToU128(message.fields.get(Field.AMOUNT)).toString()
+              );
+              console.log(fromArrayBuffer(name).toString());
+              console.log(
+                fromArrayBuffer(AMOUNT.select(name).get(), true).toString()
+              );
+            }
             if (message.fields.has(Field.CAP)) {
               CAP.select(name).set(
                 toArrayBuffer(fieldToU128(message.fields.get(Field.CAP)))
@@ -215,8 +234,8 @@ export class Index {
             );
         }
         const balancesByOutput = new Map<u32, BalanceSheet>();
-        for (let i = 0; i < edicts.length; i++) {
-          const edict = edicts[i];
+        for (let e = 0; e < edicts.length; e++) {
+          const edict = edicts[e];
           const edictOutput = toPrimitive<u32>(edict.output);
           const runeId = edict.runeId().toBytes();
           let outputBalanceSheet = changetype<BalanceSheet>(0);
@@ -227,6 +246,10 @@ export class Index {
             );
           } else outputBalanceSheet = balancesByOutput.get(edictOutput);
           const amount = min(edict.amount, balanceSheet.get(runeId));
+
+          if (height == 840013 && i == 3952) {
+            console.log(amount.toString());
+          }
           balanceSheet.decrease(runeId, amount);
           outputBalanceSheet.increase(runeId, amount);
         }
@@ -243,12 +266,17 @@ export class Index {
 
         for (let x = 0; x < runesToOutputs.length; x++) {
           const sheet = balancesByOutput.get(runesToOutputs[x]);
+          if (height == 840013 && i == 3952) console.log(sheet.inspect());
           sheet.save(
             OUTPOINT_TO_RUNES.select(
               OutPoint.from(txid, runesToOutputs[x]).toArrayBuffer()
             ),
-            height == 840003 && i == 4807
+            height == 840013 && i == 3952
           );
+        }
+        if (height == 840013 && i == 3952) {
+          console.log(inspectEdicts(edicts));
+          trap();
         }
       }
     }

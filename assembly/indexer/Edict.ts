@@ -45,15 +45,14 @@ export class Edict {
   }
   toString(): string {
     return (
-      "Edict {\n  block: 0x" +
-      u128ToHex(this.block) +
-      ",  \ntransactionIndex: 0x" +
-      u128ToHex(this.transactionIndex) +
-      ",  \namount: 0x" +
-      u128ToHex(this.amount) +
-      ",  output: " +
-      u128ToHex(this.output) +
-      "}"
+      "Edict {\n" +
+      "   runeId: " +
+      this.runeId().inspect() +
+      ",\n  amount: " +
+      this.amount.toString() +
+      ",\n  output: " +
+      this.output.toString() +
+      "\n}"
     );
   }
 }
