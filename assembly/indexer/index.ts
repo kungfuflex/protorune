@@ -259,12 +259,8 @@ export class Index {
             OUTPOINT_TO_RUNES.select(
               OutPoint.from(txid, runesToOutputs[x]).toArrayBuffer()
             ),
-            height == 840013 && i == 3952
+            false
           );
-        }
-        if (height == 840013 && i == 3952) {
-          console.log(inspectEdicts(edicts));
-          trap();
         }
       }
     }
