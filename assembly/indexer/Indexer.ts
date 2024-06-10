@@ -10,6 +10,7 @@ import { Flag } from "./Flag";
 import { Field } from "./Field";
 import { scriptParse } from "metashrew-as/assembly/utils/yabsp";
 import { u256, u128 } from "as-bignum/assembly";
+import { Index as SpendablesIndex } from "metashrew-spendables/assembly/indexer";
 import { console } from "metashrew-as/assembly/utils/logging";
 import {
   fieldTo,
@@ -79,6 +80,7 @@ export class Index {
       const tx = block.getTransaction(i);
       const txid = tx.txid();
       Index.indexOutpoints(tx, txid, height);
+      SpendablesIndex.indexBlock(height, block);
       const runestoneOutputIndex = tx.runestoneOutputIndex();
       if (height >= GENESIS && runestoneOutputIndex !== -1) {
         const runestoneOutput = tx.outs[runestoneOutputIndex];
