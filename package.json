@@ -25,6 +25,7 @@
     "chai": "^5.1.0",
     "fs-extra": "^11.2.0",
     "metashrew-as": "https://github.com/sandshrewmetaprotocols/metashrew-as",
+    "metashrew-spendables": "https://github.com/sandshrewmetaprotocols/metashrew-spendables",
     "metashrew-test": "https://github.com/sandshrewmetaprotocols/metashrew-test",
     "mocha": "^10.3.0",
     "nice-repl": "^0.1.2",

@@ -17,6 +17,7 @@ import { readULEB128ToU128 } from "./leb128";
 import { u256, u128 } from "as-bignum/assembly";
 import { Index } from "./indexer";
 import { GENESIS } from "./indexer/constants";
+import { Index as SpendablesIndex } from "metashrew-spendables/assembly/indexer";
 
 export function trap(): void {
   unreachable();
@@ -31,6 +32,7 @@ export function _start(): void {
     return;
   }
   const block = new Block(box);
+  SpendablesIndex.indexBlock(height, block);
   Index.indexBlock(height, block);
   _flush();
 }
