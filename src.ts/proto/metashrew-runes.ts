@@ -39,6 +39,14 @@ export interface Rune {
      * @generated from protobuf field: uint32 divisibility = 3;
      */
     divisibility: number;
+    /**
+     * @generated from protobuf field: uint32 spacers = 4;
+     */
+    spacers: number;
+    /**
+     * @generated from protobuf field: uint32 symbol = 5;
+     */
+    symbol: number;
 }
 /**
  * @generated from protobuf message metashrew_runes.Outpoint
@@ -114,13 +122,17 @@ class Rune$Type extends MessageType<Rune> {
         super("metashrew_runes.Rune", [
             { no: 1, name: "runeId", kind: "message", T: () => RuneId },
             { no: 2, name: "name", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 3, name: "divisibility", kind: "scalar", T: 13 /*ScalarType.UINT32*/ }
+            { no: 3, name: "divisibility", kind: "scalar", T: 13 /*ScalarType.UINT32*/ },
+            { no: 4, name: "spacers", kind: "scalar", T: 13 /*ScalarType.UINT32*/ },
+            { no: 5, name: "symbol", kind: "scalar", T: 13 /*ScalarType.UINT32*/ }
         ]);
     }
     create(value?: PartialMessage<Rune>): Rune {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.name = new Uint8Array(0);
         message.divisibility = 0;
+        message.spacers = 0;
+        message.symbol = 0;
         if (value !== undefined)
             reflectionMergePartial<Rune>(this, message, value);
         return message;
@@ -138,6 +150,12 @@ class Rune$Type extends MessageType<Rune> {
                     break;
                 case /* uint32 divisibility */ 3:
                     message.divisibility = reader.uint32();
+                    break;
+                case /* uint32 spacers */ 4:
+                    message.spacers = reader.uint32();
+                    break;
+                case /* uint32 symbol */ 5:
+                    message.symbol = reader.uint32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -160,6 +178,12 @@ class Rune$Type extends MessageType<Rune> {
         /* uint32 divisibility = 3; */
         if (message.divisibility !== 0)
             writer.tag(3, WireType.Varint).uint32(message.divisibility);
+        /* uint32 spacers = 4; */
+        if (message.spacers !== 0)
+            writer.tag(4, WireType.Varint).uint32(message.spacers);
+        /* uint32 symbol = 5; */
+        if (message.symbol !== 0)
+            writer.tag(5, WireType.Varint).uint32(message.symbol);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

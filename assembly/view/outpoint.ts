@@ -1,8 +1,8 @@
 import { metashrew as proto } from "metashrew-as/assembly/proto/metashrew";
 import { Box } from "metashrew-as/assembly/utils/box";
 import { input } from "metashrew-as/assembly/indexer/index";
-import { BalanceSheet } from "./indexer/BalanceSheet";
-import { RuneId } from "./indexer/RuneId";
+import { BalanceSheet } from "../indexer/BalanceSheet";
+import { RuneId } from "../indexer/RuneId";
 import {
   OUTPOINT_TO_RUNES,
   HEIGHT_TO_TRANSACTION_IDS,
@@ -12,13 +12,14 @@ import {
   HEIGHT_TO_BLOCKHASH,
   CAP,
   SPACERS,
-} from "./indexer/constants";
+  SYMBOL,
+} from "../indexer/constants";
 import { OutPoint } from "metashrew-as/assembly/blockdata/transaction";
-import { metashrew_runes } from "./proto/metashrew-runes";
+import { metashrew_runes } from "../proto/metashrew-runes";
 import { u256, u128 } from "as-bignum/assembly";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils/hex";
 import { console } from "metashrew-as/assembly/utils/logging";
-import { fromArrayBuffer, fieldToU128, fieldToName } from "./utils";
+import { fromArrayBuffer, fieldToU128, fieldToName } from "../utils";
 
 export function outpoint(): ArrayBuffer {
   const inputString = input();
@@ -47,6 +48,8 @@ export function outpoint(): ArrayBuffer {
         return a;
       }, new Array<u8>());
       rune.divisibility = divisibility;
+      rune.symbol = <u32>SYMBOL.select(name).getValue<u8>();
+      rune.spacers = SPACERS.select(name).getValue<u32>();
       a.push(rune);
       return a;
     },
@@ -57,7 +60,6 @@ export function outpoint(): ArrayBuffer {
 
   message.balances = balanceSheet.balances.map<Array<u8>>(
     (d, i, ary: Array<u128>) => {
-      console.log(d.toString());
       return d.toBytes(true);
     }
   );

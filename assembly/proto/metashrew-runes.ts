@@ -543,6 +543,8 @@ export namespace metashrew_runes {
     public runeId: RuneId = new RuneId();
     public name: Array<u8> = new Array<u8>();
     public divisibility: u32;
+    public spacers: u32;
+    public symbol: u32;
 
     // Decodes Rune from an ArrayBuffer
     static decode(buf: ArrayBuffer): Rune {
@@ -580,6 +582,14 @@ export namespace metashrew_runes {
             obj.divisibility = decoder.uint32();
             break;
           }
+          case 4: {
+            obj.spacers = decoder.uint32();
+            break;
+          }
+          case 5: {
+            obj.symbol = decoder.uint32();
+            break;
+          }
 
           default:
             decoder.skipType(tag & 7);
@@ -609,6 +619,8 @@ export namespace metashrew_runes {
         this.divisibility == 0
           ? 0
           : 1 + __proto.Sizer.uint32(this.divisibility);
+      size += this.spacers == 0 ? 0 : 1 + __proto.Sizer.uint32(this.spacers);
+      size += this.symbol == 0 ? 0 : 1 + __proto.Sizer.uint32(this.symbol);
 
       return size;
     }
@@ -646,6 +658,14 @@ export namespace metashrew_runes {
       if (this.divisibility != 0) {
         encoder.uint32(0x18);
         encoder.uint32(this.divisibility);
+      }
+      if (this.spacers != 0) {
+        encoder.uint32(0x20);
+        encoder.uint32(this.spacers);
+      }
+      if (this.symbol != 0) {
+        encoder.uint32(0x28);
+        encoder.uint32(this.symbol);
       }
 
       return buf;

@@ -4,6 +4,8 @@ import { EventEmitter } from "events";
 import { IndexerProgram } from "metashrew-test";
 import path from "path";
 import { decodeOutpointView } from "../src.ts";
+import { sha3_256 } from "js-sha3";
+import { readFileSync } from "fs";
 
 const stripHexPrefix = (key: string) => {
   if (key.substr(0, 2) === "0x") return key.substr(2);
@@ -96,11 +98,39 @@ describe("metashrew-runes", () => {
   //   "test_oneFortyEight",
   //   "test_fifteen",
   // ].map((v) => runTest(v));
+
   it("should test balanceSheet Output", async () => {
-    const hex =
-      "0a1b0a0608c0a2331016120f5341544f5348494e414b414d4f544f18081210000000000000000000000002540be400";
-    const outpoint = decodeOutpointView(hex);
-    console.log(outpoint);
+    const file = readFileSync("build/release.wasm");
+    const hash = sha3_256(file);
+    const inputs = [
+      "0xd66defd5daa5b101d0bf9fb47581dbd76827572646211f5058328b28765e9fda00",
+      "0x8c6c6b86069435308f468a3db4063d8b266b6dfc845ea4c5202920b13b464c4401",
+    ];
+    const res = await inputs.reduce(async (_res: Promise<any[]>, input) => {
+      const r = await _res;
+
+      let response = await fetch("http://localhost:8080", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: 0,
+          method: "metashrew_view",
+          params: [`0x${hash}`, "outpoint", input, "841569"],
+        }),
+      });
+
+      r.push((await response.json())["result"]);
+      return r;
+    }, Promise.resolve([]));
+    res.map((hex) => {
+      if (hex) {
+        const outpoint = decodeOutpointView(hex);
+        console.log(outpoint);
+      }
+    });
   });
   /*
   it('should run runes genesis block', async () => {

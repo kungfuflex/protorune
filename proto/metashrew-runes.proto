@@ -11,6 +11,8 @@ message Rune {
   RuneId runeId = 1;
   bytes name = 2;
   uint32 divisibility = 3;
+  uint32 spacers = 4;
+  uint32 symbol = 5;
 }
 
 
