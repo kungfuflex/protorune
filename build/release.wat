@@ -11719,6 +11719,7 @@
     end
     i32.const 0
     local.set $2
+<<<<<<< HEAD
     local.get $3
     i32.load offset=8
     local.tee $1
@@ -11763,6 +11764,10 @@
     local.set $2
     block $__inlined_func$assembly/indexer/RunesTransaction/RunesTransaction#runestoneOutputIndex$1647
      loop $for-loop|03
+=======
+    block $__inlined_func$assembly/indexer/RunesTransaction/RunesTransaction#runestoneOutputIndex$1646
+     loop $for-loop|02
+>>>>>>> b7fef6f (fix indexing)
       local.get $2
       local.get $9
       i32.load offset=16
@@ -11779,12 +11784,21 @@
        i32.load16_u
        i32.const 23914
        i32.eq
+<<<<<<< HEAD
        br_if $__inlined_func$assembly/indexer/RunesTransaction/RunesTransaction#runestoneOutputIndex$1647
        local.get $2
        i32.const 1
        i32.add
        local.set $2
        br $for-loop|03
+=======
+       br_if $__inlined_func$assembly/indexer/RunesTransaction/RunesTransaction#runestoneOutputIndex$1646
+       local.get $1
+       i32.const 1
+       i32.add
+       local.set $2
+       br $for-loop|02
+>>>>>>> b7fef6f (fix indexing)
       end
      end
      i32.const -1
@@ -13049,6 +13063,48 @@
     i32.add
     local.set $7
     br $for-loop|00
+   end
+  end
+  i32.const 0
+  local.set $1
+  local.get $3
+  i32.load offset=8
+  local.tee $0
+  i32.load offset=12
+  local.set $2
+  loop $for-loop|05
+   local.get $1
+   local.get $2
+   local.get $0
+   i32.load offset=12
+   local.tee $3
+   local.get $2
+   local.get $3
+   i32.lt_s
+   select
+   i32.lt_s
+   if
+    local.get $0
+    i32.load offset=4
+    local.get $1
+    i32.const 2
+    i32.shl
+    i32.add
+    i32.load
+    local.set $3
+    i32.const 3
+    global.set $~argumentsLength
+    local.get $3
+    local.get $1
+    local.get $0
+    i32.const 7760
+    i32.load
+    call_indirect (type $4)
+    local.get $1
+    i32.const 1
+    i32.add
+    local.set $1
+    br $for-loop|05
    end
   end
  )

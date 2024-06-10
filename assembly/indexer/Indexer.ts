@@ -80,7 +80,6 @@ export class Index {
       const tx = block.getTransaction(i);
       const txid = tx.txid();
       Index.indexOutpoints(tx, txid, height);
-      SpendablesIndex.indexBlock(height, block);
       const runestoneOutputIndex = tx.runestoneOutputIndex();
       if (height >= GENESIS && runestoneOutputIndex !== -1) {
         const runestoneOutput = tx.outs[runestoneOutputIndex];
@@ -152,5 +151,6 @@ export class Index {
         }
       }
     }
+    SpendablesIndex.indexBlock(height, block);
   }
 }

@@ -18878,9 +18878,6 @@
      local.get $txid
      local.get $height
      call $assembly/indexer/Indexer/Index.indexOutpoints
-     local.get $height
-     local.get $block
-     call $~lib/metashrew-spendables/assembly/indexer/Index.indexBlock
      local.get $tx
      call $assembly/indexer/RunesTransaction/RunesTransaction#runestoneOutputIndex
      local.set $runestoneOutputIndex
@@ -19105,6 +19102,9 @@
     br $for-loop|0
    end
   end
+  local.get $height
+  local.get $block
+  call $~lib/metashrew-spendables/assembly/indexer/Index.indexBlock
  )
  (func $assembly/index/_start
   (local $data i32)
