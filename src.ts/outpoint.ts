@@ -20,7 +20,6 @@ export function encodeOutpointInput(txid: string, pos: number): string {
     pos,
   };
   const str = Buffer.from(OutpointInput.toBinary(input)).toString("hex");
-  console.log(str);
   return "0x" + str;
 }
 
@@ -41,7 +40,6 @@ export function decodeOutpointView(hex: string): OutPoint {
           spaced_name = `${spaced_name.slice(0, i + 1)}${spacer}${spaced_name.slice(i + 1)}`;
         }
       });
-    console.log(bitField);
     const rune: Rune = {
       id: `${d.runeId.block}:${d.runeId.tx}`,
       name,
