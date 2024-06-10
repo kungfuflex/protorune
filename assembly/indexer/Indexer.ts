@@ -6,26 +6,17 @@ import { RunesBlock } from "./RunesBlock";
 import { RunestoneMessage } from "./RunestoneMessage";
 import { RunesTransaction } from "./RunesTransaction";
 import { Block } from "metashrew-as/assembly/blockdata/block";
-import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
-import { console } from "metashrew-as/assembly/utils/logging";
-import { intoString, scriptParse } from "metashrew-as/assembly/utils/yabsp";
 import { Flag } from "./Flag";
 import { Field } from "./Field";
+import { scriptParse } from "metashrew-as/assembly/utils/yabsp";
 import { u256, u128 } from "as-bignum/assembly";
-import { Script } from "metashrew-as/assembly/utils/yabsp";
-import { Address } from "metashrew-as/assembly/blockdata/address";
 import { console } from "metashrew-as/assembly/utils/logging";
 import {
   fieldTo,
   toPrimitive,
-  fieldToArrayBuffer,
-  fieldToName,
   toArrayBuffer,
-  stripNullRight,
-  fromArrayBuffer,
   inspectEdicts,
   min,
-  fieldToU128,
 } from "../utils";
 import {
   OUTPOINT_TO_RUNES,
@@ -34,20 +25,6 @@ import {
   BLOCKHASH_TO_HEIGHT,
   HEIGHT_TO_TRANSACTION_IDS,
   GENESIS,
-  RUNE_ID_TO_ETCHING,
-  MINTS_REMAINING,
-  HEIGHTSTART,
-  HEIGHTEND,
-  OFFSETSTART,
-  OFFSETEND,
-  RUNE_ID_TO_HEIGHT,
-  ETCHING_TO_RUNE_ID,
-  DIVISIBILITY,
-  PREMINE,
-  SYMBOL,
-  CAP,
-  AMOUNT,
-  SPACERS,
 } from "./constants";
 import {
   Transaction,
@@ -55,7 +32,6 @@ import {
   Output,
   OutPoint,
 } from "metashrew-as/assembly/blockdata/transaction";
-import { encodeHexFromBuffer } from "metashrew-as/assembly/utils/hex";
 import { trap } from "../";
 
 export class Index {

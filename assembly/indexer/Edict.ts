@@ -1,5 +1,5 @@
 import { u128 } from "as-bignum/assembly";
-import { fromU128Pair, u128ToHex } from "../utils";
+import { fromU128Pair } from "../utils";
 import { RuneId } from "./RuneId";
 
 export class Edict {

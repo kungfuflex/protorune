@@ -769,6 +769,152 @@ export namespace metashrew_runes {
       return buf;
     } // encode Outpoint
   } // Outpoint
+
+  export class OutpointInput {
+    public txid: Array<u8> = new Array<u8>();
+    public pos: u32;
+
+    // Decodes OutpointInput from an ArrayBuffer
+    static decode(buf: ArrayBuffer): OutpointInput {
+      return OutpointInput.decodeDataView(new DataView(buf));
+    }
+
+    // Decodes OutpointInput from a DataView
+    static decodeDataView(view: DataView): OutpointInput {
+      const decoder = new __proto.Decoder(view);
+      const obj = new OutpointInput();
+
+      while (!decoder.eof()) {
+        const tag = decoder.tag();
+        const number = tag >>> 3;
+
+        switch (number) {
+          case 1: {
+            obj.txid = decoder.bytes();
+            break;
+          }
+          case 2: {
+            obj.pos = decoder.uint32();
+            break;
+          }
+
+          default:
+            decoder.skipType(tag & 7);
+            break;
+        }
+      }
+      return obj;
+    } // decode OutpointInput
+
+    public size(): u32 {
+      let size: u32 = 0;
+
+      size +=
+        this.txid.length > 0
+          ? 1 + __proto.Sizer.varint64(this.txid.length) + this.txid.length
+          : 0;
+      size += this.pos == 0 ? 0 : 1 + __proto.Sizer.uint32(this.pos);
+
+      return size;
+    }
+
+    // Encodes OutpointInput to the ArrayBuffer
+    encode(): ArrayBuffer {
+      return changetype<ArrayBuffer>(
+        StaticArray.fromArray<u8>(this.encodeU8Array())
+      );
+    }
+
+    // Encodes OutpointInput to the Array<u8>
+    encodeU8Array(
+      encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
+    ): Array<u8> {
+      const buf = encoder.buf;
+
+      if (this.txid.length > 0) {
+        encoder.uint32(0xa);
+        encoder.uint32(this.txid.length);
+        encoder.bytes(this.txid);
+      }
+      if (this.pos != 0) {
+        encoder.uint32(0x10);
+        encoder.uint32(this.pos);
+      }
+
+      return buf;
+    } // encode OutpointInput
+  } // OutpointInput
+
+  export class PaginationInput {
+    public start: u32;
+    public end: u32;
+
+    // Decodes PaginationInput from an ArrayBuffer
+    static decode(buf: ArrayBuffer): PaginationInput {
+      return PaginationInput.decodeDataView(new DataView(buf));
+    }
+
+    // Decodes PaginationInput from a DataView
+    static decodeDataView(view: DataView): PaginationInput {
+      const decoder = new __proto.Decoder(view);
+      const obj = new PaginationInput();
+
+      while (!decoder.eof()) {
+        const tag = decoder.tag();
+        const number = tag >>> 3;
+
+        switch (number) {
+          case 1: {
+            obj.start = decoder.uint32();
+            break;
+          }
+          case 2: {
+            obj.end = decoder.uint32();
+            break;
+          }
+
+          default:
+            decoder.skipType(tag & 7);
+            break;
+        }
+      }
+      return obj;
+    } // decode PaginationInput
+
+    public size(): u32 {
+      let size: u32 = 0;
+
+      size += this.start == 0 ? 0 : 1 + __proto.Sizer.uint32(this.start);
+      size += this.end == 0 ? 0 : 1 + __proto.Sizer.uint32(this.end);
+
+      return size;
+    }
+
+    // Encodes PaginationInput to the ArrayBuffer
+    encode(): ArrayBuffer {
+      return changetype<ArrayBuffer>(
+        StaticArray.fromArray<u8>(this.encodeU8Array())
+      );
+    }
+
+    // Encodes PaginationInput to the Array<u8>
+    encodeU8Array(
+      encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
+    ): Array<u8> {
+      const buf = encoder.buf;
+
+      if (this.start != 0) {
+        encoder.uint32(0x8);
+        encoder.uint32(this.start);
+      }
+      if (this.end != 0) {
+        encoder.uint32(0x10);
+        encoder.uint32(this.end);
+      }
+
+      return buf;
+    } // encode PaginationInput
+  } // PaginationInput
 } // metashrew_runes
 
 // __size_bytes_repeated

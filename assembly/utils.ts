@@ -2,8 +2,6 @@ import { Box } from "metashrew-as/assembly/utils/box";
 import { u256, u128 } from "as-bignum/assembly";
 import { Edict } from "./indexer/Edict";
 
-import { console } from "metashrew-as/assembly/utils/logging";
-
 export function decodeHex(hex: string): ArrayBuffer {
   const result = new ArrayBuffer(hex.length / 2);
   for (let i = 0; i < hex.length; i += 2) {
@@ -44,10 +42,6 @@ export function inspectEdicts(ary: Array<Edict>): string {
       .join("\n") +
     "\n]"
   );
-}
-
-export function inspectRunes(ary: Array<ArrayBuffer>): string {
-  return "[\n" + "\n]";
 }
 
 export function stripNullRight(data: ArrayBuffer): ArrayBuffer {

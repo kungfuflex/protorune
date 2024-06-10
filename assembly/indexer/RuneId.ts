@@ -1,7 +1,6 @@
 import { HEIGHT_TO_TRANSACTION_IDS } from "./constants";
 import { toArrayBuffer } from "../utils";
 import { u128 } from "as-bignum/assembly";
-import { console } from "metashrew-as/assembly/utils/logging";
 
 export class RuneId {
   public block: u64;

@@ -28,6 +28,7 @@ import {
   OFFSETEND,
   SYMBOL,
   CAP,
+  ETCHINGS,
 } from "./constants";
 import { BalanceSheet } from "./BalanceSheet";
 
@@ -206,6 +207,7 @@ export class RunestoneMessage {
       SYMBOL.select(name).setValue<u8>(
         fieldTo<u8>(this.fields.get(Field.SYMBOL))
       );
+    ETCHINGS.append(name);
     return true;
   }
 }

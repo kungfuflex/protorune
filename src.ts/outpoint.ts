@@ -1,4 +1,4 @@
-import { Outpoint, RuneId } from "./proto/metashrew-runes";
+import { Outpoint, OutpointInput } from "./proto/metashrew-runes";
 
 export type Rune = {
   id: string;
@@ -13,6 +13,16 @@ export type OutPoint = {
   runes: Rune[];
   balances: BigInt[];
 };
+
+export function encodeOutpointInput(txid: string, pos: number): string {
+  const input: OutpointInput = {
+    txid: Buffer.from(txid, "hex"),
+    pos,
+  };
+  const str = Buffer.from(OutpointInput.toBinary(input)).toString("hex");
+  console.log(str);
+  return "0x" + str;
+}
 
 export function decodeOutpointView(hex: string): OutPoint {
   const bytes = Uint8Array.from(Buffer.from(hex, "hex"));

@@ -21,3 +21,12 @@ message Outpoint {
   repeated bytes balances = 2; 
 }
 
+message OutpointInput {
+  bytes txid = 1;
+  uint32 pos = 2;
+}
+
+message PaginationInput {
+  uint32 start = 1;
+  uint32 end = 2;
+}

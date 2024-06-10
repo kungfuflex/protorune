@@ -22,5 +22,6 @@ export const MINTS_REMAINING = IndexPointer.for("/runes/mints-remaining/");
 export const PREMINE = IndexPointer.for("/runes/premine/");
 export const DIVISIBILITY = IndexPointer.for("/runes/divisibility/");
 export const RUNE_ID_TO_HEIGHT = IndexPointer.for("/height/byruneid/");
+export const ETCHINGS = IndexPointer.for("/runes/names");
 export const RUNE_ID_TO_ETCHING = IndexPointer.for("/etching/byruneid/");
 export const ETCHING_TO_RUNE_ID = IndexPointer.for("/runeid/byetching/");

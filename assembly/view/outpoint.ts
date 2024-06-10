@@ -22,12 +22,11 @@ import { console } from "metashrew-as/assembly/utils/logging";
 import { fromArrayBuffer, fieldToU128, fieldToName } from "../utils";
 
 export function outpoint(): ArrayBuffer {
-  const inputString = input();
-  const txid = inputString.slice(4, inputString.byteLength - 1);
-  const k = <u32>(
-    parseInt(encodeHexFromBuffer(inputString.slice(inputString.byteLength - 1)))
-  );
-  const outpoint = OutPoint.from(txid, k).toArrayBuffer();
+  const _input = input().slice(4);
+  const inp = metashrew_runes.OutpointInput.decode(_input);
+  const txid = changetype<Uint8Array>(inp.txid).buffer;
+  const pos = inp.pos;
+  const outpoint = OutPoint.from(txid, pos).toArrayBuffer();
   const op = OUTPOINT_TO_RUNES.select(outpoint);
   const balanceSheet = BalanceSheet.load(op);
   const runes = balanceSheet.runes.reduce<Array<metashrew_runes.Rune>>(

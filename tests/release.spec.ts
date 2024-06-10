@@ -1,9 +1,8 @@
-import { expect } from "chai";
 import fs from "fs-extra";
-import { EventEmitter } from "events";
+
 import { IndexerProgram } from "metashrew-test";
 import path from "path";
-import { decodeOutpointView } from "../src.ts";
+import { decodeOutpointView, encodeOutpointInput } from "../src.ts";
 import { sha3_256 } from "js-sha3";
 import { readFileSync } from "fs";
 
@@ -103,9 +102,9 @@ describe("metashrew-runes", () => {
     const file = readFileSync("build/release.wasm");
     const hash = sha3_256(file);
     const inputs = [
-      "0xd66defd5daa5b101d0bf9fb47581dbd76827572646211f5058328b28765e9fda00",
-      "0x8c6c6b86069435308f468a3db4063d8b266b6dfc845ea4c5202920b13b464c4401",
-    ];
+      ["d66defd5daa5b101d0bf9fb47581dbd76827572646211f5058328b28765e9fda", "0"],
+      ["8c6c6b86069435308f468a3db4063d8b266b6dfc845ea4c5202920b13b464c44", "1"],
+    ].map((d) => encodeOutpointInput(d[0], parseInt(d[1])));
     const res = await inputs.reduce(async (_res: Promise<any[]>, input) => {
       const r = await _res;
 

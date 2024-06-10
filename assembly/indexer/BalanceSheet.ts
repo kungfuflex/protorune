@@ -1,8 +1,7 @@
 import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
 import { Box } from "metashrew-as/assembly/utils/box";
 import { u256, u128 } from "as-bignum/assembly";
-import { console } from "metashrew-as/assembly/utils/logging";
-import { fromArrayBuffer, inspectRunes } from "../utils";
+import { fromArrayBuffer } from "../utils";
 import { RuneId } from "./RuneId";
 
 export class BalanceSheet {
@@ -91,7 +90,7 @@ export class BalanceSheet {
       new BalanceSheet()
     );
   }
-  save(ptr: IndexPointer, log: bool = false): void {
+  save(ptr: IndexPointer): void {
     const runesPtr = ptr.keyword("/runes");
     const balancesPtr = ptr.keyword("/balances");
     for (let i = 0; i < this.runes.length; i++) {
@@ -99,14 +98,11 @@ export class BalanceSheet {
         runesPtr.append(this.runes[i]);
 
         const buf = changetype<Uint8Array>(this.balances[i].toBytes()).buffer;
-        if (log) {
-          console.log(fromArrayBuffer(buf).toString());
-        }
         balancesPtr.append(buf);
       }
     }
   }
-  static load(ptr: IndexPointer, log: bool = false): BalanceSheet {
+  static load(ptr: IndexPointer): BalanceSheet {
     const runesPtr = ptr.keyword("/runes");
     const balancesPtr = ptr.keyword("/balances");
     const length = runesPtr.lengthKey().getValue<u32>();

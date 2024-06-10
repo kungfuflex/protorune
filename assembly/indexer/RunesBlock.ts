@@ -1,8 +1,6 @@
 import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
 import { Block } from "metashrew-as/assembly/blockdata/block";
 import { RunesTransaction } from "./RunesTransaction";
-import { console } from "metashrew-as/assembly/utils/logging";
-import { encodeHexFromBuffer } from "metashrew-as/assembly/utils/hex";
 import { HEIGHT_TO_TRANSACTION_IDS } from "./constants";
 
 @final

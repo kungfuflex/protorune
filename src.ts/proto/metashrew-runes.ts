@@ -61,6 +61,32 @@ export interface Outpoint {
      */
     balances: Uint8Array[];
 }
+/**
+ * @generated from protobuf message metashrew_runes.OutpointInput
+ */
+export interface OutpointInput {
+    /**
+     * @generated from protobuf field: bytes txid = 1;
+     */
+    txid: Uint8Array;
+    /**
+     * @generated from protobuf field: uint32 pos = 2;
+     */
+    pos: number;
+}
+/**
+ * @generated from protobuf message metashrew_runes.PaginationInput
+ */
+export interface PaginationInput {
+    /**
+     * @generated from protobuf field: uint32 start = 1;
+     */
+    start: number;
+    /**
+     * @generated from protobuf field: uint32 end = 2;
+     */
+    end: number;
+}
 // @generated message type with reflection information, may provide speed optimized methods
 class RuneId$Type extends MessageType<RuneId> {
     constructor() {
@@ -249,3 +275,113 @@ class Outpoint$Type extends MessageType<Outpoint> {
  * @generated MessageType for protobuf message metashrew_runes.Outpoint
  */
 export const Outpoint = new Outpoint$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class OutpointInput$Type extends MessageType<OutpointInput> {
+    constructor() {
+        super("metashrew_runes.OutpointInput", [
+            { no: 1, name: "txid", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 2, name: "pos", kind: "scalar", T: 13 /*ScalarType.UINT32*/ }
+        ]);
+    }
+    create(value?: PartialMessage<OutpointInput>): OutpointInput {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.txid = new Uint8Array(0);
+        message.pos = 0;
+        if (value !== undefined)
+            reflectionMergePartial<OutpointInput>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: OutpointInput): OutpointInput {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bytes txid */ 1:
+                    message.txid = reader.bytes();
+                    break;
+                case /* uint32 pos */ 2:
+                    message.pos = reader.uint32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: OutpointInput, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* bytes txid = 1; */
+        if (message.txid.length)
+            writer.tag(1, WireType.LengthDelimited).bytes(message.txid);
+        /* uint32 pos = 2; */
+        if (message.pos !== 0)
+            writer.tag(2, WireType.Varint).uint32(message.pos);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message metashrew_runes.OutpointInput
+ */
+export const OutpointInput = new OutpointInput$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class PaginationInput$Type extends MessageType<PaginationInput> {
+    constructor() {
+        super("metashrew_runes.PaginationInput", [
+            { no: 1, name: "start", kind: "scalar", T: 13 /*ScalarType.UINT32*/ },
+            { no: 2, name: "end", kind: "scalar", T: 13 /*ScalarType.UINT32*/ }
+        ]);
+    }
+    create(value?: PartialMessage<PaginationInput>): PaginationInput {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.start = 0;
+        message.end = 0;
+        if (value !== undefined)
+            reflectionMergePartial<PaginationInput>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PaginationInput): PaginationInput {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* uint32 start */ 1:
+                    message.start = reader.uint32();
+                    break;
+                case /* uint32 end */ 2:
+                    message.end = reader.uint32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: PaginationInput, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* uint32 start = 1; */
+        if (message.start !== 0)
+            writer.tag(1, WireType.Varint).uint32(message.start);
+        /* uint32 end = 2; */
+        if (message.end !== 0)
+            writer.tag(2, WireType.Varint).uint32(message.end);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message metashrew_runes.PaginationInput
+ */
+export const PaginationInput = new PaginationInput$Type();
