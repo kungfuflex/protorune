@@ -2,7 +2,11 @@ import fs from "fs-extra";
 
 import { IndexerProgram } from "metashrew-test";
 import path from "path";
-import { decodeOutpointView, encodeOutpointInput } from "../src.ts";
+import {
+  decodeOutpointView,
+  encodeOutpointInput,
+  encodeWalletInput,
+} from "../src.ts";
 import { sha3_256 } from "js-sha3";
 import { readFileSync } from "fs";
 
@@ -90,6 +94,11 @@ const runTest = (s) =>
   });
 
 describe("metashrew-runes", () => {
+  let hash: string;
+  before(async () => {
+    const file = readFileSync("build/release.wasm");
+    hash = sha3_256(file);
+  });
   // [
   //   "test_indexEtching",
   //   "test_genesisTransaction",
@@ -97,18 +106,9 @@ describe("metashrew-runes", () => {
   //   "test_oneFortyEight",
   //   "test_fifteen",
   // ].map((v) => runTest(v));
-
-  it("should test balanceSheet Output", async () => {
-    const file = readFileSync("build/release.wasm");
-    const hash = sha3_256(file);
-    const inputs = [
-      ["d66defd5daa5b101d0bf9fb47581dbd76827572646211f5058328b28765e9fda", "0"],
-      ["8c6c6b86069435308f468a3db4063d8b266b6dfc845ea4c5202920b13b464c44", "1"],
-    ].map((d) => encodeOutpointInput(d[0], parseInt(d[1])));
-    const res = await inputs.reduce(async (_res: Promise<any[]>, input) => {
-      const r = await _res;
-
-      let response = await fetch("http://localhost:8080", {
+  function buildView(func: string) {
+    return (input: string) => {
+      return fetch("http://localhost:8080", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -117,10 +117,29 @@ describe("metashrew-runes", () => {
           jsonrpc: "2.0",
           id: 0,
           method: "metashrew_view",
-          params: [`0x${hash}`, "outpoint", input, "841569"],
+          params: [`0x${hash}`, func, input, "841569"],
         }),
       });
+    };
+  }
+  it("should test address output", async () => {
+    const wallet =
+      "bc1pzskepp4ys2septcfz483lmk22xvwdgydgt5r4fgmfagqegwh5a8se48yxf";
+    const walletView = buildView("wallet");
+    const input = encodeWalletInput(wallet);
+    let response = await walletView(input);
+    console.log(await response.json());
+  });
+  it("should test balanceSheet Output", async () => {
+    const inputs = [
+      ["d66defd5daa5b101d0bf9fb47581dbd76827572646211f5058328b28765e9fda", "0"],
+      ["8c6c6b86069435308f468a3db4063d8b266b6dfc845ea4c5202920b13b464c44", "1"],
+    ].map((d) => encodeOutpointInput(d[0], parseInt(d[1])));
+    const outpoint = buildView("outpoint");
+    const res = await inputs.reduce(async (_res: Promise<any[]>, input) => {
+      const r = await _res;
 
+      let response = await outpoint(input);
       r.push((await response.json())["result"]);
       return r;
     }, Promise.resolve([]));

@@ -673,8 +673,8 @@ export namespace metashrew_runes {
   } // Rune
 
   export class Outpoint {
-    public runes: Array<Rune> = new Array<Rune>();
-    public balances: Array<Array<u8>> = new Array<Array<u8>>();
+    public txid: Array<u8> = new Array<u8>();
+    public pos: u32;
 
     // Decodes Outpoint from an ArrayBuffer
     static decode(buf: ArrayBuffer): Outpoint {
@@ -685,6 +685,82 @@ export namespace metashrew_runes {
     static decodeDataView(view: DataView): Outpoint {
       const decoder = new __proto.Decoder(view);
       const obj = new Outpoint();
+
+      while (!decoder.eof()) {
+        const tag = decoder.tag();
+        const number = tag >>> 3;
+
+        switch (number) {
+          case 1: {
+            obj.txid = decoder.bytes();
+            break;
+          }
+          case 2: {
+            obj.pos = decoder.uint32();
+            break;
+          }
+
+          default:
+            decoder.skipType(tag & 7);
+            break;
+        }
+      }
+      return obj;
+    } // decode Outpoint
+
+    public size(): u32 {
+      let size: u32 = 0;
+
+      size +=
+        this.txid.length > 0
+          ? 1 + __proto.Sizer.varint64(this.txid.length) + this.txid.length
+          : 0;
+      size += this.pos == 0 ? 0 : 1 + __proto.Sizer.uint32(this.pos);
+
+      return size;
+    }
+
+    // Encodes Outpoint to the ArrayBuffer
+    encode(): ArrayBuffer {
+      return changetype<ArrayBuffer>(
+        StaticArray.fromArray<u8>(this.encodeU8Array())
+      );
+    }
+
+    // Encodes Outpoint to the Array<u8>
+    encodeU8Array(
+      encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
+    ): Array<u8> {
+      const buf = encoder.buf;
+
+      if (this.txid.length > 0) {
+        encoder.uint32(0xa);
+        encoder.uint32(this.txid.length);
+        encoder.bytes(this.txid);
+      }
+      if (this.pos != 0) {
+        encoder.uint32(0x10);
+        encoder.uint32(this.pos);
+      }
+
+      return buf;
+    } // encode Outpoint
+  } // Outpoint
+
+  export class OutpointOut {
+    public runes: Array<Rune> = new Array<Rune>();
+    public balances: Array<Array<u8>> = new Array<Array<u8>>();
+    public outpoint: Outpoint = new Outpoint();
+
+    // Decodes OutpointOut from an ArrayBuffer
+    static decode(buf: ArrayBuffer): OutpointOut {
+      return OutpointOut.decodeDataView(new DataView(buf));
+    }
+
+    // Decodes OutpointOut from a DataView
+    static decodeDataView(view: DataView): OutpointOut {
+      const decoder = new __proto.Decoder(view);
+      const obj = new OutpointOut();
 
       while (!decoder.eof()) {
         const tag = decoder.tag();
@@ -710,6 +786,19 @@ export namespace metashrew_runes {
             obj.balances.push(decoder.bytes());
             break;
           }
+          case 3: {
+            const length = decoder.uint32();
+            obj.outpoint = Outpoint.decodeDataView(
+              new DataView(
+                decoder.view.buffer,
+                decoder.pos + decoder.view.byteOffset,
+                length
+              )
+            );
+            decoder.skip(length);
+
+            break;
+          }
 
           default:
             decoder.skipType(tag & 7);
@@ -717,7 +806,7 @@ export namespace metashrew_runes {
         }
       }
       return obj;
-    } // decode Outpoint
+    } // decode OutpointOut
 
     public size(): u32 {
       let size: u32 = 0;
@@ -732,17 +821,26 @@ export namespace metashrew_runes {
 
       size += __size_bytes_repeated(this.balances);
 
+      if (this.outpoint != null) {
+        const f: Outpoint = this.outpoint as Outpoint;
+        const messageSize = f.size();
+
+        if (messageSize > 0) {
+          size += 1 + __proto.Sizer.varint64(messageSize) + messageSize;
+        }
+      }
+
       return size;
     }
 
-    // Encodes Outpoint to the ArrayBuffer
+    // Encodes OutpointOut to the ArrayBuffer
     encode(): ArrayBuffer {
       return changetype<ArrayBuffer>(
         StaticArray.fromArray<u8>(this.encodeU8Array())
       );
     }
 
-    // Encodes Outpoint to the Array<u8>
+    // Encodes OutpointOut to the Array<u8>
     encodeU8Array(
       encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
     ): Array<u8> {
@@ -766,84 +864,21 @@ export namespace metashrew_runes {
         }
       }
 
-      return buf;
-    } // encode Outpoint
-  } // Outpoint
+      if (this.outpoint != null) {
+        const f = this.outpoint as Outpoint;
 
-  export class OutpointInput {
-    public txid: Array<u8> = new Array<u8>();
-    public pos: u32;
+        const messageSize = f.size();
 
-    // Decodes OutpointInput from an ArrayBuffer
-    static decode(buf: ArrayBuffer): OutpointInput {
-      return OutpointInput.decodeDataView(new DataView(buf));
-    }
-
-    // Decodes OutpointInput from a DataView
-    static decodeDataView(view: DataView): OutpointInput {
-      const decoder = new __proto.Decoder(view);
-      const obj = new OutpointInput();
-
-      while (!decoder.eof()) {
-        const tag = decoder.tag();
-        const number = tag >>> 3;
-
-        switch (number) {
-          case 1: {
-            obj.txid = decoder.bytes();
-            break;
-          }
-          case 2: {
-            obj.pos = decoder.uint32();
-            break;
-          }
-
-          default:
-            decoder.skipType(tag & 7);
-            break;
+        if (messageSize > 0) {
+          encoder.uint32(0x1a);
+          encoder.uint32(messageSize);
+          f.encodeU8Array(encoder);
         }
       }
-      return obj;
-    } // decode OutpointInput
-
-    public size(): u32 {
-      let size: u32 = 0;
-
-      size +=
-        this.txid.length > 0
-          ? 1 + __proto.Sizer.varint64(this.txid.length) + this.txid.length
-          : 0;
-      size += this.pos == 0 ? 0 : 1 + __proto.Sizer.uint32(this.pos);
-
-      return size;
-    }
-
-    // Encodes OutpointInput to the ArrayBuffer
-    encode(): ArrayBuffer {
-      return changetype<ArrayBuffer>(
-        StaticArray.fromArray<u8>(this.encodeU8Array())
-      );
-    }
-
-    // Encodes OutpointInput to the Array<u8>
-    encodeU8Array(
-      encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
-    ): Array<u8> {
-      const buf = encoder.buf;
-
-      if (this.txid.length > 0) {
-        encoder.uint32(0xa);
-        encoder.uint32(this.txid.length);
-        encoder.bytes(this.txid);
-      }
-      if (this.pos != 0) {
-        encoder.uint32(0x10);
-        encoder.uint32(this.pos);
-      }
 
       return buf;
-    } // encode OutpointInput
-  } // OutpointInput
+    } // encode OutpointOut
+  } // OutpointOut
 
   export class PaginationInput {
     public start: u32;
@@ -982,7 +1017,7 @@ export namespace metashrew_runes {
   } // WalletInput
 
   export class WalletOutput {
-    public outpoints: Array<Outpoint> = new Array<Outpoint>();
+    public outpoints: Array<OutpointOut> = new Array<OutpointOut>();
 
     // Decodes WalletOutput from an ArrayBuffer
     static decode(buf: ArrayBuffer): WalletOutput {
@@ -1002,7 +1037,7 @@ export namespace metashrew_runes {
           case 1: {
             const length = decoder.uint32();
             obj.outpoints.push(
-              Outpoint.decodeDataView(
+              OutpointOut.decodeDataView(
                 new DataView(
                   decoder.view.buffer,
                   decoder.pos + decoder.view.byteOffset,

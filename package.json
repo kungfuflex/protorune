@@ -16,6 +16,7 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "@bitauth/libauth": "^3.0.0",
     "@protobuf-ts/protoc": "^2.9.4",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.10.6",

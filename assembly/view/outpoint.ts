@@ -21,7 +21,12 @@ import { encodeHexFromBuffer } from "metashrew-as/assembly/utils/hex";
 import { console } from "metashrew-as/assembly/utils/logging";
 import { fromArrayBuffer, fieldToU128, fieldToName } from "../utils";
 
-export function outpointBase(outpoint: ArrayBuffer): metashrew_runes.Outpoint {
+export function outpointBase(
+  inp: metashrew_runes.Outpoint
+): metashrew_runes.OutpointOut {
+  const txid = changetype<Uint8Array>(inp.txid).buffer;
+  const pos = inp.pos;
+  const outpoint = OutPoint.from(txid, pos).toArrayBuffer();
   const op = OUTPOINT_TO_RUNES.select(outpoint);
   const balanceSheet = BalanceSheet.load(op);
 
@@ -55,18 +60,15 @@ export function outpointBase(outpoint: ArrayBuffer): metashrew_runes.Outpoint {
       return d.toBytes(true);
     }
   );
-  const message = new metashrew_runes.Outpoint();
+  const message = new metashrew_runes.OutpointOut();
   message.runes = runes;
-
+  message.outpoint = inp;
   message.balances = balances;
   return message;
 }
 
 export function outpoint(): ArrayBuffer {
   const _input = input().slice(4);
-  const inp = metashrew_runes.OutpointInput.decode(_input);
-  const txid = changetype<Uint8Array>(inp.txid).buffer;
-  const pos = inp.pos;
-  const outpoint = OutPoint.from(txid, pos).toArrayBuffer();
-  return outpointBase(outpoint).encode();
+  const inp = metashrew_runes.Outpoint.decode(_input);
+  return outpointBase(inp).encode();
 }

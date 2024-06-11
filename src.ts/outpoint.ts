@@ -1,4 +1,4 @@
-import { Outpoint, OutpointInput } from "./proto/metashrew-runes";
+import { OutpointOut, Outpoint } from "./proto/metashrew-runes";
 
 export type Rune = {
   id: string;
@@ -12,20 +12,22 @@ export type Rune = {
 export type OutPoint = {
   runes: Rune[];
   balances: BigInt[];
+  outpoint: {
+    txid: string;
+    pos: number;
+  };
 };
 
 export function encodeOutpointInput(txid: string, pos: number): string {
-  const input: OutpointInput = {
+  const input: Outpoint = {
     txid: Buffer.from(txid, "hex"),
     pos,
   };
-  const str = Buffer.from(OutpointInput.toBinary(input)).toString("hex");
+  const str = Buffer.from(Outpoint.toBinary(input)).toString("hex");
   return "0x" + str;
 }
 
-export function decodeOutpointView(hex: string): OutPoint {
-  const bytes = Uint8Array.from(Buffer.from(hex, "hex"));
-  const op = Outpoint.fromBinary(bytes);
+export function decodeOutpointViewBase(op: OutpointOut): OutPoint {
   const runes = op.runes.map((d) => {
     const spacer = "•";
     const bitField = d.spacers.toString(2);
@@ -58,5 +60,16 @@ export function decodeOutpointView(hex: string): OutPoint {
   return {
     runes,
     balances,
+    outpoint: {
+      txid: Buffer.from(op.outpoint.txid).toString("hex"),
+      pos: op.outpoint.pos,
+    },
   };
+}
+
+export function decodeOutpointView(hex: string): OutPoint {
+  console.log(hex);
+  const bytes = Uint8Array.from(Buffer.from(hex, "hex"));
+  const op = OutpointOut.fromBinary(bytes);
+  return decodeOutpointViewBase(op);
 }

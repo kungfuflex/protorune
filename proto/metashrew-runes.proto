@@ -16,14 +16,16 @@ message Rune {
 }
 
 
-message Outpoint {
-  repeated Rune runes = 1;
-  repeated bytes balances = 2; 
-}
 
-message OutpointInput {
+message Outpoint {
   bytes txid = 1;
   uint32 pos = 2;
+}
+
+message OutpointOut {
+  repeated Rune runes = 1;
+  repeated bytes balances = 2; 
+  Outpoint outpoint = 3;
 }
 
 message PaginationInput {
@@ -36,7 +38,7 @@ message WalletInput {
 }
 
 message WalletOutput {
-  repeated Outpoint outpoints = 1;
+  repeated OutpointOut outpoints = 1;
 }
 
 message RunesOutput {
