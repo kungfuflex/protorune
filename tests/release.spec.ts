@@ -98,7 +98,7 @@ const runTest = (s) =>
 describe("metashrew-runes", () => {
   let hash: string;
   before(async () => {
-    const file = readFileSync("build/release.wasm");
+    const file = readFileSync("build/debug.wasm");
     hash = sha3_256(file);
   });
   // [
@@ -136,7 +136,10 @@ describe("metashrew-runes", () => {
         const walletView = buildView("wallet");
         const input = encodeWalletInput(wallet);
         let response = await walletView(input);
-        const { result } = await response.json();
+        const json = await response.json();
+	console.log(json);
+	const { result } = json;
+	console.log(result);
         const outputs = decodeWalletOutput(result);
         console.log(inspect(outputs, false, 5, true));
         return [...(await a), outputs];
@@ -161,7 +164,7 @@ describe("metashrew-runes", () => {
     res.map((hex) => {
       if (hex) {
         const outpoint = decodeOutpointView(hex);
-        //console.log(outpoint);
+        console.log(outpoint);
       }
     });
   });
