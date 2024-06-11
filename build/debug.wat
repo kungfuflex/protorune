@@ -8752,6 +8752,347 @@
   local.get $res
   return
  )
+<<<<<<< HEAD
+=======
+ (func $~lib/string/String#concat (param $this i32) (param $other i32) (result i32)
+  (local $thisSize i32)
+  (local $otherSize i32)
+  (local $outSize i32)
+  (local $out i32)
+  local.get $this
+  call $~lib/string/String#get:length
+  i32.const 1
+  i32.shl
+  local.set $thisSize
+  local.get $other
+  call $~lib/string/String#get:length
+  i32.const 1
+  i32.shl
+  local.set $otherSize
+  local.get $thisSize
+  local.get $otherSize
+  i32.add
+  local.set $outSize
+  local.get $outSize
+  i32.const 0
+  i32.eq
+  if
+   i32.const 6384
+   return
+  end
+  local.get $outSize
+  i32.const 2
+  call $~lib/rt/stub/__new
+  local.set $out
+  local.get $out
+  local.get $this
+  local.get $thisSize
+  memory.copy
+  local.get $out
+  local.get $thisSize
+  i32.add
+  local.get $other
+  local.get $otherSize
+  memory.copy
+  local.get $out
+  return
+ )
+ (func $~lib/string/String.__concat (param $left i32) (param $right i32) (result i32)
+  local.get $left
+  local.get $right
+  call $~lib/string/String#concat
+  return
+ )
+ (func $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#selectIndex (param $this i32) (param $index i32) (result i32)
+  local.get $this
+  i32.const 4576
+  local.get $index
+  i32.const 10
+  call $~lib/number/U32#toString
+  call $~lib/string/String.__concat
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#keyword
+  return
+ )
+ (func $~lib/metashrew-spendables/assembly/indexer/removeFromIndex (param $output i32)
+  (local $lookup i32)
+  (local $address i32)
+  (local $hash i32)
+  (local $addressPointer i32)
+  (local $i i32)
+  (local $itemPointer i32)
+  (local $item i32)
+  (local $vl i32)
+  (local $vr i32)
+  (local $n i32)
+  (local $vl|11 i32)
+  (local $vr|12 i32)
+  (local $n|13 i32)
+  (local $a i32)
+  (local $b i32)
+  (local $16 i32)
+  (local $a|17 i32)
+  (local $b|18 i32)
+  global.get $~lib/metashrew-spendables/assembly/tables/OUTPOINT_SPENDABLE_BY
+  local.get $output
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
+  local.set $lookup
+  local.get $lookup
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#get
+  local.set $address
+  local.get $address
+  call $~lib/arraybuffer/ArrayBuffer#get:byteLength
+  i32.const 0
+  i32.eq
+  if
+   return
+  end
+  local.get $output
+  call $~lib/fast-sha256-as/assembly/sha256/sha256
+  local.set $hash
+  global.get $~lib/metashrew-spendables/assembly/tables/OUTPOINTS_FOR_ADDRESS
+  local.get $address
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
+  local.set $addressPointer
+  local.get $addressPointer
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#length
+  local.set $i
+  block $while-break|0
+   loop $while-continue|0
+    local.get $i
+    i32.const 0
+    i32.ge_u
+    if
+     local.get $addressPointer
+     local.get $i
+     call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#selectIndex
+     local.set $itemPointer
+     local.get $itemPointer
+     call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#get
+     local.set $item
+     local.get $item
+     call $~lib/arraybuffer/ArrayBuffer#get:byteLength
+     i32.const 0
+     i32.gt_s
+     if
+      block $~lib/memory/memory.compare|inlined.0 (result i32)
+       local.get $item
+       local.set $vl
+       local.get $hash
+       local.set $vr
+       local.get $item
+       call $~lib/arraybuffer/ArrayBuffer#get:byteLength
+       local.set $n
+       block $~lib/util/memory/memcmp|inlined.0 (result i32)
+        local.get $vl
+        local.set $vl|11
+        local.get $vr
+        local.set $vr|12
+        local.get $n
+        local.set $n|13
+        local.get $vl|11
+        local.get $vr|12
+        i32.eq
+        if
+         i32.const 0
+         br $~lib/util/memory/memcmp|inlined.0
+        end
+        i32.const 0
+        i32.const 2
+        i32.lt_s
+        drop
+        local.get $vl|11
+        i32.const 7
+        i32.and
+        local.get $vr|12
+        i32.const 7
+        i32.and
+        i32.eq
+        if
+         loop $while-continue|1
+          local.get $vl|11
+          i32.const 7
+          i32.and
+          if
+           local.get $n|13
+           i32.eqz
+           if
+            i32.const 0
+            br $~lib/util/memory/memcmp|inlined.0
+           end
+           local.get $vl|11
+           i32.load8_u
+           local.set $a
+           local.get $vr|12
+           i32.load8_u
+           local.set $b
+           local.get $a
+           local.get $b
+           i32.ne
+           if
+            local.get $a
+            local.get $b
+            i32.sub
+            br $~lib/util/memory/memcmp|inlined.0
+           end
+           local.get $n|13
+           i32.const 1
+           i32.sub
+           local.set $n|13
+           local.get $vl|11
+           i32.const 1
+           i32.add
+           local.set $vl|11
+           local.get $vr|12
+           i32.const 1
+           i32.add
+           local.set $vr|12
+           br $while-continue|1
+          end
+         end
+         block $while-break|2
+          loop $while-continue|2
+           local.get $n|13
+           i32.const 8
+           i32.ge_u
+           if
+            local.get $vl|11
+            i64.load
+            local.get $vr|12
+            i64.load
+            i64.ne
+            if
+             br $while-break|2
+            end
+            local.get $vl|11
+            i32.const 8
+            i32.add
+            local.set $vl|11
+            local.get $vr|12
+            i32.const 8
+            i32.add
+            local.set $vr|12
+            local.get $n|13
+            i32.const 8
+            i32.sub
+            local.set $n|13
+            br $while-continue|2
+           end
+          end
+         end
+        end
+        loop $while-continue|3
+         local.get $n|13
+         local.tee $16
+         i32.const 1
+         i32.sub
+         local.set $n|13
+         local.get $16
+         if
+          local.get $vl|11
+          i32.load8_u
+          local.set $a|17
+          local.get $vr|12
+          i32.load8_u
+          local.set $b|18
+          local.get $a|17
+          local.get $b|18
+          i32.ne
+          if
+           local.get $a|17
+           local.get $b|18
+           i32.sub
+           br $~lib/util/memory/memcmp|inlined.0
+          end
+          local.get $vl|11
+          i32.const 1
+          i32.add
+          local.set $vl|11
+          local.get $vr|12
+          i32.const 1
+          i32.add
+          local.set $vr|12
+          br $while-continue|3
+         end
+        end
+        i32.const 0
+        br $~lib/util/memory/memcmp|inlined.0
+       end
+       br $~lib/memory/memory.compare|inlined.0
+      end
+      i32.const 0
+      i32.eq
+      if
+       local.get $itemPointer
+       i32.const 0
+       i32.const 0
+       call $~lib/arraybuffer/ArrayBuffer#constructor
+       call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
+       br $while-break|0
+      end
+     end
+     local.get $i
+     i32.const 1
+     i32.sub
+     local.set $i
+     br $while-continue|0
+    end
+   end
+  end
+ )
+ (func $~lib/metashrew-spendables/assembly/indexer/Index.indexBlock~anonymous|0~anonymous|0 (param $input i32) (param $i i32) (param $ary i32)
+  local.get $input
+  call $~lib/metashrew-as/assembly/blockdata/transaction/Input#get:hash
+  local.get $input
+  call $~lib/metashrew-as/assembly/blockdata/transaction/Input#get:index
+  call $~lib/metashrew-spendables/assembly/indexer/outputToBytes
+  call $~lib/metashrew-spendables/assembly/indexer/removeFromIndex
+ )
+ (func $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Input>#forEach (param $this i32) (param $fn i32)
+  (local $i i32)
+  (local $len i32)
+  (local $4 i32)
+  (local $5 i32)
+  i32.const 0
+  local.set $i
+  local.get $this
+  call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Input>#get:length_
+  local.set $len
+  loop $for-loop|0
+   local.get $i
+   local.get $len
+   local.tee $4
+   local.get $this
+   call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Input>#get:length_
+   local.tee $5
+   local.get $4
+   local.get $5
+   i32.lt_s
+   select
+   i32.lt_s
+   if
+    local.get $this
+    call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Input>#get:dataStart
+    local.get $i
+    i32.const 2
+    i32.shl
+    i32.add
+    i32.load
+    local.get $i
+    local.get $this
+    i32.const 3
+    global.set $~argumentsLength
+    local.get $fn
+    i32.load
+    call_indirect (type $5)
+    local.get $i
+    i32.const 1
+    i32.add
+    local.set $i
+    br $for-loop|0
+   end
+  end
+ )
+>>>>>>> f65b940 (update metashrew-spendables)
  (func $~lib/metashrew-as/assembly/blockdata/transaction/Output#get:script (param $this i32) (result i32)
   local.get $this
   i32.load offset=16

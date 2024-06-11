@@ -1345,10 +1345,14 @@
      i32.const 0
     else
 <<<<<<< HEAD
+<<<<<<< HEAD
      block $__inlined_func$~lib/string/String.__eq$1637 (result i32)
 =======
      block $__inlined_func$~lib/string/String.__eq$1718 (result i32)
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+     block $__inlined_func$~lib/string/String.__eq$1719 (result i32)
+>>>>>>> f65b940 (update metashrew-spendables)
       i32.const 1
       local.get $5
       i32.load
@@ -1356,10 +1360,14 @@
       local.get $1
       i32.eq
 <<<<<<< HEAD
+<<<<<<< HEAD
       br_if $__inlined_func$~lib/string/String.__eq$1637
 =======
       br_if $__inlined_func$~lib/string/String.__eq$1718
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+      br_if $__inlined_func$~lib/string/String.__eq$1719
+>>>>>>> f65b940 (update metashrew-spendables)
       drop
       i32.const 0
       local.get $1
@@ -1368,10 +1376,14 @@
       i32.eqz
       i32.or
 <<<<<<< HEAD
+<<<<<<< HEAD
       br_if $__inlined_func$~lib/string/String.__eq$1637
 =======
       br_if $__inlined_func$~lib/string/String.__eq$1718
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+      br_if $__inlined_func$~lib/string/String.__eq$1719
+>>>>>>> f65b940 (update metashrew-spendables)
       drop
       i32.const 0
       local.get $2
@@ -1389,10 +1401,14 @@
       i32.shr_u
       i32.ne
 <<<<<<< HEAD
+<<<<<<< HEAD
       br_if $__inlined_func$~lib/string/String.__eq$1637
 =======
       br_if $__inlined_func$~lib/string/String.__eq$1718
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+      br_if $__inlined_func$~lib/string/String.__eq$1719
+>>>>>>> f65b940 (update metashrew-spendables)
       drop
       local.get $1
       local.set $3
@@ -6066,7 +6082,12 @@
  (func $~lib/metashrew-spendables/assembly/indexer/Index.indexBlock~anonymous|0~anonymous|0 (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
   (local $4 i32)
-  block $__inlined_func$~lib/metashrew-spendables/assembly/indexer/removeFromIndex$1743
+  (local $5 i32)
+  (local $6 i32)
+  (local $7 i32)
+  (local $8 i32)
+  (local $9 i32)
+  block $__inlined_func$~lib/metashrew-spendables/assembly/indexer/removeFromIndex$93
    local.get $0
    i32.load offset=4
    local.get $0
@@ -6077,58 +6098,172 @@
    local.get $0
    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#get
-   local.tee $2
+   local.tee $1
    i32.const 20
    i32.sub
    i32.load offset=16
    i32.eqz
-   br_if $__inlined_func$~lib/metashrew-spendables/assembly/indexer/removeFromIndex$1743
+   br_if $__inlined_func$~lib/metashrew-spendables/assembly/indexer/removeFromIndex$93
    local.get $0
    call $~lib/fast-sha256-as/assembly/sha256/sha256
-   local.set $1
-   global.get $~lib/metashrew-spendables/assembly/tables/OUTPOINTS_FOR_ADDRESS
-   local.get $2
-   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
    local.set $3
+   global.get $~lib/metashrew-spendables/assembly/tables/OUTPOINTS_FOR_ADDRESS
+   local.get $1
+   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
+   local.set $6
    i32.const 1
    global.set $~argumentsLength
-   local.get $3
+   local.get $6
    i32.const 5552
    i32.const 0
    call $~lib/string/String.UTF8.encode@varargs
    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#getValue<u32>
-   local.set $0
+   local.set $5
    loop $while-continue|0
     block $while-break|0
-     local.get $3
-     local.get $0
+     local.get $6
+     local.get $5
      call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#selectIndex
-     local.tee $4
+     local.tee $7
      call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#get
-     local.tee $2
+     local.tee $1
      i32.const 20
      i32.sub
      i32.load offset=16
+     local.tee $0
      i32.const 0
      i32.gt_s
      if
-      local.get $2
-      call $~lib/fast-sha256-as/assembly/sha256/sha256
-      local.get $1
-      i32.eq
+      i32.const 0
+      local.set $4
+      block $~lib/util/memory/memcmp|inlined.0
+       local.get $3
+       local.tee $2
+       local.get $1
+       i32.eq
+       br_if $~lib/util/memory/memcmp|inlined.0
+       local.get $1
+       i32.const 7
+       i32.and
+       local.get $2
+       i32.const 7
+       i32.and
+       i32.eq
+       if
+        loop $while-continue|1
+         local.get $1
+         i32.const 7
+         i32.and
+         if
+          i32.const 0
+          local.set $4
+          local.get $0
+          i32.eqz
+          br_if $~lib/util/memory/memcmp|inlined.0
+          local.get $1
+          i32.load8_u
+          local.tee $8
+          local.get $2
+          i32.load8_u
+          local.tee $9
+          i32.sub
+          local.set $4
+          local.get $8
+          local.get $9
+          i32.ne
+          br_if $~lib/util/memory/memcmp|inlined.0
+          local.get $0
+          i32.const 1
+          i32.sub
+          local.set $0
+          local.get $1
+          i32.const 1
+          i32.add
+          local.set $1
+          local.get $2
+          i32.const 1
+          i32.add
+          local.set $2
+          br $while-continue|1
+         end
+        end
+        loop $while-continue|2
+         local.get $0
+         i32.const 8
+         i32.ge_u
+         if
+          local.get $1
+          i64.load
+          local.get $2
+          i64.load
+          i64.eq
+          if
+           local.get $1
+           i32.const 8
+           i32.add
+           local.set $1
+           local.get $2
+           i32.const 8
+           i32.add
+           local.set $2
+           local.get $0
+           i32.const 8
+           i32.sub
+           local.set $0
+           br $while-continue|2
+          end
+         end
+        end
+       end
+       loop $while-continue|3
+        local.get $0
+        local.tee $4
+        i32.const 1
+        i32.sub
+        local.set $0
+        local.get $4
+        if
+         local.get $1
+         i32.load8_u
+         local.tee $8
+         local.get $2
+         i32.load8_u
+         local.tee $9
+         i32.sub
+         local.set $4
+         local.get $8
+         local.get $9
+         i32.ne
+         br_if $~lib/util/memory/memcmp|inlined.0
+         local.get $1
+         i32.const 1
+         i32.add
+         local.set $1
+         local.get $2
+         i32.const 1
+         i32.add
+         local.set $2
+         br $while-continue|3
+        end
+       end
+       i32.const 0
+       local.set $4
+      end
+      local.get $4
+      i32.eqz
       if
-       local.get $4
+       local.get $7
        i32.const 0
        call $~lib/arraybuffer/ArrayBuffer#constructor
        call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
        br $while-break|0
       end
      end
-     local.get $0
+     local.get $5
      i32.const 1
      i32.sub
-     local.set $0
+     local.set $5
      br $while-continue|0
     end
    end
@@ -7044,10 +7179,14 @@
   (local $5 i32)
   (local $6 i32)
 <<<<<<< HEAD
+<<<<<<< HEAD
   block $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/Script#is_p2pkh$1417
 =======
   block $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/Script#is_p2pkh$1473
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+  block $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/Script#is_p2pkh$1474
+>>>>>>> f65b940 (update metashrew-spendables)
    local.get $0
    i32.load
    local.tee $4
@@ -7055,10 +7194,14 @@
    i32.const 25
    i32.ne
 <<<<<<< HEAD
+<<<<<<< HEAD
    br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/Script#is_p2pkh$1417
 =======
    br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/Script#is_p2pkh$1473
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+   br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/Script#is_p2pkh$1474
+>>>>>>> f65b940 (update metashrew-spendables)
    i32.const 1
    local.set $1
    local.get $4
@@ -7106,10 +7249,14 @@
     i32.const 0
    end
 <<<<<<< HEAD
+<<<<<<< HEAD
    br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/Script#is_p2pkh$1417
 =======
    br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/Script#is_p2pkh$1473
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+   br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/Script#is_p2pkh$1474
+>>>>>>> f65b940 (update metashrew-spendables)
    i32.const 0
    local.set $1
   end
@@ -7158,10 +7305,14 @@
    i32.const 0
    local.set $1
 <<<<<<< HEAD
+<<<<<<< HEAD
    block $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/Script#is_p2sh$1419
 =======
    block $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/Script#is_p2sh$1475
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+   block $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/Script#is_p2sh$1476
+>>>>>>> f65b940 (update metashrew-spendables)
     local.get $0
     i32.load
     local.tee $4
@@ -7169,10 +7320,14 @@
     i32.const 23
     i32.ne
 <<<<<<< HEAD
+<<<<<<< HEAD
     br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/Script#is_p2sh$1419
 =======
     br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/Script#is_p2sh$1475
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+    br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/Script#is_p2sh$1476
+>>>>>>> f65b940 (update metashrew-spendables)
     i32.const 1
     local.set $1
     local.get $4
@@ -7200,10 +7355,14 @@
      i32.const 0
     end
 <<<<<<< HEAD
+<<<<<<< HEAD
     br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/Script#is_p2sh$1419
 =======
     br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/Script#is_p2sh$1475
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+    br_if $__inlined_func$~lib/metashrew-as/assembly/utils/yabsp/Script#is_p2sh$1476
+>>>>>>> f65b940 (update metashrew-spendables)
     i32.const 0
     local.set $1
    end
@@ -8374,10 +8533,14 @@
   i32.load
   local.set $3
 <<<<<<< HEAD
+<<<<<<< HEAD
   block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1448"
 =======
   block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1504"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+  block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1505"
+>>>>>>> f65b940 (update metashrew-spendables)
    loop $while-continue|0
     local.get $3
     if
@@ -8395,10 +8558,14 @@
       i64.eq
      end
 <<<<<<< HEAD
+<<<<<<< HEAD
      br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1448"
 =======
      br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1504"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+     br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1505"
+>>>>>>> f65b940 (update metashrew-spendables)
      local.get $4
      i32.const -2
      i32.and
@@ -8670,10 +8837,14 @@
   i32.load
   local.set $0
 <<<<<<< HEAD
+<<<<<<< HEAD
   block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1449"
 =======
   block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1505"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+  block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1506"
+>>>>>>> f65b940 (update metashrew-spendables)
    loop $while-continue|0
     local.get $0
     if
@@ -8691,10 +8862,14 @@
       i64.eq
      end
 <<<<<<< HEAD
+<<<<<<< HEAD
      br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1449"
 =======
      br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1505"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+     br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1506"
+>>>>>>> f65b940 (update metashrew-spendables)
      local.get $2
      i32.const -2
      i32.and
@@ -9001,10 +9176,14 @@
      i32.load
      local.set $0
 <<<<<<< HEAD
+<<<<<<< HEAD
      block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1456"
 =======
      block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1512"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+     block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1513"
+>>>>>>> f65b940 (update metashrew-spendables)
       loop $while-continue|01
        local.get $0
        if
@@ -9022,10 +9201,14 @@
          i64.eq
         end
 <<<<<<< HEAD
+<<<<<<< HEAD
         br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1456"
 =======
         br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1512"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+        br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1513"
+>>>>>>> f65b940 (update metashrew-spendables)
         local.get $6
         i32.const -2
         i32.and
@@ -10982,10 +11165,14 @@
   i32.load
   local.set $3
 <<<<<<< HEAD
+<<<<<<< HEAD
   block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1501"
 =======
   block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1558"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+  block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1559"
+>>>>>>> f65b940 (update metashrew-spendables)
    loop $while-continue|0
     local.get $3
     if
@@ -11003,10 +11190,14 @@
       i64.eq
      end
 <<<<<<< HEAD
+<<<<<<< HEAD
      br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1501"
 =======
      br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1558"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+     br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1559"
+>>>>>>> f65b940 (update metashrew-spendables)
      local.get $5
      i32.const -2
      i32.and
@@ -11354,10 +11545,14 @@
   i32.load
   local.set $2
 <<<<<<< HEAD
+<<<<<<< HEAD
   block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1515"
 =======
   block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1572"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+  block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1573"
+>>>>>>> f65b940 (update metashrew-spendables)
    loop $while-continue|0
     local.get $2
     if
@@ -11375,10 +11570,14 @@
       i64.eq
      end
 <<<<<<< HEAD
+<<<<<<< HEAD
      br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1515"
 =======
      br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1572"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+     br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1573"
+>>>>>>> f65b940 (update metashrew-spendables)
      local.get $3
      i32.const -2
      i32.and
@@ -11616,10 +11815,14 @@
   i32.load
   local.set $2
 <<<<<<< HEAD
+<<<<<<< HEAD
   block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1517"
 =======
   block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1574"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+  block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1575"
+>>>>>>> f65b940 (update metashrew-spendables)
    loop $while-continue|0
     local.get $2
     if
@@ -11637,10 +11840,14 @@
       i64.eq
      end
 <<<<<<< HEAD
+<<<<<<< HEAD
      br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1517"
 =======
      br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1574"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+     br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1575"
+>>>>>>> f65b940 (update metashrew-spendables)
      local.get $8
      i32.const -2
      i32.and
@@ -11689,10 +11896,14 @@
   i32.load
   local.set $2
 <<<<<<< HEAD
+<<<<<<< HEAD
   block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1519"
 =======
   block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1576"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+  block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1577"
+>>>>>>> f65b940 (update metashrew-spendables)
    loop $while-continue|03
     local.get $2
     if
@@ -11710,10 +11921,14 @@
       i64.eq
      end
 <<<<<<< HEAD
+<<<<<<< HEAD
      br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1519"
 =======
      br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1576"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+     br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1577"
+>>>>>>> f65b940 (update metashrew-spendables)
      local.get $8
      i32.const -2
      i32.and
@@ -11827,10 +12042,14 @@
    i32.load
    local.set $2
 <<<<<<< HEAD
+<<<<<<< HEAD
    block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1521"
 =======
    block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1578"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+   block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1579"
+>>>>>>> f65b940 (update metashrew-spendables)
     loop $while-continue|04
      local.get $2
      if
@@ -11848,10 +12067,14 @@
        i64.eq
       end
 <<<<<<< HEAD
+<<<<<<< HEAD
       br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1521"
 =======
       br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1578"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+      br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1579"
+>>>>>>> f65b940 (update metashrew-spendables)
       local.get $3
       i32.const -2
       i32.and
@@ -11912,10 +12135,14 @@
    i32.load
    local.set $2
 <<<<<<< HEAD
+<<<<<<< HEAD
    block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1522"
 =======
    block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1579"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+   block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1580"
+>>>>>>> f65b940 (update metashrew-spendables)
     loop $while-continue|05
      local.get $2
      if
@@ -11933,10 +12160,14 @@
        i64.eq
       end
 <<<<<<< HEAD
+<<<<<<< HEAD
       br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1522"
 =======
       br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1579"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+      br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1580"
+>>>>>>> f65b940 (update metashrew-spendables)
       local.get $3
       i32.const -2
       i32.and
@@ -12008,10 +12239,14 @@
    i32.load
    local.set $2
 <<<<<<< HEAD
+<<<<<<< HEAD
    block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1523"
 =======
    block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1580"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+   block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1581"
+>>>>>>> f65b940 (update metashrew-spendables)
     loop $while-continue|06
      local.get $2
      if
@@ -12029,10 +12264,14 @@
        i64.eq
       end
 <<<<<<< HEAD
+<<<<<<< HEAD
       br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1523"
 =======
       br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1580"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+      br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1581"
+>>>>>>> f65b940 (update metashrew-spendables)
       local.get $3
       i32.const -2
       i32.and
@@ -12080,10 +12319,14 @@
    i32.load
    local.set $2
 <<<<<<< HEAD
+<<<<<<< HEAD
    block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1525"
 =======
    block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1582"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+   block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1583"
+>>>>>>> f65b940 (update metashrew-spendables)
     loop $while-continue|07
      local.get $2
      if
@@ -12101,10 +12344,14 @@
        i64.eq
       end
 <<<<<<< HEAD
+<<<<<<< HEAD
       br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1525"
 =======
       br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1582"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+      br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1583"
+>>>>>>> f65b940 (update metashrew-spendables)
       local.get $3
       i32.const -2
       i32.and
@@ -12152,10 +12399,14 @@
    i32.load
    local.set $2
 <<<<<<< HEAD
+<<<<<<< HEAD
    block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1527"
 =======
    block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1584"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+   block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1585"
+>>>>>>> f65b940 (update metashrew-spendables)
     loop $while-continue|08
      local.get $2
      if
@@ -12173,10 +12424,14 @@
        i64.eq
       end
 <<<<<<< HEAD
+<<<<<<< HEAD
       br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1527"
 =======
       br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1584"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+      br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1585"
+>>>>>>> f65b940 (update metashrew-spendables)
       local.get $3
       i32.const -2
       i32.and
@@ -12224,10 +12479,14 @@
    i32.load
    local.set $2
 <<<<<<< HEAD
+<<<<<<< HEAD
    block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1529"
 =======
    block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1586"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+   block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1587"
+>>>>>>> f65b940 (update metashrew-spendables)
     loop $while-continue|09
      local.get $2
      if
@@ -12245,10 +12504,14 @@
        i64.eq
       end
 <<<<<<< HEAD
+<<<<<<< HEAD
       br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1529"
 =======
       br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1586"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+      br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1587"
+>>>>>>> f65b940 (update metashrew-spendables)
       local.get $3
       i32.const -2
       i32.and
@@ -12297,10 +12560,14 @@
   i32.load
   local.set $2
 <<<<<<< HEAD
+<<<<<<< HEAD
   block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1531"
 =======
   block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1588"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+  block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1589"
+>>>>>>> f65b940 (update metashrew-spendables)
    loop $while-continue|010
     local.get $2
     if
@@ -12318,10 +12585,14 @@
       i64.eq
      end
 <<<<<<< HEAD
+<<<<<<< HEAD
      br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1531"
 =======
      br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1588"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+     br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1589"
+>>>>>>> f65b940 (update metashrew-spendables)
      local.get $3
      i32.const -2
      i32.and
@@ -12370,10 +12641,14 @@
   i32.load
   local.set $2
 <<<<<<< HEAD
+<<<<<<< HEAD
   block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1533"
 =======
   block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1590"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+  block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1591"
+>>>>>>> f65b940 (update metashrew-spendables)
    loop $while-continue|011
     local.get $2
     if
@@ -12391,10 +12666,14 @@
       i64.eq
      end
 <<<<<<< HEAD
+<<<<<<< HEAD
      br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1533"
 =======
      br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1590"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+     br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1591"
+>>>>>>> f65b940 (update metashrew-spendables)
      local.get $3
      i32.const -2
      i32.and
@@ -12476,10 +12755,14 @@
   i32.load
   local.set $0
 <<<<<<< HEAD
+<<<<<<< HEAD
   block $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$1537"
 =======
   block $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$1594"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+  block $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$1595"
+>>>>>>> f65b940 (update metashrew-spendables)
    loop $while-continue|0
     local.get $0
     if
@@ -12497,10 +12780,14 @@
       i32.eq
      end
 <<<<<<< HEAD
+<<<<<<< HEAD
      br_if $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$1537"
 =======
      br_if $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$1594"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+     br_if $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$1595"
+>>>>>>> f65b940 (update metashrew-spendables)
      local.get $2
      i32.const -2
      i32.and
@@ -12575,10 +12862,14 @@
   i32.load
   local.set $1
 <<<<<<< HEAD
+<<<<<<< HEAD
   block $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$1540"
 =======
   block $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$1597"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+  block $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$1598"
+>>>>>>> f65b940 (update metashrew-spendables)
    loop $while-continue|0
     local.get $1
     if
@@ -12596,10 +12887,14 @@
       i32.eq
      end
 <<<<<<< HEAD
+<<<<<<< HEAD
      br_if $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$1540"
 =======
      br_if $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$1597"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+     br_if $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$1598"
+>>>>>>> f65b940 (update metashrew-spendables)
      local.get $4
      i32.const -2
      i32.and
@@ -13191,10 +13486,14 @@
       i32.load offset=12
       local.set $2
 <<<<<<< HEAD
+<<<<<<< HEAD
       block $__inlined_func$~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#findIndex$1549
 =======
       block $__inlined_func$~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#findIndex$1606
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+      block $__inlined_func$~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#findIndex$1607
+>>>>>>> f65b940 (update metashrew-spendables)
        loop $for-loop|002
         local.get $1
         local.get $2
@@ -13224,10 +13523,14 @@
          i32.load
          call_indirect (type $2)
 <<<<<<< HEAD
+<<<<<<< HEAD
          br_if $__inlined_func$~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#findIndex$1549
 =======
          br_if $__inlined_func$~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#findIndex$1606
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+         br_if $__inlined_func$~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#findIndex$1607
+>>>>>>> f65b940 (update metashrew-spendables)
          local.get $1
          i32.const 1
          i32.add
@@ -13596,10 +13899,14 @@
        i32.load
        local.set $1
 <<<<<<< HEAD
+<<<<<<< HEAD
        block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1552"
 =======
        block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1609"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+       block $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1610"
+>>>>>>> f65b940 (update metashrew-spendables)
         loop $while-continue|02
          local.get $1
          if
@@ -13617,10 +13924,14 @@
            i64.eq
           end
 <<<<<<< HEAD
+<<<<<<< HEAD
           br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1552"
 =======
           br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1609"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+          br_if $"__inlined_func$~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#find$1610"
+>>>>>>> f65b940 (update metashrew-spendables)
           local.get $2
           i32.const -2
           i32.and
@@ -13721,10 +14032,14 @@
        i32.load
        local.set $2
 <<<<<<< HEAD
+<<<<<<< HEAD
        block $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$1536"
 =======
        block $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$1593"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+       block $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$1594"
+>>>>>>> f65b940 (update metashrew-spendables)
         loop $while-continue|00
          local.get $2
          if
@@ -13742,10 +14057,14 @@
            i32.eq
           end
 <<<<<<< HEAD
+<<<<<<< HEAD
           br_if $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$1536"
 =======
           br_if $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$1593"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+          br_if $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$1594"
+>>>>>>> f65b940 (update metashrew-spendables)
           local.get $6
           i32.const -2
           i32.and
@@ -13851,10 +14170,14 @@
         i32.load
         local.set $2
 <<<<<<< HEAD
+<<<<<<< HEAD
         block $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$15360"
 =======
         block $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$15930"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+        block $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$15940"
+>>>>>>> f65b940 (update metashrew-spendables)
          loop $while-continue|03
           local.get $2
           if
@@ -13872,10 +14195,14 @@
             i32.eq
            end
 <<<<<<< HEAD
+<<<<<<< HEAD
            br_if $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$15360"
 =======
            br_if $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$15930"
 >>>>>>> 21d213c (view function to fetch by address)
+=======
+           br_if $"__inlined_func$~lib/map/Map<u32,assembly/indexer/BalanceSheet/BalanceSheet>#find$15940"
+>>>>>>> f65b940 (update metashrew-spendables)
            local.get $13
            i32.const -2
            i32.and
