@@ -25576,7 +25576,7 @@
   loop $while-continue|0
    local.get $i
    i32.const 0
-   i32.ge_u
+   i32.ge_s
    if
     local.get $addressPointer
     local.get $i

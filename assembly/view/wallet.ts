@@ -4,6 +4,7 @@ import { metashrew_runes } from "../proto/metashrew-runes";
 import { Output } from "metashrew-as/assembly/blockdata/transaction";
 import { Box } from "metashrew-as/assembly/utils/box";
 import { parsePrimitive } from "metashrew-as/assembly/utils/utils";
+import { console } from "metashrew-as/assembly/utils/logging";
 import { input } from "metashrew-as/assembly/indexer";
 
 export function wallet(): ArrayBuffer {
@@ -11,10 +12,10 @@ export function wallet(): ArrayBuffer {
   const address = changetype<Uint8Array>(_address).buffer;
 
   const addressPointer = OUTPOINTS_FOR_ADDRESS.select(address);
-  let i = addressPointer.length();
+  let i = <i32>addressPointer.length();
   const outpoints = new Array<metashrew_runes.OutpointOut>();
   while (i >= 0) {
-    const itemPointer = addressPointer.selectIndex(i);
+    const itemPointer = addressPointer.selectIndex(<u32>i);
     const item = itemPointer.get();
     i--;
     if (item.byteLength == 0) continue;

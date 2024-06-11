@@ -1,11 +1,13 @@
 import fs from "fs-extra";
 
+import { inspect } from "node:util";
 import { IndexerProgram } from "metashrew-test";
 import path from "path";
 import {
   decodeOutpointView,
   encodeOutpointInput,
   encodeWalletInput,
+  decodeWalletOutput,
 } from "../src.ts";
 import { sha3_256 } from "js-sha3";
 import { readFileSync } from "fs";
@@ -123,17 +125,30 @@ describe("metashrew-runes", () => {
     };
   }
   it("should test address output", async () => {
-    const wallet =
-      "bc1pzskepp4ys2septcfz483lmk22xvwdgydgt5r4fgmfagqegwh5a8se48yxf";
-    const walletView = buildView("wallet");
-    const input = encodeWalletInput(wallet);
-    let response = await walletView(input);
-    console.log(await response.json());
+    const wallets = [
+      "bc1pwpd3dfvvsy2gcdc6du27wkzwl86pp50arycwzrh3r28a5g46fjfsluvsr9",
+      "bc1pzskepp4ys2septcfz483lmk22xvwdgydgt5r4fgmfagqegwh5a8se48yxf",
+    ];
+
+    await wallets.reduce(
+      async (a, wallet) => {
+        await a;
+        const walletView = buildView("wallet");
+        const input = encodeWalletInput(wallet);
+        let response = await walletView(input);
+        const { result } = await response.json();
+        const outputs = decodeWalletOutput(result);
+        console.log(inspect(outputs, false, 5, true));
+        return [...(await a), outputs];
+      },
+      Promise.resolve([] as any[])
+    );
   });
   it("should test balanceSheet Output", async () => {
     const inputs = [
       ["d66defd5daa5b101d0bf9fb47581dbd76827572646211f5058328b28765e9fda", "0"],
       ["8c6c6b86069435308f468a3db4063d8b266b6dfc845ea4c5202920b13b464c44", "1"],
+      ["e79134080a83fe3e0e06ed6990c5a9b63b362313341745707a2bff7d788a1375", "1"],
     ].map((d) => encodeOutpointInput(d[0], parseInt(d[1])));
     const outpoint = buildView("outpoint");
     const res = await inputs.reduce(async (_res: Promise<any[]>, input) => {
@@ -146,7 +161,7 @@ describe("metashrew-runes", () => {
     res.map((hex) => {
       if (hex) {
         const outpoint = decodeOutpointView(hex);
-        console.log(outpoint);
+        //console.log(outpoint);
       }
     });
   });

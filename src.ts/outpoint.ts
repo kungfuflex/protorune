@@ -34,12 +34,14 @@ export function decodeOutpointViewBase(op: OutpointOut): OutPoint {
     let name = Buffer.from(d.name).toString("utf-8");
     let spaced_name = name;
     const symbol = String.fromCharCode(d.symbol);
+    let x = 0;
     bitField
       .split("")
       .reverse()
       .map((d, i) => {
         if (d == "1") {
-          spaced_name = `${spaced_name.slice(0, i + 1)}${spacer}${spaced_name.slice(i + 1)}`;
+          spaced_name = `${spaced_name.slice(0, i + 1 + x)}${spacer}${spaced_name.slice(i + 1 + x)}`;
+          x++;
         }
       });
     const rune: Rune = {
@@ -68,7 +70,6 @@ export function decodeOutpointViewBase(op: OutpointOut): OutPoint {
 }
 
 export function decodeOutpointView(hex: string): OutPoint {
-  console.log(hex);
   const bytes = Uint8Array.from(Buffer.from(hex, "hex"));
   const op = OutpointOut.fromBinary(bytes);
   return decodeOutpointViewBase(op);
