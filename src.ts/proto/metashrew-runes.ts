@@ -88,6 +88,24 @@ export interface PaginationInput {
     end: number;
 }
 /**
+ * @generated from protobuf message metashrew_runes.WalletInput
+ */
+export interface WalletInput {
+    /**
+     * @generated from protobuf field: bytes wallet = 1;
+     */
+    wallet: Uint8Array;
+}
+/**
+ * @generated from protobuf message metashrew_runes.WalletOutput
+ */
+export interface WalletOutput {
+    /**
+     * @generated from protobuf field: repeated metashrew_runes.Outpoint outpoints = 1;
+     */
+    outpoints: Outpoint[];
+}
+/**
  * @generated from protobuf message metashrew_runes.RunesOutput
  */
 export interface RunesOutput {
@@ -394,6 +412,100 @@ class PaginationInput$Type extends MessageType<PaginationInput> {
  * @generated MessageType for protobuf message metashrew_runes.PaginationInput
  */
 export const PaginationInput = new PaginationInput$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class WalletInput$Type extends MessageType<WalletInput> {
+    constructor() {
+        super("metashrew_runes.WalletInput", [
+            { no: 1, name: "wallet", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+        ]);
+    }
+    create(value?: PartialMessage<WalletInput>): WalletInput {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.wallet = new Uint8Array(0);
+        if (value !== undefined)
+            reflectionMergePartial<WalletInput>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: WalletInput): WalletInput {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bytes wallet */ 1:
+                    message.wallet = reader.bytes();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: WalletInput, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* bytes wallet = 1; */
+        if (message.wallet.length)
+            writer.tag(1, WireType.LengthDelimited).bytes(message.wallet);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message metashrew_runes.WalletInput
+ */
+export const WalletInput = new WalletInput$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class WalletOutput$Type extends MessageType<WalletOutput> {
+    constructor() {
+        super("metashrew_runes.WalletOutput", [
+            { no: 1, name: "outpoints", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Outpoint }
+        ]);
+    }
+    create(value?: PartialMessage<WalletOutput>): WalletOutput {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.outpoints = [];
+        if (value !== undefined)
+            reflectionMergePartial<WalletOutput>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: WalletOutput): WalletOutput {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated metashrew_runes.Outpoint outpoints */ 1:
+                    message.outpoints.push(Outpoint.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: WalletOutput, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* repeated metashrew_runes.Outpoint outpoints = 1; */
+        for (let i = 0; i < message.outpoints.length; i++)
+            Outpoint.internalBinaryWrite(message.outpoints[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message metashrew_runes.WalletOutput
+ */
+export const WalletOutput = new WalletOutput$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class RunesOutput$Type extends MessageType<RunesOutput> {
     constructor() {

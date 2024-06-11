@@ -31,6 +31,14 @@ message PaginationInput {
   uint32 end = 2;
 }
 
+message WalletInput {
+  bytes wallet = 1;
+}
+
+message WalletOutput {
+  repeated Outpoint outpoints = 1;
+}
+
 message RunesOutput {
   repeated Rune runes = 1;
 }

@@ -916,6 +916,154 @@ export namespace metashrew_runes {
     } // encode PaginationInput
   } // PaginationInput
 
+  export class WalletInput {
+    public wallet: Array<u8> = new Array<u8>();
+
+    // Decodes WalletInput from an ArrayBuffer
+    static decode(buf: ArrayBuffer): WalletInput {
+      return WalletInput.decodeDataView(new DataView(buf));
+    }
+
+    // Decodes WalletInput from a DataView
+    static decodeDataView(view: DataView): WalletInput {
+      const decoder = new __proto.Decoder(view);
+      const obj = new WalletInput();
+
+      while (!decoder.eof()) {
+        const tag = decoder.tag();
+        const number = tag >>> 3;
+
+        switch (number) {
+          case 1: {
+            obj.wallet = decoder.bytes();
+            break;
+          }
+
+          default:
+            decoder.skipType(tag & 7);
+            break;
+        }
+      }
+      return obj;
+    } // decode WalletInput
+
+    public size(): u32 {
+      let size: u32 = 0;
+
+      size +=
+        this.wallet.length > 0
+          ? 1 + __proto.Sizer.varint64(this.wallet.length) + this.wallet.length
+          : 0;
+
+      return size;
+    }
+
+    // Encodes WalletInput to the ArrayBuffer
+    encode(): ArrayBuffer {
+      return changetype<ArrayBuffer>(
+        StaticArray.fromArray<u8>(this.encodeU8Array())
+      );
+    }
+
+    // Encodes WalletInput to the Array<u8>
+    encodeU8Array(
+      encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
+    ): Array<u8> {
+      const buf = encoder.buf;
+
+      if (this.wallet.length > 0) {
+        encoder.uint32(0xa);
+        encoder.uint32(this.wallet.length);
+        encoder.bytes(this.wallet);
+      }
+
+      return buf;
+    } // encode WalletInput
+  } // WalletInput
+
+  export class WalletOutput {
+    public outpoints: Array<Outpoint> = new Array<Outpoint>();
+
+    // Decodes WalletOutput from an ArrayBuffer
+    static decode(buf: ArrayBuffer): WalletOutput {
+      return WalletOutput.decodeDataView(new DataView(buf));
+    }
+
+    // Decodes WalletOutput from a DataView
+    static decodeDataView(view: DataView): WalletOutput {
+      const decoder = new __proto.Decoder(view);
+      const obj = new WalletOutput();
+
+      while (!decoder.eof()) {
+        const tag = decoder.tag();
+        const number = tag >>> 3;
+
+        switch (number) {
+          case 1: {
+            const length = decoder.uint32();
+            obj.outpoints.push(
+              Outpoint.decodeDataView(
+                new DataView(
+                  decoder.view.buffer,
+                  decoder.pos + decoder.view.byteOffset,
+                  length
+                )
+              )
+            );
+            decoder.skip(length);
+
+            break;
+          }
+
+          default:
+            decoder.skipType(tag & 7);
+            break;
+        }
+      }
+      return obj;
+    } // decode WalletOutput
+
+    public size(): u32 {
+      let size: u32 = 0;
+
+      for (let n: i32 = 0; n < this.outpoints.length; n++) {
+        const messageSize = this.outpoints[n].size();
+
+        if (messageSize > 0) {
+          size += 1 + __proto.Sizer.varint64(messageSize) + messageSize;
+        }
+      }
+
+      return size;
+    }
+
+    // Encodes WalletOutput to the ArrayBuffer
+    encode(): ArrayBuffer {
+      return changetype<ArrayBuffer>(
+        StaticArray.fromArray<u8>(this.encodeU8Array())
+      );
+    }
+
+    // Encodes WalletOutput to the Array<u8>
+    encodeU8Array(
+      encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
+    ): Array<u8> {
+      const buf = encoder.buf;
+
+      for (let n: i32 = 0; n < this.outpoints.length; n++) {
+        const messageSize = this.outpoints[n].size();
+
+        if (messageSize > 0) {
+          encoder.uint32(0xa);
+          encoder.uint32(messageSize);
+          this.outpoints[n].encodeU8Array(encoder);
+        }
+      }
+
+      return buf;
+    } // encode WalletOutput
+  } // WalletOutput
+
   export class RunesOutput {
     public runes: Array<Rune> = new Array<Rune>();
 
