@@ -915,6 +915,89 @@ export namespace metashrew_runes {
       return buf;
     } // encode PaginationInput
   } // PaginationInput
+
+  export class RunesOutput {
+    public runes: Array<Rune> = new Array<Rune>();
+
+    // Decodes RunesOutput from an ArrayBuffer
+    static decode(buf: ArrayBuffer): RunesOutput {
+      return RunesOutput.decodeDataView(new DataView(buf));
+    }
+
+    // Decodes RunesOutput from a DataView
+    static decodeDataView(view: DataView): RunesOutput {
+      const decoder = new __proto.Decoder(view);
+      const obj = new RunesOutput();
+
+      while (!decoder.eof()) {
+        const tag = decoder.tag();
+        const number = tag >>> 3;
+
+        switch (number) {
+          case 1: {
+            const length = decoder.uint32();
+            obj.runes.push(
+              Rune.decodeDataView(
+                new DataView(
+                  decoder.view.buffer,
+                  decoder.pos + decoder.view.byteOffset,
+                  length
+                )
+              )
+            );
+            decoder.skip(length);
+
+            break;
+          }
+
+          default:
+            decoder.skipType(tag & 7);
+            break;
+        }
+      }
+      return obj;
+    } // decode RunesOutput
+
+    public size(): u32 {
+      let size: u32 = 0;
+
+      for (let n: i32 = 0; n < this.runes.length; n++) {
+        const messageSize = this.runes[n].size();
+
+        if (messageSize > 0) {
+          size += 1 + __proto.Sizer.varint64(messageSize) + messageSize;
+        }
+      }
+
+      return size;
+    }
+
+    // Encodes RunesOutput to the ArrayBuffer
+    encode(): ArrayBuffer {
+      return changetype<ArrayBuffer>(
+        StaticArray.fromArray<u8>(this.encodeU8Array())
+      );
+    }
+
+    // Encodes RunesOutput to the Array<u8>
+    encodeU8Array(
+      encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
+    ): Array<u8> {
+      const buf = encoder.buf;
+
+      for (let n: i32 = 0; n < this.runes.length; n++) {
+        const messageSize = this.runes[n].size();
+
+        if (messageSize > 0) {
+          encoder.uint32(0xa);
+          encoder.uint32(messageSize);
+          this.runes[n].encodeU8Array(encoder);
+        }
+      }
+
+      return buf;
+    } // encode RunesOutput
+  } // RunesOutput
 } // metashrew_runes
 
 // __size_bytes_repeated

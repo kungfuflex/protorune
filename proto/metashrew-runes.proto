@@ -30,3 +30,7 @@ message PaginationInput {
   uint32 start = 1;
   uint32 end = 2;
 }
+
+message RunesOutput {
+  repeated Rune runes = 1;
+}

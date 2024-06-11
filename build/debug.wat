@@ -110,7 +110,7 @@
  (global $~lib/as-bignum/assembly/globals/__divmod_quot_hi (mut i64) (i64.const 0))
  (global $~lib/as-bignum/assembly/globals/__divmod_rem_lo (mut i64) (i64.const 0))
  (global $~lib/as-bignum/assembly/globals/__divmod_rem_hi (mut i64) (i64.const 0))
- (global $~lib/memory/__heap_base i32 (i32.const 16492))
+ (global $~lib/memory/__heap_base i32 (i32.const 16556))
  (memory $0 1)
  (data $0 (i32.const 12) "\1c\02\00\00\00\00\00\00\00\00\00\00\04\00\00\00\00\02\00\00000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8d9dadbdcdddedfe0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4f5f6f7f8f9fafbfcfdfeff\00\00\00\00\00\00\00\00\00\00\00\00")
  (data $1 (i32.const 556) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00(\00\00\00A\00l\00l\00o\00c\00a\00t\00i\00o\00n\00 \00t\00o\00o\00 \00l\00a\00r\00g\00e\00\00\00\00\00")
@@ -212,8 +212,15 @@
  (data $97 (i32.const 16396) "\1c\00\00\00\00\00\00\00\00\00\00\00>\00\00\00\08\00\00\00\0e\00\00\00\00\00\00\00\00\00\00\00")
  (data $98 (i32.const 16428) "\1c\00\00\00\00\00\00\00\00\00\00\00F\00\00\00\08\00\00\00\0f\00\00\00\00\00\00\00\00\00\00\00")
  (data $99 (i32.const 16460) "\1c\00\00\00\00\00\00\00\00\00\00\00H\00\00\00\08\00\00\00\10\00\00\00\00\00\00\00\00\00\00\00")
+<<<<<<< HEAD
  (table $0 17 17 funcref)
  (elem $0 (i32.const 1) $~lib/metashrew-as/assembly/indexer/index/_flush~anonymous|0 $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|0 $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|1 $~lib/metashrew-as/assembly/utils/utils/concat~anonymous|0 $~lib/metashrew-spendables/assembly/indexer/Index.indexBlock~anonymous|0~anonymous|0 $~lib/metashrew-spendables/assembly/indexer/Index.indexBlock~anonymous|0 $assembly/indexer/Indexer/Index.indexBlock~anonymous|0 $assembly/indexer/Edict/Edict.fromDeltaSeries~anonymous|0 $assembly/indexer/Indexer/Index.indexBlock~anonymous|1 $assembly/indexer/BalanceSheet/BalanceSheet.concat~anonymous|0 $assembly/utils/fieldToArrayBuffer~anonymous|0 $assembly/indexer/RuneId/RuneId.fromBytes~anonymous|0 $assembly/indexer/RuneId/RuneId.fromBytesU128~anonymous|0 $assembly/view/outpoint/outpoint~anonymous|0~anonymous|0 $assembly/view/outpoint/outpoint~anonymous|0 $assembly/view/outpoint/outpoint~anonymous|1)
+=======
+ (data $100 (i32.const 16492) "\1c\00\00\00\00\00\00\00\00\00\00\00>\00\00\00\08\00\00\00\11\00\00\00\00\00\00\00\00\00\00\00")
+ (data $101 (i32.const 16524) "\1c\00\00\00\00\00\00\00\00\00\00\00K\00\00\00\08\00\00\00\12\00\00\00\00\00\00\00\00\00\00\00")
+ (table $0 19 19 funcref)
+ (elem $0 (i32.const 1) $~lib/metashrew-as/assembly/indexer/index/_flush~anonymous|0 $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|0 $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|1 $~lib/metashrew-spendables/assembly/indexer/Index.indexBlock~anonymous|0~anonymous|0 $~lib/metashrew-as/assembly/utils/utils/concat~anonymous|0 $~lib/metashrew-spendables/assembly/indexer/Index.indexBlock~anonymous|0 $assembly/indexer/Indexer/Index.indexBlock~anonymous|0 $assembly/indexer/Edict/Edict.fromDeltaSeries~anonymous|0 $assembly/indexer/Indexer/Index.indexBlock~anonymous|1 $assembly/indexer/BalanceSheet/BalanceSheet.concat~anonymous|0 $assembly/utils/fieldToArrayBuffer~anonymous|0 $assembly/indexer/RuneId/RuneId.fromBytes~anonymous|0 $assembly/indexer/RuneId/RuneId.fromBytesU128~anonymous|0 $assembly/view/outpoint/outpoint~anonymous|0~anonymous|0 $assembly/view/outpoint/outpoint~anonymous|0 $assembly/view/outpoint/outpoint~anonymous|1 $assembly/view/runes/runes~anonymous|0~anonymous|0 $assembly/view/runes/runes~anonymous|0)
+>>>>>>> a3fe1db (wrote out runes view function)
  (export "trap" (func $assembly/index/trap))
  (export "_start" (func $assembly/index/_start))
  (export "test_indexEtching" (func $assembly/tests/test_indexEtching))
@@ -24249,10 +24256,535 @@
   call $assembly/proto/metashrew-runes/metashrew_runes.Outpoint#encode
   return
  )
+ (func $assembly/proto/metashrew-runes/metashrew_runes.PaginationInput#set:start (param $this i32) (param $start i32)
+  local.get $this
+  local.get $start
+  i32.store
+ )
+ (func $assembly/proto/metashrew-runes/metashrew_runes.PaginationInput#set:end (param $this i32) (param $end i32)
+  local.get $this
+  local.get $end
+  i32.store offset=4
+ )
+ (func $assembly/proto/metashrew-runes/metashrew_runes.PaginationInput#constructor (param $this i32) (result i32)
+  local.get $this
+  i32.eqz
+  if
+   i32.const 8
+   i32.const 74
+   call $~lib/rt/stub/__new
+   local.set $this
+  end
+  local.get $this
+  call $~lib/object/Object#constructor
+  local.set $this
+  local.get $this
+  i32.const 0
+  call $assembly/proto/metashrew-runes/metashrew_runes.PaginationInput#set:start
+  local.get $this
+  i32.const 0
+  call $assembly/proto/metashrew-runes/metashrew_runes.PaginationInput#set:end
+  local.get $this
+ )
+ (func $assembly/proto/metashrew-runes/metashrew_runes.PaginationInput.decodeDataView (param $view i32) (result i32)
+  (local $decoder i32)
+  (local $obj i32)
+  (local $this i32)
+  (local $this|4 i32)
+  (local $this|5 i32)
+  (local $tag i32)
+  (local $number i32)
+  (local $8 i32)
+  (local $this|9 i32)
+  (local $this|10 i32)
+  i32.const 0
+  local.get $view
+  call $assembly/proto/metashrew-runes/__proto.Decoder#constructor
+  local.set $decoder
+  i32.const 0
+  call $assembly/proto/metashrew-runes/metashrew_runes.PaginationInput#constructor
+  local.set $obj
+  loop $while-continue|0
+   block $assembly/proto/metashrew-runes/__proto.Decoder#eof|inlined.1 (result i32)
+    local.get $decoder
+    local.set $this
+    local.get $this
+    call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+    local.get $this
+    call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
+    call $~lib/dataview/DataView#get:byteLength
+    i32.ge_s
+    br $assembly/proto/metashrew-runes/__proto.Decoder#eof|inlined.1
+   end
+   i32.eqz
+   if
+    block $assembly/proto/metashrew-runes/__proto.Decoder#tag|inlined.1 (result i32)
+     local.get $decoder
+     local.set $this|4
+     block $assembly/proto/metashrew-runes/__proto.Decoder#uint32|inlined.5 (result i32)
+      local.get $this|4
+      local.set $this|5
+      local.get $this|5
+      call $assembly/proto/metashrew-runes/__proto.Decoder#varint
+      i32.wrap_i64
+      br $assembly/proto/metashrew-runes/__proto.Decoder#uint32|inlined.5
+     end
+     br $assembly/proto/metashrew-runes/__proto.Decoder#tag|inlined.1
+    end
+    local.set $tag
+    local.get $tag
+    i32.const 3
+    i32.shr_u
+    local.set $number
+    block $break|1
+     block $case2|1
+      block $case1|1
+       block $case0|1
+        local.get $number
+        local.set $8
+        local.get $8
+        i32.const 1
+        i32.eq
+        br_if $case0|1
+        local.get $8
+        i32.const 2
+        i32.eq
+        br_if $case1|1
+        br $case2|1
+       end
+       local.get $obj
+       block $assembly/proto/metashrew-runes/__proto.Decoder#uint32|inlined.6 (result i32)
+        local.get $decoder
+        local.set $this|9
+        local.get $this|9
+        call $assembly/proto/metashrew-runes/__proto.Decoder#varint
+        i32.wrap_i64
+        br $assembly/proto/metashrew-runes/__proto.Decoder#uint32|inlined.6
+       end
+       call $assembly/proto/metashrew-runes/metashrew_runes.PaginationInput#set:start
+       br $break|1
+      end
+      local.get $obj
+      block $assembly/proto/metashrew-runes/__proto.Decoder#uint32|inlined.7 (result i32)
+       local.get $decoder
+       local.set $this|10
+       local.get $this|10
+       call $assembly/proto/metashrew-runes/__proto.Decoder#varint
+       i32.wrap_i64
+       br $assembly/proto/metashrew-runes/__proto.Decoder#uint32|inlined.7
+      end
+      call $assembly/proto/metashrew-runes/metashrew_runes.PaginationInput#set:end
+      br $break|1
+     end
+     local.get $decoder
+     local.get $tag
+     i32.const 7
+     i32.and
+     call $assembly/proto/metashrew-runes/__proto.Decoder#skipType
+     br $break|1
+    end
+    br $while-continue|0
+   end
+  end
+  local.get $obj
+  return
+ )
+ (func $assembly/proto/metashrew-runes/metashrew_runes.PaginationInput.decode (param $buf i32) (result i32)
+  i32.const 0
+  local.get $buf
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/dataview/DataView#constructor@varargs
+  call $assembly/proto/metashrew-runes/metashrew_runes.PaginationInput.decodeDataView
+  return
+ )
+ (func $assembly/proto/metashrew-runes/metashrew_runes.PaginationInput#get:start (param $this i32) (result i32)
+  local.get $this
+  i32.load
+ )
+ (func $assembly/proto/metashrew-runes/metashrew_runes.PaginationInput#get:end (param $this i32) (result i32)
+  local.get $this
+  i32.load offset=4
+ )
+ (func $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#getList (param $this i32) (result i32)
+  (local $result i32)
+  (local $i i32)
+  i32.const 0
+  local.get $this
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#length
+  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#constructor
+  local.set $result
+  i32.const 0
+  local.set $i
+  loop $for-loop|0
+   local.get $i
+   local.get $result
+   call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#get:length
+   i32.lt_s
+   if
+    local.get $result
+    local.get $i
+    local.get $this
+    local.get $i
+    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#selectIndex
+    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#get
+    call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#__set
+    local.get $i
+    i32.const 1
+    i32.add
+    local.set $i
+    br $for-loop|0
+   end
+  end
+  local.get $result
+  return
+ )
+ (func $assembly/view/runes/runes~anonymous|0~anonymous|0 (param $a i32) (param $d i32) (param $$2 i32) (param $$3 i32) (result i32)
+  local.get $a
+  local.get $d
+  call $~lib/array/Array<u8>#push
+  drop
+  local.get $a
+  return
+ )
+ (func $assembly/view/runes/runes~anonymous|0 (param $d i32) (param $$1 i32) (param $$2 i32) (result i32)
+  (local $name i32)
+  (local $rune i32)
+  (local $runeId i32)
+  (local $_runeId i32)
+  local.get $d
+  call $assembly/utils/fromArrayBuffer
+  local.set $name
+  i32.const 0
+  call $assembly/proto/metashrew-runes/metashrew_runes.Rune#constructor
+  local.set $rune
+  i32.const 0
+  call $assembly/proto/metashrew-runes/metashrew_runes.RuneId#constructor
+  local.set $runeId
+  global.get $assembly/indexer/constants/ETCHING_TO_RUNE_ID
+  local.get $d
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#get
+  call $assembly/indexer/RuneId/RuneId.fromBytesU128
+  local.set $_runeId
+  local.get $runeId
+  local.get $_runeId
+  call $assembly/indexer/RuneId/RuneId#get:block
+  call $assembly/proto/metashrew-runes/metashrew_runes.RuneId#set:block
+  local.get $runeId
+  local.get $_runeId
+  call $assembly/indexer/RuneId/RuneId#get:tx
+  call $assembly/proto/metashrew-runes/metashrew_runes.RuneId#set:tx
+  local.get $rune
+  local.get $runeId
+  call $assembly/proto/metashrew-runes/metashrew_runes.Rune#set:runeId
+  local.get $rune
+  local.get $name
+  call $assembly/utils/fieldToName
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/string/String.UTF8.encode@varargs
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/typedarray/Uint8Array.wrap@varargs
+  i32.const 16512
+  i32.const 0
+  i32.const 0
+  call $~lib/array/Array<u8>#constructor
+  call $~lib/typedarray/Uint8Array#reduce<~lib/array/Array<u8>>
+  call $assembly/proto/metashrew-runes/metashrew_runes.Rune#set:name
+  local.get $rune
+  global.get $assembly/indexer/constants/DIVISIBILITY
+  local.get $d
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#getValue<u8>
+  call $assembly/proto/metashrew-runes/metashrew_runes.Rune#set:divisibility
+  local.get $rune
+  global.get $assembly/indexer/constants/SYMBOL
+  local.get $d
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#getValue<u8>
+  call $assembly/proto/metashrew-runes/metashrew_runes.Rune#set:symbol
+  local.get $rune
+  global.get $assembly/indexer/constants/SPACERS
+  local.get $d
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#getValue<u32>
+  call $assembly/proto/metashrew-runes/metashrew_runes.Rune#set:spacers
+  local.get $rune
+  return
+ )
+ (func $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#map<assembly/proto/metashrew-runes/metashrew_runes.Rune> (param $this i32) (param $fn i32) (result i32)
+  (local $len i32)
+  (local $out i32)
+  (local $outStart i32)
+  (local $i i32)
+  (local $6 i32)
+  (local $7 i32)
+  (local $result i32)
+  local.get $this
+  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#get:length_
+  local.set $len
+  local.get $len
+  i32.const 2
+  i32.const 69
+  i32.const 0
+  call $~lib/rt/__newArray
+  local.set $out
+  local.get $out
+  call $~lib/array/Array<assembly/proto/metashrew-runes/metashrew_runes.Rune>#get:dataStart
+  local.set $outStart
+  i32.const 0
+  local.set $i
+  loop $for-loop|0
+   local.get $i
+   local.get $len
+   local.tee $6
+   local.get $this
+   call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#get:length_
+   local.tee $7
+   local.get $6
+   local.get $7
+   i32.lt_s
+   select
+   i32.lt_s
+   if
+    local.get $this
+    call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#get:dataStart
+    local.get $i
+    i32.const 2
+    i32.shl
+    i32.add
+    i32.load
+    local.get $i
+    local.get $this
+    i32.const 3
+    global.set $~argumentsLength
+    local.get $fn
+    i32.load
+    call_indirect (type $3)
+    local.set $result
+    local.get $outStart
+    local.get $i
+    i32.const 2
+    i32.shl
+    i32.add
+    local.get $result
+    i32.store
+    i32.const 1
+    drop
+    local.get $out
+    local.get $result
+    i32.const 1
+    call $~lib/rt/stub/__link
+    local.get $i
+    i32.const 1
+    i32.add
+    local.set $i
+    br $for-loop|0
+   end
+  end
+  local.get $out
+  return
+ )
+ (func $assembly/proto/metashrew-runes/metashrew_runes.RunesOutput#set:runes (param $this i32) (param $runes i32)
+  local.get $this
+  local.get $runes
+  i32.store
+  local.get $this
+  local.get $runes
+  i32.const 0
+  call $~lib/rt/stub/__link
+ )
+ (func $assembly/proto/metashrew-runes/metashrew_runes.RunesOutput#constructor (param $this i32) (result i32)
+  local.get $this
+  i32.eqz
+  if
+   i32.const 4
+   i32.const 76
+   call $~lib/rt/stub/__new
+   local.set $this
+  end
+  local.get $this
+  call $~lib/object/Object#constructor
+  local.set $this
+  local.get $this
+  i32.const 0
+  i32.const 0
+  call $~lib/array/Array<assembly/proto/metashrew-runes/metashrew_runes.Rune>#constructor
+  call $assembly/proto/metashrew-runes/metashrew_runes.RunesOutput#set:runes
+  local.get $this
+ )
+ (func $assembly/proto/metashrew-runes/metashrew_runes.RunesOutput#get:runes (param $this i32) (result i32)
+  local.get $this
+  i32.load
+ )
+ (func $assembly/proto/metashrew-runes/metashrew_runes.RunesOutput#encodeU8Array (param $this i32) (param $encoder i32) (result i32)
+  (local $buf i32)
+  (local $n i32)
+  (local $messageSize i32)
+  (local $this|5 i32)
+  (local $value i32)
+  (local $this|7 i32)
+  (local $value|8 i32)
+  local.get $encoder
+  call $assembly/proto/metashrew-runes/__proto.Encoder#get:buf
+  local.set $buf
+  i32.const 0
+  local.set $n
+  loop $for-loop|0
+   local.get $n
+   local.get $this
+   call $assembly/proto/metashrew-runes/metashrew_runes.RunesOutput#get:runes
+   call $~lib/array/Array<assembly/proto/metashrew-runes/metashrew_runes.Rune>#get:length
+   i32.lt_s
+   if
+    local.get $this
+    call $assembly/proto/metashrew-runes/metashrew_runes.RunesOutput#get:runes
+    local.get $n
+    call $~lib/array/Array<assembly/proto/metashrew-runes/metashrew_runes.Rune>#__get
+    call $assembly/proto/metashrew-runes/metashrew_runes.Rune#size
+    local.set $messageSize
+    local.get $messageSize
+    i32.const 0
+    i32.gt_u
+    if
+     local.get $encoder
+     local.set $this|5
+     i32.const 10
+     local.set $value
+     local.get $this|5
+     local.get $value
+     i64.extend_i32_u
+     call $assembly/proto/metashrew-runes/__proto.Encoder#varint64
+     local.get $encoder
+     local.set $this|7
+     local.get $messageSize
+     local.set $value|8
+     local.get $this|7
+     local.get $value|8
+     i64.extend_i32_u
+     call $assembly/proto/metashrew-runes/__proto.Encoder#varint64
+     local.get $this
+     call $assembly/proto/metashrew-runes/metashrew_runes.RunesOutput#get:runes
+     local.get $n
+     call $~lib/array/Array<assembly/proto/metashrew-runes/metashrew_runes.Rune>#__get
+     local.get $encoder
+     call $assembly/proto/metashrew-runes/metashrew_runes.Rune#encodeU8Array
+     drop
+    end
+    local.get $n
+    i32.const 1
+    i32.add
+    local.set $n
+    br $for-loop|0
+   end
+  end
+  local.get $buf
+  return
+ )
+ (func $assembly/proto/metashrew-runes/metashrew_runes.RunesOutput#encodeU8Array@varargs (param $this i32) (param $encoder i32) (result i32)
+  block $1of1
+   block $0of1
+    block $outOfRange
+     global.get $~argumentsLength
+     br_table $0of1 $1of1 $outOfRange
+    end
+    unreachable
+   end
+   i32.const 0
+   i32.const 0
+   i32.const 0
+   call $~lib/array/Array<u8>#constructor
+   call $assembly/proto/metashrew-runes/__proto.Encoder#constructor
+   local.set $encoder
+  end
+  local.get $this
+  local.get $encoder
+  call $assembly/proto/metashrew-runes/metashrew_runes.RunesOutput#encodeU8Array
+ )
+ (func $assembly/proto/metashrew-runes/metashrew_runes.RunesOutput#encode (param $this i32) (result i32)
+  local.get $this
+  i32.const 0
+  global.set $~argumentsLength
+  i32.const 0
+  call $assembly/proto/metashrew-runes/metashrew_runes.RunesOutput#encodeU8Array@varargs
+  call $~lib/staticarray/StaticArray.fromArray<u8>
+  return
+ )
  (func $assembly/view/runes/runes (result i32)
+  (local $inp i32)
+  (local $start i32)
+  (local $end i32)
+  (local $_list i32)
+  (local $i i32)
+  (local $list i32)
+  (local $message i32)
+  call $~lib/metashrew-as/assembly/indexer/index/input
+  i32.const 4
+  i32.const 1073741820
+  call $~lib/arraybuffer/ArrayBuffer#slice
+  call $assembly/proto/metashrew-runes/metashrew_runes.PaginationInput.decode
+  local.set $inp
+  local.get $inp
+  call $assembly/proto/metashrew-runes/metashrew_runes.PaginationInput#get:start
+  local.set $start
+  local.get $inp
+  call $assembly/proto/metashrew-runes/metashrew_runes.PaginationInput#get:end
+  local.set $end
   i32.const 0
   i32.const 0
-  call $~lib/arraybuffer/ArrayBuffer#constructor
+  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#constructor
+  local.set $_list
+  local.get $inp
+  call $assembly/proto/metashrew-runes/metashrew_runes.PaginationInput#get:end
+  i32.const 0
+  i32.eq
+  if
+   global.get $assembly/indexer/constants/ETCHINGS
+   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#getList
+   local.set $_list
+  else
+   local.get $start
+   local.set $i
+   loop $for-loop|0
+    local.get $i
+    local.get $end
+    i32.lt_u
+    if
+     local.get $_list
+     global.get $assembly/indexer/constants/ETCHINGS
+     local.get $i
+     call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#selectIndex
+     call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#get
+     call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#push
+     drop
+     local.get $i
+     i32.const 1
+     i32.add
+     local.set $i
+     br $for-loop|0
+    end
+   end
+  end
+  local.get $_list
+  i32.const 16544
+  call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#map<assembly/proto/metashrew-runes/metashrew_runes.Rune>
+  local.set $list
+  i32.const 0
+  call $assembly/proto/metashrew-runes/metashrew_runes.RunesOutput#constructor
+  local.set $message
+  local.get $message
+  local.get $list
+  call $assembly/proto/metashrew-runes/metashrew_runes.RunesOutput#set:runes
+  local.get $message
+  call $assembly/proto/metashrew-runes/metashrew_runes.RunesOutput#encode
   return
  )
  (func $~lib/as-bignum/assembly/integer/u128/u128#clone@override (param $0 i32) (result i32)
