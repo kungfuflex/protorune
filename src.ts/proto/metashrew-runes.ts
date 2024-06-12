@@ -15,13 +15,13 @@ import { MessageType } from "@protobuf-ts/runtime";
  */
 export interface RuneId {
     /**
-     * @generated from protobuf field: uint64 block = 1;
+     * @generated from protobuf field: uint32 height = 1;
      */
-    block: bigint;
+    height: number;
     /**
-     * @generated from protobuf field: uint32 tx = 2;
+     * @generated from protobuf field: uint32 txindex = 2;
      */
-    tx: number;
+    txindex: number;
 }
 /**
  * @generated from protobuf message metashrew_runes.Rune
@@ -49,6 +49,28 @@ export interface Rune {
     symbol: number;
 }
 /**
+ * @generated from protobuf message metashrew_runes.BalanceSheetItem
+ */
+export interface BalanceSheetItem {
+    /**
+     * @generated from protobuf field: metashrew_runes.Rune rune = 1;
+     */
+    rune?: Rune;
+    /**
+     * @generated from protobuf field: bytes balance = 2;
+     */
+    balance: Uint8Array;
+}
+/**
+ * @generated from protobuf message metashrew_runes.BalanceSheet
+ */
+export interface BalanceSheet {
+    /**
+     * @generated from protobuf field: repeated metashrew_runes.BalanceSheetItem entries = 1;
+     */
+    entries: BalanceSheetItem[];
+}
+/**
  * @generated from protobuf message metashrew_runes.Outpoint
  */
 export interface Outpoint {
@@ -57,26 +79,47 @@ export interface Outpoint {
      */
     txid: Uint8Array;
     /**
-     * @generated from protobuf field: uint32 pos = 2;
+     * @generated from protobuf field: uint32 vout = 2;
      */
-    pos: number;
+    vout: number;
 }
 /**
- * @generated from protobuf message metashrew_runes.OutpointOut
+ * @generated from protobuf message metashrew_runes.Output
  */
-export interface OutpointOut {
+export interface Output {
     /**
-     * @generated from protobuf field: repeated metashrew_runes.Rune runes = 1;
+     * @generated from protobuf field: bytes script = 1;
      */
-    runes: Rune[];
+    script: Uint8Array;
     /**
-     * @generated from protobuf field: repeated bytes balances = 2;
+     * @generated from protobuf field: uint64 value = 2;
      */
-    balances: Uint8Array[];
+    value: bigint;
+}
+/**
+ * @generated from protobuf message metashrew_runes.OutpointResponse
+ */
+export interface OutpointResponse {
     /**
-     * @generated from protobuf field: metashrew_runes.Outpoint outpoint = 3;
+     * @generated from protobuf field: metashrew_runes.BalanceSheet balances = 1;
+     */
+    balances?: BalanceSheet;
+    /**
+     * @generated from protobuf field: metashrew_runes.Outpoint outpoint = 2;
      */
     outpoint?: Outpoint;
+    /**
+     * @generated from protobuf field: metashrew_runes.Output output = 3;
+     */
+    output?: Output;
+    /**
+     * @generated from protobuf field: uint32 height = 4;
+     */
+    height: number;
+    /**
+     * @generated from protobuf field: uint32 txindex = 5;
+     */
+    txindex: number;
 }
 /**
  * @generated from protobuf message metashrew_runes.PaginationInput
@@ -92,27 +135,31 @@ export interface PaginationInput {
     end: number;
 }
 /**
- * @generated from protobuf message metashrew_runes.WalletInput
+ * @generated from protobuf message metashrew_runes.WalletRequest
  */
-export interface WalletInput {
+export interface WalletRequest {
     /**
      * @generated from protobuf field: bytes wallet = 1;
      */
     wallet: Uint8Array;
 }
 /**
- * @generated from protobuf message metashrew_runes.WalletOutput
+ * @generated from protobuf message metashrew_runes.WalletResponse
  */
-export interface WalletOutput {
+export interface WalletResponse {
     /**
-     * @generated from protobuf field: repeated metashrew_runes.OutpointOut outpoints = 1;
+     * @generated from protobuf field: repeated metashrew_runes.OutpointResponse outpoints = 1;
      */
-    outpoints: OutpointOut[];
+    outpoints: OutpointResponse[];
+    /**
+     * @generated from protobuf field: metashrew_runes.BalanceSheet balances = 2;
+     */
+    balances?: BalanceSheet;
 }
 /**
- * @generated from protobuf message metashrew_runes.RunesOutput
+ * @generated from protobuf message metashrew_runes.RunesResponse
  */
-export interface RunesOutput {
+export interface RunesResponse {
     /**
      * @generated from protobuf field: repeated metashrew_runes.Rune runes = 1;
      */
@@ -122,14 +169,14 @@ export interface RunesOutput {
 class RuneId$Type extends MessageType<RuneId> {
     constructor() {
         super("metashrew_runes.RuneId", [
-            { no: 1, name: "block", kind: "scalar", T: 4 /*ScalarType.UINT64*/, L: 0 /*LongType.BIGINT*/ },
-            { no: 2, name: "tx", kind: "scalar", T: 13 /*ScalarType.UINT32*/ }
+            { no: 1, name: "height", kind: "scalar", T: 13 /*ScalarType.UINT32*/ },
+            { no: 2, name: "txindex", kind: "scalar", T: 13 /*ScalarType.UINT32*/ }
         ]);
     }
     create(value?: PartialMessage<RuneId>): RuneId {
         const message = globalThis.Object.create((this.messagePrototype!));
-        message.block = 0n;
-        message.tx = 0;
+        message.height = 0;
+        message.txindex = 0;
         if (value !== undefined)
             reflectionMergePartial<RuneId>(this, message, value);
         return message;
@@ -139,11 +186,11 @@ class RuneId$Type extends MessageType<RuneId> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* uint64 block */ 1:
-                    message.block = reader.uint64().toBigInt();
+                case /* uint32 height */ 1:
+                    message.height = reader.uint32();
                     break;
-                case /* uint32 tx */ 2:
-                    message.tx = reader.uint32();
+                case /* uint32 txindex */ 2:
+                    message.txindex = reader.uint32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -157,12 +204,12 @@ class RuneId$Type extends MessageType<RuneId> {
         return message;
     }
     internalBinaryWrite(message: RuneId, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* uint64 block = 1; */
-        if (message.block !== 0n)
-            writer.tag(1, WireType.Varint).uint64(message.block);
-        /* uint32 tx = 2; */
-        if (message.tx !== 0)
-            writer.tag(2, WireType.Varint).uint32(message.tx);
+        /* uint32 height = 1; */
+        if (message.height !== 0)
+            writer.tag(1, WireType.Varint).uint32(message.height);
+        /* uint32 txindex = 2; */
+        if (message.txindex !== 0)
+            writer.tag(2, WireType.Varint).uint32(message.txindex);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -252,17 +299,118 @@ class Rune$Type extends MessageType<Rune> {
  */
 export const Rune = new Rune$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class BalanceSheetItem$Type extends MessageType<BalanceSheetItem> {
+    constructor() {
+        super("metashrew_runes.BalanceSheetItem", [
+            { no: 1, name: "rune", kind: "message", T: () => Rune },
+            { no: 2, name: "balance", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+        ]);
+    }
+    create(value?: PartialMessage<BalanceSheetItem>): BalanceSheetItem {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.balance = new Uint8Array(0);
+        if (value !== undefined)
+            reflectionMergePartial<BalanceSheetItem>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: BalanceSheetItem): BalanceSheetItem {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* metashrew_runes.Rune rune */ 1:
+                    message.rune = Rune.internalBinaryRead(reader, reader.uint32(), options, message.rune);
+                    break;
+                case /* bytes balance */ 2:
+                    message.balance = reader.bytes();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: BalanceSheetItem, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* metashrew_runes.Rune rune = 1; */
+        if (message.rune)
+            Rune.internalBinaryWrite(message.rune, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* bytes balance = 2; */
+        if (message.balance.length)
+            writer.tag(2, WireType.LengthDelimited).bytes(message.balance);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message metashrew_runes.BalanceSheetItem
+ */
+export const BalanceSheetItem = new BalanceSheetItem$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class BalanceSheet$Type extends MessageType<BalanceSheet> {
+    constructor() {
+        super("metashrew_runes.BalanceSheet", [
+            { no: 1, name: "entries", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => BalanceSheetItem }
+        ]);
+    }
+    create(value?: PartialMessage<BalanceSheet>): BalanceSheet {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.entries = [];
+        if (value !== undefined)
+            reflectionMergePartial<BalanceSheet>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: BalanceSheet): BalanceSheet {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated metashrew_runes.BalanceSheetItem entries */ 1:
+                    message.entries.push(BalanceSheetItem.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: BalanceSheet, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* repeated metashrew_runes.BalanceSheetItem entries = 1; */
+        for (let i = 0; i < message.entries.length; i++)
+            BalanceSheetItem.internalBinaryWrite(message.entries[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message metashrew_runes.BalanceSheet
+ */
+export const BalanceSheet = new BalanceSheet$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class Outpoint$Type extends MessageType<Outpoint> {
     constructor() {
         super("metashrew_runes.Outpoint", [
             { no: 1, name: "txid", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 2, name: "pos", kind: "scalar", T: 13 /*ScalarType.UINT32*/ }
+            { no: 2, name: "vout", kind: "scalar", T: 13 /*ScalarType.UINT32*/ }
         ]);
     }
     create(value?: PartialMessage<Outpoint>): Outpoint {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.txid = new Uint8Array(0);
-        message.pos = 0;
+        message.vout = 0;
         if (value !== undefined)
             reflectionMergePartial<Outpoint>(this, message, value);
         return message;
@@ -275,8 +423,8 @@ class Outpoint$Type extends MessageType<Outpoint> {
                 case /* bytes txid */ 1:
                     message.txid = reader.bytes();
                     break;
-                case /* uint32 pos */ 2:
-                    message.pos = reader.uint32();
+                case /* uint32 vout */ 2:
+                    message.vout = reader.uint32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -293,9 +441,9 @@ class Outpoint$Type extends MessageType<Outpoint> {
         /* bytes txid = 1; */
         if (message.txid.length)
             writer.tag(1, WireType.LengthDelimited).bytes(message.txid);
-        /* uint32 pos = 2; */
-        if (message.pos !== 0)
-            writer.tag(2, WireType.Varint).uint32(message.pos);
+        /* uint32 vout = 2; */
+        if (message.vout !== 0)
+            writer.tag(2, WireType.Varint).uint32(message.vout);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -307,35 +455,31 @@ class Outpoint$Type extends MessageType<Outpoint> {
  */
 export const Outpoint = new Outpoint$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class OutpointOut$Type extends MessageType<OutpointOut> {
+class Output$Type extends MessageType<Output> {
     constructor() {
-        super("metashrew_runes.OutpointOut", [
-            { no: 1, name: "runes", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Rune },
-            { no: 2, name: "balances", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 12 /*ScalarType.BYTES*/ },
-            { no: 3, name: "outpoint", kind: "message", T: () => Outpoint }
+        super("metashrew_runes.Output", [
+            { no: 1, name: "script", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 2, name: "value", kind: "scalar", T: 4 /*ScalarType.UINT64*/, L: 0 /*LongType.BIGINT*/ }
         ]);
     }
-    create(value?: PartialMessage<OutpointOut>): OutpointOut {
+    create(value?: PartialMessage<Output>): Output {
         const message = globalThis.Object.create((this.messagePrototype!));
-        message.runes = [];
-        message.balances = [];
+        message.script = new Uint8Array(0);
+        message.value = 0n;
         if (value !== undefined)
-            reflectionMergePartial<OutpointOut>(this, message, value);
+            reflectionMergePartial<Output>(this, message, value);
         return message;
     }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: OutpointOut): OutpointOut {
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Output): Output {
         let message = target ?? this.create(), end = reader.pos + length;
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated metashrew_runes.Rune runes */ 1:
-                    message.runes.push(Rune.internalBinaryRead(reader, reader.uint32(), options));
+                case /* bytes script */ 1:
+                    message.script = reader.bytes();
                     break;
-                case /* repeated bytes balances */ 2:
-                    message.balances.push(reader.bytes());
-                    break;
-                case /* metashrew_runes.Outpoint outpoint */ 3:
-                    message.outpoint = Outpoint.internalBinaryRead(reader, reader.uint32(), options, message.outpoint);
+                case /* uint64 value */ 2:
+                    message.value = reader.uint64().toBigInt();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -348,16 +492,13 @@ class OutpointOut$Type extends MessageType<OutpointOut> {
         }
         return message;
     }
-    internalBinaryWrite(message: OutpointOut, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* repeated metashrew_runes.Rune runes = 1; */
-        for (let i = 0; i < message.runes.length; i++)
-            Rune.internalBinaryWrite(message.runes[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* repeated bytes balances = 2; */
-        for (let i = 0; i < message.balances.length; i++)
-            writer.tag(2, WireType.LengthDelimited).bytes(message.balances[i]);
-        /* metashrew_runes.Outpoint outpoint = 3; */
-        if (message.outpoint)
-            Outpoint.internalBinaryWrite(message.outpoint, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+    internalBinaryWrite(message: Output, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* bytes script = 1; */
+        if (message.script.length)
+            writer.tag(1, WireType.LengthDelimited).bytes(message.script);
+        /* uint64 value = 2; */
+        if (message.value !== 0n)
+            writer.tag(2, WireType.Varint).uint64(message.value);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -365,9 +506,85 @@ class OutpointOut$Type extends MessageType<OutpointOut> {
     }
 }
 /**
- * @generated MessageType for protobuf message metashrew_runes.OutpointOut
+ * @generated MessageType for protobuf message metashrew_runes.Output
  */
-export const OutpointOut = new OutpointOut$Type();
+export const Output = new Output$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class OutpointResponse$Type extends MessageType<OutpointResponse> {
+    constructor() {
+        super("metashrew_runes.OutpointResponse", [
+            { no: 1, name: "balances", kind: "message", T: () => BalanceSheet },
+            { no: 2, name: "outpoint", kind: "message", T: () => Outpoint },
+            { no: 3, name: "output", kind: "message", T: () => Output },
+            { no: 4, name: "height", kind: "scalar", T: 13 /*ScalarType.UINT32*/ },
+            { no: 5, name: "txindex", kind: "scalar", T: 13 /*ScalarType.UINT32*/ }
+        ]);
+    }
+    create(value?: PartialMessage<OutpointResponse>): OutpointResponse {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.height = 0;
+        message.txindex = 0;
+        if (value !== undefined)
+            reflectionMergePartial<OutpointResponse>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: OutpointResponse): OutpointResponse {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* metashrew_runes.BalanceSheet balances */ 1:
+                    message.balances = BalanceSheet.internalBinaryRead(reader, reader.uint32(), options, message.balances);
+                    break;
+                case /* metashrew_runes.Outpoint outpoint */ 2:
+                    message.outpoint = Outpoint.internalBinaryRead(reader, reader.uint32(), options, message.outpoint);
+                    break;
+                case /* metashrew_runes.Output output */ 3:
+                    message.output = Output.internalBinaryRead(reader, reader.uint32(), options, message.output);
+                    break;
+                case /* uint32 height */ 4:
+                    message.height = reader.uint32();
+                    break;
+                case /* uint32 txindex */ 5:
+                    message.txindex = reader.uint32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: OutpointResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* metashrew_runes.BalanceSheet balances = 1; */
+        if (message.balances)
+            BalanceSheet.internalBinaryWrite(message.balances, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* metashrew_runes.Outpoint outpoint = 2; */
+        if (message.outpoint)
+            Outpoint.internalBinaryWrite(message.outpoint, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* metashrew_runes.Output output = 3; */
+        if (message.output)
+            Output.internalBinaryWrite(message.output, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* uint32 height = 4; */
+        if (message.height !== 0)
+            writer.tag(4, WireType.Varint).uint32(message.height);
+        /* uint32 txindex = 5; */
+        if (message.txindex !== 0)
+            writer.tag(5, WireType.Varint).uint32(message.txindex);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message metashrew_runes.OutpointResponse
+ */
+export const OutpointResponse = new OutpointResponse$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class PaginationInput$Type extends MessageType<PaginationInput> {
     constructor() {
@@ -424,20 +641,20 @@ class PaginationInput$Type extends MessageType<PaginationInput> {
  */
 export const PaginationInput = new PaginationInput$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class WalletInput$Type extends MessageType<WalletInput> {
+class WalletRequest$Type extends MessageType<WalletRequest> {
     constructor() {
-        super("metashrew_runes.WalletInput", [
+        super("metashrew_runes.WalletRequest", [
             { no: 1, name: "wallet", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
         ]);
     }
-    create(value?: PartialMessage<WalletInput>): WalletInput {
+    create(value?: PartialMessage<WalletRequest>): WalletRequest {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.wallet = new Uint8Array(0);
         if (value !== undefined)
-            reflectionMergePartial<WalletInput>(this, message, value);
+            reflectionMergePartial<WalletRequest>(this, message, value);
         return message;
     }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: WalletInput): WalletInput {
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: WalletRequest): WalletRequest {
         let message = target ?? this.create(), end = reader.pos + length;
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
@@ -456,7 +673,7 @@ class WalletInput$Type extends MessageType<WalletInput> {
         }
         return message;
     }
-    internalBinaryWrite(message: WalletInput, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+    internalBinaryWrite(message: WalletRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* bytes wallet = 1; */
         if (message.wallet.length)
             writer.tag(1, WireType.LengthDelimited).bytes(message.wallet);
@@ -467,30 +684,34 @@ class WalletInput$Type extends MessageType<WalletInput> {
     }
 }
 /**
- * @generated MessageType for protobuf message metashrew_runes.WalletInput
+ * @generated MessageType for protobuf message metashrew_runes.WalletRequest
  */
-export const WalletInput = new WalletInput$Type();
+export const WalletRequest = new WalletRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class WalletOutput$Type extends MessageType<WalletOutput> {
+class WalletResponse$Type extends MessageType<WalletResponse> {
     constructor() {
-        super("metashrew_runes.WalletOutput", [
-            { no: 1, name: "outpoints", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => OutpointOut }
+        super("metashrew_runes.WalletResponse", [
+            { no: 1, name: "outpoints", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => OutpointResponse },
+            { no: 2, name: "balances", kind: "message", T: () => BalanceSheet }
         ]);
     }
-    create(value?: PartialMessage<WalletOutput>): WalletOutput {
+    create(value?: PartialMessage<WalletResponse>): WalletResponse {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.outpoints = [];
         if (value !== undefined)
-            reflectionMergePartial<WalletOutput>(this, message, value);
+            reflectionMergePartial<WalletResponse>(this, message, value);
         return message;
     }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: WalletOutput): WalletOutput {
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: WalletResponse): WalletResponse {
         let message = target ?? this.create(), end = reader.pos + length;
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated metashrew_runes.OutpointOut outpoints */ 1:
-                    message.outpoints.push(OutpointOut.internalBinaryRead(reader, reader.uint32(), options));
+                case /* repeated metashrew_runes.OutpointResponse outpoints */ 1:
+                    message.outpoints.push(OutpointResponse.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* metashrew_runes.BalanceSheet balances */ 2:
+                    message.balances = BalanceSheet.internalBinaryRead(reader, reader.uint32(), options, message.balances);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -503,10 +724,13 @@ class WalletOutput$Type extends MessageType<WalletOutput> {
         }
         return message;
     }
-    internalBinaryWrite(message: WalletOutput, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* repeated metashrew_runes.OutpointOut outpoints = 1; */
+    internalBinaryWrite(message: WalletResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* repeated metashrew_runes.OutpointResponse outpoints = 1; */
         for (let i = 0; i < message.outpoints.length; i++)
-            OutpointOut.internalBinaryWrite(message.outpoints[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+            OutpointResponse.internalBinaryWrite(message.outpoints[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* metashrew_runes.BalanceSheet balances = 2; */
+        if (message.balances)
+            BalanceSheet.internalBinaryWrite(message.balances, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -514,24 +738,24 @@ class WalletOutput$Type extends MessageType<WalletOutput> {
     }
 }
 /**
- * @generated MessageType for protobuf message metashrew_runes.WalletOutput
+ * @generated MessageType for protobuf message metashrew_runes.WalletResponse
  */
-export const WalletOutput = new WalletOutput$Type();
+export const WalletResponse = new WalletResponse$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class RunesOutput$Type extends MessageType<RunesOutput> {
+class RunesResponse$Type extends MessageType<RunesResponse> {
     constructor() {
-        super("metashrew_runes.RunesOutput", [
+        super("metashrew_runes.RunesResponse", [
             { no: 1, name: "runes", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Rune }
         ]);
     }
-    create(value?: PartialMessage<RunesOutput>): RunesOutput {
+    create(value?: PartialMessage<RunesResponse>): RunesResponse {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.runes = [];
         if (value !== undefined)
-            reflectionMergePartial<RunesOutput>(this, message, value);
+            reflectionMergePartial<RunesResponse>(this, message, value);
         return message;
     }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: RunesOutput): RunesOutput {
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: RunesResponse): RunesResponse {
         let message = target ?? this.create(), end = reader.pos + length;
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
@@ -550,7 +774,7 @@ class RunesOutput$Type extends MessageType<RunesOutput> {
         }
         return message;
     }
-    internalBinaryWrite(message: RunesOutput, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+    internalBinaryWrite(message: RunesResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* repeated metashrew_runes.Rune runes = 1; */
         for (let i = 0; i < message.runes.length; i++)
             Rune.internalBinaryWrite(message.runes[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
@@ -561,6 +785,6 @@ class RunesOutput$Type extends MessageType<RunesOutput> {
     }
 }
 /**
- * @generated MessageType for protobuf message metashrew_runes.RunesOutput
+ * @generated MessageType for protobuf message metashrew_runes.RunesResponse
  */
-export const RunesOutput = new RunesOutput$Type();
+export const RunesResponse = new RunesResponse$Type();

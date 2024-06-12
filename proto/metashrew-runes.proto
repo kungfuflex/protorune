@@ -3,8 +3,8 @@ syntax = "proto3";
 package metashrew_runes;
 
 message RuneId {
-  uint64 block = 1;
-  uint32 tx = 2;
+  uint32 height = 1;
+  uint32 txindex = 2;
 }
 
 message Rune {
@@ -15,17 +15,31 @@ message Rune {
   uint32 symbol = 5;
 }
 
+message BalanceSheetItem {
+  Rune rune = 1;
+  bytes balance = 2;
+}
 
+message BalanceSheet {
+  repeated BalanceSheetItem entries = 1;
+}
 
 message Outpoint {
   bytes txid = 1;
-  uint32 pos = 2;
+  uint32 vout = 2;
 }
 
-message OutpointOut {
-  repeated Rune runes = 1;
-  repeated bytes balances = 2; 
-  Outpoint outpoint = 3;
+message Output {
+  bytes script = 1;
+  uint64 value = 2;
+}
+
+message OutpointResponse {
+  BalanceSheet balances = 1;
+  Outpoint outpoint = 2;
+  Output output = 3;
+  uint32 height = 4;
+  uint32 txindex = 5;
 }
 
 message PaginationInput {
@@ -33,14 +47,15 @@ message PaginationInput {
   uint32 end = 2;
 }
 
-message WalletInput {
+message WalletRequest {
   bytes wallet = 1;
 }
 
-message WalletOutput {
-  repeated OutpointOut outpoints = 1;
+message WalletResponse {
+  repeated OutpointResponse outpoints = 1;
+  BalanceSheet balances = 2;
 }
 
-message RunesOutput {
+message RunesResponse {
   repeated Rune runes = 1;
 }

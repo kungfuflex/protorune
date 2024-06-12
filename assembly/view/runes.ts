@@ -5,14 +5,14 @@ import {
   DIVISIBILITY,
   SYMBOL,
 } from "../indexer/constants";
-import { metashrew_runes } from "../proto/metashrew-runes";
+import { metashrew_runes as protobuf } from "../proto/metashrew-runes";
 import { input } from "metashrew-as/assembly/indexer";
 import { RuneId } from "../indexer/RuneId";
 import { u128 } from "as-bignum/assembly";
 import { fromArrayBuffer, fieldToName } from "../utils";
 
 export function runes(): ArrayBuffer {
-  const inp = metashrew_runes.PaginationInput.decode(input().slice(4));
+  const inp = protobuf.PaginationInput.decode(input().slice(4));
   const start = inp.start;
   const end = inp.end;
   let _list: Array<ArrayBuffer> = new Array<ArrayBuffer>(0);
@@ -23,14 +23,14 @@ export function runes(): ArrayBuffer {
       _list.push(ETCHINGS.selectIndex(i).get());
     }
   }
-  const list = _list.map<metashrew_runes.Rune>((d) => {
+  const list = _list.map<protobuf.Rune>((d) => {
     const name = fromArrayBuffer(d);
-    const rune = new metashrew_runes.Rune();
-    const runeId = new metashrew_runes.RuneId();
+    const rune = new protobuf.Rune();
+    const runeId = new protobuf.RuneId();
     const _runeId = RuneId.fromBytesU128(ETCHING_TO_RUNE_ID.select(d).get());
 
-    runeId.block = _runeId.block;
-    runeId.tx = _runeId.tx;
+    runeId.height = <u32>_runeId.block;
+    runeId.txindex = _runeId.tx;
 
     rune.runeId = runeId;
     rune.name = Uint8Array.wrap(String.UTF8.encode(fieldToName(name))).reduce<
@@ -44,7 +44,7 @@ export function runes(): ArrayBuffer {
     rune.spacers = SPACERS.select(d).getValue<u32>();
     return rune;
   });
-  const message = new metashrew_runes.RunesOutput();
+  const message = new protobuf.RunesResponse();
   message.runes = list;
 
   return message.encode();

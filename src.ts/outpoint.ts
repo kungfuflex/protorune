@@ -21,14 +21,16 @@ export type OutPoint = {
 export function encodeOutpointInput(txid: string, pos: number): string {
   const input: Outpoint = {
     txid: Buffer.from(txid, "hex"),
-    pos,
+    txindex: pos,
   };
   const str = Buffer.from(Outpoint.toBinary(input)).toString("hex");
   return "0x" + str;
 }
 
-export function decodeOutpointViewBase(op: OutpointOut): OutPoint {
-  const runes = op.runes.map((d) => {
+export function decodeRunes(balances: any): any {
+  return balances.entries.map((entry) => {
+    const balance = Buffer.from(entry.balance);
+    const d = entry.rune;
     const spacer = "•";
     const bitField = d.spacers.toString(2);
     let name = Buffer.from(d.name).toString("utf-8");
@@ -45,27 +47,32 @@ export function decodeOutpointViewBase(op: OutpointOut): OutPoint {
         }
       });
     const rune: Rune = {
-      id: `${d.runeId.block}:${d.runeId.tx}`,
+      id: `${d.runeId.height}:${d.runeId.txindex}`,
       name,
       spacedName: spaced_name,
       divisibility: d.divisibility,
       spacers: d.spacers,
       symbol: symbol,
     };
-    return rune;
+    return {
+      rune,
+      balance: BigInt('0x' + Buffer.from(balance).toString('hex'))
+    };
   });
-
-  const balances = op.balances.map((d) => {
-    return BigInt("0x" + Buffer.from(d).toString("hex"));
-  });
-
+}
+export function decodeOutpointViewBase(op: any): OutPoint {
   return {
-    runes,
-    balances,
+    runes: decodeRunes(op.balances),
     outpoint: {
       txid: Buffer.from(op.outpoint.txid).toString("hex"),
-      pos: op.outpoint.pos,
+      vout: op.outpoint.vout
     },
+    output: {
+      value: op.output.value,
+      script: Buffer.from(op.output.script).toString('hex')
+    },
+    height: op.height,
+    txindex: op.txindex
   };
 }
 

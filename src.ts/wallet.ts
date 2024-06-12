@@ -1,21 +1,21 @@
-import { WalletOutput, WalletInput } from "./proto/metashrew-runes";
+import { WalletResponse, WalletRequest } from "./proto/metashrew-runes";
 import { decodeOutpointViewBase } from "./outpoint";
 import {
   isBech32CharacterSet,
   decodeBase58Address,
   decodeBech32,
 } from "@bitauth/libauth";
-import type { OutPoint } from "./outpoint";
+import { decodeRunes, OutPoint } from "./outpoint";
 
 export function decodeWalletOutput(hex: string): OutPoint[] {
-  const wo = WalletOutput.fromBinary(Uint8Array.from(Buffer.from(hex, "hex")));
+  const wo = WalletResponse.fromBinary(Uint8Array.from(Buffer.from(hex, "hex")));
 
-  return wo.outpoints.map((op) => decodeOutpointViewBase(op));
+  return { outpoints: wo.outpoints.map((op) => decodeOutpointViewBase(op)), runes: decodeRunes(wo.balances) };
 }
 
 export function encodeWalletInput(address: string) {
   const input: WalletInput = {
     wallet: Uint8Array.from(Buffer.from(address, "utf-8")),
   };
-  return "0x" + Buffer.from(WalletInput.toBinary(input)).toString("hex");
+  return "0x" + Buffer.from(WalletRequest.toBinary(input)).toString("hex");
 }

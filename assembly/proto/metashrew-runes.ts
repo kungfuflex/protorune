@@ -469,8 +469,8 @@ namespace __proto {
 }
 export namespace metashrew_runes {
   export class RuneId {
-    public block: u64;
-    public tx: u32;
+    public height: u32;
+    public txindex: u32;
 
     // Decodes RuneId from an ArrayBuffer
     static decode(buf: ArrayBuffer): RuneId {
@@ -488,11 +488,11 @@ export namespace metashrew_runes {
 
         switch (number) {
           case 1: {
-            obj.block = decoder.uint64();
+            obj.height = decoder.uint32();
             break;
           }
           case 2: {
-            obj.tx = decoder.uint32();
+            obj.txindex = decoder.uint32();
             break;
           }
 
@@ -507,8 +507,8 @@ export namespace metashrew_runes {
     public size(): u32 {
       let size: u32 = 0;
 
-      size += this.block == 0 ? 0 : 1 + __proto.Sizer.uint64(this.block);
-      size += this.tx == 0 ? 0 : 1 + __proto.Sizer.uint32(this.tx);
+      size += this.height == 0 ? 0 : 1 + __proto.Sizer.uint32(this.height);
+      size += this.txindex == 0 ? 0 : 1 + __proto.Sizer.uint32(this.txindex);
 
       return size;
     }
@@ -526,13 +526,13 @@ export namespace metashrew_runes {
     ): Array<u8> {
       const buf = encoder.buf;
 
-      if (this.block != 0) {
+      if (this.height != 0) {
         encoder.uint32(0x8);
-        encoder.uint64(this.block);
+        encoder.uint32(this.height);
       }
-      if (this.tx != 0) {
+      if (this.txindex != 0) {
         encoder.uint32(0x10);
-        encoder.uint32(this.tx);
+        encoder.uint32(this.txindex);
       }
 
       return buf;
@@ -672,9 +672,194 @@ export namespace metashrew_runes {
     } // encode Rune
   } // Rune
 
+  export class BalanceSheetItem {
+    public rune: Rune = new Rune();
+    public balance: Array<u8> = new Array<u8>();
+
+    // Decodes BalanceSheetItem from an ArrayBuffer
+    static decode(buf: ArrayBuffer): BalanceSheetItem {
+      return BalanceSheetItem.decodeDataView(new DataView(buf));
+    }
+
+    // Decodes BalanceSheetItem from a DataView
+    static decodeDataView(view: DataView): BalanceSheetItem {
+      const decoder = new __proto.Decoder(view);
+      const obj = new BalanceSheetItem();
+
+      while (!decoder.eof()) {
+        const tag = decoder.tag();
+        const number = tag >>> 3;
+
+        switch (number) {
+          case 1: {
+            const length = decoder.uint32();
+            obj.rune = Rune.decodeDataView(
+              new DataView(
+                decoder.view.buffer,
+                decoder.pos + decoder.view.byteOffset,
+                length
+              )
+            );
+            decoder.skip(length);
+
+            break;
+          }
+          case 2: {
+            obj.balance = decoder.bytes();
+            break;
+          }
+
+          default:
+            decoder.skipType(tag & 7);
+            break;
+        }
+      }
+      return obj;
+    } // decode BalanceSheetItem
+
+    public size(): u32 {
+      let size: u32 = 0;
+
+      if (this.rune != null) {
+        const f: Rune = this.rune as Rune;
+        const messageSize = f.size();
+
+        if (messageSize > 0) {
+          size += 1 + __proto.Sizer.varint64(messageSize) + messageSize;
+        }
+      }
+
+      size +=
+        this.balance.length > 0
+          ? 1 +
+            __proto.Sizer.varint64(this.balance.length) +
+            this.balance.length
+          : 0;
+
+      return size;
+    }
+
+    // Encodes BalanceSheetItem to the ArrayBuffer
+    encode(): ArrayBuffer {
+      return changetype<ArrayBuffer>(
+        StaticArray.fromArray<u8>(this.encodeU8Array())
+      );
+    }
+
+    // Encodes BalanceSheetItem to the Array<u8>
+    encodeU8Array(
+      encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
+    ): Array<u8> {
+      const buf = encoder.buf;
+
+      if (this.rune != null) {
+        const f = this.rune as Rune;
+
+        const messageSize = f.size();
+
+        if (messageSize > 0) {
+          encoder.uint32(0xa);
+          encoder.uint32(messageSize);
+          f.encodeU8Array(encoder);
+        }
+      }
+
+      if (this.balance.length > 0) {
+        encoder.uint32(0x12);
+        encoder.uint32(this.balance.length);
+        encoder.bytes(this.balance);
+      }
+
+      return buf;
+    } // encode BalanceSheetItem
+  } // BalanceSheetItem
+
+  export class BalanceSheet {
+    public entries: Array<BalanceSheetItem> = new Array<BalanceSheetItem>();
+
+    // Decodes BalanceSheet from an ArrayBuffer
+    static decode(buf: ArrayBuffer): BalanceSheet {
+      return BalanceSheet.decodeDataView(new DataView(buf));
+    }
+
+    // Decodes BalanceSheet from a DataView
+    static decodeDataView(view: DataView): BalanceSheet {
+      const decoder = new __proto.Decoder(view);
+      const obj = new BalanceSheet();
+
+      while (!decoder.eof()) {
+        const tag = decoder.tag();
+        const number = tag >>> 3;
+
+        switch (number) {
+          case 1: {
+            const length = decoder.uint32();
+            obj.entries.push(
+              BalanceSheetItem.decodeDataView(
+                new DataView(
+                  decoder.view.buffer,
+                  decoder.pos + decoder.view.byteOffset,
+                  length
+                )
+              )
+            );
+            decoder.skip(length);
+
+            break;
+          }
+
+          default:
+            decoder.skipType(tag & 7);
+            break;
+        }
+      }
+      return obj;
+    } // decode BalanceSheet
+
+    public size(): u32 {
+      let size: u32 = 0;
+
+      for (let n: i32 = 0; n < this.entries.length; n++) {
+        const messageSize = this.entries[n].size();
+
+        if (messageSize > 0) {
+          size += 1 + __proto.Sizer.varint64(messageSize) + messageSize;
+        }
+      }
+
+      return size;
+    }
+
+    // Encodes BalanceSheet to the ArrayBuffer
+    encode(): ArrayBuffer {
+      return changetype<ArrayBuffer>(
+        StaticArray.fromArray<u8>(this.encodeU8Array())
+      );
+    }
+
+    // Encodes BalanceSheet to the Array<u8>
+    encodeU8Array(
+      encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
+    ): Array<u8> {
+      const buf = encoder.buf;
+
+      for (let n: i32 = 0; n < this.entries.length; n++) {
+        const messageSize = this.entries[n].size();
+
+        if (messageSize > 0) {
+          encoder.uint32(0xa);
+          encoder.uint32(messageSize);
+          this.entries[n].encodeU8Array(encoder);
+        }
+      }
+
+      return buf;
+    } // encode BalanceSheet
+  } // BalanceSheet
+
   export class Outpoint {
     public txid: Array<u8> = new Array<u8>();
-    public pos: u32;
+    public vout: u32;
 
     // Decodes Outpoint from an ArrayBuffer
     static decode(buf: ArrayBuffer): Outpoint {
@@ -696,7 +881,7 @@ export namespace metashrew_runes {
             break;
           }
           case 2: {
-            obj.pos = decoder.uint32();
+            obj.vout = decoder.uint32();
             break;
           }
 
@@ -715,7 +900,7 @@ export namespace metashrew_runes {
         this.txid.length > 0
           ? 1 + __proto.Sizer.varint64(this.txid.length) + this.txid.length
           : 0;
-      size += this.pos == 0 ? 0 : 1 + __proto.Sizer.uint32(this.pos);
+      size += this.vout == 0 ? 0 : 1 + __proto.Sizer.uint32(this.vout);
 
       return size;
     }
@@ -738,29 +923,106 @@ export namespace metashrew_runes {
         encoder.uint32(this.txid.length);
         encoder.bytes(this.txid);
       }
-      if (this.pos != 0) {
+      if (this.vout != 0) {
         encoder.uint32(0x10);
-        encoder.uint32(this.pos);
+        encoder.uint32(this.vout);
       }
 
       return buf;
     } // encode Outpoint
   } // Outpoint
 
-  export class OutpointOut {
-    public runes: Array<Rune> = new Array<Rune>();
-    public balances: Array<Array<u8>> = new Array<Array<u8>>();
-    public outpoint: Outpoint = new Outpoint();
+  export class Output {
+    public script: Array<u8> = new Array<u8>();
+    public value: u64;
 
-    // Decodes OutpointOut from an ArrayBuffer
-    static decode(buf: ArrayBuffer): OutpointOut {
-      return OutpointOut.decodeDataView(new DataView(buf));
+    // Decodes Output from an ArrayBuffer
+    static decode(buf: ArrayBuffer): Output {
+      return Output.decodeDataView(new DataView(buf));
     }
 
-    // Decodes OutpointOut from a DataView
-    static decodeDataView(view: DataView): OutpointOut {
+    // Decodes Output from a DataView
+    static decodeDataView(view: DataView): Output {
       const decoder = new __proto.Decoder(view);
-      const obj = new OutpointOut();
+      const obj = new Output();
+
+      while (!decoder.eof()) {
+        const tag = decoder.tag();
+        const number = tag >>> 3;
+
+        switch (number) {
+          case 1: {
+            obj.script = decoder.bytes();
+            break;
+          }
+          case 2: {
+            obj.value = decoder.uint64();
+            break;
+          }
+
+          default:
+            decoder.skipType(tag & 7);
+            break;
+        }
+      }
+      return obj;
+    } // decode Output
+
+    public size(): u32 {
+      let size: u32 = 0;
+
+      size +=
+        this.script.length > 0
+          ? 1 + __proto.Sizer.varint64(this.script.length) + this.script.length
+          : 0;
+      size += this.value == 0 ? 0 : 1 + __proto.Sizer.uint64(this.value);
+
+      return size;
+    }
+
+    // Encodes Output to the ArrayBuffer
+    encode(): ArrayBuffer {
+      return changetype<ArrayBuffer>(
+        StaticArray.fromArray<u8>(this.encodeU8Array())
+      );
+    }
+
+    // Encodes Output to the Array<u8>
+    encodeU8Array(
+      encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
+    ): Array<u8> {
+      const buf = encoder.buf;
+
+      if (this.script.length > 0) {
+        encoder.uint32(0xa);
+        encoder.uint32(this.script.length);
+        encoder.bytes(this.script);
+      }
+      if (this.value != 0) {
+        encoder.uint32(0x10);
+        encoder.uint64(this.value);
+      }
+
+      return buf;
+    } // encode Output
+  } // Output
+
+  export class OutpointResponse {
+    public balances: BalanceSheet = new BalanceSheet();
+    public outpoint: Outpoint = new Outpoint();
+    public output: Output = new Output();
+    public height: u32;
+    public txindex: u32;
+
+    // Decodes OutpointResponse from an ArrayBuffer
+    static decode(buf: ArrayBuffer): OutpointResponse {
+      return OutpointResponse.decodeDataView(new DataView(buf));
+    }
+
+    // Decodes OutpointResponse from a DataView
+    static decodeDataView(view: DataView): OutpointResponse {
+      const decoder = new __proto.Decoder(view);
+      const obj = new OutpointResponse();
 
       while (!decoder.eof()) {
         const tag = decoder.tag();
@@ -769,13 +1031,11 @@ export namespace metashrew_runes {
         switch (number) {
           case 1: {
             const length = decoder.uint32();
-            obj.runes.push(
-              Rune.decodeDataView(
-                new DataView(
-                  decoder.view.buffer,
-                  decoder.pos + decoder.view.byteOffset,
-                  length
-                )
+            obj.balances = BalanceSheet.decodeDataView(
+              new DataView(
+                decoder.view.buffer,
+                decoder.pos + decoder.view.byteOffset,
+                length
               )
             );
             decoder.skip(length);
@@ -783,10 +1043,6 @@ export namespace metashrew_runes {
             break;
           }
           case 2: {
-            obj.balances.push(decoder.bytes());
-            break;
-          }
-          case 3: {
             const length = decoder.uint32();
             obj.outpoint = Outpoint.decodeDataView(
               new DataView(
@@ -799,6 +1055,27 @@ export namespace metashrew_runes {
 
             break;
           }
+          case 3: {
+            const length = decoder.uint32();
+            obj.output = Output.decodeDataView(
+              new DataView(
+                decoder.view.buffer,
+                decoder.pos + decoder.view.byteOffset,
+                length
+              )
+            );
+            decoder.skip(length);
+
+            break;
+          }
+          case 4: {
+            obj.height = decoder.uint32();
+            break;
+          }
+          case 5: {
+            obj.txindex = decoder.uint32();
+            break;
+          }
 
           default:
             decoder.skipType(tag & 7);
@@ -806,20 +1083,19 @@ export namespace metashrew_runes {
         }
       }
       return obj;
-    } // decode OutpointOut
+    } // decode OutpointResponse
 
     public size(): u32 {
       let size: u32 = 0;
 
-      for (let n: i32 = 0; n < this.runes.length; n++) {
-        const messageSize = this.runes[n].size();
+      if (this.balances != null) {
+        const f: BalanceSheet = this.balances as BalanceSheet;
+        const messageSize = f.size();
 
         if (messageSize > 0) {
           size += 1 + __proto.Sizer.varint64(messageSize) + messageSize;
         }
       }
-
-      size += __size_bytes_repeated(this.balances);
 
       if (this.outpoint != null) {
         const f: Outpoint = this.outpoint as Outpoint;
@@ -830,42 +1106,60 @@ export namespace metashrew_runes {
         }
       }
 
+      if (this.output != null) {
+        const f: Output = this.output as Output;
+        const messageSize = f.size();
+
+        if (messageSize > 0) {
+          size += 1 + __proto.Sizer.varint64(messageSize) + messageSize;
+        }
+      }
+
+      size += this.height == 0 ? 0 : 1 + __proto.Sizer.uint32(this.height);
+      size += this.txindex == 0 ? 0 : 1 + __proto.Sizer.uint32(this.txindex);
+
       return size;
     }
 
-    // Encodes OutpointOut to the ArrayBuffer
+    // Encodes OutpointResponse to the ArrayBuffer
     encode(): ArrayBuffer {
       return changetype<ArrayBuffer>(
         StaticArray.fromArray<u8>(this.encodeU8Array())
       );
     }
 
-    // Encodes OutpointOut to the Array<u8>
+    // Encodes OutpointResponse to the Array<u8>
     encodeU8Array(
       encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
     ): Array<u8> {
       const buf = encoder.buf;
 
-      for (let n: i32 = 0; n < this.runes.length; n++) {
-        const messageSize = this.runes[n].size();
+      if (this.balances != null) {
+        const f = this.balances as BalanceSheet;
+
+        const messageSize = f.size();
 
         if (messageSize > 0) {
           encoder.uint32(0xa);
           encoder.uint32(messageSize);
-          this.runes[n].encodeU8Array(encoder);
-        }
-      }
-
-      if (this.balances.length > 0) {
-        for (let n: i32 = 0; n < this.balances.length; n++) {
-          encoder.uint32(0x12);
-          encoder.uint32(this.balances[n].length);
-          encoder.bytes(this.balances[n]);
+          f.encodeU8Array(encoder);
         }
       }
 
       if (this.outpoint != null) {
         const f = this.outpoint as Outpoint;
+
+        const messageSize = f.size();
+
+        if (messageSize > 0) {
+          encoder.uint32(0x12);
+          encoder.uint32(messageSize);
+          f.encodeU8Array(encoder);
+        }
+      }
+
+      if (this.output != null) {
+        const f = this.output as Output;
 
         const messageSize = f.size();
 
@@ -876,9 +1170,18 @@ export namespace metashrew_runes {
         }
       }
 
+      if (this.height != 0) {
+        encoder.uint32(0x20);
+        encoder.uint32(this.height);
+      }
+      if (this.txindex != 0) {
+        encoder.uint32(0x28);
+        encoder.uint32(this.txindex);
+      }
+
       return buf;
-    } // encode OutpointOut
-  } // OutpointOut
+    } // encode OutpointResponse
+  } // OutpointResponse
 
   export class PaginationInput {
     public start: u32;
@@ -951,18 +1254,18 @@ export namespace metashrew_runes {
     } // encode PaginationInput
   } // PaginationInput
 
-  export class WalletInput {
+  export class WalletRequest {
     public wallet: Array<u8> = new Array<u8>();
 
-    // Decodes WalletInput from an ArrayBuffer
-    static decode(buf: ArrayBuffer): WalletInput {
-      return WalletInput.decodeDataView(new DataView(buf));
+    // Decodes WalletRequest from an ArrayBuffer
+    static decode(buf: ArrayBuffer): WalletRequest {
+      return WalletRequest.decodeDataView(new DataView(buf));
     }
 
-    // Decodes WalletInput from a DataView
-    static decodeDataView(view: DataView): WalletInput {
+    // Decodes WalletRequest from a DataView
+    static decodeDataView(view: DataView): WalletRequest {
       const decoder = new __proto.Decoder(view);
-      const obj = new WalletInput();
+      const obj = new WalletRequest();
 
       while (!decoder.eof()) {
         const tag = decoder.tag();
@@ -980,7 +1283,7 @@ export namespace metashrew_runes {
         }
       }
       return obj;
-    } // decode WalletInput
+    } // decode WalletRequest
 
     public size(): u32 {
       let size: u32 = 0;
@@ -993,14 +1296,14 @@ export namespace metashrew_runes {
       return size;
     }
 
-    // Encodes WalletInput to the ArrayBuffer
+    // Encodes WalletRequest to the ArrayBuffer
     encode(): ArrayBuffer {
       return changetype<ArrayBuffer>(
         StaticArray.fromArray<u8>(this.encodeU8Array())
       );
     }
 
-    // Encodes WalletInput to the Array<u8>
+    // Encodes WalletRequest to the Array<u8>
     encodeU8Array(
       encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
     ): Array<u8> {
@@ -1013,21 +1316,22 @@ export namespace metashrew_runes {
       }
 
       return buf;
-    } // encode WalletInput
-  } // WalletInput
+    } // encode WalletRequest
+  } // WalletRequest
 
-  export class WalletOutput {
-    public outpoints: Array<OutpointOut> = new Array<OutpointOut>();
+  export class WalletResponse {
+    public outpoints: Array<OutpointResponse> = new Array<OutpointResponse>();
+    public balances: BalanceSheet = new BalanceSheet();
 
-    // Decodes WalletOutput from an ArrayBuffer
-    static decode(buf: ArrayBuffer): WalletOutput {
-      return WalletOutput.decodeDataView(new DataView(buf));
+    // Decodes WalletResponse from an ArrayBuffer
+    static decode(buf: ArrayBuffer): WalletResponse {
+      return WalletResponse.decodeDataView(new DataView(buf));
     }
 
-    // Decodes WalletOutput from a DataView
-    static decodeDataView(view: DataView): WalletOutput {
+    // Decodes WalletResponse from a DataView
+    static decodeDataView(view: DataView): WalletResponse {
       const decoder = new __proto.Decoder(view);
-      const obj = new WalletOutput();
+      const obj = new WalletResponse();
 
       while (!decoder.eof()) {
         const tag = decoder.tag();
@@ -1037,12 +1341,25 @@ export namespace metashrew_runes {
           case 1: {
             const length = decoder.uint32();
             obj.outpoints.push(
-              OutpointOut.decodeDataView(
+              OutpointResponse.decodeDataView(
                 new DataView(
                   decoder.view.buffer,
                   decoder.pos + decoder.view.byteOffset,
                   length
                 )
+              )
+            );
+            decoder.skip(length);
+
+            break;
+          }
+          case 2: {
+            const length = decoder.uint32();
+            obj.balances = BalanceSheet.decodeDataView(
+              new DataView(
+                decoder.view.buffer,
+                decoder.pos + decoder.view.byteOffset,
+                length
               )
             );
             decoder.skip(length);
@@ -1056,7 +1373,7 @@ export namespace metashrew_runes {
         }
       }
       return obj;
-    } // decode WalletOutput
+    } // decode WalletResponse
 
     public size(): u32 {
       let size: u32 = 0;
@@ -1069,17 +1386,26 @@ export namespace metashrew_runes {
         }
       }
 
+      if (this.balances != null) {
+        const f: BalanceSheet = this.balances as BalanceSheet;
+        const messageSize = f.size();
+
+        if (messageSize > 0) {
+          size += 1 + __proto.Sizer.varint64(messageSize) + messageSize;
+        }
+      }
+
       return size;
     }
 
-    // Encodes WalletOutput to the ArrayBuffer
+    // Encodes WalletResponse to the ArrayBuffer
     encode(): ArrayBuffer {
       return changetype<ArrayBuffer>(
         StaticArray.fromArray<u8>(this.encodeU8Array())
       );
     }
 
-    // Encodes WalletOutput to the Array<u8>
+    // Encodes WalletResponse to the Array<u8>
     encodeU8Array(
       encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
     ): Array<u8> {
@@ -1095,22 +1421,34 @@ export namespace metashrew_runes {
         }
       }
 
-      return buf;
-    } // encode WalletOutput
-  } // WalletOutput
+      if (this.balances != null) {
+        const f = this.balances as BalanceSheet;
 
-  export class RunesOutput {
+        const messageSize = f.size();
+
+        if (messageSize > 0) {
+          encoder.uint32(0x12);
+          encoder.uint32(messageSize);
+          f.encodeU8Array(encoder);
+        }
+      }
+
+      return buf;
+    } // encode WalletResponse
+  } // WalletResponse
+
+  export class RunesResponse {
     public runes: Array<Rune> = new Array<Rune>();
 
-    // Decodes RunesOutput from an ArrayBuffer
-    static decode(buf: ArrayBuffer): RunesOutput {
-      return RunesOutput.decodeDataView(new DataView(buf));
+    // Decodes RunesResponse from an ArrayBuffer
+    static decode(buf: ArrayBuffer): RunesResponse {
+      return RunesResponse.decodeDataView(new DataView(buf));
     }
 
-    // Decodes RunesOutput from a DataView
-    static decodeDataView(view: DataView): RunesOutput {
+    // Decodes RunesResponse from a DataView
+    static decodeDataView(view: DataView): RunesResponse {
       const decoder = new __proto.Decoder(view);
-      const obj = new RunesOutput();
+      const obj = new RunesResponse();
 
       while (!decoder.eof()) {
         const tag = decoder.tag();
@@ -1139,7 +1477,7 @@ export namespace metashrew_runes {
         }
       }
       return obj;
-    } // decode RunesOutput
+    } // decode RunesResponse
 
     public size(): u32 {
       let size: u32 = 0;
@@ -1155,14 +1493,14 @@ export namespace metashrew_runes {
       return size;
     }
 
-    // Encodes RunesOutput to the ArrayBuffer
+    // Encodes RunesResponse to the ArrayBuffer
     encode(): ArrayBuffer {
       return changetype<ArrayBuffer>(
         StaticArray.fromArray<u8>(this.encodeU8Array())
       );
     }
 
-    // Encodes RunesOutput to the Array<u8>
+    // Encodes RunesResponse to the Array<u8>
     encodeU8Array(
       encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
     ): Array<u8> {
@@ -1179,18 +1517,6 @@ export namespace metashrew_runes {
       }
 
       return buf;
-    } // encode RunesOutput
-  } // RunesOutput
+    } // encode RunesResponse
+  } // RunesResponse
 } // metashrew_runes
-
-// __size_bytes_repeated
-
-function __size_bytes_repeated(value: Array<Array<u8>>): u32 {
-  let size: u32 = 0;
-
-  for (let n: i32 = 0; n < value.length; n++) {
-    size += 1 + __proto.Sizer.varint64(value[n].length) + value[n].length;
-  }
-
-  return size;
-}

@@ -14,32 +14,39 @@ import {
   SPACERS,
   SYMBOL,
 } from "../indexer/constants";
-import { OutPoint } from "metashrew-as/assembly/blockdata/transaction";
-import { metashrew_runes } from "../proto/metashrew-runes";
+import { OutPoint, Output } from "metashrew-as/assembly/blockdata/transaction";
+import { arrayBufferToArray } from "metashrew-spendables/assembly/indexer";
+import { OUTPOINT_TO_OUTPUT } from "metashrew-spendables/assembly/tables";
+import { metashrew_runes as protobuf } from "../proto/metashrew-runes";
 import { u256, u128 } from "as-bignum/assembly";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils/hex";
 import { console } from "metashrew-as/assembly/utils/logging";
 import { fromArrayBuffer, fieldToU128, fieldToName } from "../utils";
 
-export function outpointBase(
-  inp: metashrew_runes.Outpoint
-): metashrew_runes.OutpointOut {
-  const txid = changetype<Uint8Array>(inp.txid).buffer;
-  const pos = inp.pos;
-  const outpoint = OutPoint.from(txid, pos).toArrayBuffer();
-  const op = OUTPOINT_TO_RUNES.select(outpoint);
-  const balanceSheet = BalanceSheet.load(op);
+export function txindexForOutpoint(outpoint: ArrayBuffer): u32 {
+  const box = Box.from(outpoint);
+  box.len -= 4;
+  const txid = box.toArrayBuffer();
+  const ptr = HEIGHT_TO_TRANSACTION_IDS.selectValue<u32>(OUTPOINT_TO_HEIGHT.select(outpoint).getValue<u32>());
+  const length = ptr.length();
+  console.log(length.toString(10));
+  for (let i = 0; i < <i32>length; i++) {
+    if (memory.compare(changetype<usize>(txid), changetype<usize>(ptr.selectIndex(i).get()), txid.byteLength) === 0) return i;
+  }
+  return ~0;
+}
 
-  const runes = balanceSheet.runes.reduce<Array<metashrew_runes.Rune>>(
+export function balanceSheetToProtobuf(sheet: BalanceSheet): protobuf.BalanceSheet {
+  const runes = sheet.runes.reduce<Array<protobuf.Rune>>(
     (a, d, i, init) => {
       const _runeId = RuneId.fromBytesU128(d);
       const name = RUNE_ID_TO_ETCHING.select(d).get();
       const spacers = SPACERS.select(name);
       const divisibility = <u32>DIVISIBILITY.select(name).getValue<u8>();
-      const rune = new metashrew_runes.Rune();
-      const runeId = new metashrew_runes.RuneId();
-      runeId.block = _runeId.block;
-      runeId.tx = _runeId.tx;
+      const rune = new protobuf.Rune();
+      const runeId = new protobuf.RuneId();
+      runeId.height = <u32>_runeId.block;
+      runeId.txindex = _runeId.tx;
       rune.runeId = runeId;
       rune.name = Uint8Array.wrap(
         String.UTF8.encode(fieldToName(fromArrayBuffer(name)))
@@ -53,22 +60,46 @@ export function outpointBase(
       a.push(rune);
       return a;
     },
-    new Array<metashrew_runes.Rune>()
+    new Array<protobuf.Rune>()
   );
-  const balances = balanceSheet.balances.map<Array<u8>>(
+  const balances = sheet.balances.map<Array<u8>>(
     (d, i, ary: Array<u128>) => {
       return d.toBytes(true);
     }
   );
-  const message = new metashrew_runes.OutpointOut();
-  message.runes = runes;
+  const balanceSheet = new protobuf.BalanceSheet();
+  for (let i = 0; i < balances.length; i++) {
+    const entry = new protobuf.BalanceSheetItem();
+    entry.rune = runes[i];
+    entry.balance = balances[i];
+    balanceSheet.entries.push(entry);
+  }
+  return balanceSheet;
+}
+
+export function outpointBase(
+  inp: protobuf.Outpoint
+): protobuf.OutpointResponse {
+  const txid = changetype<Uint8Array>(inp.txid).buffer;
+  const pos = inp.vout;
+  const outpoint = OutPoint.from(txid, pos).toArrayBuffer();
+
+  const op = OUTPOINT_TO_RUNES.select(outpoint);
+  const output = new Output(Box.from(OUTPOINT_TO_OUTPUT.select(outpoint).get()));
+  const balanceSheet = balanceSheetToProtobuf(BalanceSheet.load(op));
+
+  const message = new protobuf.OutpointResponse();
   message.outpoint = inp;
-  message.balances = balances;
+  message.output.script = arrayBufferToArray(output.script.toArrayBuffer());
+  message.output.value = output.value;
+  message.balances = balanceSheet;
+  message.height = OUTPOINT_TO_HEIGHT.select(outpoint).getValue<u32>();
+  message.txindex = txindexForOutpoint(outpoint);
   return message;
 }
 
 export function outpoint(): ArrayBuffer {
   const _input = input().slice(4);
-  const inp = metashrew_runes.Outpoint.decode(_input);
+  const inp = protobuf.Outpoint.decode(_input);
   return outpointBase(inp).encode();
 }

@@ -133,7 +133,7 @@ describe("metashrew-runes", () => {
     await wallets.reduce(
       async (a, wallet) => {
         await a;
-        const walletView = buildView("wallet");
+        const walletView = buildView("runesbyaddress");
         const input = encodeWalletInput(wallet);
         let response = await walletView(input);
         const json = await response.json();
