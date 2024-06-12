@@ -137,9 +137,9 @@ describe("metashrew-runes", () => {
         const input = encodeWalletInput(wallet);
         let response = await walletView(input);
         const json = await response.json();
-	console.log(json);
-	const { result } = json;
-	console.log(result);
+        console.log(json);
+        const { result } = json;
+        console.log(result);
         const outputs = decodeWalletOutput(result);
         console.log(inspect(outputs, false, 5, true));
         return [...(await a), outputs];

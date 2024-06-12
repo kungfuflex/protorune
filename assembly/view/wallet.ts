@@ -1,6 +1,6 @@
 import {
   OUTPOINTS_FOR_ADDRESS,
-  OUTPOINT_TO_OUTPUT
+  OUTPOINT_TO_OUTPUT,
 } from "metashrew-spendables/assembly/tables.ts";
 import { balanceSheetToProtobuf, outpointBase } from "./outpoint";
 import { BalanceSheet } from "../indexer/BalanceSheet";
@@ -47,9 +47,14 @@ export function runesbyaddress(): ArrayBuffer {
 
   const message = new protobuf.WalletResponse();
   message.outpoints = outpoints;
-  message.balances = balanceSheetToProtobuf(balanceSheets.reduce((r: BalanceSheet, v: BalanceSheet, i: i32, ary: Array<BalanceSheet>) => {
-    return BalanceSheet.merge(r, v);
-  }, new BalanceSheet()));
+  message.balances = balanceSheetToProtobuf(
+    balanceSheets.reduce(
+      (r: BalanceSheet, v: BalanceSheet, i: i32, ary: Array<BalanceSheet>) => {
+        return BalanceSheet.merge(r, v);
+      },
+      new BalanceSheet()
+    )
+  );
 
   return message.encode();
 }

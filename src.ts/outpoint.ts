@@ -1,4 +1,8 @@
-import { OutpointOut, Outpoint } from "./proto/metashrew-runes";
+import {
+  OutpointResponse,
+  Outpoint,
+  BalanceSheet,
+} from "./proto/metashrew-runes";
 
 export type Rune = {
   id: string;
@@ -8,26 +12,35 @@ export type Rune = {
   spacers: number;
   symbol: string;
 };
+export type RuneOutput = {
+  rune: Rune;
+  balance: BigInt;
+};
 
 export type OutPoint = {
-  runes: Rune[];
-  balances: BigInt[];
+  runes: RuneOutput[];
   outpoint: {
     txid: string;
-    pos: number;
+    vout: number;
   };
+  output: {
+    value: any;
+    script: string;
+  };
+  height: number;
+  txindex: number;
 };
 
 export function encodeOutpointInput(txid: string, pos: number): string {
   const input: Outpoint = {
     txid: Buffer.from(txid, "hex"),
-    txindex: pos,
+    vout: pos,
   };
   const str = Buffer.from(Outpoint.toBinary(input)).toString("hex");
   return "0x" + str;
 }
 
-export function decodeRunes(balances: any): any {
+export function decodeRunes(balances: BalanceSheet): RuneOutput[] {
   return balances.entries.map((entry) => {
     const balance = Buffer.from(entry.balance);
     const d = entry.rune;
@@ -56,28 +69,28 @@ export function decodeRunes(balances: any): any {
     };
     return {
       rune,
-      balance: BigInt('0x' + Buffer.from(balance).toString('hex'))
+      balance: BigInt("0x" + Buffer.from(balance).toString("hex")),
     };
   });
 }
-export function decodeOutpointViewBase(op: any): OutPoint {
+export function decodeOutpointViewBase(op: OutpointResponse): OutPoint {
   return {
     runes: decodeRunes(op.balances),
     outpoint: {
       txid: Buffer.from(op.outpoint.txid).toString("hex"),
-      vout: op.outpoint.vout
+      vout: op.outpoint.vout,
     },
     output: {
       value: op.output.value,
-      script: Buffer.from(op.output.script).toString('hex')
+      script: Buffer.from(op.output.script).toString("hex"),
     },
     height: op.height,
-    txindex: op.txindex
+    txindex: op.txindex,
   };
 }
 
 export function decodeOutpointView(hex: string): OutPoint {
   const bytes = Uint8Array.from(Buffer.from(hex, "hex"));
-  const op = OutpointOut.fromBinary(bytes);
+  const op = OutpointResponse.fromBinary(bytes);
   return decodeOutpointViewBase(op);
 }

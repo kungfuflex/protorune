@@ -27,46 +27,52 @@ export function txindexForOutpoint(outpoint: ArrayBuffer): u32 {
   const box = Box.from(outpoint);
   box.len -= 4;
   const txid = box.toArrayBuffer();
-  const ptr = HEIGHT_TO_TRANSACTION_IDS.selectValue<u32>(OUTPOINT_TO_HEIGHT.select(outpoint).getValue<u32>());
+  const ptr = HEIGHT_TO_TRANSACTION_IDS.selectValue<u32>(
+    OUTPOINT_TO_HEIGHT.select(outpoint).getValue<u32>()
+  );
   const length = ptr.length();
   console.log(length.toString(10));
   for (let i = 0; i < <i32>length; i++) {
-    if (memory.compare(changetype<usize>(txid), changetype<usize>(ptr.selectIndex(i).get()), txid.byteLength) === 0) return i;
+    if (
+      memory.compare(
+        changetype<usize>(txid),
+        changetype<usize>(ptr.selectIndex(i).get()),
+        txid.byteLength
+      ) === 0
+    )
+      return i;
   }
   return ~0;
 }
 
-export function balanceSheetToProtobuf(sheet: BalanceSheet): protobuf.BalanceSheet {
-  const runes = sheet.runes.reduce<Array<protobuf.Rune>>(
-    (a, d, i, init) => {
-      const _runeId = RuneId.fromBytesU128(d);
-      const name = RUNE_ID_TO_ETCHING.select(d).get();
-      const spacers = SPACERS.select(name);
-      const divisibility = <u32>DIVISIBILITY.select(name).getValue<u8>();
-      const rune = new protobuf.Rune();
-      const runeId = new protobuf.RuneId();
-      runeId.height = <u32>_runeId.block;
-      runeId.txindex = _runeId.tx;
-      rune.runeId = runeId;
-      rune.name = Uint8Array.wrap(
-        String.UTF8.encode(fieldToName(fromArrayBuffer(name)))
-      ).reduce<Array<u8>>((a, d) => {
-        a.push(d);
-        return a;
-      }, new Array<u8>());
-      rune.divisibility = divisibility;
-      rune.symbol = <u32>SYMBOL.select(name).getValue<u8>();
-      rune.spacers = SPACERS.select(name).getValue<u32>();
-      a.push(rune);
+export function balanceSheetToProtobuf(
+  sheet: BalanceSheet
+): protobuf.BalanceSheet {
+  const runes = sheet.runes.reduce<Array<protobuf.Rune>>((a, d, i, init) => {
+    const _runeId = RuneId.fromBytesU128(d);
+    const name = RUNE_ID_TO_ETCHING.select(d).get();
+    const spacers = SPACERS.select(name);
+    const divisibility = <u32>DIVISIBILITY.select(name).getValue<u8>();
+    const rune = new protobuf.Rune();
+    const runeId = new protobuf.RuneId();
+    runeId.height = <u32>_runeId.block;
+    runeId.txindex = _runeId.tx;
+    rune.runeId = runeId;
+    rune.name = Uint8Array.wrap(
+      String.UTF8.encode(fieldToName(fromArrayBuffer(name)))
+    ).reduce<Array<u8>>((a, d) => {
+      a.push(d);
       return a;
-    },
-    new Array<protobuf.Rune>()
-  );
-  const balances = sheet.balances.map<Array<u8>>(
-    (d, i, ary: Array<u128>) => {
-      return d.toBytes(true);
-    }
-  );
+    }, new Array<u8>());
+    rune.divisibility = divisibility;
+    rune.symbol = <u32>SYMBOL.select(name).getValue<u8>();
+    rune.spacers = SPACERS.select(name).getValue<u32>();
+    a.push(rune);
+    return a;
+  }, new Array<protobuf.Rune>());
+  const balances = sheet.balances.map<Array<u8>>((d, i, ary: Array<u128>) => {
+    return d.toBytes(true);
+  });
   const balanceSheet = new protobuf.BalanceSheet();
   for (let i = 0; i < balances.length; i++) {
     const entry = new protobuf.BalanceSheetItem();
@@ -85,7 +91,9 @@ export function outpointBase(
   const outpoint = OutPoint.from(txid, pos).toArrayBuffer();
 
   const op = OUTPOINT_TO_RUNES.select(outpoint);
-  const output = new Output(Box.from(OUTPOINT_TO_OUTPUT.select(outpoint).get()));
+  const output = new Output(
+    Box.from(OUTPOINT_TO_OUTPUT.select(outpoint).get())
+  );
   const balanceSheet = balanceSheetToProtobuf(BalanceSheet.load(op));
 
   const message = new protobuf.OutpointResponse();
