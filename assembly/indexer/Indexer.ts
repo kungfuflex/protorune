@@ -10,7 +10,6 @@ import { Flag } from "./Flag";
 import { Field } from "./Field";
 import { scriptParse } from "metashrew-as/assembly/utils/yabsp";
 import { u256, u128 } from "as-bignum/assembly";
-import { Index as SpendablesIndex } from "metashrew-spendables/assembly/indexer";
 import { console } from "metashrew-as/assembly/utils/logging";
 import {
   fieldTo,
@@ -151,6 +150,5 @@ export class Index {
         }
       }
     }
-    SpendablesIndex.indexBlock(height, block);
   }
 }

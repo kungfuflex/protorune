@@ -94,7 +94,9 @@ const runTest = (s) =>
     await new Promise((r) => setTimeout(r, 2000));
     return program;
   });
-
+const log = (obj: any) => {
+  console.log(inspect(obj, false, 10, true));
+};
 describe("metashrew-runes", () => {
   let hash: string;
   before(async () => {
@@ -128,6 +130,7 @@ describe("metashrew-runes", () => {
     const wallets = [
       "bc1pwpd3dfvvsy2gcdc6du27wkzwl86pp50arycwzrh3r28a5g46fjfsluvsr9",
       "bc1pzskepp4ys2septcfz483lmk22xvwdgydgt5r4fgmfagqegwh5a8se48yxf",
+      "bc1qp0wdw7ttsayed7rvsteajys74wyjfak68eufve",
     ];
 
     await wallets.reduce(
@@ -138,8 +141,10 @@ describe("metashrew-runes", () => {
         let response = await walletView(input);
         const json = await response.json();
         const { result } = json;
+        log(result);
+        if (result.length == 0) return [...(await a), null];
         const outputs = decodeWalletOutput(result);
-        console.log(inspect(outputs, false, 5, true));
+        log(outputs);
         return [...(await a), outputs];
       },
       Promise.resolve([] as any[])
@@ -160,9 +165,9 @@ describe("metashrew-runes", () => {
       return r;
     }, Promise.resolve([]));
     res.map((hex) => {
-      if (hex) {
+      if (hex.length > 0) {
         const outpoint = decodeOutpointView(hex);
-        console.log(outpoint);
+        //log(outpoint);
       }
     });
   });

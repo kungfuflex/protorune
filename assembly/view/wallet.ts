@@ -30,10 +30,10 @@ export function runesbyaddress(): ArrayBuffer {
   let i = <i32>addressPointer.length();
   const outpoints = new Array<protobuf.OutpointResponse>();
   const balanceSheets = new Array<BalanceSheet>();
+  console.log(i.toString());
   while (i >= 0) {
     const itemPointer = addressPointer.selectIndex(<u32>i);
     const item = itemPointer.get();
-    balanceSheets.push(BalanceSheet.load(OUTPOINT_TO_RUNES.select(item)));
     i--;
     if (item.byteLength == 0) continue;
     const inp = new protobuf.Outpoint();
@@ -41,7 +41,7 @@ export function runesbyaddress(): ArrayBuffer {
     inp.vout = parsePrimitive<u32>(Box.from(item.slice(32)));
     const op = outpointBase(inp);
     if (op.balances.entries.length == 0) continue;
-
+    balanceSheets.push(BalanceSheet.load(OUTPOINT_TO_RUNES.select(item)));
     outpoints.push(op);
   }
 

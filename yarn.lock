@@ -1223,7 +1223,7 @@ memorystream@^0.3.1:
 
 "metashrew-spendables@https://github.com/sandshrewmetaprotocols/metashrew-spendables":
   version "0.1.0"
-  resolved "https://github.com/sandshrewmetaprotocols/metashrew-spendables#ba7cc0838129ae33a2a2059d3eb73951aee2c358"
+  resolved "https://github.com/sandshrewmetaprotocols/metashrew-spendables#559820f72b9ae678d786b935fcaaf6d21708aca3"
 
 "metashrew-test@https://github.com/sandshrewmetaprotocols/metashrew-test":
   version "0.1.0"

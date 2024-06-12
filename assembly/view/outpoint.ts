@@ -31,7 +31,6 @@ export function txindexForOutpoint(outpoint: ArrayBuffer): u32 {
     OUTPOINT_TO_HEIGHT.select(outpoint).getValue<u32>()
   );
   const length = ptr.length();
-  console.log(length.toString(10));
   for (let i = 0; i < <i32>length; i++) {
     if (
       memory.compare(
