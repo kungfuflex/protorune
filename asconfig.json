@@ -4,7 +4,8 @@
     "sourceMap": true,
     "explicitStart": true,
     "measure": true,
-    "threads": true
+    "threads": true,
+    "exportRuntime": true
   },
   "targets": {
     "debug": {
