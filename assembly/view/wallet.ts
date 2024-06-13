@@ -30,7 +30,6 @@ export function runesbyaddress(): ArrayBuffer {
   let i = <i32>addressPointer.length();
   const outpoints = new Array<protobuf.OutpointResponse>();
   const balanceSheets = new Array<BalanceSheet>();
-  console.log(i.toString());
   while (i >= 0) {
     const itemPointer = addressPointer.selectIndex(<u32>i);
     const item = itemPointer.get();
