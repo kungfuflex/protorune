@@ -126,6 +126,10 @@ describe("metashrew-runes", () => {
       });
     };
   }
+  // it("should test fixed bst", async () => {
+  //   const view = buildView("wallet_test");
+  //   await view("");
+  // });
   it("should test address output", async () => {
     const wallets = [
       "bc1pwpd3dfvvsy2gcdc6du27wkzwl86pp50arycwzrh3r28a5g46fjfsluvsr9",
@@ -187,7 +191,7 @@ describe("metashrew-runes", () => {
   program.setBlockHeight(840000);
   await program.run('_start');
   return program;
-    
+
   });
   */
 });

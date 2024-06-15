@@ -174,14 +174,16 @@
   integrity sha512-GaPq2U8tWosTT+gBTXIPSWrW3q2ok2ohWpq3xF8mREFJ1gZrfjZUrkbt34GKbN8KGfM2NSCZzYzX/1IEcOvE9w==
 
 acorn-walk@^8.1.1:
-  version "8.3.2"
-  resolved "https://registry.yarnpkg.com/acorn-walk/-/acorn-walk-8.3.2.tgz#7703af9415f1b6db9315d6895503862e231d34aa"
-  integrity sha512-cjkyv4OtNCIeqhHrfS81QWXoCBPExR/J62oyEqepVw8WaQeSqpW2uhuLPh1m9eWhDuOo/jUXVTlifvesOWp/4A==
+  version "8.3.3"
+  resolved "https://registry.yarnpkg.com/acorn-walk/-/acorn-walk-8.3.3.tgz#9caeac29eefaa0c41e3d4c65137de4d6f34df43e"
+  integrity sha512-MxXdReSRhGO7VlFe1bRG/oI7/mdLV9B9JJT0N8vZOhF7gFRR5l3M8W9G8JxmKV+JC5mGqJ0QvqfSOLsCPa4nUw==
+  dependencies:
+    acorn "^8.11.0"
 
-acorn@^8.4.1:
-  version "8.11.3"
-  resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.11.3.tgz#71e0b14e13a4ec160724b38fb7b0f233b1b81d7a"
-  integrity sha512-Y9rRfJG5jcKOE0CLisYbojUjIrIEE7AGMzA/Sm4BslANhbS+cDMpgBdcPT91oJ7OuJ9hYJBx59RjbhxVnrF8Xg==
+acorn@^8.11.0, acorn@^8.4.1:
+  version "8.12.0"
+  resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.12.0.tgz#1627bfa2e058148036133b8d9b51a700663c294c"
+  integrity sha512-RTvkC4w+KNXrM39/lWCUaG0IbRkWdCv7W/IOW9oU6SawyxulvkQy5HQPVTKxEjczcUvapcrw3cFx/60VN/NRNw==
 
 ansi-colors@4.1.1:
   version "4.1.1"
@@ -1216,14 +1218,14 @@ memorystream@^0.3.1:
 
 "metashrew-as@https://github.com/sandshrewmetaprotocols/metashrew-as":
   version "0.1.0"
-  resolved "https://github.com/sandshrewmetaprotocols/metashrew-as#e0c1f1b0c0ac24ae5ca4cb46440503208d606f61"
+  resolved "https://github.com/sandshrewmetaprotocols/metashrew-as#673bec54c390fe2e3746bf98eedbed7fb493b19e"
   dependencies:
     fast-sha256-as "https://github.com/sandshrewmetaprotocols/fast-sha256-as"
     lodash "^4.17.21"
 
 "metashrew-spendables@https://github.com/sandshrewmetaprotocols/metashrew-spendables":
   version "0.1.0"
-  resolved "https://github.com/sandshrewmetaprotocols/metashrew-spendables#559820f72b9ae678d786b935fcaaf6d21708aca3"
+  resolved "https://github.com/sandshrewmetaprotocols/metashrew-spendables#ca4e3482bb1408d182a9c90d4f828c0b42873954"
 
 "metashrew-test@https://github.com/sandshrewmetaprotocols/metashrew-test":
   version "0.1.0"

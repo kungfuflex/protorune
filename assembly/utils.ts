@@ -2,17 +2,6 @@ import { Box } from "metashrew-as/assembly/utils/box";
 import { u256, u128 } from "as-bignum/assembly";
 import { Edict } from "./indexer/Edict";
 
-export function decodeHex(hex: string): ArrayBuffer {
-  const result = new ArrayBuffer(hex.length / 2);
-  for (let i = 0; i < hex.length; i += 2) {
-    store<u8>(
-      changetype<usize>(result) + i / 2,
-      <u8>parseInt(hex.substring(i, i + 2), 16)
-    );
-  }
-  return result;
-}
-
 export function min<T>(a: T, b: T): T {
   if (a > b) return b;
   return a;
@@ -98,13 +87,13 @@ export function toArrayBuffer(data: u128): ArrayBuffer {
 
 export function fieldToArrayBuffer(data: Array<u128>): ArrayBuffer {
   return Box.concat(
-    data.map((v: u128, i: i32, ary: Array<u128>) => Box.from(toArrayBuffer(v)))
+    data.map((v: u128, i: i32, ary: Array<u128>) => Box.from(toArrayBuffer(v))),
   );
 }
 
 export function fromBox(data: Box): u128 {
   return u128.fromBytesLE(
-    changetype<u8[]>(Uint8Array.wrap(data.toArrayBuffer()))
+    changetype<u8[]>(Uint8Array.wrap(data.toArrayBuffer())),
   );
 }
 
