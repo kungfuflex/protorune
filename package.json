@@ -15,7 +15,9 @@
     "prettier": "npm-run-all prettier:assemblyscript",
     "test": "ts-mocha --timeout 0 ./tests/**.spec.ts"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@protobuf-ts/runtime": "^2.9.4"
+  },
   "devDependencies": {
     "@bitauth/libauth": "^3.0.0",
     "@protobuf-ts/protoc": "^2.9.4",
