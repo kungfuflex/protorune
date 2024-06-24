@@ -4,8 +4,16 @@ import { Block } from "metashrew-as/assembly/blockdata/block";
 import { Transaction } from "metashrew-as/assembly/blockdata/transaction";
 import { Box } from "metashrew-as/assembly/utils/box";
 import { decodeHex } from "metashrew-as/assembly";
-import { console } from "metashrew-as/assembly/utils/logging";
 import { GENESIS } from "./indexer/constants";
+import { parsePrimitive } from "metashrew-as/assembly/utils/utils";
+
+export function testCommitment(): void {
+  const data = input();
+  const box = Box.from(data);
+  const height = parsePrimitive<u32>(box);
+  const block = new Block(box);
+  Index.inspectTransaction(height, block, 298);
+}
 
 function testTransaction(hex: string): void {
   const block = new Block(

@@ -1,6 +1,7 @@
 import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
 
 export const RUNESTONE_TAG: u16 = 0x5d6a;
+
 export const OP_RETURN: u8 = 0x6a;
 
 export const GENESIS: u32 = 840000;

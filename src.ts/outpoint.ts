@@ -41,6 +41,7 @@ export function encodeOutpointInput(txid: string, pos: number): string {
 }
 
 export function decodeRunes(balances: BalanceSheet): RuneOutput[] {
+  if (!balances) return [];
   return balances.entries.map((entry) => {
     const balance = Buffer.from(entry.balance);
     const d = entry.rune;
@@ -80,10 +81,12 @@ export function decodeOutpointViewBase(op: OutpointResponse): OutPoint {
       txid: Buffer.from(op.outpoint.txid).toString("hex"),
       vout: op.outpoint.vout,
     },
-    output: {
-      value: op.output.value,
-      script: Buffer.from(op.output.script).toString("hex"),
-    },
+    output: op.output
+      ? {
+          value: op.output.value,
+          script: Buffer.from(op.output.script).toString("hex"),
+        }
+      : { value: "", script: "" },
     height: op.height,
     txindex: op.txindex,
   };

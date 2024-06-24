@@ -6,20 +6,23 @@
     "asbuild:release": "asc assembly/index.ts --target release --config asconfig.json",
     "build": "npm-run-all build:protoc asbuild:debug asbuild:release build:ts",
     "build:debug:preloader": "npm run asbuild:preloader --sharedMemory",
+    "build:ts": "tsc",
     "build:protoc:as": "protoc --plugin=./node_modules/.bin/protoc-gen-as --as_out=assembly/proto --as_opt targetFileName=metashrew-runes.ts --proto_path=./ proto/metashrew-runes.proto",
     "build:protoc:ts": "protoc --ts_out src.ts/proto --proto_path proto metashrew-runes.proto",
-    "build:ts": "tsc",
     "build:protoc": "npm-run-all build:protoc:as build:protoc:ts",
     "prettier:assemblyscript": "prettier --write ./assembly/**/*.ts",
     "prettier:ts": "prettier --write ./src.ts/**/*.ts",
     "prettier": "npm-run-all prettier:assemblyscript",
-    "test": "ts-mocha --timeout 0 ./tests/**.spec.ts"
+    "test": "ts-mocha --timeout 0 ./tests/**.spec.ts",
+    "test:view": "ts-mocha --timeout 0 ./tests/view.spec.ts",
+    "test:release": "ts-mocha --timeout 0 ./tests/release.spec.ts"
   },
   "dependencies": {
     "@protobuf-ts/runtime": "^2.9.4"
   },
   "devDependencies": {
     "@bitauth/libauth": "^3.0.0",
+    "@magiceden-oss/runestone-lib": "^1.0.2",
     "@protobuf-ts/protoc": "^2.9.4",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.10.6",

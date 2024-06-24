@@ -1,4 +1,5 @@
 {
+  "extends": ["../node_modules/assemblyscript/std/assembly.json"],
   "compilerOptions": {
     "experimentalDecorators": true,
     "resolveJsonModule": true,
@@ -12,7 +13,7 @@
     "sourceMap": true,
     "outDir": "./lib",
     "declaration": true,
-    "types": ["node"]
+    "types": ["assembly"]
   },
-  "include": ["./src.ts/*"]
+  "include": ["./**/*.ts"]
 }

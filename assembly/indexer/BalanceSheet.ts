@@ -1,6 +1,5 @@
 import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
-import { Box } from "metashrew-as/assembly/utils/box";
-import { u256, u128 } from "as-bignum/assembly";
+import { u128 } from "as-bignum/assembly";
 import { fromArrayBuffer } from "../utils";
 import { RuneId } from "./RuneId";
 
@@ -28,7 +27,7 @@ export class BalanceSheet {
   }
   static fromPairs(
     runes: Array<ArrayBuffer>,
-    balances: Array<u128>
+    balances: Array<u128>,
   ): BalanceSheet {
     const balanceSheet = new BalanceSheet();
     for (let i = 0; i < runes.length; i++) {
@@ -42,7 +41,7 @@ export class BalanceSheet {
     return -1;
   }
   @inline
-  has(rune: ArrayBuffer): boolean {
+  has(rune: ArrayBuffer): bool {
     return this.index.has(changetype<string>(rune));
   }
   get(rune: ArrayBuffer): u128 {
@@ -53,8 +52,7 @@ export class BalanceSheet {
   set(rune: ArrayBuffer, v: u128): void {
     if (this.has(rune)) {
       const i = this.getIndex(rune);
-      const record = this.balances[i];
-      this.balances[i] = this.balances[i] + record;
+      this.balances[i] = v;
     } else {
       this.index.set(changetype<string>(rune), this.runes.length);
       this.runes.push(rune);
@@ -87,14 +85,15 @@ export class BalanceSheet {
       (r: BalanceSheet, v: BalanceSheet, i: i32, ary: Array<BalanceSheet>) => {
         return BalanceSheet.merge(r, v);
       },
-      new BalanceSheet()
+      new BalanceSheet(),
     );
   }
-  save(ptr: IndexPointer): void {
+  save(ptr: IndexPointer, isCenotaph: bool = false): void {
     const runesPtr = ptr.keyword("/runes");
     const balancesPtr = ptr.keyword("/balances");
+
     for (let i = 0; i < this.runes.length; i++) {
-      if (this.balances[i] != u128.from(0)) {
+      if (this.balances[i] != u128.from(0) && !isCenotaph) {
         runesPtr.append(this.runes[i]);
 
         const buf = changetype<Uint8Array>(this.balances[i].toBytes()).buffer;
@@ -111,7 +110,7 @@ export class BalanceSheet {
     for (let i: u32 = 0; i < length; i++) {
       result.set(
         runesPtr.selectIndex(i).get(),
-        fromArrayBuffer(balancesPtr.selectIndex(i).get())
+        fromArrayBuffer(balancesPtr.selectIndex(i).get()),
       );
     }
     return result;

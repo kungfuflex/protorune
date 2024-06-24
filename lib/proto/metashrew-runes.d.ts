@@ -159,6 +159,75 @@ export interface RunesResponse {
      */
     runes: Rune[];
 }
+/**
+ * @generated from protobuf message metashrew_runes.ProtoBurn
+ */
+export interface ProtoBurn {
+    /**
+     * @generated from protobuf field: bytes protocol_tag = 1;
+     */
+    protocolTag: Uint8Array;
+    /**
+     * @generated from protobuf field: uint32 pointer = 2;
+     */
+    pointer: number;
+}
+/**
+ * @generated from protobuf message metashrew_runes.uint128
+ */
+export interface uint128 {
+    /**
+     * @generated from protobuf field: uint64 lo = 1;
+     */
+    lo: bigint;
+    /**
+     * @generated from protobuf field: uint64 hi = 2;
+     */
+    hi: bigint;
+}
+/**
+ * @generated from protobuf message metashrew_runes.Clause
+ */
+export interface Clause {
+    /**
+     * @generated from protobuf field: metashrew_runes.RuneId rune = 1;
+     */
+    rune?: RuneId;
+    /**
+     * @generated from protobuf field: metashrew_runes.uint128 amount = 2;
+     */
+    amount?: uint128;
+}
+/**
+ * @generated from protobuf message metashrew_runes.Predicate
+ */
+export interface Predicate {
+    /**
+     * @generated from protobuf field: repeated metashrew_runes.Clause clauses = 1;
+     */
+    clauses: Clause[];
+}
+/**
+ * @generated from protobuf message metashrew_runes.ProtoMessage
+ */
+export interface ProtoMessage {
+    /**
+     * @generated from protobuf field: bytes calldata = 1;
+     */
+    calldata: Uint8Array;
+    /**
+     * @generated from protobuf field: metashrew_runes.Predicate predicate = 2;
+     */
+    predicate?: Predicate;
+    /**
+     * @generated from protobuf field: uint32 pointer = 3;
+     */
+    pointer: number;
+    /**
+     * @generated from protobuf field: uint32 refund_pointer = 4;
+     */
+    refundPointer: number;
+}
 declare class RuneId$Type extends MessageType<RuneId> {
     constructor();
     create(value?: PartialMessage<RuneId>): RuneId;
@@ -269,4 +338,54 @@ declare class RunesResponse$Type extends MessageType<RunesResponse> {
  * @generated MessageType for protobuf message metashrew_runes.RunesResponse
  */
 export declare const RunesResponse: RunesResponse$Type;
+declare class ProtoBurn$Type extends MessageType<ProtoBurn> {
+    constructor();
+    create(value?: PartialMessage<ProtoBurn>): ProtoBurn;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ProtoBurn): ProtoBurn;
+    internalBinaryWrite(message: ProtoBurn, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message metashrew_runes.ProtoBurn
+ */
+export declare const ProtoBurn: ProtoBurn$Type;
+declare class uint128$Type extends MessageType<uint128> {
+    constructor();
+    create(value?: PartialMessage<uint128>): uint128;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: uint128): uint128;
+    internalBinaryWrite(message: uint128, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message metashrew_runes.uint128
+ */
+export declare const uint128: uint128$Type;
+declare class Clause$Type extends MessageType<Clause> {
+    constructor();
+    create(value?: PartialMessage<Clause>): Clause;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Clause): Clause;
+    internalBinaryWrite(message: Clause, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message metashrew_runes.Clause
+ */
+export declare const Clause: Clause$Type;
+declare class Predicate$Type extends MessageType<Predicate> {
+    constructor();
+    create(value?: PartialMessage<Predicate>): Predicate;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Predicate): Predicate;
+    internalBinaryWrite(message: Predicate, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message metashrew_runes.Predicate
+ */
+export declare const Predicate: Predicate$Type;
+declare class ProtoMessage$Type extends MessageType<ProtoMessage> {
+    constructor();
+    create(value?: PartialMessage<ProtoMessage>): ProtoMessage;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ProtoMessage): ProtoMessage;
+    internalBinaryWrite(message: ProtoMessage, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message metashrew_runes.ProtoMessage
+ */
+export declare const ProtoMessage: ProtoMessage$Type;
 export {};

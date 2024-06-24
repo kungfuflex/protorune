@@ -9,9 +9,12 @@ import {
   fieldTo,
   toArrayBuffer,
   fromArrayBuffer,
+  toPrimitive,
+  min,
 } from "../utils";
 import { Flag } from "./Flag";
 import { RuneId } from "./RuneId";
+import { Edict } from "./Edict";
 import {
   AMOUNT,
   SPACERS,
@@ -20,7 +23,6 @@ import {
   RUNE_ID_TO_HEIGHT,
   DIVISIBILITY,
   PREMINE,
-  CAP,
   MINTS_REMAINING,
   HEIGHTSTART,
   HEIGHTEND,
@@ -29,8 +31,11 @@ import {
   SYMBOL,
   CAP,
   ETCHINGS,
+  OUTPOINT_TO_RUNES,
 } from "./constants";
 import { BalanceSheet } from "./BalanceSheet";
+import { RunesTransaction } from "./RunesTransaction";
+import { Input, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
 
 export class RunestoneMessage {
   public fields: Map<u64, Array<u128>>;
@@ -114,7 +119,7 @@ export class RunestoneMessage {
     return new RunestoneMessage(fields, edicts);
   }
 
-  mint(height: u32, initialBalanceSheetPtr: usize): bool {
+  mint(height: u32, balanceSheet: BalanceSheet): bool {
     let mintTo = this.mintTo();
     if (changetype<usize>(mintTo) !== 0 && mintTo.byteLength == 32) {
       mintTo = RuneId.fromBytes(mintTo).toBytes();
@@ -132,13 +137,12 @@ export class RunestoneMessage {
           (offsetStart === 0 || height >= offsetStart + etchingHeight) &&
           (offsetEnd === 0 || height < etchingHeight + offsetEnd)
         ) {
-          const balanceSheet = changetype<BalanceSheet>(initialBalanceSheetPtr);
           MINTS_REMAINING.select(name).set(
-            toArrayBuffer(remaining - u128.from(1))
+            toArrayBuffer(remaining - u128.from(1)),
           );
           balanceSheet.increase(
             mintTo,
-            fromArrayBuffer(AMOUNT.select(name).get())
+            fromArrayBuffer(AMOUNT.select(name).get()),
           );
           return true;
         }
@@ -147,23 +151,19 @@ export class RunestoneMessage {
     return false;
   }
 
-  etch(height: u64, tx: u32, initialBalanceSheetPtr: usize): bool {
+  etch(height: u64, tx: u32, initialBalanceSheet: BalanceSheet): bool {
     if (!this.isEtching()) return false;
     const name = fieldToArrayBuffer(this.fields.get(Field.RUNE));
     if (ETCHING_TO_RUNE_ID.select(name).get().byteLength !== 0) return false; // already taken / commitment not foun
     const runeId = new RuneId(height, tx).toBytes();
-    const ar = Uint8Array.wrap(runeId);
     RUNE_ID_TO_ETCHING.select(runeId).set(name);
     ETCHING_TO_RUNE_ID.select(name).set(runeId);
     RUNE_ID_TO_HEIGHT.select(runeId).setValue<u32>(<u32>height);
     if (this.fields.has(Field.DIVISIBILITY))
       DIVISIBILITY.select(name).setValue<u8>(
-        fieldTo<u8>(this.fields.get(Field.DIVISIBILITY))
+        fieldTo<u8>(this.fields.get(Field.DIVISIBILITY)),
       );
     if (this.fields.has(Field.PREMINE)) {
-      const initialBalanceSheet = changetype<BalanceSheet>(
-        initialBalanceSheetPtr
-      );
       const premine = fieldToU128(this.fields.get(Field.PREMINE));
       BalanceSheet.fromPairs([runeId], [premine]).pipe(initialBalanceSheet);
       PREMINE.select(name).set(toArrayBuffer(premine));
@@ -171,43 +171,112 @@ export class RunestoneMessage {
     if (this.getFlag(Flag.TERMS)) {
       if (this.fields.has(Field.AMOUNT))
         AMOUNT.select(name).set(
-          toArrayBuffer(fieldToU128(this.fields.get(Field.AMOUNT)))
+          toArrayBuffer(fieldToU128(this.fields.get(Field.AMOUNT))),
         );
 
       if (this.fields.has(Field.CAP)) {
         CAP.select(name).set(
-          toArrayBuffer(fieldToU128(this.fields.get(Field.CAP)))
+          toArrayBuffer(fieldToU128(this.fields.get(Field.CAP))),
         );
         MINTS_REMAINING.select(name).set(
-          fieldToArrayBuffer(this.fields.get(Field.CAP))
+          fieldToArrayBuffer(this.fields.get(Field.CAP)),
         );
       }
       if (this.fields.has(Field.HEIGHTSTART))
         HEIGHTSTART.select(name).setValue<u64>(
-          fieldTo<u64>(this.fields.get(Field.HEIGHTSTART))
+          fieldTo<u64>(this.fields.get(Field.HEIGHTSTART)),
         );
       if (this.fields.has(Field.HEIGHTEND))
         HEIGHTEND.select(name).setValue<u64>(
-          fieldTo<u64>(this.fields.get(Field.HEIGHTEND))
+          fieldTo<u64>(this.fields.get(Field.HEIGHTEND)),
         );
       if (this.fields.has(Field.OFFSETSTART))
         OFFSETSTART.select(name).setValue<u64>(
-          fieldTo<u64>(this.fields.get(Field.OFFSETSTART))
+          fieldTo<u64>(this.fields.get(Field.OFFSETSTART)),
         );
       if (this.fields.has(Field.OFFSETEND))
         OFFSETEND.select(name).setValue<u64>(
-          fieldTo<u64>(this.fields.get(Field.OFFSETEND))
+          fieldTo<u64>(this.fields.get(Field.OFFSETEND)),
         );
     }
     if (this.fields.has(Field.SPACERS))
       SPACERS.select(name).setValue<u32>(
-        fieldTo<u32>(this.fields.get(Field.SPACERS))
+        fieldTo<u32>(this.fields.get(Field.SPACERS)),
       );
     if (this.fields.has(Field.SYMBOL))
       SYMBOL.select(name).setValue<u8>(
-        fieldTo<u8>(this.fields.get(Field.SYMBOL))
+        fieldTo<u8>(this.fields.get(Field.SYMBOL)),
       );
     ETCHINGS.append(name);
     return true;
+  }
+
+  processEdicts(
+    balancesByOutput: Map<u32, BalanceSheet>,
+    balanceSheet: BalanceSheet,
+    txid: ArrayBuffer,
+  ): bool {
+    let isCenotaph: bool = false;
+    const edicts = Edict.fromDeltaSeries(this.edicts);
+    for (let e = 0; e < edicts.length; e++) {
+      const edict = edicts[e];
+      const edictOutput = toPrimitive<u32>(edict.output);
+
+      const runeId = edict.runeId().toBytes();
+      let outputBalanceSheet = changetype<BalanceSheet>(0);
+      if (!balancesByOutput.has(edictOutput)) {
+        balancesByOutput.set(
+          edictOutput,
+          (outputBalanceSheet = new BalanceSheet()),
+        );
+      } else outputBalanceSheet = balancesByOutput.get(edictOutput);
+      const amount = min(edict.amount, balanceSheet.get(runeId));
+
+      const canDecrease = balanceSheet.decrease(runeId, amount);
+      if (canDecrease) isCenotaph = true;
+      outputBalanceSheet.increase(runeId, amount);
+    }
+    return isCenotaph;
+  }
+  process(
+    tx: RunesTransaction,
+    txid: ArrayBuffer,
+    height: u32,
+    txindex: u32,
+  ): void {
+    let balanceSheet = BalanceSheet.concat(
+      tx.ins.map<BalanceSheet>((v: Input, i: i32, ary: Array<Input>) =>
+        BalanceSheet.load(
+          OUTPOINT_TO_RUNES.select(v.previousOutput().toArrayBuffer()),
+        ),
+      ),
+    );
+    const balancesByOutput = new Map<u32, BalanceSheet>();
+
+    this.mint(height, balanceSheet);
+    this.etch(<u64>height, <u32>txindex, balanceSheet);
+
+    const unallocatedTo = this.fields.has(Field.POINTER)
+      ? fieldTo<u32>(this.fields.get(Field.POINTER))
+      : <u32>tx.defaultOutput();
+    if (balancesByOutput.has(unallocatedTo)) {
+      balanceSheet.pipe(balancesByOutput.get(unallocatedTo));
+    } else {
+      balancesByOutput.set(unallocatedTo, balanceSheet);
+    }
+
+    const isCenotaph = this.processEdicts(balancesByOutput, balanceSheet, txid);
+
+    const runesToOutputs = balancesByOutput.keys();
+
+    for (let x = 0; x < runesToOutputs.length; x++) {
+      const sheet = balancesByOutput.get(runesToOutputs[x]);
+      sheet.save(
+        OUTPOINT_TO_RUNES.select(
+          OutPoint.from(txid, runesToOutputs[x]).toArrayBuffer(),
+        ),
+        isCenotaph,
+      );
+    }
   }
 }

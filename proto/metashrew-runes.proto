@@ -59,3 +59,28 @@ message WalletResponse {
 message RunesResponse {
   repeated Rune runes = 1;
 }
+message ProtoBurn {
+  bytes protocol_tag = 1;
+  uint32 pointer = 2;
+}
+
+message uint128 {
+  uint64 lo = 1;
+  uint64 hi = 2;
+}
+
+message Clause {
+  RuneId rune = 1;
+  uint128 amount = 2;
+}
+
+message Predicate {
+  repeated Clause clauses = 1;
+}
+
+message ProtoMessage {
+  bytes calldata = 1;
+  Predicate predicate = 2;
+  uint32 pointer = 3;
+  uint32 refund_pointer = 4;
+}

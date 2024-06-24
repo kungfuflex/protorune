@@ -45,13 +45,10 @@ export function stripNullRight(data: ArrayBuffer): ArrayBuffer {
 
 export function isEqualArrayBuffer(a: ArrayBuffer, b: ArrayBuffer): bool {
   if (a.byteLength !== b.byteLength) return false;
-  for (let i = 0; i < a.byteLength; i++) {
-    if (
-      load<u8>(changetype<usize>(a) + i) !== load<u8>(changetype<usize>(b) + i)
-    )
-      return false;
-  }
-  return true;
+  return (
+    memory.compare(changetype<usize>(a), changetype<usize>(b), a.byteLength) ==
+    0
+  );
 }
 
 export function toPrimitive<T>(v: u128): T {
