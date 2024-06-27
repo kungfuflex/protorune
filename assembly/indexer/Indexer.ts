@@ -12,7 +12,11 @@ import {
   GENESIS,
 } from "./constants";
 import { OutPoint } from "metashrew-as/assembly/blockdata/transaction";
-import { isEqualArrayBuffer, fieldToArrayBuffer } from "../utils";
+import {
+  isEqualArrayBuffer,
+  fieldToArrayBuffer,
+  stripNullRight,
+} from "../utils";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils";
 
 export class Index {
@@ -36,13 +40,11 @@ export class Index {
       const input = tx.ins[i];
       // check that there is 1 data push
       const inscription = input.inscription();
+
       if (changetype<usize>(inscription) === 0) continue;
-      const commitment = inscription.field(5);
-      for (let i = 0; i < inscription.fields.length; i++)
-        console.log(inscription.fields[i].tag.toString());
+      const commitment = inscription.field(0);
       if (!commitment) continue;
       const previousOutpoint = tx.ins[i].previousOutput().toArrayBuffer();
-      console.log(encodeHexFromBuffer(commitment));
       if (
         height - OUTPOINT_TO_HEIGHT.select(previousOutpoint).getValue<u32>() >=
         6
@@ -74,7 +76,7 @@ export class Index {
     const payload = Box.concat(parsed);
     const message = RunestoneMessage.parse(payload);
     if (changetype<usize>(message) === 0) return;
-    const commitment = Index.findCommitment(name, tx, height);
+    const commitment = Index.findCommitment(stripNullRight(name), tx, height);
     if (commitment) console.log("no commitment");
     else console.log("commitment found");
   }

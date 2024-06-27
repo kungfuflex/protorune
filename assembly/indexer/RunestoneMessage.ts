@@ -41,6 +41,7 @@ import {
   RESERVED_NAME,
 } from "./constants";
 import { BalanceSheet } from "./BalanceSheet";
+import { Index } from "./Indexer";
 import { RunesTransaction } from "./RunesTransaction";
 import { Input, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
 import { SUBSIDY_HALVING_INTERVAL } from "metashrew-as/assembly/utils";
@@ -174,12 +175,18 @@ export class RunestoneMessage {
     SYMBOL.select(name).setValue<u8>(<u8>"\u{29C9}".charCodeAt(0));
     ETCHINGS.append(name);
   }
-  etch(height: u64, tx: u32, initialBalanceSheet: BalanceSheet): bool {
+  etch(
+    height: u64,
+    tx: u32,
+    initialBalanceSheet: BalanceSheet,
+    transaction: RunesTransaction,
+  ): bool {
     if (!this.isEtching()) return false;
     let name: ArrayBuffer;
     if (this.fields.has(Field.RUNE))
       name = fieldToArrayBuffer(this.fields.get(Field.RUNE));
     else name = fieldToArrayBuffer([getReservedNameFor(height, tx)]);
+
     let interval: i64 = (height - GENESIS) / HEIGHT_INTERVAL;
     let minimum_name = MINIMUM_NAME;
     if (interval > 0)
@@ -189,7 +196,8 @@ export class RunestoneMessage {
       }
     if (
       fromArrayBuffer(name) < minimum_name ||
-      fromArrayBuffer(name) >= RESERVED_NAME
+      fromArrayBuffer(name) >= RESERVED_NAME ||
+      !Index.findCommitment(name, transaction, <u32>height)
     )
       return false;
     if (ETCHING_TO_RUNE_ID.select(name).get().byteLength !== 0) return false; // already taken / commitment not foun
@@ -292,7 +300,7 @@ export class RunestoneMessage {
     const balancesByOutput = new Map<u32, BalanceSheet>();
 
     this.mint(height, balanceSheet);
-    this.etch(<u64>height, <u32>txindex, balanceSheet);
+    this.etch(<u64>height, <u32>txindex, balanceSheet, tx);
 
     const unallocatedTo = this.fields.has(Field.POINTER)
       ? fieldTo<u32>(this.fields.get(Field.POINTER))
