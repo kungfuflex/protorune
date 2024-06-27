@@ -4,7 +4,7 @@ import { Block } from "metashrew-as/assembly/blockdata/block";
 import { Transaction } from "metashrew-as/assembly/blockdata/transaction";
 import { Box } from "metashrew-as/assembly/utils/box";
 import { decodeHex } from "metashrew-as/assembly";
-import { GENESIS } from "./indexer/constants";
+import { GENESIS, TWENTY_SIX } from "./indexer/constants";
 import { fieldToName, fromArrayBuffer, nameToArrayBuffer } from "./utils";
 import { parsePrimitive } from "metashrew-as/assembly/utils/utils";
 import { u128 } from "as-bignum/assembly";
@@ -23,6 +23,8 @@ export function testFieldToName(): void {
   console.log(name);
   const num = fromArrayBuffer(nameToArrayBuffer(name));
   console.log(num.toString());
+  const next = fieldToName(u128.from("99246114928149461") / TWENTY_SIX);
+  console.log(next);
 }
 
 function testTransaction(hex: string): void {

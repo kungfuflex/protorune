@@ -1,6 +1,6 @@
 import { Box } from "metashrew-as/assembly/utils/box";
 import { u256, u128 } from "as-bignum/assembly";
-import { RESERVED_NAME } from "./indexer/constants";
+import { RESERVED_NAME, TWENTY_SIX } from "./indexer/constants";
 import { Edict } from "./indexer/Edict";
 
 export function min<T>(a: T, b: T): T {
@@ -62,13 +62,12 @@ export function fieldTo<T>(data: Array<u128>): T {
 
 export function fieldToName(data: u128): string {
   let v = data + u128.from(1);
-  const ts = u128.from(26);
   let str = "";
   while (!v.isZero()) {
-    const y = (v % ts).toU32();
+    const y = (v % TWENTY_SIX).toU32();
     str = String.fromCharCode(64 + y) + str;
     v--;
-    v = v / ts;
+    v = v / TWENTY_SIX;
   }
   return str;
 }
@@ -76,11 +75,10 @@ export function fieldToName(data: u128): string {
 export function nameToArrayBuffer(name: string): ArrayBuffer {
   let y = u128.from(0);
   let x = u128.from(0);
-  const ts = u128.from(26);
   for (let i = 0; i < name.length; i++) {
     const char = name.charCodeAt(i) - 64;
     y = u128.from(char);
-    x *= ts;
+    x *= TWENTY_SIX;
     x += y;
   }
   x--;

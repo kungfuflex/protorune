@@ -29,5 +29,7 @@ export const RUNE_ID_TO_ETCHING = IndexPointer.for("/etching/byruneid/");
 export const ETCHING_TO_RUNE_ID = IndexPointer.for("/runeid/byetching/");
 
 export const MINIMUM_NAME = u128.from("99246114928149462");
+export const TWENTY_SIX = u128.from(26);
 export const RESERVED_NAME = u128.from("6402364363415443603228541259936211926");
 export const SUBSIDY_HALVING_INTERVAL: u64 = 210_000;
+export const HEIGHT_INTERVAL: u64 = 17_500;

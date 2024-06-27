@@ -35,6 +35,10 @@ import {
   ETCHINGS,
   OUTPOINT_TO_RUNES,
   GENESIS,
+  HEIGHT_INTERVAL,
+  MINIMUM_NAME,
+  TWENTY_SIX,
+  RESERVED_NAME,
 } from "./constants";
 import { BalanceSheet } from "./BalanceSheet";
 import { RunesTransaction } from "./RunesTransaction";
@@ -176,6 +180,18 @@ export class RunestoneMessage {
     if (this.fields.has(Field.RUNE))
       name = fieldToArrayBuffer(this.fields.get(Field.RUNE));
     else name = fieldToArrayBuffer([getReservedNameFor(height, tx)]);
+    let interval: i64 = (height - GENESIS) / HEIGHT_INTERVAL;
+    let minimum_name = MINIMUM_NAME;
+    if (interval > 0)
+      while (interval > 0) {
+        minimum_name = --minimum_name / TWENTY_SIX;
+        interval--;
+      }
+    if (
+      fromArrayBuffer(name) < minimum_name ||
+      fromArrayBuffer(name) >= RESERVED_NAME
+    )
+      return false;
     if (ETCHING_TO_RUNE_ID.select(name).get().byteLength !== 0) return false; // already taken / commitment not foun
     const runeId = new RuneId(height, tx).toBytes();
     RUNE_ID_TO_ETCHING.select(runeId).set(name);
