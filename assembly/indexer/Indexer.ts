@@ -5,7 +5,6 @@ import { RunesTransaction } from "./RunesTransaction";
 import { Block } from "metashrew-as/assembly/blockdata/block";
 import { scriptParse } from "metashrew-as/assembly/utils/yabsp";
 import { console } from "metashrew-as/assembly/utils/logging";
-import { Field } from "./Field";
 import {
   OUTPOINT_TO_HEIGHT,
   HEIGHT_TO_BLOCKHASH,
@@ -28,7 +27,11 @@ export class Index {
       ).setValue<u32>(height);
     }
   }
-  static findCommitment(tx: RunesTransaction, height: u32): bool {
+  static findCommitment(
+    name: ArrayBuffer,
+    tx: RunesTransaction,
+    height: u32,
+  ): bool {
     for (let i = 0; i < tx.ins.length; i++) {
       const input = tx.ins[i];
       // check that there is 1 data push
@@ -49,7 +52,12 @@ export class Index {
     }
     return false;
   }
-  static inspectTransaction(height: u32, _block: Block, txindex: u32): void {
+  static inspectTransaction(
+    name: ArrayBuffer,
+    height: u32,
+    _block: Block,
+    txindex: u32,
+  ): void {
     const block = changetype<RunesBlock>(_block);
     const tx = block.getTransaction(txindex);
     tx.processRunestones();
@@ -66,8 +74,7 @@ export class Index {
     const payload = Box.concat(parsed);
     const message = RunestoneMessage.parse(payload);
     if (changetype<usize>(message) === 0) return;
-    const name = new ArrayBuffer(0);
-    const commitment = Index.findCommitment(tx, height);
+    const commitment = Index.findCommitment(name, tx, height);
     if (commitment) console.log("no commitment");
     else console.log("commitment found");
   }
@@ -85,11 +92,7 @@ export class Index {
       const txid = tx.txid();
       Index.indexOutpoints(tx, txid, height);
       tx.processRunestones();
-      if (
-        height >= GENESIS &&
-        tx.tags.runestone !== -1 &&
-        Index.findCommitment(tx, height)
-      ) {
+      if (height >= GENESIS && tx.tags.runestone !== -1) {
         const runestoneOutputIndex = tx.tags.runestone;
         const runestoneOutput = tx.outs[runestoneOutputIndex];
         const parsed = scriptParse(runestoneOutput.script).slice(2);

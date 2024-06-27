@@ -15,7 +15,12 @@ export function testCommitment(): void {
   const box = Box.from(data);
   const height = parsePrimitive<u32>(box);
   const block = new Block(box);
-  Index.inspectTransaction(height, block, 298);
+  Index.inspectTransaction(
+    nameToArrayBuffer("QUORUMGENESISPROTORUNE"),
+    height,
+    block,
+    298,
+  );
 }
 
 export function testFieldToName(): void {
