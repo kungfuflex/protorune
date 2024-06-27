@@ -28,11 +28,7 @@ export class Index {
       ).setValue<u32>(height);
     }
   }
-  static findCommitment(
-    tx: RunesTransaction,
-    name: ArrayBuffer,
-    height: u32,
-  ): ArrayBuffer {
+  static findCommitment(tx: RunesTransaction, height: u32): bool {
     for (let i = 0; i < tx.ins.length; i++) {
       const input = tx.ins[i];
       // check that there is 1 data push
@@ -48,11 +44,10 @@ export class Index {
         height - OUTPOINT_TO_HEIGHT.select(previousOutpoint).getValue<u32>() >=
         6
       ) {
-        // check the commitment has at least 6 confirmations
-        if (isEqualArrayBuffer(name, commitment)) return commitment;
+        return true;
       }
     }
-    return changetype<ArrayBuffer>(0);
+    return false;
   }
   static inspectTransaction(height: u32, _block: Block, txindex: u32): void {
     const block = changetype<RunesBlock>(_block);
@@ -72,11 +67,14 @@ export class Index {
     const message = RunestoneMessage.parse(payload);
     if (changetype<usize>(message) === 0) return;
     const name = new ArrayBuffer(0);
-    const commitment = Index.findCommitment(tx, name, height);
-    if (changetype<usize>(commitment) == 0) console.log("no commitment");
+    const commitment = Index.findCommitment(tx, height);
+    if (commitment) console.log("no commitment");
     else console.log("commitment found");
   }
   static indexBlock(height: u32, _block: Block): void {
+    if (height == GENESIS) {
+      RunestoneMessage.etchGenesisRune();
+    }
     const block = changetype<RunesBlock>(_block);
     console.log("METASHREW_RUNES_LOG::indexing block: " + height.toString());
     HEIGHT_TO_BLOCKHASH.selectValue<u32>(height).set(block.blockhash());
@@ -87,7 +85,11 @@ export class Index {
       const txid = tx.txid();
       Index.indexOutpoints(tx, txid, height);
       tx.processRunestones();
-      if (height >= GENESIS && tx.tags.runestone !== -1) {
+      if (
+        height >= GENESIS &&
+        tx.tags.runestone !== -1 &&
+        Index.findCommitment(tx, height)
+      ) {
         const runestoneOutputIndex = tx.tags.runestone;
         const runestoneOutput = tx.outs[runestoneOutputIndex];
         const parsed = scriptParse(runestoneOutput.script).slice(2);

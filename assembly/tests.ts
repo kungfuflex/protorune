@@ -5,7 +5,10 @@ import { Transaction } from "metashrew-as/assembly/blockdata/transaction";
 import { Box } from "metashrew-as/assembly/utils/box";
 import { decodeHex } from "metashrew-as/assembly";
 import { GENESIS } from "./indexer/constants";
+import { fieldToName, fromArrayBuffer, nameToArrayBuffer } from "./utils";
 import { parsePrimitive } from "metashrew-as/assembly/utils/utils";
+import { u128 } from "as-bignum/assembly";
+import { console } from "metashrew-as/assembly/utils/logging";
 
 export function testCommitment(): void {
   const data = input();
@@ -13,6 +16,13 @@ export function testCommitment(): void {
   const height = parsePrimitive<u32>(box);
   const block = new Block(box);
   Index.inspectTransaction(height, block, 298);
+}
+
+export function testFieldToName(): void {
+  const name = fieldToName(u128.from("99246114928149462"));
+  console.log(name);
+  const num = fromArrayBuffer(nameToArrayBuffer(name));
+  console.log(num.toString());
 }
 
 function testTransaction(hex: string): void {

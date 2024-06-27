@@ -11,6 +11,8 @@ import {
   fromArrayBuffer,
   toPrimitive,
   min,
+  nameToArrayBuffer,
+  getReservedNameFor,
 } from "../utils";
 import { Flag } from "./Flag";
 import { RuneId } from "./RuneId";
@@ -32,10 +34,12 @@ import {
   CAP,
   ETCHINGS,
   OUTPOINT_TO_RUNES,
+  GENESIS,
 } from "./constants";
 import { BalanceSheet } from "./BalanceSheet";
 import { RunesTransaction } from "./RunesTransaction";
 import { Input, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
+import { SUBSIDY_HALVING_INTERVAL } from "metashrew-as/assembly/utils";
 
 export class RunestoneMessage {
   public fields: Map<u64, Array<u128>>;
@@ -150,10 +154,28 @@ export class RunestoneMessage {
     }
     return false;
   }
-
+  static etchGenesisRune(): void {
+    const name = nameToArrayBuffer("UNCOMMONGOODS");
+    const spacers = 128;
+    const runeId = new RuneId(1, 0).toBytes();
+    ETCHING_TO_RUNE_ID.select(name).set(runeId);
+    RUNE_ID_TO_ETCHING.select(runeId).set(name);
+    RUNE_ID_TO_HEIGHT.select(runeId).setValue<u32>(GENESIS);
+    DIVISIBILITY.select(name).setValue<u8>(1);
+    AMOUNT.select(name).set(toArrayBuffer(u128.from(1)));
+    CAP.select(name).set(toArrayBuffer(u128.Max));
+    MINTS_REMAINING.select(name).set(toArrayBuffer(u128.Max));
+    OFFSETEND.select(name).setValue<u64>(SUBSIDY_HALVING_INTERVAL);
+    SPACERS.select(name).setValue<u32>(128);
+    SYMBOL.select(name).setValue<u8>(<u8>"\u{29C9}".charCodeAt(0));
+    ETCHINGS.append(name);
+  }
   etch(height: u64, tx: u32, initialBalanceSheet: BalanceSheet): bool {
     if (!this.isEtching()) return false;
-    const name = fieldToArrayBuffer(this.fields.get(Field.RUNE));
+    let name: ArrayBuffer;
+    if (this.fields.has(Field.RUNE))
+      name = fieldToArrayBuffer(this.fields.get(Field.RUNE));
+    else name = fieldToArrayBuffer([getReservedNameFor(height, tx)]);
     if (ETCHING_TO_RUNE_ID.select(name).get().byteLength !== 0) return false; // already taken / commitment not foun
     const runeId = new RuneId(height, tx).toBytes();
     RUNE_ID_TO_ETCHING.select(runeId).set(name);

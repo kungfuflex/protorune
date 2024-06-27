@@ -1,5 +1,6 @@
 import { Box } from "metashrew-as/assembly/utils/box";
 import { u256, u128 } from "as-bignum/assembly";
+import { RESERVED_NAME } from "./indexer/constants";
 import { Edict } from "./indexer/Edict";
 
 export function min<T>(a: T, b: T): T {
@@ -72,6 +73,20 @@ export function fieldToName(data: u128): string {
   return str;
 }
 
+export function nameToArrayBuffer(name: string): ArrayBuffer {
+  let y = u128.from(0);
+  let x = u128.from(0);
+  const ts = u128.from(26);
+  for (let i = 0; i < name.length; i++) {
+    const char = name.charCodeAt(i) - 64;
+    y = u128.from(char);
+    x *= ts;
+    x += y;
+  }
+  x--;
+  return toArrayBuffer(x);
+}
+
 export function fieldToU128(data: Array<u128>): u128 {
   if (data.length === 0) return u128.from(0);
   return data[0];
@@ -98,4 +113,9 @@ export function fromArrayBuffer(data: ArrayBuffer): u128 {
   if (data.byteLength === 0) return u128.from(0);
   const result = u128.fromBytes(changetype<u8[]>(Uint8Array.wrap(data)));
   return result;
+}
+
+export function getReservedNameFor(block: u64, txindex: u32): u128 {
+  const add = (u128.from(block) << 32) | u128.from(txindex);
+  return RESERVED_NAME + add;
 }

@@ -1519,4 +1519,481 @@ export namespace metashrew_runes {
       return buf;
     } // encode RunesResponse
   } // RunesResponse
+
+  export class ProtoBurn {
+    public protocol_tag: Array<u8> = new Array<u8>();
+    public pointer: u32;
+
+    // Decodes ProtoBurn from an ArrayBuffer
+    static decode(buf: ArrayBuffer): ProtoBurn {
+      return ProtoBurn.decodeDataView(new DataView(buf));
+    }
+
+    // Decodes ProtoBurn from a DataView
+    static decodeDataView(view: DataView): ProtoBurn {
+      const decoder = new __proto.Decoder(view);
+      const obj = new ProtoBurn();
+
+      while (!decoder.eof()) {
+        const tag = decoder.tag();
+        const number = tag >>> 3;
+
+        switch (number) {
+          case 1: {
+            obj.protocol_tag = decoder.bytes();
+            break;
+          }
+          case 2: {
+            obj.pointer = decoder.uint32();
+            break;
+          }
+
+          default:
+            decoder.skipType(tag & 7);
+            break;
+        }
+      }
+      return obj;
+    } // decode ProtoBurn
+
+    public size(): u32 {
+      let size: u32 = 0;
+
+      size +=
+        this.protocol_tag.length > 0
+          ? 1 +
+            __proto.Sizer.varint64(this.protocol_tag.length) +
+            this.protocol_tag.length
+          : 0;
+      size += this.pointer == 0 ? 0 : 1 + __proto.Sizer.uint32(this.pointer);
+
+      return size;
+    }
+
+    // Encodes ProtoBurn to the ArrayBuffer
+    encode(): ArrayBuffer {
+      return changetype<ArrayBuffer>(
+        StaticArray.fromArray<u8>(this.encodeU8Array())
+      );
+    }
+
+    // Encodes ProtoBurn to the Array<u8>
+    encodeU8Array(
+      encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
+    ): Array<u8> {
+      const buf = encoder.buf;
+
+      if (this.protocol_tag.length > 0) {
+        encoder.uint32(0xa);
+        encoder.uint32(this.protocol_tag.length);
+        encoder.bytes(this.protocol_tag);
+      }
+      if (this.pointer != 0) {
+        encoder.uint32(0x10);
+        encoder.uint32(this.pointer);
+      }
+
+      return buf;
+    } // encode ProtoBurn
+  } // ProtoBurn
+
+  export class uint128 {
+    public lo: u64;
+    public hi: u64;
+
+    // Decodes uint128 from an ArrayBuffer
+    static decode(buf: ArrayBuffer): uint128 {
+      return uint128.decodeDataView(new DataView(buf));
+    }
+
+    // Decodes uint128 from a DataView
+    static decodeDataView(view: DataView): uint128 {
+      const decoder = new __proto.Decoder(view);
+      const obj = new uint128();
+
+      while (!decoder.eof()) {
+        const tag = decoder.tag();
+        const number = tag >>> 3;
+
+        switch (number) {
+          case 1: {
+            obj.lo = decoder.uint64();
+            break;
+          }
+          case 2: {
+            obj.hi = decoder.uint64();
+            break;
+          }
+
+          default:
+            decoder.skipType(tag & 7);
+            break;
+        }
+      }
+      return obj;
+    } // decode uint128
+
+    public size(): u32 {
+      let size: u32 = 0;
+
+      size += this.lo == 0 ? 0 : 1 + __proto.Sizer.uint64(this.lo);
+      size += this.hi == 0 ? 0 : 1 + __proto.Sizer.uint64(this.hi);
+
+      return size;
+    }
+
+    // Encodes uint128 to the ArrayBuffer
+    encode(): ArrayBuffer {
+      return changetype<ArrayBuffer>(
+        StaticArray.fromArray<u8>(this.encodeU8Array())
+      );
+    }
+
+    // Encodes uint128 to the Array<u8>
+    encodeU8Array(
+      encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
+    ): Array<u8> {
+      const buf = encoder.buf;
+
+      if (this.lo != 0) {
+        encoder.uint32(0x8);
+        encoder.uint64(this.lo);
+      }
+      if (this.hi != 0) {
+        encoder.uint32(0x10);
+        encoder.uint64(this.hi);
+      }
+
+      return buf;
+    } // encode uint128
+  } // uint128
+
+  export class Clause {
+    public rune: RuneId = new RuneId();
+    public amount: uint128 = new uint128();
+
+    // Decodes Clause from an ArrayBuffer
+    static decode(buf: ArrayBuffer): Clause {
+      return Clause.decodeDataView(new DataView(buf));
+    }
+
+    // Decodes Clause from a DataView
+    static decodeDataView(view: DataView): Clause {
+      const decoder = new __proto.Decoder(view);
+      const obj = new Clause();
+
+      while (!decoder.eof()) {
+        const tag = decoder.tag();
+        const number = tag >>> 3;
+
+        switch (number) {
+          case 1: {
+            const length = decoder.uint32();
+            obj.rune = RuneId.decodeDataView(
+              new DataView(
+                decoder.view.buffer,
+                decoder.pos + decoder.view.byteOffset,
+                length
+              )
+            );
+            decoder.skip(length);
+
+            break;
+          }
+          case 2: {
+            const length = decoder.uint32();
+            obj.amount = uint128.decodeDataView(
+              new DataView(
+                decoder.view.buffer,
+                decoder.pos + decoder.view.byteOffset,
+                length
+              )
+            );
+            decoder.skip(length);
+
+            break;
+          }
+
+          default:
+            decoder.skipType(tag & 7);
+            break;
+        }
+      }
+      return obj;
+    } // decode Clause
+
+    public size(): u32 {
+      let size: u32 = 0;
+
+      if (this.rune != null) {
+        const f: RuneId = this.rune as RuneId;
+        const messageSize = f.size();
+
+        if (messageSize > 0) {
+          size += 1 + __proto.Sizer.varint64(messageSize) + messageSize;
+        }
+      }
+
+      if (this.amount != null) {
+        const f: uint128 = this.amount as uint128;
+        const messageSize = f.size();
+
+        if (messageSize > 0) {
+          size += 1 + __proto.Sizer.varint64(messageSize) + messageSize;
+        }
+      }
+
+      return size;
+    }
+
+    // Encodes Clause to the ArrayBuffer
+    encode(): ArrayBuffer {
+      return changetype<ArrayBuffer>(
+        StaticArray.fromArray<u8>(this.encodeU8Array())
+      );
+    }
+
+    // Encodes Clause to the Array<u8>
+    encodeU8Array(
+      encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
+    ): Array<u8> {
+      const buf = encoder.buf;
+
+      if (this.rune != null) {
+        const f = this.rune as RuneId;
+
+        const messageSize = f.size();
+
+        if (messageSize > 0) {
+          encoder.uint32(0xa);
+          encoder.uint32(messageSize);
+          f.encodeU8Array(encoder);
+        }
+      }
+
+      if (this.amount != null) {
+        const f = this.amount as uint128;
+
+        const messageSize = f.size();
+
+        if (messageSize > 0) {
+          encoder.uint32(0x12);
+          encoder.uint32(messageSize);
+          f.encodeU8Array(encoder);
+        }
+      }
+
+      return buf;
+    } // encode Clause
+  } // Clause
+
+  export class Predicate {
+    public clauses: Array<Clause> = new Array<Clause>();
+
+    // Decodes Predicate from an ArrayBuffer
+    static decode(buf: ArrayBuffer): Predicate {
+      return Predicate.decodeDataView(new DataView(buf));
+    }
+
+    // Decodes Predicate from a DataView
+    static decodeDataView(view: DataView): Predicate {
+      const decoder = new __proto.Decoder(view);
+      const obj = new Predicate();
+
+      while (!decoder.eof()) {
+        const tag = decoder.tag();
+        const number = tag >>> 3;
+
+        switch (number) {
+          case 1: {
+            const length = decoder.uint32();
+            obj.clauses.push(
+              Clause.decodeDataView(
+                new DataView(
+                  decoder.view.buffer,
+                  decoder.pos + decoder.view.byteOffset,
+                  length
+                )
+              )
+            );
+            decoder.skip(length);
+
+            break;
+          }
+
+          default:
+            decoder.skipType(tag & 7);
+            break;
+        }
+      }
+      return obj;
+    } // decode Predicate
+
+    public size(): u32 {
+      let size: u32 = 0;
+
+      for (let n: i32 = 0; n < this.clauses.length; n++) {
+        const messageSize = this.clauses[n].size();
+
+        if (messageSize > 0) {
+          size += 1 + __proto.Sizer.varint64(messageSize) + messageSize;
+        }
+      }
+
+      return size;
+    }
+
+    // Encodes Predicate to the ArrayBuffer
+    encode(): ArrayBuffer {
+      return changetype<ArrayBuffer>(
+        StaticArray.fromArray<u8>(this.encodeU8Array())
+      );
+    }
+
+    // Encodes Predicate to the Array<u8>
+    encodeU8Array(
+      encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
+    ): Array<u8> {
+      const buf = encoder.buf;
+
+      for (let n: i32 = 0; n < this.clauses.length; n++) {
+        const messageSize = this.clauses[n].size();
+
+        if (messageSize > 0) {
+          encoder.uint32(0xa);
+          encoder.uint32(messageSize);
+          this.clauses[n].encodeU8Array(encoder);
+        }
+      }
+
+      return buf;
+    } // encode Predicate
+  } // Predicate
+
+  export class ProtoMessage {
+    public calldata: Array<u8> = new Array<u8>();
+    public predicate: Predicate = new Predicate();
+    public pointer: u32;
+    public refund_pointer: u32;
+
+    // Decodes ProtoMessage from an ArrayBuffer
+    static decode(buf: ArrayBuffer): ProtoMessage {
+      return ProtoMessage.decodeDataView(new DataView(buf));
+    }
+
+    // Decodes ProtoMessage from a DataView
+    static decodeDataView(view: DataView): ProtoMessage {
+      const decoder = new __proto.Decoder(view);
+      const obj = new ProtoMessage();
+
+      while (!decoder.eof()) {
+        const tag = decoder.tag();
+        const number = tag >>> 3;
+
+        switch (number) {
+          case 1: {
+            obj.calldata = decoder.bytes();
+            break;
+          }
+          case 2: {
+            const length = decoder.uint32();
+            obj.predicate = Predicate.decodeDataView(
+              new DataView(
+                decoder.view.buffer,
+                decoder.pos + decoder.view.byteOffset,
+                length
+              )
+            );
+            decoder.skip(length);
+
+            break;
+          }
+          case 3: {
+            obj.pointer = decoder.uint32();
+            break;
+          }
+          case 4: {
+            obj.refund_pointer = decoder.uint32();
+            break;
+          }
+
+          default:
+            decoder.skipType(tag & 7);
+            break;
+        }
+      }
+      return obj;
+    } // decode ProtoMessage
+
+    public size(): u32 {
+      let size: u32 = 0;
+
+      size +=
+        this.calldata.length > 0
+          ? 1 +
+            __proto.Sizer.varint64(this.calldata.length) +
+            this.calldata.length
+          : 0;
+
+      if (this.predicate != null) {
+        const f: Predicate = this.predicate as Predicate;
+        const messageSize = f.size();
+
+        if (messageSize > 0) {
+          size += 1 + __proto.Sizer.varint64(messageSize) + messageSize;
+        }
+      }
+
+      size += this.pointer == 0 ? 0 : 1 + __proto.Sizer.uint32(this.pointer);
+      size +=
+        this.refund_pointer == 0
+          ? 0
+          : 1 + __proto.Sizer.uint32(this.refund_pointer);
+
+      return size;
+    }
+
+    // Encodes ProtoMessage to the ArrayBuffer
+    encode(): ArrayBuffer {
+      return changetype<ArrayBuffer>(
+        StaticArray.fromArray<u8>(this.encodeU8Array())
+      );
+    }
+
+    // Encodes ProtoMessage to the Array<u8>
+    encodeU8Array(
+      encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
+    ): Array<u8> {
+      const buf = encoder.buf;
+
+      if (this.calldata.length > 0) {
+        encoder.uint32(0xa);
+        encoder.uint32(this.calldata.length);
+        encoder.bytes(this.calldata);
+      }
+
+      if (this.predicate != null) {
+        const f = this.predicate as Predicate;
+
+        const messageSize = f.size();
+
+        if (messageSize > 0) {
+          encoder.uint32(0x12);
+          encoder.uint32(messageSize);
+          f.encodeU8Array(encoder);
+        }
+      }
+
+      if (this.pointer != 0) {
+        encoder.uint32(0x18);
+        encoder.uint32(this.pointer);
+      }
+      if (this.refund_pointer != 0) {
+        encoder.uint32(0x20);
+        encoder.uint32(this.refund_pointer);
+      }
+
+      return buf;
+    } // encode ProtoMessage
+  } // ProtoMessage
 } // metashrew_runes

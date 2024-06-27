@@ -44,7 +44,22 @@ describe("metashrew-runes", () => {
       fs.readFileSync(path.join(__dirname, "849236.hex"), "utf8"),
     );
     program.setBlockHeight(849236);
-    await program.run("testCommitment");
+    await program.run("testFieldToName");
+    let spaced_name = "UNCOMMONGOODS";
+    const spacer = "•";
+    const spacers = 128;
+    const bitField = spacers.toString(2);
+    let x = 0;
+    bitField
+      .split("")
+      .reverse()
+      .map((d, i) => {
+        if (d == "1") {
+          spaced_name = `${spaced_name.slice(0, i + 1 + x)}${spacer}${spaced_name.slice(i + 1 + x)}`;
+          x++;
+        }
+      });
+    console.log(spaced_name);
     return program;
   });
 });
