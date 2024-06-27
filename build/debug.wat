@@ -19575,7 +19575,7 @@
   if
    i32.const 0
    i32.const 7936
-   i32.const 81
+   i32.const 74
    i32.const 7
    call $~lib/builtins/abort
    unreachable
@@ -19700,7 +19700,7 @@
   end
   if
    i32.const 0
-   drop
+   return
   end
   i32.const 0
   local.get $script

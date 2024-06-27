@@ -121,7 +121,7 @@ describe("metashrew-runes", () => {
           jsonrpc: "2.0",
           id: 0,
           method: "metashrew_view",
-          params: [`0x${hash}`, func, input, "841569"],
+          params: [func, input, "841569"],
         }),
       });
     };
