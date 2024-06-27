@@ -40,6 +40,7 @@ import {
   MINIMUM_NAME,
   TWENTY_SIX,
   RESERVED_NAME,
+  PROTOCOLS_TO_INDEX,
 } from "./constants";
 import { BalanceSheet } from "./BalanceSheet";
 import { RunesTransaction } from "./RunesTransaction";
@@ -53,9 +54,11 @@ import { console } from "metashrew-as/assembly/utils/logging";
 export class RunestoneMessage {
   public fields: Map<u64, Array<u128>>;
   public edicts: Array<StaticArray<u128>>;
+  protoBurns: Map<u32, Array<ProtoBurn>>;
   constructor(fields: Map<u64, Array<u128>>, edicts: Array<StaticArray<u128>>) {
     this.fields = fields;
     this.edicts = edicts;
+    this.protoBurns = new Map<u32, Array<ProtoBurn>>();
   }
   inspect(): string {
     let result = "RunestoneMessage {\n";
@@ -151,11 +154,11 @@ export class RunestoneMessage {
           (offsetEnd === 0 || height < etchingHeight + offsetEnd)
         ) {
           MINTS_REMAINING.select(name).set(
-            toArrayBuffer(remaining - u128.from(1)),
+            toArrayBuffer(remaining - u128.from(1))
           );
           balanceSheet.increase(
             mintTo,
-            fromArrayBuffer(AMOUNT.select(name).get()),
+            fromArrayBuffer(AMOUNT.select(name).get())
           );
           return true;
         }
@@ -183,7 +186,7 @@ export class RunestoneMessage {
     height: u64,
     tx: u32,
     initialBalanceSheet: BalanceSheet,
-    transaction: RunesTransaction,
+    transaction: RunesTransaction
   ): bool {
     if (!this.isEtching()) return false;
     let name: ArrayBuffer;
@@ -206,7 +209,7 @@ export class RunestoneMessage {
     RUNE_ID_TO_HEIGHT.select(runeId).setValue<u32>(<u32>height);
     if (this.fields.has(Field.DIVISIBILITY))
       DIVISIBILITY.select(name).setValue<u8>(
-        fieldTo<u8>(this.fields.get(Field.DIVISIBILITY)),
+        fieldTo<u8>(this.fields.get(Field.DIVISIBILITY))
       );
     if (this.fields.has(Field.PREMINE)) {
       const premine = fieldToU128(this.fields.get(Field.PREMINE));
@@ -216,41 +219,41 @@ export class RunestoneMessage {
     if (this.getFlag(Flag.TERMS)) {
       if (this.fields.has(Field.AMOUNT))
         AMOUNT.select(name).set(
-          toArrayBuffer(fieldToU128(this.fields.get(Field.AMOUNT))),
+          toArrayBuffer(fieldToU128(this.fields.get(Field.AMOUNT)))
         );
 
       if (this.fields.has(Field.CAP)) {
         CAP.select(name).set(
-          toArrayBuffer(fieldToU128(this.fields.get(Field.CAP))),
+          toArrayBuffer(fieldToU128(this.fields.get(Field.CAP)))
         );
         MINTS_REMAINING.select(name).set(
-          fieldToArrayBuffer(this.fields.get(Field.CAP)),
+          fieldToArrayBuffer(this.fields.get(Field.CAP))
         );
       }
       if (this.fields.has(Field.HEIGHTSTART))
         HEIGHTSTART.select(name).setValue<u64>(
-          fieldTo<u64>(this.fields.get(Field.HEIGHTSTART)),
+          fieldTo<u64>(this.fields.get(Field.HEIGHTSTART))
         );
       if (this.fields.has(Field.HEIGHTEND))
         HEIGHTEND.select(name).setValue<u64>(
-          fieldTo<u64>(this.fields.get(Field.HEIGHTEND)),
+          fieldTo<u64>(this.fields.get(Field.HEIGHTEND))
         );
       if (this.fields.has(Field.OFFSETSTART))
         OFFSETSTART.select(name).setValue<u64>(
-          fieldTo<u64>(this.fields.get(Field.OFFSETSTART)),
+          fieldTo<u64>(this.fields.get(Field.OFFSETSTART))
         );
       if (this.fields.has(Field.OFFSETEND))
         OFFSETEND.select(name).setValue<u64>(
-          fieldTo<u64>(this.fields.get(Field.OFFSETEND)),
+          fieldTo<u64>(this.fields.get(Field.OFFSETEND))
         );
     }
     if (this.fields.has(Field.SPACERS))
       SPACERS.select(name).setValue<u32>(
-        fieldTo<u32>(this.fields.get(Field.SPACERS)),
+        fieldTo<u32>(this.fields.get(Field.SPACERS))
       );
     if (this.fields.has(Field.SYMBOL))
       SYMBOL.select(name).setValue<u8>(
-        fieldTo<u8>(this.fields.get(Field.SYMBOL)),
+        fieldTo<u8>(this.fields.get(Field.SYMBOL))
       );
     ETCHINGS.append(name);
     return true;
@@ -259,7 +262,7 @@ export class RunestoneMessage {
   processEdicts(
     balancesByOutput: Map<u32, BalanceSheet>,
     balanceSheet: BalanceSheet,
-    txid: ArrayBuffer,
+    txid: ArrayBuffer
   ): bool {
     let isCenotaph: bool = false;
     const edicts = Edict.fromDeltaSeries(this.edicts);
@@ -272,7 +275,7 @@ export class RunestoneMessage {
       if (!balancesByOutput.has(edictOutput)) {
         balancesByOutput.set(
           edictOutput,
-          (outputBalanceSheet = new BalanceSheet()),
+          (outputBalanceSheet = new BalanceSheet())
         );
       } else outputBalanceSheet = balancesByOutput.get(edictOutput);
       const amount = min(edict.amount, balanceSheet.get(runeId));
@@ -280,6 +283,16 @@ export class RunestoneMessage {
       const canDecrease = balanceSheet.decrease(runeId, amount);
       if (!canDecrease) isCenotaph = true;
       outputBalanceSheet.increase(runeId, amount);
+      if (this.protoBurns.has(edictOutput)) {
+        const ary = this.protoBurns.get(edictOutput);
+        for (let i = 0; i < ary.length; i++) {
+          const protoBurn = ary[i];
+          protoBurn.process(
+            outputBalanceSheet,
+            OutPoint.from(txid, edictOutput).toArrayBuffer()
+          );
+        }
+      }
     }
     return isCenotaph;
   }
@@ -287,14 +300,29 @@ export class RunestoneMessage {
     tx: RunesTransaction,
     txid: ArrayBuffer,
     height: u32,
-    txindex: u32,
+    txindex: u32
   ): void {
+    // collect all protoburns
+    if (tx.tags.protoburn.length > 0) {
+      for (let i = 0; i < tx.tags.protoburn.length; i++) {
+        const protoburnOut = tx.tags.protoburn[i];
+        const out = tx.outs[protoburnOut];
+        const protoburn = ProtoBurn.from(out.script);
+        if (PROTOCOLS_TO_INDEX.has(protoburn.protocol_tag)) {
+          let ary = new Array<ProtoBurn>();
+          if (this.protoBurns.has(protoburnOut))
+            ary = this.protoBurns.get(protoburnOut);
+          ary.push(protoburn);
+          this.protoBurns.set(protoburnOut, ary);
+        }
+      }
+    }
     let balanceSheet = BalanceSheet.concat(
       tx.ins.map<BalanceSheet>((v: Input, i: i32, ary: Array<Input>) =>
         BalanceSheet.load(
-          OUTPOINT_TO_RUNES.select(v.previousOutput().toArrayBuffer()),
-        ),
-      ),
+          OUTPOINT_TO_RUNES.select(v.previousOutput().toArrayBuffer())
+        )
+      )
     );
     const balancesByOutput = new Map<u32, BalanceSheet>();
 
@@ -318,9 +346,9 @@ export class RunestoneMessage {
       const sheet = balancesByOutput.get(runesToOutputs[x]);
       sheet.save(
         OUTPOINT_TO_RUNES.select(
-          OutPoint.from(txid, runesToOutputs[x]).toArrayBuffer(),
+          OutPoint.from(txid, runesToOutputs[x]).toArrayBuffer()
         ),
-        isCenotaph,
+        isCenotaph
       );
     }
   }

@@ -1,11 +1,18 @@
 import { u128 } from "as-bignum/assembly";
 import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
+import { PROTOCOL_TAG as PROTORUNE_TAG } from "./protorune";
 
 export const RUNESTONE_TAG: u16 = 0x5d6a;
+export const PROTOBURN_TAG: u16 = 0x6a6a;
+export const PROTOMESSAGE_TAG: u16 = 0x6b6a;
 
 export const OP_RETURN: u8 = 0x6a;
 
 export const GENESIS: u32 = 840000;
+
+export const PROTOCOLS_TO_INDEX = new Set<u16>();
+// initial protorune tag
+PROTOCOLS_TO_INDEX.add(PROTORUNE_TAG);
 
 export const HEIGHT_TO_BLOCKHASH = IndexPointer.for("/blockhash/byheight/");
 export const BLOCKHASH_TO_HEIGHT = IndexPointer.for("/height/byblockhash/");

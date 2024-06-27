@@ -1,6 +1,7 @@
 import { Box } from "metashrew-as/assembly/utils/box";
 import { RunesBlock } from "./RunesBlock";
 import { RunestoneMessage } from "./RunestoneMessage";
+import { ProtoruneMessage } from "./ProtoruneMessage";
 import { RunesTransaction } from "./RunesTransaction";
 import { Block } from "metashrew-as/assembly/blockdata/block";
 import { scriptParse } from "metashrew-as/assembly/utils/yabsp";
@@ -12,6 +13,7 @@ import {
   GENESIS,
 } from "./constants";
 import { OutPoint } from "metashrew-as/assembly/blockdata/transaction";
+import { protorune } from "../proto/protorune";
 import {
   isEqualArrayBuffer,
   fieldToArrayBuffer,
@@ -23,18 +25,18 @@ export class Index {
   static indexOutpoints(
     tx: RunesTransaction,
     txid: ArrayBuffer,
-    height: u32,
+    height: u32
   ): void {
     for (let i: i32 = 0; i < tx.outs.length; i++) {
       OUTPOINT_TO_HEIGHT.select(
-        OutPoint.from(txid, <u32>i).toArrayBuffer(),
+        OutPoint.from(txid, <u32>i).toArrayBuffer()
       ).setValue<u32>(height);
     }
   }
   static findCommitment(
     name: ArrayBuffer,
     tx: RunesTransaction,
-    height: u32,
+    height: u32
   ): bool {
     for (let i = 0; i < tx.ins.length; i++) {
       const input = tx.ins[i];
@@ -55,7 +57,7 @@ export class Index {
     name: ArrayBuffer,
     height: u32,
     _block: Block,
-    txindex: u32,
+    txindex: u32
   ): void {
     const block = changetype<RunesBlock>(_block);
     const tx = block.getTransaction(txindex);
@@ -85,24 +87,56 @@ export class Index {
     height: u32,
     i: u32,
   ): void {
-    tx.processRunestones();
-    if (height >= GENESIS && tx.tags.runestone !== -1) {
-      const runestoneOutputIndex = tx.tags.runestone;
-      const runestoneOutput = tx.outs[runestoneOutputIndex];
-      const parsed = scriptParse(runestoneOutput.script).slice(2);
-      if (
-        parsed.findIndex((v: Box, i: i32, ary: Array<Box>) => {
-          return v.start === usize.MAX_VALUE;
-        }) !== -1
-      )
-        return; // non-data push: cenotaph
-      const payload = Box.concat(parsed);
-      const message = RunestoneMessage.parse(payload);
-      if (changetype<usize>(message) === 0) return;
+      tx.processRunestones();
+      if (height >= GENESIS && tx.tags.runestone !== -1) {
+        const protoMessages: Array<protorune.ProtoMessage> =
+          new Array<protorune.ProtoMessage>(0);
 
-      //process message here
-      message.process(tx, txid, height, i);
-    }
+        // parse all protomessages
+        if (tx.tags.protomessage.length > 0) {
+          for (let i = 0; i < tx.tags.protomessage.length; i++) {
+            const out = tx.outs[tx.tags.protomessage[i]];
+            const parsed = scriptParse(out.script).slice(2);
+            protoMessages.push(
+              protorune.ProtoMessage.decode(Box.concat(parsed))
+            );
+          }
+        }
+        const runestoneOutputIndex = tx.tags.runestone;
+        const runestoneOutput = tx.outs[runestoneOutputIndex];
+        const parsed = scriptParse(runestoneOutput.script).slice(2);
+        if (
+          parsed.findIndex((v: Box, i: i32, ary: Array<Box>) => {
+            return v.start === usize.MAX_VALUE;
+          }) !== -1
+        )
+          return; // non-data push: cenotaph
+        const payload = Box.concat(parsed);
+        const message = RunestoneMessage.parse(payload);
+        if (changetype<usize>(message) === 0) return;
+
+        //process message here
+        message.process(tx, txid, height, i);
+
+        //process protorune runestone here
+        if (tx.tags.protorunestone != -1) {
+          const protoruneParsed = scriptParse(
+            tx.outs[tx.tags.protorunestone].script
+          ).slice(2);
+          if (
+            !(
+              protoruneParsed.findIndex((v: Box, i: i32, ary: Array<Box>) => {
+                return v.start === usize.MAX_VALUE;
+              }) !== -1
+            )
+          ) {
+            const protoRunestoneMessage = ProtoruneMessage.parse(
+              Box.concat(protoruneParsed)
+            );
+            protoRunestoneMessage.process(tx, txid, height, i);
+          }
+        }
+      }
   }
   static indexBlock(height: u32, _block: Block): void {
     if (height == GENESIS) {

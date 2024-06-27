@@ -7,8 +7,8 @@
     "build": "npm-run-all build:protoc asbuild:debug asbuild:release build:ts",
     "build:debug:preloader": "npm run asbuild:preloader --sharedMemory",
     "build:ts": "tsc",
-    "build:protoc:as": "protoc --plugin=./node_modules/.bin/protoc-gen-as --as_out=assembly/proto --as_opt targetFileName=metashrew-runes.ts --proto_path=./ proto/metashrew-runes.proto",
-    "build:protoc:ts": "protoc --ts_out src.ts/proto --proto_path proto metashrew-runes.proto",
+    "build:protoc:as": "protoc --plugin=./node_modules/.bin/protoc-gen-as --as_out=assembly/proto --as_opt targetFileName=protorune.ts --proto_path=./ proto/protorune.proto",
+    "build:protoc:ts": "protoc --ts_out src.ts/proto --proto_path proto protorune.proto",
     "build:protoc": "npm-run-all build:protoc:as build:protoc:ts",
     "prettier:assemblyscript": "prettier --write ./assembly/**/*.ts",
     "prettier:ts": "prettier --write ./src.ts/**/*.ts ./tests/*.ts",
@@ -48,6 +48,6 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   },
-  "name": "metashrew-runes",
-  "description": "metashrew-runes"
+  "name": "protorune",
+  "description": "protorune"
 }

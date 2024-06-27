@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package metashrew_runes;
+package protorune;
 
 message RuneId {
   uint32 height = 1;

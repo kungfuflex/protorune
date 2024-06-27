@@ -3,14 +3,27 @@ import {
   Output,
   OutPoint,
 } from "metashrew-as/assembly/blockdata/transaction";
-import { RUNESTONE_TAG, OP_RETURN } from "./constants";
+import {
+  RUNESTONE_TAG,
+  OP_RETURN,
+  PROTOBURN_TAG,
+  PROTOMESSAGE_TAG,
+  PROTOCOLS_TO_INDEX,
+} from "./constants";
 
 class TagOutput {
   runestone: i32;
+  protoburn: Array<i32>;
+  protomessage: Array<i32>;
+  protorunestone: i32;
   constructor() {
     this.runestone = -1;
+    this.protoburn = new Array<i32>();
+    this.protomessage = new Array<i32>();
+    this.protorunestone = -1;
   }
 }
+
 
 @final
 export class RunesTransaction extends Transaction {
@@ -23,6 +36,16 @@ export class RunesTransaction extends Transaction {
       switch (op) {
         case RUNESTONE_TAG:
           if (output.runestone == -1) output.runestone = i;
+          break;
+        case PROTOBURN_TAG:
+          output.protoburn.push(i);
+          break;
+        case PROTOMESSAGE_TAG:
+          if (next == 0) output.protomessage.push(i);
+          break;
+        default:
+          if (output.protorunestone == -1 && PROTOCOLS_TO_INDEX.has(op))
+            output.protorunestone = i;
           break;
       }
     }
