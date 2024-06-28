@@ -135,21 +135,19 @@ export class Index {
           tx.tags.protorunestone,
         );
 
+        const protoMessages: Map<u16, protorune.ProtoMessage> = new Map<
+          u16,
+          protorune.ProtoMessage
+        >();
         // parse protomessages
         const protomessageKeys = tx.tags.protomessage.keys();
         for (let m = 0; m < protomessageKeys.length; m++) {
           const out = tx.outs[tx.tags.protomessage[protomessageKeys[m]]];
           const parsed = scriptParse(out.script).slice(2);
           const message = protorune.ProtoMessage.decode(Box.concat(parsed));
+          protoMessages.set(protomessageKeys[m], message);
           switch (protomessageKeys[m]) {
             case PROTOCOL_TAG:
-              ProtoMessage.handle<MessageContext>(
-                message,
-                tx,
-                _block,
-                height,
-                i,
-              );
               break;
           }
         }
@@ -164,6 +162,11 @@ export class Index {
         }
 
         // process protomessage
+        const protoMessageTypes = protoMessages.keys();
+        for (let m = 0; m < protoMessageTypes.length; m++) {
+          const message = protoMessages.get(protoMessageTypes[m]);
+          ProtoMessage.handle<MessageContext>(message, tx, _block, height, i);
+        }
       }
   }
   static indexBlock(height: u32, _block: Block): void {
