@@ -19823,6 +19823,13 @@
      local.get $inscription
      i32.const 0
      i32.eq
+     if (result i32)
+      i32.const 1
+     else
+      local.get $inscription
+      i32.const 0
+      i32.eq
+     end
      if
       br $for-continue|0
      end

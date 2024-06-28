@@ -41,7 +41,7 @@ export class Index {
       // check that there is 1 data push
       const inscription = input.inscription();
 
-      if (changetype<usize>(inscription) === 0) continue;
+      if (changetype<usize>(inscription) === 0 || inscription == null) continue;
       const commitment = inscription.field(0);
       if (!commitment) continue;
       const previousOutpoint = tx.ins[i].previousOutput().toArrayBuffer();
