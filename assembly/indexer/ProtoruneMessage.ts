@@ -39,7 +39,7 @@ export class ProtoruneMessage extends RunestoneMessage {
     txid: ArrayBuffer,
     _height: u32,
     _txindex: u32,
-  ): void {
+  ): Map<u32, BalanceSheet> {
     let balanceSheet = BalanceSheet.concat(
       tx.ins.map<BalanceSheet>((v: Input, i: i32, ary: Array<Input>) =>
         BalanceSheet.load(
@@ -61,5 +61,6 @@ export class ProtoruneMessage extends RunestoneMessage {
         ),
       );
     }
+    return balancesByOutput;
   }
 }

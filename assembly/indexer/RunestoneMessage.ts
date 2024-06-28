@@ -301,7 +301,7 @@ export class RunestoneMessage {
     txid: ArrayBuffer,
     height: u32,
     txindex: u32,
-  ): void {
+  ): Map<u32, BalanceSheet> {
     // collect all protoburns
     if (tx.tags.protoburn.length > 0) {
       for (let i = 0; i < tx.tags.protoburn.length; i++) {
@@ -351,5 +351,6 @@ export class RunestoneMessage {
         isCenotaph,
       );
     }
+    return balancesByOutput;
   }
 }

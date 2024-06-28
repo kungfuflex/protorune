@@ -7,6 +7,7 @@ import { RuneId } from "../indexer/RuneId";
 export class MessageContext {
   runtime: AtomicTransaction = new AtomicTransaction();
   public runes: Array<IncomingRune> = new Array<IncomingRune>();
+  public predicates: Array<IncomingRune> = new Array<IncomingRune>();
   transaction: Transaction = changetype<Transaction>(0);
   block: Block = changetype<Block>(0);
   height: u64 = 0;
@@ -26,7 +27,7 @@ export class MessageContext {
       const clause = message.predicate.clauses[i];
       const runeId = new RuneId(<u64>clause.rune.height, clause.rune.txindex);
       const rune = new IncomingRune(runeId, clause.amount.lo, clause.amount.hi);
-      this.runes.push(rune);
+      this.predicates.push(rune);
     }
     this.transaction = transaction;
     this.block = block;
