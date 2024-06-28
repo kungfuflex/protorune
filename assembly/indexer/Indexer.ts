@@ -12,13 +12,10 @@ import {
   BLOCKHASH_TO_HEIGHT,
   GENESIS,
 } from "./constants";
+import { PROTOCOL_TAG } from "./constants/protorune";
 import { OutPoint } from "metashrew-as/assembly/blockdata/transaction";
 import { protorune } from "../proto/protorune";
-import {
-  isEqualArrayBuffer,
-  fieldToArrayBuffer,
-  stripNullRight,
-} from "../utils";
+import { stripNullRight } from "../utils";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils";
 import { ProtoMessage, MessageContext } from "../protomessage";
 
@@ -26,18 +23,18 @@ export class Index {
   static indexOutpoints(
     tx: RunesTransaction,
     txid: ArrayBuffer,
-    height: u32
+    height: u32,
   ): void {
     for (let i: i32 = 0; i < tx.outs.length; i++) {
       OUTPOINT_TO_HEIGHT.select(
-        OutPoint.from(txid, <u32>i).toArrayBuffer()
+        OutPoint.from(txid, <u32>i).toArrayBuffer(),
       ).setValue<u32>(height);
     }
   }
   static findCommitment(
     name: ArrayBuffer,
     tx: RunesTransaction,
-    height: u32
+    height: u32,
   ): bool {
     for (let i = 0; i < tx.ins.length; i++) {
       const input = tx.ins[i];
@@ -58,7 +55,7 @@ export class Index {
     name: ArrayBuffer,
     height: u32,
     _block: Block,
-    txindex: u32
+    txindex: u32,
   ): void {
     const block = changetype<RunesBlock>(_block);
     const tx = block.getTransaction(txindex);
@@ -82,67 +79,91 @@ export class Index {
     else console.log("commitment found");
    */
   }
+
+  static processMessage<T>(
+    height: u64,
+    tx: RunesTransaction,
+    txid: ArrayBuffer,
+    txindex: u32,
+    outputIndex: i32,
+  ): void {
+    if (outputIndex > -1) {
+      const runestoneOutput = tx.outs[outputIndex];
+      const parsed = scriptParse(runestoneOutput.script).slice(2);
+      if (
+        parsed.findIndex((v: Box, i: i32, ary: Array<Box>) => {
+          return v.start === usize.MAX_VALUE;
+        }) !== -1
+      )
+        return;
+      const payload = Box.concat(parsed);
+      const message = RunestoneMessage.parse(payload);
+      if (changetype<usize>(message) === 0) return;
+
+      //process message here
+      //@ts-ignore
+      changetype<T>(message).process(tx, txid, <u32>height, txindex);
+    }
+  }
   static processRunesTransaction(
+    _block: Block,
     tx: RunesTransaction,
     txid: ArrayBuffer,
     height: u32,
     i: u32,
   ): void {
       tx.processRunestones();
-      if (height >= GENESIS && tx.tags.runestone !== -1) {
-        const protoMessages: Array<protorune.ProtoMessage> =
-          new Array<protorune.ProtoMessage>(0);
+      if (height >= GENESIS) {
+        let protoMessage: Map<u16, protorune.ProtoMessage> = new Map<
+          u16,
+          protorune.ProtoMessage
+        >();
 
-        // parse all protomessages
-        if (tx.tags.protomessage.length > 0) {
-          for (let i = 0; i < tx.tags.protomessage.length; i++) {
-            const out = tx.outs[tx.tags.protomessage[i]];
-            const parsed = scriptParse(out.script).slice(2);
-            protoMessages.push(
-              protorune.ProtoMessage.decode(Box.concat(parsed))
-            );
-          }
-        }
-        const runestoneOutputIndex = tx.tags.runestone;
-        const runestoneOutput = tx.outs[runestoneOutputIndex];
-        const parsed = scriptParse(runestoneOutput.script).slice(2);
-        if (
-          parsed.findIndex((v: Box, i: i32, ary: Array<Box>) => {
-            return v.start === usize.MAX_VALUE;
-          }) !== -1
-        )
-          return; // non-data push: cenotaph
-        const payload = Box.concat(parsed);
-        const message = RunestoneMessage.parse(payload);
-        if (changetype<usize>(message) === 0) return;
+        Index.processMessage<RunestoneMessage>(
+          height,
+          tx,
+          txid,
+          i,
+          tx.tags.runestone,
+        );
 
-        //process message here
-        message.process(tx, txid, height, i);
+        Index.processMessage<ProtoruneMessage>(
+          height,
+          tx,
+          txid,
+          i,
+          tx.tags.protorunestone,
+        );
 
-        //process protorune runestone here
-        if (tx.tags.protorunestone != -1) {
-          const protoruneParsed = scriptParse(
-            tx.outs[tx.tags.protorunestone].script
-          ).slice(2);
-          if (
-            !(
-              protoruneParsed.findIndex((v: Box, i: i32, ary: Array<Box>) => {
-                return v.start === usize.MAX_VALUE;
-              }) !== -1
-            )
-          ) {
-            const protoRunestoneMessage = ProtoruneMessage.parse(
-              Box.concat(protoruneParsed)
-            );
-            protoRunestoneMessage.process(tx, txid, height, i);
+        // parse protomessages
+        const protomessageKeys = tx.tags.protomessage.keys();
+        for (let m = 0; m < protomessageKeys.length; m++) {
+          const out = tx.outs[tx.tags.protomessage[protomessageKeys[m]]];
+          const parsed = scriptParse(out.script).slice(2);
+          const message = protorune.ProtoMessage.decode(Box.concat(parsed));
+          switch (protomessageKeys[m]) {
+            case PROTOCOL_TAG:
+              ProtoMessage.handle<MessageContext>(
+                message,
+                tx,
+                _block,
+                height,
+                i,
+              );
+              break;
           }
         }
 
-        for (let m = 0; m < protoMessages.length; m++) {
-          const message = protoMessages[m];
-          const ctx = new MessageContext(message, tx, _block, height, i);
-          ProtoMessage.handle<MessageContext>(ctx);
+        //parse protosplit
+        const protosplitKeys = tx.tags.protosplits.keys();
+        for (let k = 0; k < protosplitKeys.length; k++) {
+          const outs = tx.tags.protosplits.get(protosplitKeys[k]);
+          for (let o = 0; o < outs.length; o++) {}
+          //parse only one protocols protosplit message
+          break;
         }
+
+        // process protomessage
       }
   }
   static indexBlock(height: u32, _block: Block): void {
@@ -158,7 +179,7 @@ export class Index {
       const tx = block.getTransaction(i);
       const txid = tx.txid();
       Index.indexOutpoints(tx, txid, height);
-      Index.processRunesTransaction(tx, txid, height, i);
+      Index.processRunesTransaction(_block, tx, txid, height, i);
     }
   }
 }

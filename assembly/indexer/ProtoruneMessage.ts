@@ -8,19 +8,13 @@ import { Input, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
 import { RunestoneMessage } from "./RunestoneMessage";
 
 export class ProtoruneMessage extends RunestoneMessage {
-  mint(_height: u32, _balanceSheet: BalanceSheet): bool {
-    return false;
-  }
-
-  etch(_height: u64, _tx: u32, _initialBalanceSheet: BalanceSheet): bool {
-    return false;
-  }
-
   processEdicts(
     balancesByOutput: Map<u32, BalanceSheet>,
     balanceSheet: BalanceSheet,
-  ): void {
+    _txid: ArrayBuffer,
+  ): bool {
     const edicts = Edict.fromDeltaSeries(this.edicts);
+    let isCenotaph: bool = false;
     for (let e = 0; e < edicts.length; e++) {
       const edict = edicts[e];
       const edictOutput = toPrimitive<u32>(edict.output);
@@ -35,15 +29,16 @@ export class ProtoruneMessage extends RunestoneMessage {
       } else outputBalanceSheet = balancesByOutput.get(edictOutput);
       const amount = min(edict.amount, balanceSheet.get(runeId));
 
-      balanceSheet.decrease(runeId, amount);
+      isCenotaph = balanceSheet.decrease(runeId, amount);
       outputBalanceSheet.increase(runeId, amount);
     }
+    return isCenotaph;
   }
   process(
     tx: RunesTransaction,
     txid: ArrayBuffer,
-    height: u32,
-    txindex: u32,
+    _height: u32,
+    _txindex: u32,
   ): void {
     let balanceSheet = BalanceSheet.concat(
       tx.ins.map<BalanceSheet>((v: Input, i: i32, ary: Array<Input>) =>
@@ -54,21 +49,7 @@ export class ProtoruneMessage extends RunestoneMessage {
     );
     const balancesByOutput = new Map<u32, BalanceSheet>();
 
-    const hasMinted = this.mint(height, balanceSheet);
-    const hasEtched = this.etch(<u64>height, <u32>txindex, balanceSheet);
-
-    if (hasMinted || hasEtched) {
-      const unallocatedTo = this.fields.has(Field.POINTER)
-        ? fieldTo<u32>(this.fields.get(Field.POINTER))
-        : <u32>tx.defaultOutput();
-      if (balancesByOutput.has(unallocatedTo)) {
-        balanceSheet.pipe(balancesByOutput.get(unallocatedTo));
-      } else {
-        balancesByOutput.set(unallocatedTo, balanceSheet);
-      }
-    }
-
-    this.processEdicts(balancesByOutput, balanceSheet);
+    this.processEdicts(balancesByOutput, balanceSheet, txid);
 
     const runesToOutputs = balancesByOutput.keys();
 
