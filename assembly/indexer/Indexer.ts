@@ -20,6 +20,7 @@ import {
   stripNullRight,
 } from "../utils";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils";
+import { ProtoMessage, MessageContext } from "../protomessage";
 
 export class Index {
   static indexOutpoints(
@@ -135,6 +136,12 @@ export class Index {
             );
             protoRunestoneMessage.process(tx, txid, height, i);
           }
+        }
+
+        for (let m = 0; m < protoMessages.length; m++) {
+          const message = protoMessages[m];
+          const ctx = new MessageContext(message, tx, _block, height, i);
+          ProtoMessage.handle<MessageContext>(ctx);
         }
       }
   }

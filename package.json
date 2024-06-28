@@ -4,7 +4,8 @@
   "scripts": {
     "asbuild:debug": "asc assembly/index.ts --target debug --enable threads --config asconfig.json",
     "asbuild:release": "asc assembly/index.ts --target release --config asconfig.json",
-    "build": "npm-run-all build:protoc asbuild:debug asbuild:release build:ts",
+    "build:as": "npm-run-all asbuild:debug asbuild:release",
+    "build": "npm-run-all build:protoc build:as build:ts",
     "build:debug:preloader": "npm run asbuild:preloader --sharedMemory",
     "build:ts": "tsc",
     "build:protoc:as": "protoc --plugin=./node_modules/.bin/protoc-gen-as --as_out=assembly/proto --as_opt targetFileName=protorune.ts --proto_path=./ proto/protorune.proto",
