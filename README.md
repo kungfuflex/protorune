@@ -1,8 +1,8 @@
-# metashrew-runes
+# Protorunes HAS a Specification
 
-Implementation of [https://github.com/ordinals/ord](https://github.com/ordinals/ord) runestone.
+## IF YOU HAVE DISCOVERED THIS DOCUMENT, READ THIS NEXT LINE
 
-## Author
+NO protoburn shall be honored prior to the first on-chain protoburn of QUORUM•GENESIS•PROTORUNE.
 
 The first protoburn of QUORUM•GENESIS•PROTORUNE signifies maturity of the protorune specification, as defined in this document.
 
@@ -27,42 +27,26 @@ We present a protocol extension compatible with runes which permits the use of a
 
 ## Protocol messages
 
-The following structures MUST be compiled with a protoc-compatible compiler.
+The following messages are parsed in the same manner as a Runestone payload, where key/value pairs are parsed in pairs of leb128 encoded u128 integers, and when pairs occur with the same key, the value is appended to the value for that key. Protocol message tags use unique values with respect to the Runestone specification, but since they are appended to a unique protocol tag, we do not have to be worry that we are creating cenotaphs.
 
 
-```proto
-syntax = "proto3";
-package protorune;
-
-message ProtoBurn {
-  bytes protocol_tag = 1;
-  uint32 pointer = 2;
+```rs
+enum ProtoTag {
+  Message = 81,
+  Burn = 83,
+  Split = 85,
+  Pointer = 91,
+  Refund = 93,
+  Cenotaph = 126,
+  Nop = 127
 }
 
-message Etched {
-  uint64 height = 1;
-  uint32 txindex = 2;
-}
-
-message uint128 {
-  uint64 lo = 1;
-  uint64 hi = 2;
-}
-
-message Clause {
-  Etched rune = 1;
-  uint128 amount = 2;
-}
-
-message Predicate {
-  repeated Clause clauses = 1;
-}
-
-message ProtoMessage {
-  bytes calldata = 1;
-  Predicate predicate = 2;
-  uint32 pointer = 3;
-  uint32 refund_pointer = 4;
+struct Protostone {
+  pointer: Option<u32>,
+  refund_pointer: Option<u32>,
+  split: Option<Vec<u32>>,
+  burn: Option<Vec<u8>>,
+  message: Option<Vec<u8>>
 }
 ```
 
@@ -74,35 +58,31 @@ The protorunes design is such that a minimal indexer for a protorune subprotocol
 
 A protoburn is used to burn runes onto a subprotocol, and is generally a one-way function. A subprotocol MAY allow a protoburn from a sibling subprotocol, if it decides that the indexer for the given subprotocol is sound and is willing to honor incoming assets. Alternatively, protorunes on different subprotocols or runes itself can be exchanged via the usual protocol features of runes and Bitcoin itself.
 
-A protoburn message is an OP_RETURN output where all data pushes are concatenated to a single byte string. The first bytes MUST be 0x6a6a to be considered a protoburn message, followed by a valid protobuf encoding of the ProtoBurn message given above.
+A protoburn message is an OP_RETURN output where all data pushes are concatenated to a single byte string. The first bytes MUST be 0x6a6a to be considered a protoburn message, followed by a Protostone encoding of the protocol tag for the subprotocol targeted, with any zero bytes removed.
 
-The protocol_tag within the ProtoBurn message SHOULD be unique for the subprotocol, and serve as a replacement for the tag 0x6a5d when parsing a RunestoneMessage for protorunes transfers. A protocol_tag MUST NOT include a 0x00 byte.
+The protocol tag within the protoburn message SHOULD be unique for the subprotocol, and serve as a replacement for the tag 0x6a5d when parsing a RunestoneMessage for protorunes transfers. A protocol_tag MUST NOT include a 0x00 byte.
 
-The pointer within the ProtoBurn message MUST contain the index of a spendable UTXO within the transaction outputs.
+The pointer within the Protostone MUST contain the index of a spendable UTXO within the transaction outputs. For a protoburn, this will be where protorunes end up.
 
-All edicts in a RunestoneMessage that are burned into the protoburn output are delegated to the pointer in the protoburn, which MAY be a spendable UTXO OR an OP_RETURN containing a protomessage or a RunestoneMessage with the subprotocol tag.
+All edicts in a Runestone that are burned into the Protostone burn output are delegated to the pointer in the Protostone, which MAY be a spendable UTXO OR an OP_RETURN containing another Protostone with the subprotocol tag or a Runestone with the subprotocol tag.
 
 ### protomessage
 
-A protomessage is a protocol message that an indexer MUST interpret as an action on the subprotocol. It is an OP_RETURN output where all data pushes are concatenated to a single byte string, similar to a protoburn. The first bytes of a protomessage contain 0x6a6b, followed by the protocol_tag for the subprotocol, followed by the 0x00 byte. Subsequent bytes MUST be be a valid protobuf message built with the above scheme for ProtoMessage.
+A protomessage is a protocol message that an indexer MUST interpret as an action on the subprotocol. It is an OP_RETURN output where all data pushes are concatenated to a single byte string, the same for any Protostone. The first bytes of a protomessage contain 0x6a6b, followed by the protocol_tag for the subprotocol, followed by the 0x00 byte. Subsequent bytes MUST be a Protostone data structure.
 
-A protomessage contains an input byte string which SHOULD be interpreted as an argument to the runtime of the subprotocol. Protorunes MUST be output to the locations pointed to by the `pointer` tag in ProtoMessage or the inputs refunded to the `refund_pointer` if the runtime decides it should not execute against its input of runes and calldata.
+A protomessage contains an input byte string concatenated together from the Message field, which SHOULD be then parsed with protobuf (or any appropriate serializer), and interpreted as an argument to the runtime of the subprotocol. Protorunes MUST be output to the locations pointed to by the `pointer` tag in Protostone or the inputs refunded to the `refund_pointer` if the runtime decides it should not execute against its input of runes and calldata.
 
-It is also acceptable for protorunes to be returned to the refund_pointer as well as to the pointer, for instances where a surplus of protorunes are sent for processing, or protorunes are sent which are not handled by the runtime of the indexer.
+Protorunes which target the Protostone that are unused by the runtime MUST be returned to the refund_pointer.
 
-The pointers are named for simplicitly in terms of their intended function, but ultimately they provide a mechanism for a branch in execution outputs which can, in turn, target another protomessage. In this way the scheme can support an unlimited amount of protorunes recipients in a given transaction script.
-
-A predicate MUST be supplied with the protomessage which defines the minimum balance sheet which MUST exist on the output pointed to by the pointer, else all assets should be returned to the output pointed to by the refund_pointer.
-
-Assets which are not handled by the runtime which are transferred to the protomessage output SHOULD be returned via the refund_pointer.
+The pointers are named for simplicitly in terms of their intended function, but ultimately they provide a mechanism for a branch in execution outputs which can, in turn, target another Protostone. In this way the scheme can support an unlimited amount of protorunes recipients in a given transaction script.
 
 ### protosplit
 
-For instances where an OP_RETURN output buffer is not large enough to fit a protomessage, the protosplit structure is defined. A protosplit is an OP_RETURN output followed by a data push of the bytes 0x6a6c, then the bytestring representing the protocol tag for the subprotocol. The remaining data pushes are parsed as a series of leb128 encoded u128 values, which should represent the vout index for each of a list of outputs, which MUST each either be an OP_RETURN output beginning with a 0x6a6d data push, or another protosplit output. The data pushes following the first 0x6a6d data push of each output are concatenated together to form a single bytestring, evaluating 0x6a6c prefixed OP_RETURN outputs as protosplit and flattening the entire concatenation in the order it is evaluated. The final bytestring should be interpreted as a protomessage payload, which does NOT include the magic number NOR the protocol tag of the subprotocol. The complete bytestring should be directly parsed by the protobuf parser to decode the protomessage structure defined above. Pointers which target a protosplit result in behavior which is identical to a scenario where the same protomessage were to exist on the single output in its entirety, that is, if the OP_RETURN size limit were not present and this were permitted.
+For instances where an OP_RETURN output buffer is not large enough to fit an entire protomessage, the protosplit structure is defined. The u32 values in the split field of the Protostone represent the vout index for each of a list of outputs, which MUST each either be an OP_RETURN output beginning with a 0x6a6d data push, or another protosplit output. The data pushes following the first 0x6a6d data push of each output are concatenated together to form a single bytestring, and the entire list of concatenated bytes are appended to the message field of the Protostone being evaluated, in the order that chunks are evaluated.
 
 ### Ordering
 
-A protorunes compatible indexer MUST process a maximum of two RunestoneMessage outputs per transaction, in the order they appear. Edicts that result in a transfer to a protoburn output execute atomically with the processing of the edict. All other execution is handled in layers, where outputs are processed in the order that they are marked by an edict, protoburn, or another protomessage.
+A protorunes compatible indexer MUST process a maximum of one RunestoneMessage, in the order they appear. Edicts that result in a transfer to a protoburn output execute atomically with the processing of the edict. All other execution is handled in layers, where outputs are processed in the order that they are marked by an edict, protoburn, or protomessage.
 
 In this way, processing occurs in layers, where batches of protorunes are allowed to collect on a given output before the next phase of execution begins. An AMM, for example, may handle a pair of runes that are received directly from the runes protocol, atomically. In this case, it is necessary we would allow edicts to target a protoburn to the subprotocol, and the protoburn pointer target a protomessage. This way, the protomessage can be designed to expect the pair of protorunes as an input and respond by issuing protorunes representing LP to the protomessage pointer, and then any component which should be refunded to the refund pointer. Protomessage outputs are always processed in the order they are targeted by an output as each processing phase is executed.
 
