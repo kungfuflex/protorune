@@ -45,12 +45,9 @@ export class Index {
       const commitment = inscription.field(0);
       if (!commitment) continue;
       const previousOutpoint = tx.ins[i].previousOutput().toArrayBuffer();
-      if (
-        height - OUTPOINT_TO_HEIGHT.select(previousOutpoint).getValue<u32>() >=
-        6
-      ) {
-        return true;
-      }
+      const previousOutpointHeight =
+        OUTPOINT_TO_HEIGHT.select(previousOutpoint).getValue<u32>();
+      if (height - previousOutpointHeight >= 6) return true;
     }
     return false;
   }

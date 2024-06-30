@@ -196,8 +196,7 @@ export class RunestoneMessage {
       }
     if (
       fromArrayBuffer(name) < minimum_name ||
-      fromArrayBuffer(name) >= RESERVED_NAME ||
-      !Index.findCommitment(name, transaction, <u32>height)
+      fromArrayBuffer(name) >= RESERVED_NAME
     )
       return false;
     if (ETCHING_TO_RUNE_ID.select(name).get().byteLength !== 0) return false; // already taken / commitment not foun

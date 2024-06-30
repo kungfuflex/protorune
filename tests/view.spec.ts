@@ -62,6 +62,7 @@ describe("metashrew-runes", () => {
       ["d66defd5daa5b101d0bf9fb47581dbd76827572646211f5058328b28765e9fda", "0"],
       ["8c6c6b86069435308f468a3db4063d8b266b6dfc845ea4c5202920b13b464c44", "0"],
       ["e79134080a83fe3e0e06ed6990c5a9b63b362313341745707a2bff7d788a1375", "1"],
+      ["e5c74c1cffbc96e3d825635a9dd0ea16f99d1f240e2ab076eb88fea9ac6de64f", "0"],
     ].map((d) => encodeOutpointInput(d[0], parseInt(d[1])));
     const outpoint = buildView("outpoint");
     const res = await inputs.reduce(async (_res: Promise<any[]>, input) => {
