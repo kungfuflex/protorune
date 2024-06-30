@@ -13,6 +13,6 @@ export class ProtoMessage {
   ): void {
     const context = new MessageContext(message, tx, block, height, i);
     //@ts-ignore
-    changetype<T>(context).handle();
+    changetype<T>(context).run();
   }
 }

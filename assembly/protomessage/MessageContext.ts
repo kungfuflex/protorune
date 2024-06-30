@@ -3,6 +3,27 @@ import { IncomingRune } from "./IncomingRune";
 import { AtomicTransaction } from "metashrew-as/assembly/indexer/atomic";
 import { protorune } from "../proto/protorune";
 import { RuneId } from "../indexer/RuneId";
+import { BalanceSheet } from "../indexer/BalanceSheet";
+import { OUTPOINT_TO_RUNES } from "../indexer/constants/protorune";
+import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
+
+class BalanceSheetPointers {
+  balances: IndexPointer;
+  runes: IndexPointer;
+  runtime: AtomicTransaction;
+
+  constructor(outpoint: OutPoint, runtime: AtomicTransaction) {
+    this.balances = OUTPOINT_TO_RUNES.select(outpoint.toArrayBuffer()).keyword(
+      "/balances",
+    );
+    this.runes = OUTPOINT_TO_RUNES.select(outpoint.toArrayBuffer()).keyword(
+      "/runes",
+    );
+    this.runtime = runtime;
+  }
+
+  nullifyBalances(runtime: AtomicTransaction): void {}
+}
 
 export class MessageContext {
   runtime: AtomicTransaction = new AtomicTransaction();
@@ -39,5 +60,17 @@ export class MessageContext {
     this.calldata = changetype<Uint8Array>(message.calldata).buffer;
   }
 
-  handle(): void {}
+  run(): void {
+    this.runtime.checkpoint();
+    const result = this.handle();
+    if (!result) {
+      this.runtime.rollback();
+    }
+
+    this.runtime.commit();
+  }
+
+  handle(): bool {
+    return false;
+  }
 }
