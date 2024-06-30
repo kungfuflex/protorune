@@ -145,11 +145,10 @@ export class Index {
           const out = tx.outs[tx.tags.protomessage[protomessageKeys[m]]];
           const parsed = scriptParse(out.script).slice(2);
           const message = protorune.ProtoMessage.decode(Box.concat(parsed));
-          protoMessages.set(protomessageKeys[m], message);
-          switch (protomessageKeys[m]) {
-            case PROTOCOL_TAG:
-              break;
-          }
+          protoMessages.set(
+            protomessageKeys[m],
+            new ProtoMessage(message, index, sheets),
+          );
         }
 
         //parse protosplit

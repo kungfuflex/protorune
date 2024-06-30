@@ -4,26 +4,6 @@ import { AtomicTransaction } from "metashrew-as/assembly/indexer/atomic";
 import { protorune } from "../proto/protorune";
 import { RuneId } from "../indexer/RuneId";
 import { BalanceSheet } from "../indexer/BalanceSheet";
-import { OUTPOINT_TO_RUNES } from "../indexer/constants/protorune";
-import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
-
-class BalanceSheetPointers {
-  balances: IndexPointer;
-  runes: IndexPointer;
-  runtime: AtomicTransaction;
-
-  constructor(outpoint: OutPoint, runtime: AtomicTransaction) {
-    this.balances = OUTPOINT_TO_RUNES.select(outpoint.toArrayBuffer()).keyword(
-      "/balances",
-    );
-    this.runes = OUTPOINT_TO_RUNES.select(outpoint.toArrayBuffer()).keyword(
-      "/runes",
-    );
-    this.runtime = runtime;
-  }
-
-  nullifyBalances(runtime: AtomicTransaction): void {}
-}
 
 export class MessageContext {
   runtime: AtomicTransaction = new AtomicTransaction();
@@ -36,6 +16,7 @@ export class MessageContext {
   pointer: OutPoint = changetype<OutPoint>(0);
   refund_pointer: OutPoint = changetype<OutPoint>(0);
   calldata: ArrayBuffer = new ArrayBuffer(0);
+  sheets: Map<u32, BalanceSheet>;
 
   constructor(
     message: protorune.ProtoMessage,
@@ -43,7 +24,21 @@ export class MessageContext {
     block: Block,
     height: u64,
     index: u32,
+    sheets: Map<u32, BalanceSheet>,
   ) {
+    if (sheets.has(index)) {
+      for (let i = 0; i < sheets.get(index).runes.length; i++) {
+        const sheet = sheets.get(index);
+        const runeId = RuneId.fromBytesU128(sheet.runes[i]);
+        const rune = new IncomingRune(
+          runeId,
+          sheet.balances[i].lo,
+          sheet.balances[i].hi,
+        );
+        this.runes.push(rune);
+      }
+    }
+    this.sheets = sheets;
     for (let i = 0; i < message.predicate.clauses.length; i++) {
       const clause = message.predicate.clauses[i];
       const runeId = new RuneId(<u64>clause.rune.height, clause.rune.txindex);
