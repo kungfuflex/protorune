@@ -29,6 +29,7 @@
     "as-bignum": "^0.3.0",
     "assemblyscript": "^0.27.22",
     "assemblyscript-prettier": "^3.0.1",
+    "bitcoinjs-lib": "^6.1.6",
     "chai": "^5.1.0",
     "fs-extra": "^11.2.0",
     "js-sha3": "^0.9.3",
