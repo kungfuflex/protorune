@@ -22,7 +22,7 @@ export class ProtoMessage {
     block: Block,
     height: u64,
     i: u32,
-  ) {
+  ): void {
     const context = new MessageContext(
       this.message,
       tx,

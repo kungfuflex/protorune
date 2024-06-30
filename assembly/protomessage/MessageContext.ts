@@ -26,9 +26,10 @@ export class MessageContext {
     index: u32,
     sheets: Map<u32, BalanceSheet>,
   ) {
+    this.sheets = sheets;
     if (sheets.has(index)) {
-      for (let i = 0; i < sheets.get(index).runes.length; i++) {
-        const sheet = sheets.get(index);
+      const sheet = sheets.get(index);
+      for (let i = 0; i < sheet.runes.length; i++) {
         const runeId = RuneId.fromBytesU128(sheet.runes[i]);
         const rune = new IncomingRune(
           runeId,
@@ -38,7 +39,6 @@ export class MessageContext {
         this.runes.push(rune);
       }
     }
-    this.sheets = sheets;
     for (let i = 0; i < message.predicate.clauses.length; i++) {
       const clause = message.predicate.clauses[i];
       const runeId = new RuneId(<u64>clause.rune.height, clause.rune.txindex);
