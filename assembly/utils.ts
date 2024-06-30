@@ -64,7 +64,8 @@ export function fieldToName(data: u128): string {
   let v = data + u128.from(1);
   let str = "";
   while (!v.isZero()) {
-    const y = (v % TWENTY_SIX).toU32();
+    let y = (v % TWENTY_SIX).toU32();
+    if (y == 0) y = 26;
     str = String.fromCharCode(64 + y) + str;
     v--;
     v = v / TWENTY_SIX;
@@ -77,7 +78,7 @@ export function nameToArrayBuffer(name: string): ArrayBuffer {
   let x = u128.from(0);
   for (let i = 0; i < name.length; i++) {
     const char = name.charCodeAt(i) - 64;
-    y = u128.from(char);
+    y = u128.from(char == 26 ? 0 : char);
     x *= TWENTY_SIX;
     x += y;
   }

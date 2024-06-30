@@ -2,6 +2,7 @@ import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
 import { u128 } from "as-bignum/assembly";
 import { fromArrayBuffer } from "../utils";
 import { RuneId } from "./RuneId";
+import { console } from "metashrew-as/assembly/utils";
 
 export class BalanceSheet {
   public runes: Array<ArrayBuffer>;
@@ -93,7 +94,7 @@ export class BalanceSheet {
     const balancesPtr = ptr.keyword("/balances");
 
     for (let i = 0; i < this.runes.length; i++) {
-      if (this.balances[i] != u128.from(0) && !isCenotaph) {
+      if (this.balances[i] != u128.Zero && !isCenotaph) {
         runesPtr.append(this.runes[i]);
 
         const buf = changetype<Uint8Array>(this.balances[i].toBytes()).buffer;

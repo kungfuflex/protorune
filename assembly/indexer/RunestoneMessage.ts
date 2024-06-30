@@ -13,6 +13,7 @@ import {
   min,
   nameToArrayBuffer,
   getReservedNameFor,
+  fieldToName,
 } from "../utils";
 import { Flag } from "./Flag";
 import { RuneId } from "./RuneId";
@@ -44,7 +45,11 @@ import { BalanceSheet } from "./BalanceSheet";
 import { Index } from "./Indexer";
 import { RunesTransaction } from "./RunesTransaction";
 import { Input, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
-import { SUBSIDY_HALVING_INTERVAL } from "metashrew-as/assembly/utils";
+import {
+  encodeHexFromBuffer,
+  SUBSIDY_HALVING_INTERVAL,
+} from "metashrew-as/assembly/utils";
+import { console } from "metashrew-as/assembly/utils/logging";
 
 export class RunestoneMessage {
   public fields: Map<u64, Array<u128>>;
@@ -183,10 +188,9 @@ export class RunestoneMessage {
   ): bool {
     if (!this.isEtching()) return false;
     let name: ArrayBuffer;
-    if (this.fields.has(Field.RUNE))
-      name = fieldToArrayBuffer(this.fields.get(Field.RUNE));
-    else name = fieldToArrayBuffer([getReservedNameFor(height, tx)]);
-
+    let nameU128: u128;
+    if (this.fields.has(Field.RUNE)) nameU128 = this.fields.get(Field.RUNE)[0];
+    else nameU128 = getReservedNameFor(height, tx);
     let interval: i64 = (height - GENESIS) / HEIGHT_INTERVAL;
     let minimum_name = MINIMUM_NAME;
     if (interval > 0)
@@ -194,15 +198,37 @@ export class RunestoneMessage {
         minimum_name = --minimum_name / TWENTY_SIX;
         interval--;
       }
-    if (
-      fromArrayBuffer(name) < minimum_name ||
-      fromArrayBuffer(name) >= RESERVED_NAME
-    )
-      return false;
+    if (nameU128 < minimum_name || nameU128 >= RESERVED_NAME) return false;
+    name = toArrayBuffer(nameU128);
     if (ETCHING_TO_RUNE_ID.select(name).get().byteLength !== 0) return false; // already taken / commitment not foun
     const runeId = new RuneId(height, tx).toBytes();
+    const testRuneId = new RuneId(840000, 142).toBytes();
+    const b = RUNE_ID_TO_ETCHING.select(testRuneId).unwrap();
+    console.log(
+      memory
+        .compare(
+          changetype<usize>(b),
+          changetype<usize>(RUNE_ID_TO_ETCHING.select(runeId).unwrap()),
+          b.byteLength,
+        )
+        .toString(),
+    );
+    if (tx == 158) {
+      console.log(
+        fieldToName(
+          fromArrayBuffer(RUNE_ID_TO_ETCHING.select(testRuneId).get()),
+        ),
+      );
+    }
     RUNE_ID_TO_ETCHING.select(runeId).set(name);
     ETCHING_TO_RUNE_ID.select(name).set(runeId);
+    if (tx == 158) {
+      console.log(
+        fieldToName(
+          fromArrayBuffer(RUNE_ID_TO_ETCHING.select(testRuneId).get()),
+        ),
+      );
+    }
     RUNE_ID_TO_HEIGHT.select(runeId).setValue<u32>(<u32>height);
     if (this.fields.has(Field.DIVISIBILITY))
       DIVISIBILITY.select(name).setValue<u8>(
@@ -278,7 +304,7 @@ export class RunestoneMessage {
       const amount = min(edict.amount, balanceSheet.get(runeId));
 
       const canDecrease = balanceSheet.decrease(runeId, amount);
-      if (canDecrease) isCenotaph = true;
+      if (!canDecrease) isCenotaph = true;
       outputBalanceSheet.increase(runeId, amount);
     }
     return isCenotaph;
@@ -323,5 +349,6 @@ export class RunestoneMessage {
         isCenotaph,
       );
     }
+    if (height == 840000 && txindex == 158) unreachable();
   }
 }
