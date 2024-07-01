@@ -3,6 +3,7 @@ import fs from "node:fs";
 import { inspect } from "node:util";
 import { IndexerProgram, readArrayBufferAsHex } from "metashrew-test";
 import * as path from "node:path";
+//@ts-ignore
 import bitcoinjs = require("bitcoinjs-lib");
 import { encodeRunestone } from "@magiceden-oss/runestone-lib";
 import { MetashrewRunes } from "../lib/rpc";
@@ -12,13 +13,13 @@ const log = (obj: any) => {
 };
 
 const stripHexPrefix = (key: string) => {
-  if (key.substr(0, 2) === '0x') return key.substr(2);
+  if (key.substr(0, 2) === "0x") return key.substr(2);
   return key;
 };
 
 const addHexPrefix = (s: string) => {
-  if (s.substr(0, 2) === '0x') return s;
-  return '0x' + s;
+  if (s.substr(0, 2) === "0x") return s;
+  return "0x" + s;
 };
 
 const split = (ary, sym) => {
@@ -26,30 +27,34 @@ const split = (ary, sym) => {
     if (v === sym) {
       r.push([]);
     } else {
-      if (r.length ===0) r.push([]);
+      if (r.length === 0) r.push([]);
       r[r.length - 1].push(v);
     }
     return r;
   }, []);
 };
-  
+
 const formatKey = (key: string) => {
-  return split(Array.from(Buffer.from(stripHexPrefix(key), 'hex')), Buffer.from('/')[0]).reduce((r, v, i, ary) => {
-    const token = Buffer.from(v).toString('utf8');
+  return split(
+    Array.from(Buffer.from(stripHexPrefix(key), "hex")),
+    Buffer.from("/")[0],
+  ).reduce((r, v, i, ary) => {
+    const token = Buffer.from(v).toString("utf8");
     if (!(i + v.length)) {
-      return  r + '/';
+      return r + "/";
     } else if (token.match(/^[0-9a-zA-Z]+$/)) {
-      return r + '/' + token;
+      return r + "/" + token;
     } else {
-      return r + '/' + addHexPrefix(Buffer.from(v).toString('hex'));
+      return r + "/" + addHexPrefix(Buffer.from(v).toString("hex"));
     }
-  }, '');
+  }, "");
 };
 
 const formatKv = (kv: any) => {
-  return Object.fromEntries(Object.entries(kv).map(([key, value]) => [ formatKey(key), value ]));
+  return Object.fromEntries(
+    Object.entries(kv).map(([key, value]) => [formatKey(key), value]),
+  );
 };
-
 
 const DEBUG_WASM = fs.readFileSync(
   path.join(__dirname, "..", "build", "debug.wasm"),
@@ -147,13 +152,14 @@ const runesbyaddress = async (
 };
 
 describe("metashrew-runes", () => {
-  it("should check runes witness script", async () => {
+  it("should check if duplicate keys are not being set", async () => {
     const program = buildProgram();
     program.setBlock(
-      fs.readFileSync(path.join(__dirname, "849236.hex"), "utf8"),
+      fs.readFileSync(path.join(__dirname, "runes-genesis.hex"), "utf8"),
     );
-    program.setBlockHeight(849236);
-    await program.run("testCommitment");
+    program.setBlockHeight(840000);
+    program.on("log", console.log);
+    await program.run("testOverwrite");
     return program;
   });
   it("should index Runestone", async () => {
@@ -161,7 +167,7 @@ describe("metashrew-runes", () => {
     program.setBlockHeight(840001);
     const block = buildDefaultBlock();
     const coinbase = buildCoinbaseToTestAddress();
-    block.transactions.push(coinbase);
+    block.transactions?.push(coinbase);
     const runesGenesis = encodeRunestone({
       etching: {
         divisibility: 8,
@@ -201,7 +207,7 @@ describe("metashrew-runes", () => {
         },
       ],
     );
-    block.transactions.push(transaction);
+    block.transactions?.push(transaction);
     program.setBlock(block.toHex());
     await program.run("_start");
     console.log(formatKv(program.kv));

@@ -23,6 +23,8 @@ export function testCommitment(): void {
   );
 }
 
+export function testOverwrite(): void {}
+
 export function testFieldToName(): void {
   const name = fieldToName(u128.from("99246114928149462"));
   console.log(name);

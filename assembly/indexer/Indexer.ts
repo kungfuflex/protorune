@@ -77,6 +77,31 @@ export class Index {
     if (commitment) console.log("no commitment");
     else console.log("commitment found");
   }
+  static processRunesTransaction(
+    tx: RunesTransaction,
+    txid: ArrayBuffer,
+    height: u32,
+    i: u32,
+  ): void {
+    tx.processRunestones();
+    if (height >= GENESIS && tx.tags.runestone !== -1) {
+      const runestoneOutputIndex = tx.tags.runestone;
+      const runestoneOutput = tx.outs[runestoneOutputIndex];
+      const parsed = scriptParse(runestoneOutput.script).slice(2);
+      if (
+        parsed.findIndex((v: Box, i: i32, ary: Array<Box>) => {
+          return v.start === usize.MAX_VALUE;
+        }) !== -1
+      )
+        return; // non-data push: cenotaph
+      const payload = Box.concat(parsed);
+      const message = RunestoneMessage.parse(payload);
+      if (changetype<usize>(message) === 0) return;
+
+      //process message here
+      message.process(tx, txid, height, i);
+    }
+  }
   static indexBlock(height: u32, _block: Block): void {
     if (height == GENESIS) {
       RunestoneMessage.etchGenesisRune();
@@ -90,24 +115,7 @@ export class Index {
       const tx = block.getTransaction(i);
       const txid = tx.txid();
       Index.indexOutpoints(tx, txid, height);
-      tx.processRunestones();
-      if (height >= GENESIS && tx.tags.runestone !== -1) {
-        const runestoneOutputIndex = tx.tags.runestone;
-        const runestoneOutput = tx.outs[runestoneOutputIndex];
-        const parsed = scriptParse(runestoneOutput.script).slice(2);
-        if (
-          parsed.findIndex((v: Box, i: i32, ary: Array<Box>) => {
-            return v.start === usize.MAX_VALUE;
-          }) !== -1
-        )
-          continue; // non-data push: cenotaph
-        const payload = Box.concat(parsed);
-        const message = RunestoneMessage.parse(payload);
-        if (changetype<usize>(message) === 0) continue;
-
-        //process message here
-        message.process(tx, txid, height, i);
-      }
+      Index.processRunesTransaction(tx, txid, height, i);
     }
   }
 }
