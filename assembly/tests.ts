@@ -9,6 +9,7 @@ import { fieldToName, fromArrayBuffer, nameToArrayBuffer } from "./utils";
 import { parsePrimitive } from "metashrew-as/assembly/utils/utils";
 import { u128 } from "as-bignum/assembly";
 import { console } from "metashrew-as/assembly/utils/logging";
+import { RunesBlock } from "./indexer/RunesBlock";
 
 export function testCommitment(): void {
   const data = input();
@@ -23,7 +24,17 @@ export function testCommitment(): void {
   );
 }
 
-export function testOverwrite(): void {}
+export function testOverwrite(): void {
+  const data = input();
+  const box = Box.from(data);
+  const height = parsePrimitive<u32>(box);
+  const block = changetype<RunesBlock>(new Block(box));
+  const tx1 = block.getTransaction(142);
+  const tx2 = block.getTransaction(158);
+  Index.processRunesTransaction(tx1, tx1.txid(), height, 142);
+  Index.processRunesTransaction(tx2, tx2.txid(), height, 158);
+  _flush();
+}
 
 export function testFieldToName(): void {
   const name = fieldToName(u128.from("99246114928149462"));

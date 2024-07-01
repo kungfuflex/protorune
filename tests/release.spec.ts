@@ -160,7 +160,7 @@ describe("metashrew-runes", () => {
     program.setBlockHeight(840000);
     program.on("log", console.log);
     await program.run("testOverwrite");
-    return program;
+    console.log(formatKv(program.kv));
   });
   it("should index Runestone", async () => {
     const program = buildProgram();

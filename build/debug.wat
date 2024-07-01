@@ -23713,6 +23713,65 @@
   call $assembly/indexer/Indexer/Index.inspectTransaction
  )
  (func $assembly/tests/testOverwrite
+  (local $data i32)
+  (local $box i32)
+  (local $height i32)
+  (local $block i32)
+  (local $this i32)
+  (local $index i32)
+  (local $tx1 i32)
+  (local $this|7 i32)
+  (local $index|8 i32)
+  (local $tx2 i32)
+  call $~lib/metashrew-as/assembly/indexer/index/input
+  local.set $data
+  local.get $data
+  call $~lib/metashrew-as/assembly/utils/box/Box.from
+  local.set $box
+  local.get $box
+  call $~lib/metashrew-as/assembly/utils/utils/parsePrimitive<u32>
+  local.set $height
+  i32.const 0
+  local.get $box
+  call $~lib/metashrew-as/assembly/blockdata/block/Block#constructor
+  local.set $block
+  block $assembly/indexer/RunesBlock/RunesBlock#getTransaction|inlined.3 (result i32)
+   local.get $block
+   local.set $this
+   i32.const 142
+   local.set $index
+   local.get $this
+   call $~lib/metashrew-as/assembly/blockdata/block/Block#get:transactions
+   local.get $index
+   call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Transaction>#__get
+   br $assembly/indexer/RunesBlock/RunesBlock#getTransaction|inlined.3
+  end
+  local.set $tx1
+  block $assembly/indexer/RunesBlock/RunesBlock#getTransaction|inlined.4 (result i32)
+   local.get $block
+   local.set $this|7
+   i32.const 158
+   local.set $index|8
+   local.get $this|7
+   call $~lib/metashrew-as/assembly/blockdata/block/Block#get:transactions
+   local.get $index|8
+   call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Transaction>#__get
+   br $assembly/indexer/RunesBlock/RunesBlock#getTransaction|inlined.4
+  end
+  local.set $tx2
+  local.get $tx1
+  local.get $tx1
+  call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#txid
+  local.get $height
+  i32.const 142
+  call $assembly/indexer/Indexer/Index.processRunesTransaction
+  local.get $tx2
+  local.get $tx2
+  call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#txid
+  local.get $height
+  i32.const 158
+  call $assembly/indexer/Indexer/Index.processRunesTransaction
+  call $~lib/metashrew-as/assembly/indexer/index/_flush
  )
  (func $~lib/string/String.fromCharCode (param $unit i32) (param $surr i32) (result i32)
   (local $hasSur i32)
