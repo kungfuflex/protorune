@@ -19,6 +19,7 @@ export class MessageContext {
   sheets: Map<u32, BalanceSheet>;
   txid: ArrayBuffer;
   baseSheet: BalanceSheet;
+  runeIdToIndex: Map<ArrayBuffer, i32> = new Map<ArrayBuffer, i32>();
 
   constructor(
     message: protorune.ProtoMessage,
@@ -42,17 +43,10 @@ export class MessageContext {
       const sheet = sheets.get(index);
       for (let i = 0; i < sheet.runes.length; i++) {
         const runeId = RuneId.fromBytesU128(sheet.runes[i]);
-        const rune = new IncomingRune(
-          runeId,
-          sheet.balances[i].lo,
-          sheet.balances[i].hi,
-        );
+        this.runeIdToIndex.set(sheet.runes[i], i);
+        const rune = new IncomingRune(this, runeId, sheet.balances[i]);
         this.runes.push(rune);
         this.baseSheet.pipe(sheet);
-        sheet.saveToAtomicTx(
-          OUTPOINT_TO_RUNES.select(this.refund_pointer.toArrayBuffer()),
-          this.runtime,
-        );
       }
     }
   }
@@ -88,6 +82,11 @@ export class MessageContext {
   run(): void {
     if (this.sheets.has(this.pointer.index)) {
       const sheet = this.sheets.get(this.pointer.index);
+      for (let i = 0; i < sheet.runes.length; i++) {
+        if (this.runeIdToIndex.has(sheet.runes[i])) {
+          this.runes[this.runeIdToIndex.get(sheet.runes[i])].pointer_index = i;
+        }
+      }
       sheet.saveToAtomicTx(
         OUTPOINT_TO_RUNES.select(this.pointer.toArrayBuffer()),
         this.runtime,
@@ -96,6 +95,18 @@ export class MessageContext {
     }
     if (this.sheets.has(this.refund_pointer.index)) {
       const sheet = this.sheets.get(this.refund_pointer.index);
+      sheet.pipe(
+        this.sheets.has(this.outpoint.index)
+          ? this.sheets.get(this.outpoint.index)
+          : new BalanceSheet(),
+      );
+      for (let i = 0; i < sheet.runes.length; i++) {
+        if (this.runeIdToIndex.has(sheet.runes[i])) {
+          this.runes[
+            this.runeIdToIndex.get(sheet.runes[i])
+          ].refund_pointer_index = i;
+        }
+      }
       sheet.saveToAtomicTx(
         OUTPOINT_TO_RUNES.select(this.refund_pointer.toArrayBuffer()),
         this.runtime,
