@@ -1,10 +1,11 @@
 import fs from "node:fs";
 
 import { inspect } from "node:util";
-import { IndexerProgram } from "metashrew-test";
+import { IndexerProgram, readArrayBufferAsHex } from "metashrew-test";
 import * as path from "node:path";
 import bitcoinjs = require("bitcoinjs-lib");
 import { encodeRunestone } from "@magiceden-oss/runestone-lib";
+import { MetashrewRunes } from "../lib/rpc";
 
 const log = (obj: any) => {
   console.log(inspect(obj, false, 10, true));
@@ -66,7 +67,7 @@ const buildCoinbaseToTestAddress = () =>
         address: TEST_BTC_ADDRESS1,
         network: bitcoinjs.networks.bitcoin,
       }).output,
-      value: 625000000n,
+      value: 625000000,
     },
   ]);
 
@@ -86,6 +87,21 @@ const runTest = (s) =>
     await new Promise((r) => setTimeout(r, 2000));
     return program;
   });
+
+
+const runesbyaddress = async (program: IndexerProgram, address: string): any => {
+  const cloned = program; // just mutate it
+  const result = await MetashrewRunes.prototype.runesbyaddress.call({
+    async _call({
+      input
+    }) {
+      cloned.setBlock(input);
+      const ptr = await cloned.run('runesbyaddress');
+      return readArrayBufferAsHex(cloned.memory, ptr);
+    }
+  }, { address });
+  return result;
+}
 
 describe("metashrew-runes", () => {
   it("should check runes witness script", async () => {
@@ -108,35 +124,37 @@ describe("metashrew-runes", () => {
         divisibility: 8,
         premine: 2100000000000000n,
         name: "GENESNS•RUNE•FR",
-	symbol: 'G'
+	      symbol: 'G'
       },
       pointer: 1,
     }).encodedRunestone;
     const transaction = buildTransaction(
-      [{ hash: coinbase.getHash(), index: 0 }],
+      [{ hash: coinbase.getHash(), index: 0, witness: EMPTY_WITNESS, script: EMPTY_BUFFER }],
       [
         {
           script: runesGenesis,
-          value: 0n,
+          value: 0,
         },
         {
           script: bitcoinjs.payments.p2pkh({
-            address: TEST_BITCOIN_ADDRESS1,
+            address: TEST_BTC_ADDRESS1,
             network: bitcoinjs.networks.bitcoin,
           }).output,
-          value: 1n,
+          value: 1,
         },
         {
           script: bitcoinjs.payments.p2pkh({
             network: bitcoinjs.networks.bitcoin,
-            address: TEST_BITCOIN_ADDRESS_1,
+            address: TEST_BTC_ADDRESS1,
           }).output,
-          value: 624999999n,
+          value: 624999999,
         },
       ],
     );
     block.transactions.push(transaction);
-    program.setBlock("0x" + block.encodeHex());
-    await program.run();
+    program.setBlock(block.toHex());
+    await program.run("_start");
+
+    console.log(await runesbyaddress(program, TEST_BTC_ADDRESS1))
   });
 });

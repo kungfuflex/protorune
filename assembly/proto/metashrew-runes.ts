@@ -1,4 +1,6 @@
 namespace __proto {
+  export const MAX_POS = 0x1000;
+
   /**
    * Decoder implements protobuf message decode interface.
    *
@@ -277,6 +279,207 @@ namespace __proto {
     }
   }
 
+  class SafeDecoder extends Decoder {
+    public _invalid: boolean;
+    invalid(): boolean {
+      if (this._invalid) return true;
+      if (this.pos > MAX_POS) {
+        this._invalid = true;
+        return true;
+      }
+      return false;
+    }
+    string(): string {
+      if (this.invalid()) return "";
+      const length = this.uint32();
+      if (this.pos + length > this.byteLength) {
+        this._invalid = true;
+        return "";
+      }
+      const p = this.pos + this.view.byteOffset;
+      const value = String.UTF8.decode(this.view.buffer.slice(p, p + length));
+      this.pos += length;
+      return value;
+    }
+    @inline
+    sfixed64(): i64 {
+      if (this.invalid()) return 0;
+      return i64(this.fixed64());
+    }
+
+    @inline
+    float(): f32 {
+      if (this.invalid()) return 0;
+      return f32.reinterpret_i32(this.fixed32());
+    }
+
+    @inline
+    double(): f64 {
+      if (this.invalid()) return 0;
+      return f64.reinterpret_i64(this.fixed64());
+    }
+
+    @inline
+    bool(): boolean {
+      if (this.invalid()) return false;
+      return this.uint32() > 0;
+    }
+    fixed64(): u64 {
+      if (this.invalid()) return 0;
+      this.pos += 8;
+      if (this.pos > this.byteLength || this.pos > MAX_POS) {
+        this._invalid = true;
+        return <u64>0;
+      }
+
+      return (
+        u64(u8(this.u8at(this.pos - 8))) |
+        (u64(u8(this.u8at(this.pos - 7))) << 8) |
+        (u64(u8(this.u8at(this.pos - 6))) << 16) |
+        (u64(u8(this.u8at(this.pos - 5))) << 24) |
+        (u64(u8(this.u8at(this.pos - 4))) << 32) |
+        (u64(u8(this.u8at(this.pos - 3))) << 40) |
+        (u64(u8(this.u8at(this.pos - 2))) << 48) |
+        (u64(u8(this.u8at(this.pos - 1))) << 56)
+      );
+    }
+    eof(): boolean {
+      if (this.invalid()) return true;
+      return super.eof();
+    }
+    varint(): u64 {
+      if (this.invalid()) return 0;
+      let value: u64;
+
+      // u32
+      value = (u64(u8(this.u8at(this.pos))) & 127) >>> 0;
+      if (u8(this.u8at(this.pos++)) < 128) return value;
+      value = (value | ((u64(u8(this.u8at(this.pos))) & 127) << 7)) >>> 0;
+      if (this.pos + 1 > MAX_POS) {
+        this._invalid = true;
+        return 0;
+      }
+      if (u8(this.u8at(this.pos++)) < 128) return value;
+      value = (value | ((u64(u8(this.u8at(this.pos))) & 127) << 14)) >>> 0;
+      if (this.pos + 1 > MAX_POS) {
+        this._invalid = true;
+        return 0;
+      }
+      if (u8(this.u8at(this.pos++)) < 128) return value;
+      value = (value | ((u64(u8(this.u8at(this.pos))) & 127) << 21)) >>> 0;
+      if (this.pos + 1 > MAX_POS) {
+        this._invalid = true;
+        return 0;
+      }
+      if (u8(this.u8at(this.pos++)) < 128) return value;
+      // u32 remainder or u64 byte
+      value = (value | ((u64(u8(this.u8at(this.pos))) & 127) << 28)) >>> 0;
+      if (this.pos + 1 > MAX_POS) {
+        this._invalid = true;
+        return 0;
+      }
+      if (u8(this.u8at(this.pos++)) < 128) return value;
+      // u64
+      value = (value | ((u64(u8(this.u8at(this.pos))) & 127) << 35)) >>> 0;
+      if (this.pos + 1 > MAX_POS) {
+        this._invalid = true;
+        return 0;
+      }
+      if (u8(this.u8at(this.pos++)) < 128) return value;
+      value =
+        (value | ((u64(u8(this.u8at(this.pos))) & 127) << 42)) /* 42!!! */ >>>
+        0;
+      if (u8(this.u8at(this.pos++)) < 128) return value;
+      value = (value | ((u64(u8(this.u8at(this.pos))) & 127) << 49)) >>> 0;
+      if (u8(this.u8at(this.pos++)) < 128) return value;
+      value = (value | ((u64(u8(this.u8at(this.pos))) & 127) << 28)) >>> 0;
+      if (u8(this.u8at(this.pos++)) < 128) return value;
+      // u64 remainder
+      value = (value | ((u64(u8(this.u8at(this.pos))) & 127) << 35)) >>> 0;
+      if (this.pos + 1 > MAX_POS) {
+        this._invalid = true;
+        return 0;
+      }
+      if (u8(this.u8at(this.pos++)) < 128) return value;
+
+      if (this.pos > this.byteLength || this.pos > MAX_POS) {
+        this._invalid = true;
+        return 0;
+      }
+
+      return value;
+    }
+    fixed32(): u32 {
+      if (this.invalid()) return 0;
+      this.pos += 4;
+      if (this.pos > this.byteLength || this.pos > MAX_POS) {
+        this._invalid = true;
+        return <u32>0;
+      }
+
+      // u32(u8) ensures that u8(-1) becomes u32(4294967295) instead of u8(255)
+      return (
+        u32(u8(this.u8at(this.pos - 4))) |
+        (u32(u8(this.u8at(this.pos - 3))) << 8) |
+        (u32(u8(this.u8at(this.pos - 2))) << 16) |
+        (u32(u8(this.u8at(this.pos - 1))) << 24)
+      );
+    }
+    bytes(): Array<u8> {
+      if (this.invalid()) return new Array<u8>(0);
+      const len = this.uint32();
+      if (this.pos + len > this.byteLength || this.pos + len > MAX_POS) {
+        this._invalid = true;
+        return new Array<u8>(0);
+      }
+      const a = new Array<u8>(len);
+      for (let i: u32 = 0; i < len; i++) {
+        a[i] = u8(this.u8at(this.pos++));
+      }
+
+      return a;
+    }
+    skipType(wireType: u32): void {
+      if (this.invalid()) return;
+      switch (wireType) {
+        // int32, int64, uint32, uint64, sint32, sint64, bool, enum: varint, variable length
+        case 0:
+          this.varint(); // Just read a varint
+          break;
+        // fixed64, sfixed64, double: 8 bytes always
+        case 1:
+          this.skip(8);
+          break;
+        // length-delimited; length is determined by varint32; skip length bytes;
+        case 2:
+          this.skip(this.uint32());
+          break;
+        // tart group: skip till the end of the group, then skip group end marker
+        case 3:
+          while ((wireType = this.uint32() & 7) !== 4) {
+            this.skipType(wireType);
+          }
+          break;
+        // fixed32, sfixed32, float: 4 bytes always
+        case 5:
+          this.skip(4);
+          break;
+
+        // Something went beyond our capability to understand
+        default:
+          this._invalid = true;
+          break;
+      }
+    }
+    skip(length: u32): void {
+      if (this.invalid()) return;
+      if (this.pos + length > this.byteLength || this.pos + length > MAX_POS) {
+        this._invalid = true;
+      }
+      this.pos += length;
+    }
+  }
+
   /**
    * Encoder implements protobuf message encode interface. This is the simplest not very effective version, which uses
    * Array<u8>.
@@ -479,7 +682,7 @@ export namespace metashrew_runes {
 
     // Decodes RuneId from a DataView
     static decodeDataView(view: DataView): RuneId {
-      const decoder = new __proto.Decoder(view);
+      const decoder = new __proto.SafeDecoder(view);
       const obj = new RuneId();
 
       while (!decoder.eof()) {
@@ -501,6 +704,7 @@ export namespace metashrew_runes {
             break;
         }
       }
+      if (decoder.invalid()) return changetype<RuneId>(0);
       return obj;
     } // decode RuneId
 
@@ -553,7 +757,7 @@ export namespace metashrew_runes {
 
     // Decodes Rune from a DataView
     static decodeDataView(view: DataView): Rune {
-      const decoder = new __proto.Decoder(view);
+      const decoder = new __proto.SafeDecoder(view);
       const obj = new Rune();
 
       while (!decoder.eof()) {
@@ -596,6 +800,7 @@ export namespace metashrew_runes {
             break;
         }
       }
+      if (decoder.invalid()) return changetype<Rune>(0);
       return obj;
     } // decode Rune
 
@@ -683,7 +888,7 @@ export namespace metashrew_runes {
 
     // Decodes BalanceSheetItem from a DataView
     static decodeDataView(view: DataView): BalanceSheetItem {
-      const decoder = new __proto.Decoder(view);
+      const decoder = new __proto.SafeDecoder(view);
       const obj = new BalanceSheetItem();
 
       while (!decoder.eof()) {
@@ -714,6 +919,7 @@ export namespace metashrew_runes {
             break;
         }
       }
+      if (decoder.invalid()) return changetype<BalanceSheetItem>(0);
       return obj;
     } // decode BalanceSheetItem
 
@@ -784,7 +990,7 @@ export namespace metashrew_runes {
 
     // Decodes BalanceSheet from a DataView
     static decodeDataView(view: DataView): BalanceSheet {
-      const decoder = new __proto.Decoder(view);
+      const decoder = new __proto.SafeDecoder(view);
       const obj = new BalanceSheet();
 
       while (!decoder.eof()) {
@@ -813,6 +1019,7 @@ export namespace metashrew_runes {
             break;
         }
       }
+      if (decoder.invalid()) return changetype<BalanceSheet>(0);
       return obj;
     } // decode BalanceSheet
 
@@ -868,7 +1075,7 @@ export namespace metashrew_runes {
 
     // Decodes Outpoint from a DataView
     static decodeDataView(view: DataView): Outpoint {
-      const decoder = new __proto.Decoder(view);
+      const decoder = new __proto.SafeDecoder(view);
       const obj = new Outpoint();
 
       while (!decoder.eof()) {
@@ -890,6 +1097,7 @@ export namespace metashrew_runes {
             break;
         }
       }
+      if (decoder.invalid()) return changetype<Outpoint>(0);
       return obj;
     } // decode Outpoint
 
@@ -943,7 +1151,7 @@ export namespace metashrew_runes {
 
     // Decodes Output from a DataView
     static decodeDataView(view: DataView): Output {
-      const decoder = new __proto.Decoder(view);
+      const decoder = new __proto.SafeDecoder(view);
       const obj = new Output();
 
       while (!decoder.eof()) {
@@ -965,6 +1173,7 @@ export namespace metashrew_runes {
             break;
         }
       }
+      if (decoder.invalid()) return changetype<Output>(0);
       return obj;
     } // decode Output
 
@@ -1021,7 +1230,7 @@ export namespace metashrew_runes {
 
     // Decodes OutpointResponse from a DataView
     static decodeDataView(view: DataView): OutpointResponse {
-      const decoder = new __proto.Decoder(view);
+      const decoder = new __proto.SafeDecoder(view);
       const obj = new OutpointResponse();
 
       while (!decoder.eof()) {
@@ -1082,6 +1291,7 @@ export namespace metashrew_runes {
             break;
         }
       }
+      if (decoder.invalid()) return changetype<OutpointResponse>(0);
       return obj;
     } // decode OutpointResponse
 
@@ -1194,7 +1404,7 @@ export namespace metashrew_runes {
 
     // Decodes PaginationInput from a DataView
     static decodeDataView(view: DataView): PaginationInput {
-      const decoder = new __proto.Decoder(view);
+      const decoder = new __proto.SafeDecoder(view);
       const obj = new PaginationInput();
 
       while (!decoder.eof()) {
@@ -1216,6 +1426,7 @@ export namespace metashrew_runes {
             break;
         }
       }
+      if (decoder.invalid()) return changetype<PaginationInput>(0);
       return obj;
     } // decode PaginationInput
 
@@ -1264,7 +1475,7 @@ export namespace metashrew_runes {
 
     // Decodes WalletRequest from a DataView
     static decodeDataView(view: DataView): WalletRequest {
-      const decoder = new __proto.Decoder(view);
+      const decoder = new __proto.SafeDecoder(view);
       const obj = new WalletRequest();
 
       while (!decoder.eof()) {
@@ -1282,6 +1493,7 @@ export namespace metashrew_runes {
             break;
         }
       }
+      if (decoder.invalid()) return changetype<WalletRequest>(0);
       return obj;
     } // decode WalletRequest
 
@@ -1330,7 +1542,7 @@ export namespace metashrew_runes {
 
     // Decodes WalletResponse from a DataView
     static decodeDataView(view: DataView): WalletResponse {
-      const decoder = new __proto.Decoder(view);
+      const decoder = new __proto.SafeDecoder(view);
       const obj = new WalletResponse();
 
       while (!decoder.eof()) {
@@ -1372,6 +1584,7 @@ export namespace metashrew_runes {
             break;
         }
       }
+      if (decoder.invalid()) return changetype<WalletResponse>(0);
       return obj;
     } // decode WalletResponse
 
@@ -1447,7 +1660,7 @@ export namespace metashrew_runes {
 
     // Decodes RunesResponse from a DataView
     static decodeDataView(view: DataView): RunesResponse {
-      const decoder = new __proto.Decoder(view);
+      const decoder = new __proto.SafeDecoder(view);
       const obj = new RunesResponse();
 
       while (!decoder.eof()) {
@@ -1476,6 +1689,7 @@ export namespace metashrew_runes {
             break;
         }
       }
+      if (decoder.invalid()) return changetype<RunesResponse>(0);
       return obj;
     } // decode RunesResponse
 
@@ -1531,7 +1745,7 @@ export namespace metashrew_runes {
 
     // Decodes ProtoBurn from a DataView
     static decodeDataView(view: DataView): ProtoBurn {
-      const decoder = new __proto.Decoder(view);
+      const decoder = new __proto.SafeDecoder(view);
       const obj = new ProtoBurn();
 
       while (!decoder.eof()) {
@@ -1553,6 +1767,7 @@ export namespace metashrew_runes {
             break;
         }
       }
+      if (decoder.invalid()) return changetype<ProtoBurn>(0);
       return obj;
     } // decode ProtoBurn
 
@@ -1608,7 +1823,7 @@ export namespace metashrew_runes {
 
     // Decodes uint128 from a DataView
     static decodeDataView(view: DataView): uint128 {
-      const decoder = new __proto.Decoder(view);
+      const decoder = new __proto.SafeDecoder(view);
       const obj = new uint128();
 
       while (!decoder.eof()) {
@@ -1630,6 +1845,7 @@ export namespace metashrew_runes {
             break;
         }
       }
+      if (decoder.invalid()) return changetype<uint128>(0);
       return obj;
     } // decode uint128
 
@@ -1679,7 +1895,7 @@ export namespace metashrew_runes {
 
     // Decodes Clause from a DataView
     static decodeDataView(view: DataView): Clause {
-      const decoder = new __proto.Decoder(view);
+      const decoder = new __proto.SafeDecoder(view);
       const obj = new Clause();
 
       while (!decoder.eof()) {
@@ -1719,6 +1935,7 @@ export namespace metashrew_runes {
             break;
         }
       }
+      if (decoder.invalid()) return changetype<Clause>(0);
       return obj;
     } // decode Clause
 
@@ -1797,7 +2014,7 @@ export namespace metashrew_runes {
 
     // Decodes Predicate from a DataView
     static decodeDataView(view: DataView): Predicate {
-      const decoder = new __proto.Decoder(view);
+      const decoder = new __proto.SafeDecoder(view);
       const obj = new Predicate();
 
       while (!decoder.eof()) {
@@ -1826,6 +2043,7 @@ export namespace metashrew_runes {
             break;
         }
       }
+      if (decoder.invalid()) return changetype<Predicate>(0);
       return obj;
     } // decode Predicate
 
@@ -1883,7 +2101,7 @@ export namespace metashrew_runes {
 
     // Decodes ProtoMessage from a DataView
     static decodeDataView(view: DataView): ProtoMessage {
-      const decoder = new __proto.Decoder(view);
+      const decoder = new __proto.SafeDecoder(view);
       const obj = new ProtoMessage();
 
       while (!decoder.eof()) {
@@ -1922,6 +2140,7 @@ export namespace metashrew_runes {
             break;
         }
       }
+      if (decoder.invalid()) return changetype<ProtoMessage>(0);
       return obj;
     } // decode ProtoMessage
 
