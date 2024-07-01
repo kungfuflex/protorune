@@ -3,6 +3,7 @@ import fs from "node:fs";
 import { inspect } from "node:util";
 import { IndexerProgram, readArrayBufferAsHex } from "metashrew-test";
 import * as path from "node:path";
+import { expect } from "chai";
 //@ts-ignore
 import bitcoinjs = require("bitcoinjs-lib");
 import { encodeRunestone } from "@magiceden-oss/runestone-lib";
@@ -82,7 +83,7 @@ const buildCoinbase = (outputs) => {
     hash: buildBytes32(),
     index: bitcoinjs.Transaction.DEFAULT_SEQUENCE,
     script: EMPTY_BUFFER,
-    sequence: bitcoinjs.Transaction.DEFAULT_SEQUENECE,
+    sequence: bitcoinjs.Transaction.DEFAULT_SEQUENCE,
     witness: EMPTY_WITNESS,
   });
   outputs.forEach((v) => tx.outs.push(v));
@@ -163,7 +164,7 @@ describe("metashrew-runes", () => {
     expect(
       Object.keys(formatKv(program.kv)).filter((d) =>
         d.includes("/etching/byruneid"),
-      ),
+      ).length,
     ).to.be.equal(2);
   });
   it("should index Runestone", async () => {
