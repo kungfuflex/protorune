@@ -251,10 +251,11 @@
  (data $110 (i32.const 17516) "\1c\00\00\00\00\00\00\00\00\00\00\009\00\00\00\08\00\00\00\12\00\00\00\00\00\00\00\00\00\00\00")
  (data $111 (i32.const 17552) "Y\00\00\00 \00\00\00 \00\00\00 \00\00\00\00\00\00\00d\00\00\00 \00\00\00\02\01\00\00\10A\82\00 \00\00\00 \00\00\00 \00\00\00 \00\00\00 \00\00\00B\00\00\00A\00\00\00 \00\00\00\02A\00\00\02A\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\02A\00\00\02A\00\00\00\00\00\00\02A\00\00\02A\00\00 \00\00\00\00\00\00\00\02A\00\00\02\t\00\00\02A\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\01\t\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00\02A\00\00\10A\04\00\04A\00\00\02A\00\00\00\00\00\00\10\t\82\00\02A\00\00\00\00\00\00\00\00\00\00\10A\02\00\00\00\00\00\00\00\00\00\00\00\00\00\02A\00\00\00\00\00\00\00\00\00\00\00\00\00\00\02A\00\00\00\00\00\00\00\00\00\00\00\00\00\00 \00\00\00\02A\00\00\02A\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\04A\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\02A\00\00\00\00\00\00")
  (table $0 19 19 funcref)
- (elem $0 (i32.const 1) $~lib/metashrew-as/assembly/indexer/index/_flush~anonymous|0 $~lib/metashrew-as/assembly/utils/utils/concat~anonymous|0 $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|0 $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|1 $assembly/indexer/Indexer/Index.indexBlock~anonymous|0 $assembly/indexer/RunestoneMessage/RunestoneMessage#process~anonymous|0 $assembly/indexer/BalanceSheet/BalanceSheet.concat~anonymous|0 $assembly/utils/fieldToArrayBuffer~anonymous|0 $assembly/indexer/RuneId/RuneId.fromBytes~anonymous|0 $assembly/indexer/Edict/Edict.fromDeltaSeries~anonymous|0 $assembly/indexer/Indexer/Index.inspectTransaction~anonymous|0 $assembly/indexer/RuneId/RuneId.fromBytesU128~anonymous|0 $assembly/view/outpoint/balanceSheetToProtobuf~anonymous|0~anonymous|0 $assembly/view/outpoint/balanceSheetToProtobuf~anonymous|0 $assembly/view/outpoint/balanceSheetToProtobuf~anonymous|1 $assembly/view/runes/runes~anonymous|0~anonymous|0 $assembly/view/runes/runes~anonymous|0 $assembly/view/wallet/runesbyaddress~anonymous|0)
+ (elem $0 (i32.const 1) $~lib/metashrew-as/assembly/indexer/index/_flush~anonymous|0 $~lib/metashrew-as/assembly/utils/utils/concat~anonymous|0 $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|0 $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|1 $assembly/indexer/Indexer/Index.processRunesTransaction~anonymous|0 $assembly/indexer/RunestoneMessage/RunestoneMessage#process~anonymous|0 $assembly/indexer/BalanceSheet/BalanceSheet.concat~anonymous|0 $assembly/utils/fieldToArrayBuffer~anonymous|0 $assembly/indexer/RuneId/RuneId.fromBytes~anonymous|0 $assembly/indexer/Edict/Edict.fromDeltaSeries~anonymous|0 $assembly/indexer/Indexer/Index.inspectTransaction~anonymous|0 $assembly/indexer/RuneId/RuneId.fromBytesU128~anonymous|0 $assembly/view/outpoint/balanceSheetToProtobuf~anonymous|0~anonymous|0 $assembly/view/outpoint/balanceSheetToProtobuf~anonymous|0 $assembly/view/outpoint/balanceSheetToProtobuf~anonymous|1 $assembly/view/runes/runes~anonymous|0~anonymous|0 $assembly/view/runes/runes~anonymous|0 $assembly/view/wallet/runesbyaddress~anonymous|0)
  (export "trap" (func $assembly/index/trap))
  (export "_start" (func $assembly/index/_start))
  (export "testCommitment" (func $assembly/tests/testCommitment))
+ (export "testOverwrite" (func $assembly/tests/testOverwrite))
  (export "testFieldToName" (func $assembly/tests/testFieldToName))
  (export "test_indexEtching" (func $assembly/tests/test_indexEtching))
  (export "test_genesisTransaction" (func $assembly/tests/test_genesisTransaction))
@@ -13251,7 +13252,7 @@
   local.get $end
   call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#slice
  )
- (func $assembly/indexer/Indexer/Index.indexBlock~anonymous|0 (param $v i32) (param $i i32) (param $ary i32) (result i32)
+ (func $assembly/indexer/Indexer/Index.processRunesTransaction~anonymous|0 (param $v i32) (param $i i32) (param $ary i32) (result i32)
   local.get $v
   call $~lib/metashrew-as/assembly/utils/box/Box#get:start
   global.get $~lib/builtins/usize.MAX_VALUE
@@ -22485,6 +22486,73 @@
    unreachable
   end
  )
+ (func $assembly/indexer/Indexer/Index.processRunesTransaction (param $tx i32) (param $txid i32) (param $height i32) (param $i i32)
+  (local $runestoneOutputIndex i32)
+  (local $runestoneOutput i32)
+  (local $parsed i32)
+  (local $payload i32)
+  (local $message i32)
+  local.get $tx
+  call $assembly/indexer/RunesTransaction/RunesTransaction#processRunestones
+  local.get $height
+  global.get $assembly/indexer/constants/index/GENESIS
+  i32.ge_u
+  if (result i32)
+   local.get $tx
+   call $assembly/indexer/RunesTransaction/RunesTransaction#get:tags
+   call $assembly/indexer/RunesTransaction/TagOutput#get:runestone
+   i32.const -1
+   i32.ne
+  else
+   i32.const 0
+  end
+  if
+   local.get $tx
+   call $assembly/indexer/RunesTransaction/RunesTransaction#get:tags
+   call $assembly/indexer/RunesTransaction/TagOutput#get:runestone
+   local.set $runestoneOutputIndex
+   local.get $tx
+   call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:outs
+   local.get $runestoneOutputIndex
+   call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Output>#__get
+   local.set $runestoneOutput
+   local.get $runestoneOutput
+   call $~lib/metashrew-as/assembly/blockdata/transaction/Output#get:script
+   call $~lib/metashrew-as/assembly/utils/yabsp/scriptParse
+   i32.const 2
+   i32.const 1
+   global.set $~argumentsLength
+   i32.const 0
+   call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#slice@varargs
+   local.set $parsed
+   local.get $parsed
+   i32.const 7424
+   call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#findIndex
+   i32.const -1
+   i32.ne
+   if
+    return
+   end
+   local.get $parsed
+   call $~lib/metashrew-as/assembly/utils/box/Box.concat
+   local.set $payload
+   local.get $payload
+   call $assembly/indexer/RunestoneMessage/RunestoneMessage.parse
+   local.set $message
+   local.get $message
+   i32.const 0
+   i32.eq
+   if
+    return
+   end
+   local.get $message
+   local.get $tx
+   local.get $txid
+   local.get $height
+   local.get $i
+   call $assembly/indexer/RunestoneMessage/RunestoneMessage#process
+  end
+ )
  (func $assembly/indexer/Indexer/Index.indexBlock (param $height i32) (param $_block i32)
   (local $block i32)
   (local $i i32)
@@ -22492,11 +22560,6 @@
   (local $index i32)
   (local $tx i32)
   (local $txid i32)
-  (local $runestoneOutputIndex i32)
-  (local $runestoneOutput i32)
-  (local $parsed i32)
-  (local $payload i32)
-  (local $message i32)
   local.get $height
   global.get $assembly/indexer/constants/index/GENESIS
   i32.eq
@@ -22536,87 +22599,30 @@
    call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Transaction>#get:length
    i32.lt_s
    if
-    block $for-continue|0
-     block $assembly/indexer/RunesBlock/RunesBlock#getTransaction|inlined.1 (result i32)
-      local.get $block
-      local.set $this
-      local.get $i
-      local.set $index
-      local.get $this
-      call $~lib/metashrew-as/assembly/blockdata/block/Block#get:transactions
-      local.get $index
-      call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Transaction>#__get
-      br $assembly/indexer/RunesBlock/RunesBlock#getTransaction|inlined.1
-     end
-     local.set $tx
-     local.get $tx
-     call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#txid
-     local.set $txid
-     local.get $tx
-     local.get $txid
-     local.get $height
-     call $assembly/indexer/Indexer/Index.indexOutpoints
-     local.get $tx
-     call $assembly/indexer/RunesTransaction/RunesTransaction#processRunestones
-     local.get $height
-     global.get $assembly/indexer/constants/index/GENESIS
-     i32.ge_u
-     if (result i32)
-      local.get $tx
-      call $assembly/indexer/RunesTransaction/RunesTransaction#get:tags
-      call $assembly/indexer/RunesTransaction/TagOutput#get:runestone
-      i32.const -1
-      i32.ne
-     else
-      i32.const 0
-     end
-     if
-      local.get $tx
-      call $assembly/indexer/RunesTransaction/RunesTransaction#get:tags
-      call $assembly/indexer/RunesTransaction/TagOutput#get:runestone
-      local.set $runestoneOutputIndex
-      local.get $tx
-      call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:outs
-      local.get $runestoneOutputIndex
-      call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Output>#__get
-      local.set $runestoneOutput
-      local.get $runestoneOutput
-      call $~lib/metashrew-as/assembly/blockdata/transaction/Output#get:script
-      call $~lib/metashrew-as/assembly/utils/yabsp/scriptParse
-      i32.const 2
-      i32.const 1
-      global.set $~argumentsLength
-      i32.const 0
-      call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#slice@varargs
-      local.set $parsed
-      local.get $parsed
-      i32.const 7424
-      call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#findIndex
-      i32.const -1
-      i32.ne
-      if
-       br $for-continue|0
-      end
-      local.get $parsed
-      call $~lib/metashrew-as/assembly/utils/box/Box.concat
-      local.set $payload
-      local.get $payload
-      call $assembly/indexer/RunestoneMessage/RunestoneMessage.parse
-      local.set $message
-      local.get $message
-      i32.const 0
-      i32.eq
-      if
-       br $for-continue|0
-      end
-      local.get $message
-      local.get $tx
-      local.get $txid
-      local.get $height
-      local.get $i
-      call $assembly/indexer/RunestoneMessage/RunestoneMessage#process
-     end
+    block $assembly/indexer/RunesBlock/RunesBlock#getTransaction|inlined.1 (result i32)
+     local.get $block
+     local.set $this
+     local.get $i
+     local.set $index
+     local.get $this
+     call $~lib/metashrew-as/assembly/blockdata/block/Block#get:transactions
+     local.get $index
+     call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Transaction>#__get
+     br $assembly/indexer/RunesBlock/RunesBlock#getTransaction|inlined.1
     end
+    local.set $tx
+    local.get $tx
+    call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#txid
+    local.set $txid
+    local.get $tx
+    local.get $txid
+    local.get $height
+    call $assembly/indexer/Indexer/Index.indexOutpoints
+    local.get $tx
+    local.get $txid
+    local.get $height
+    local.get $i
+    call $assembly/indexer/Indexer/Index.processRunesTransaction
     local.get $i
     i32.const 1
     i32.add
@@ -24184,6 +24190,73 @@
   local.get $block
   i32.const 298
   call $assembly/indexer/Indexer/Index.inspectTransaction
+ )
+ (func $assembly/tests/testOverwrite
+  (local $data i32)
+  (local $box i32)
+  (local $height i32)
+  (local $block i32)
+  (local $this i32)
+  (local $index i32)
+  (local $tx1 i32)
+  (local $this|7 i32)
+  (local $index|8 i32)
+  (local $tx2 i32)
+  (local $testBytes i32)
+  call $~lib/metashrew-as/assembly/indexer/index/input
+  local.set $data
+  local.get $data
+  call $~lib/metashrew-as/assembly/utils/box/Box.from
+  local.set $box
+  local.get $box
+  call $~lib/metashrew-as/assembly/utils/utils/parsePrimitive<u32>
+  local.set $height
+  i32.const 0
+  local.get $box
+  call $~lib/metashrew-as/assembly/blockdata/block/Block#constructor
+  local.set $block
+  block $assembly/indexer/RunesBlock/RunesBlock#getTransaction|inlined.3 (result i32)
+   local.get $block
+   local.set $this
+   i32.const 142
+   local.set $index
+   local.get $this
+   call $~lib/metashrew-as/assembly/blockdata/block/Block#get:transactions
+   local.get $index
+   call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Transaction>#__get
+   br $assembly/indexer/RunesBlock/RunesBlock#getTransaction|inlined.3
+  end
+  local.set $tx1
+  block $assembly/indexer/RunesBlock/RunesBlock#getTransaction|inlined.4 (result i32)
+   local.get $block
+   local.set $this|7
+   i32.const 158
+   local.set $index|8
+   local.get $this|7
+   call $~lib/metashrew-as/assembly/blockdata/block/Block#get:transactions
+   local.get $index|8
+   call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Transaction>#__get
+   br $assembly/indexer/RunesBlock/RunesBlock#getTransaction|inlined.4
+  end
+  local.set $tx2
+  local.get $tx1
+  local.get $tx1
+  call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#txid
+  local.get $height
+  i32.const 142
+  call $assembly/indexer/Indexer/Index.processRunesTransaction
+  i32.const 0
+  i64.const 840000
+  i32.const 158
+  call $assembly/indexer/RuneId/RuneId#constructor
+  call $assembly/indexer/RuneId/RuneId#toBytes
+  local.set $testBytes
+  global.get $assembly/indexer/constants/index/RUNE_ID_TO_ETCHING
+  local.get $testBytes
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
+  i32.const 10
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u32>
+  call $~lib/metashrew-as/assembly/indexer/index/_flush
  )
  (func $~lib/string/String#charAt (param $this i32) (param $pos i32) (result i32)
   (local $out i32)

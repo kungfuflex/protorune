@@ -42,7 +42,6 @@ import {
   RESERVED_NAME,
 } from "./constants";
 import { BalanceSheet } from "./BalanceSheet";
-import { Index } from "./Indexer";
 import { RunesTransaction } from "./RunesTransaction";
 import { Input, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
 import {
