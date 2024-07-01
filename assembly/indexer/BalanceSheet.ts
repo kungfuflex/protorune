@@ -1,4 +1,5 @@
 import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
+import { AtomicTransaction } from "metashrew-as/assembly/indexer/atomic";
 import { u128 } from "as-bignum/assembly";
 import { fromArrayBuffer } from "../utils";
 import { RuneId } from "./RuneId";
@@ -89,6 +90,39 @@ export class BalanceSheet {
       new BalanceSheet(),
     );
   }
+  saveToAtomicTx(ptr: IndexPointer, tx: AtomicTransaction) {
+    const runesPtr = ptr.keyword("/runes");
+    const balancesPtr = ptr.keyword("/balances");
+
+    for (let i = 0; i < this.runes.length; i++) {
+      if (this.balances[i] != u128.from(0)) {
+        tx.appendIndexPointerList(runesPtr, this.runes[i]);
+
+        const buf = changetype<Uint8Array>(this.balances[i].toBytes()).buffer;
+        tx.appendIndexPointerList(balancesPtr, buf);
+      }
+    }
+  }
+
+  static loadFromAtomicTx(
+    ptr: IndexPointer,
+    tx: AtomicTransaction,
+  ): BalanceSheet {
+    const runesPtr = ptr.keyword("/runes");
+    const balancesPtr = ptr.keyword("/balances");
+
+    const length = tx.getValue<u32>(runesPtr.lengthKey().unwrap());
+    const result = new BalanceSheet();
+
+    for (let i: u32 = 0; i < length; i++) {
+      result.set(
+        tx.get(runesPtr.selectIndex(i).unwrap()),
+        fromArrayBuffer(tx.get(balancesPtr.selectIndex(i).unwrap())),
+      );
+    }
+    return result;
+  }
+
   save(ptr: IndexPointer, isCenotaph: bool = false): void {
     const runesPtr = ptr.keyword("/runes");
     const balancesPtr = ptr.keyword("/balances");

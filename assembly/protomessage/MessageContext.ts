@@ -4,11 +4,11 @@ import { AtomicTransaction } from "metashrew-as/assembly/indexer/atomic";
 import { protorune } from "../proto/protorune";
 import { RuneId } from "../indexer/RuneId";
 import { BalanceSheet } from "../indexer/BalanceSheet";
+import { OUTPOINT_TO_RUNES } from "../indexer/constants/protorune";
 
 export class MessageContext {
   runtime: AtomicTransaction = new AtomicTransaction();
   public runes: Array<IncomingRune> = new Array<IncomingRune>();
-  public predicates: Array<IncomingRune> = new Array<IncomingRune>();
   transaction: Transaction = changetype<Transaction>(0);
   block: Block = changetype<Block>(0);
   height: u64 = 0;
@@ -17,6 +17,8 @@ export class MessageContext {
   refund_pointer: OutPoint = changetype<OutPoint>(0);
   calldata: ArrayBuffer = new ArrayBuffer(0);
   sheets: Map<u32, BalanceSheet>;
+  txid: ArrayBuffer;
+  baseSheet: BalanceSheet;
 
   constructor(
     message: protorune.ProtoMessage,
@@ -27,6 +29,15 @@ export class MessageContext {
     sheets: Map<u32, BalanceSheet>,
   ) {
     this.sheets = sheets;
+    this.baseSheet = new BalanceSheet();
+    this.transaction = transaction;
+    this.block = block;
+    this.height = height;
+    this.txid = this.transaction.txid();
+    this.outpoint = OutPoint.from(this.txid, index);
+    this.pointer = OutPoint.from(this.txid, message.pointer);
+    this.refund_pointer = OutPoint.from(this.txid, message.refund_pointer);
+    this.calldata = changetype<Uint8Array>(message.calldata).buffer;
     if (sheets.has(index)) {
       const sheet = sheets.get(index);
       for (let i = 0; i < sheet.runes.length; i++) {
@@ -37,31 +48,69 @@ export class MessageContext {
           sheet.balances[i].hi,
         );
         this.runes.push(rune);
+        this.baseSheet.pipe(sheet);
+        sheet.saveToAtomicTx(
+          OUTPOINT_TO_RUNES.select(this.refund_pointer.toArrayBuffer()),
+          this.runtime,
+        );
       }
     }
-    for (let i = 0; i < message.predicate.clauses.length; i++) {
-      const clause = message.predicate.clauses[i];
-      const runeId = new RuneId(<u64>clause.rune.height, clause.rune.txindex);
-      const rune = new IncomingRune(runeId, clause.amount.lo, clause.amount.hi);
-      this.predicates.push(rune);
+  }
+
+  checkBalances(): bool {
+    const checkingSheet = BalanceSheet.loadFromAtomicTx(
+      OUTPOINT_TO_RUNES.select(this.refund_pointer.toArrayBuffer()),
+      this.runtime,
+    );
+    checkingSheet.pipe(
+      BalanceSheet.loadFromAtomicTx(
+        OUTPOINT_TO_RUNES.select(this.pointer.toArrayBuffer()),
+        this.runtime,
+      ),
+    );
+    checkingSheet.pipe(
+      BalanceSheet.loadFromAtomicTx(
+        OUTPOINT_TO_RUNES.select(this.outpoint.toArrayBuffer()),
+        this.runtime,
+      ),
+    );
+    if (this.baseSheet.runes.length != checkingSheet.runes.length) return false;
+    for (let i = 0; i < this.baseSheet.runes.length; i++) {
+      if (
+        this.baseSheet.get(this.baseSheet.runes[i]) !=
+        checkingSheet.get(this.baseSheet.runes[i])
+      )
+        return false;
     }
-    this.transaction = transaction;
-    this.block = block;
-    this.height = height;
-    const txid = this.transaction.txid();
-    this.outpoint = OutPoint.from(txid, index);
-    this.pointer = OutPoint.from(txid, message.pointer);
-    this.refund_pointer = OutPoint.from(txid, message.refund_pointer);
-    this.calldata = changetype<Uint8Array>(message.calldata).buffer;
+    return true;
   }
 
   run(): void {
+    if (this.sheets.has(this.pointer.index)) {
+      const sheet = this.sheets.get(this.pointer.index);
+      sheet.saveToAtomicTx(
+        OUTPOINT_TO_RUNES.select(this.pointer.toArrayBuffer()),
+        this.runtime,
+      );
+      this.baseSheet.pipe(sheet);
+    }
+    if (this.sheets.has(this.refund_pointer.index)) {
+      const sheet = this.sheets.get(this.refund_pointer.index);
+      sheet.saveToAtomicTx(
+        OUTPOINT_TO_RUNES.select(this.refund_pointer.toArrayBuffer()),
+        this.runtime,
+      );
+      this.baseSheet.pipe(sheet);
+    }
     this.runtime.checkpoint();
     const result = this.handle();
     if (!result) {
       this.runtime.rollback();
     }
 
+    if (!this.checkBalances()) {
+      this.runtime.rollback();
+    }
     this.runtime.commit();
   }
 
