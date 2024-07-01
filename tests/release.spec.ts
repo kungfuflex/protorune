@@ -205,6 +205,11 @@ describe("metashrew-runes", () => {
     program.setBlock(block.toHex());
     await program.run("_start");
     console.log(formatKv(program.kv));
+    /*
+    const r = require('repl').start('> ');
+    r.context.program = program;
+    await new Promise((resolve, reject) => {});
+   */
 
     console.log(await runesbyaddress(program, TEST_BTC_ADDRESS1));
   });

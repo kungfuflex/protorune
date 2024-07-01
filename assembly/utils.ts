@@ -2,6 +2,7 @@ import { Box } from "metashrew-as/assembly/utils/box";
 import { u256, u128 } from "as-bignum/assembly";
 import { RESERVED_NAME, TWENTY_SIX } from "./indexer/constants";
 import { Edict } from "./indexer/Edict";
+import { console } from "metashrew-as/assembly/utils/logging";
 
 export function min<T>(a: T, b: T): T {
   if (a > b) return b;

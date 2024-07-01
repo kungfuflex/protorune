@@ -1295,7 +1295,7 @@ memorystream@^0.3.1:
 
 "metashrew-test@https://github.com/sandshrewmetaprotocols/metashrew-test":
   version "0.1.0"
-  resolved "https://github.com/sandshrewmetaprotocols/metashrew-test#797759a73637bde4c9354368d6cb3e31eb8bba6e"
+  resolved "https://github.com/sandshrewmetaprotocols/metashrew-test#94c3b5ac1e70f85df8ed95a12c6a59bdd5152c10"
   dependencies:
     "@protobuf-ts/plugin" "^2.9.4"
     lodash "^4.17.21"
