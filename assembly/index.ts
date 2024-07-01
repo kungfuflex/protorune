@@ -32,7 +32,9 @@ export function _start(): void {
     return;
   }
   const block = new Block(box);
-  if (height >= GENESIS) SpendablesIndex.indexBlock(height, block);
+  if (height >= GENESIS) {
+    SpendablesIndex.indexBlock(height, block);
+  }
   Index.indexBlock(height, block);
   _flush();
 }
