@@ -126,6 +126,7 @@
  (global $~lib/metashrew-spendables/assembly/tables/OUTPOINTS_FOR_ADDRESS (mut i32) (i32.const 0))
  (global $~lib/metashrew-spendables/assembly/tables/OUTPOINT_SPENDABLE_BY (mut i32) (i32.const 0))
  (global $~lib/metashrew-spendables/assembly/tables/OUTPOINT_TO_OUTPUT (mut i32) (i32.const 0))
+ (global $assembly/proto/metashrew-runes/__proto.MAX_POS i32 (i32.const 4096))
  (global $~lib/builtins/usize.MAX_VALUE i32 (i32.const -1))
  (global $~lib/native/ASC_OPTIMIZE_LEVEL i32 (i32.const 0))
  (global $~lib/builtins/i32.MAX_VALUE i32 (i32.const 2147483647))
@@ -134,8 +135,8 @@
  (global $~lib/as-bignum/assembly/globals/__divmod_rem_hi (mut i64) (i64.const 0))
  (global $~lib/builtins/u32.MAX_VALUE i32 (i32.const -1))
  (global $~lib/as-bignum/assembly/integer/u128/HEX_CHARS i32 (i32.const 8416))
- (global $~lib/rt/__rtti_base i32 (i32.const 17888))
- (global $~lib/memory/__heap_base i32 (i32.const 18244))
+ (global $~lib/rt/__rtti_base i32 (i32.const 17664))
+ (global $~lib/memory/__heap_base i32 (i32.const 18024))
  (memory $0 1)
  (data $0 (i32.const 12) "\1c\02\00\00\00\00\00\00\00\00\00\00\04\00\00\00\00\02\00\00000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8d9dadbdcdddedfe0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4f5f6f7f8f9fafbfcfdfeff\00\00\00\00\00\00\00\00\00\00\00\00")
  (data $1 (i32.const 556) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00(\00\00\00A\00l\00l\00o\00c\00a\00t\00i\00o\00n\00 \00t\00o\00o\00 \00l\00a\00r\00g\00e\00\00\00\00\00")
@@ -243,19 +244,14 @@
  (data $103 (i32.const 16924) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00 \00\00\00~\00l\00i\00b\00/\00d\00a\00t\00a\00v\00i\00e\00w\00.\00t\00s\00\00\00\00\00\00\00\00\00\00\00\00\00")
  (data $104 (i32.const 16988) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\"\00\00\00D\00e\00c\00o\00d\00e\00r\00 \00p\00o\00s\00i\00t\00i\00o\00n\00 \00\00\00\00\00\00\00\00\00\00\00")
  (data $105 (i32.const 17052) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\"\00\00\00 \00i\00s\00 \00o\00u\00t\00 \00o\00f\00 \00r\00a\00n\00g\00e\00!\00\00\00\00\00\00\00\00\00\00\00")
- (data $106 (i32.const 17116) "\1c\00\00\00\03\00\00\00\00\00\00\00P\00\00\00\0c\00\00\00pB\00\00\00\00\00\00\b0B\00\00")
+ (data $106 (i32.const 17116) "\1c\00\00\00\03\00\00\00\00\00\00\00Q\00\00\00\0c\00\00\00pB\00\00\00\00\00\00\b0B\00\00")
  (data $107 (i32.const 17148) "\\\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00B\00\00\00a\00s\00s\00e\00m\00b\00l\00y\00/\00p\00r\00o\00t\00o\00/\00m\00e\00t\00a\00s\00h\00r\00e\00w\00-\00r\00u\00n\00e\00s\00.\00t\00s\00\00\00\00\00\00\00\00\00\00\00")
- (data $108 (i32.const 17244) "\1c\00\00\00\03\00\00\00\00\00\00\00P\00\00\00\0c\00\00\00pB\00\00\00\00\00\00\b0B\00\00")
- (data $109 (i32.const 17276) "\1c\00\00\00\03\00\00\00\00\00\00\00P\00\00\00\0c\00\00\00pB\00\00\00\00\00\00\b0B\00\00")
- (data $110 (i32.const 17308) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00$\00\00\00I\00n\00v\00a\00l\00i\00d\00 \00w\00i\00r\00e\00 \00t\00y\00p\00e\00 \00\00\00\00\00\00\00\00\00")
- (data $111 (i32.const 17372) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\16\00\00\00 \00a\00t\00 \00o\00f\00f\00s\00e\00t\00 \00\00\00\00\00\00\00")
- (data $112 (i32.const 17420) ",\00\00\00\03\00\00\00\00\00\00\00P\00\00\00\10\00\00\00\b0C\00\00\00\00\00\00\f0C\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $113 (i32.const 17468) "\1c\00\00\00\00\00\00\00\00\00\00\00<\00\00\00\08\00\00\00\10\00\00\00\00\00\00\00\00\00\00\00")
- (data $114 (i32.const 17500) "\1c\00\00\00\00\00\00\00\00\00\00\00S\00\00\00\08\00\00\00\11\00\00\00\00\00\00\00\00\00\00\00")
- (data $115 (i32.const 17532) "\8c\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00|\00\00\00b\00c\001\00p\00l\003\005\00w\00n\007\00k\005\007\008\00z\00g\005\005\00e\00x\00z\007\009\009\00m\006\00v\006\00p\00n\00u\005\006\003\00w\00g\003\004\00t\007\00y\00g\007\00j\00s\00n\00m\00x\00p\00m\00v\00w\005\00f\00d\00s\00c\00d\00s\00m\00v\00u\00")
- (data $116 (i32.const 17676) "\ac\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\90\00\00\00a\009\002\00b\00a\004\00a\00a\00b\006\00a\00c\003\00f\00e\002\006\006\006\007\006\006\005\00c\00a\006\00b\00c\00d\007\005\00e\00f\00f\002\00c\00d\000\005\009\006\003\00a\00b\006\006\005\00d\002\005\009\00a\003\001\001\001\003\00a\00e\008\003\001\00a\004\000\001\000\000\000\000\000\000\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $117 (i32.const 17852) "\1c\00\00\00\00\00\00\00\00\00\00\009\00\00\00\08\00\00\00\12\00\00\00\00\00\00\00\00\00\00\00")
- (data $118 (i32.const 17888) "X\00\00\00 \00\00\00 \00\00\00 \00\00\00\00\00\00\00d\00\00\00 \00\00\00\02\01\00\00\10A\82\00 \00\00\00 \00\00\00 \00\00\00 \00\00\00 \00\00\00B\00\00\00A\00\00\00 \00\00\00\02A\00\00\02A\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\02A\00\00\02A\00\00\00\00\00\00\02A\00\00\02A\00\00 \00\00\00\00\00\00\00\02A\00\00\02\t\00\00\02A\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\01\t\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00\02A\00\00\10A\04\00\04A\00\00\02A\00\00\00\00\00\00\10\t\82\00\02A\00\00\00\00\00\00\00\00\00\00\10A\02\00\00\00\00\00\00\00\00\00\00\00\00\00\02A\00\00\00\00\00\00\00\00\00\00\00\00\00\00\02A\00\00\00\00\00\00\00\00\00\00\00\00\00\00 \00\00\00\02A\00\00\02A\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\04A\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\02A\00\00\00\00\00\00")
+ (data $108 (i32.const 17244) "\1c\00\00\00\00\00\00\00\00\00\00\00<\00\00\00\08\00\00\00\10\00\00\00\00\00\00\00\00\00\00\00")
+ (data $109 (i32.const 17276) "\1c\00\00\00\00\00\00\00\00\00\00\00T\00\00\00\08\00\00\00\11\00\00\00\00\00\00\00\00\00\00\00")
+ (data $110 (i32.const 17308) "\8c\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00|\00\00\00b\00c\001\00p\00l\003\005\00w\00n\007\00k\005\007\008\00z\00g\005\005\00e\00x\00z\007\009\009\00m\006\00v\006\00p\00n\00u\005\006\003\00w\00g\003\004\00t\007\00y\00g\007\00j\00s\00n\00m\00x\00p\00m\00v\00w\005\00f\00d\00s\00c\00d\00s\00m\00v\00u\00")
+ (data $111 (i32.const 17452) "\ac\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\90\00\00\00a\009\002\00b\00a\004\00a\00a\00b\006\00a\00c\003\00f\00e\002\006\006\006\007\006\006\005\00c\00a\006\00b\00c\00d\007\005\00e\00f\00f\002\00c\00d\000\005\009\006\003\00a\00b\006\006\005\00d\002\005\009\00a\003\001\001\001\003\00a\00e\008\003\001\00a\004\000\001\000\000\000\000\000\000\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data $112 (i32.const 17628) "\1c\00\00\00\00\00\00\00\00\00\00\009\00\00\00\08\00\00\00\12\00\00\00\00\00\00\00\00\00\00\00")
+ (data $113 (i32.const 17664) "Y\00\00\00 \00\00\00 \00\00\00 \00\00\00\00\00\00\00d\00\00\00 \00\00\00\02\01\00\00\10A\82\00 \00\00\00 \00\00\00 \00\00\00 \00\00\00 \00\00\00B\00\00\00A\00\00\00 \00\00\00\02A\00\00\02A\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\02A\00\00\02A\00\00\00\00\00\00\02A\00\00\02A\00\00 \00\00\00\00\00\00\00\02A\00\00\02\t\00\00\02A\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\01\t\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00\02A\00\00\10A\04\00\04A\00\00\02A\00\00\00\00\00\00\10\t\82\00\02A\00\00\00\00\00\00\00\00\00\00\10A\02\00\00\00\00\00\00\00\00\00\00\00\00\00\02A\00\00\00\00\00\00\00\00\00\00\00\00\00\00\02A\00\00\00\00\00\00\00\00\00\00\00\00\00\00 \00\00\00\02A\00\00\02A\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\04A\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\02A\00\00\00\00\00\00")
  (table $0 19 19 funcref)
  (elem $0 (i32.const 1) $~lib/metashrew-as/assembly/indexer/index/_flush~anonymous|0 $~lib/metashrew-as/assembly/utils/utils/concat~anonymous|0 $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|0 $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|1 $assembly/indexer/Indexer/Index.indexBlock~anonymous|0 $assembly/indexer/RunestoneMessage/RunestoneMessage#process~anonymous|0 $assembly/indexer/BalanceSheet/BalanceSheet.concat~anonymous|0 $assembly/utils/fieldToArrayBuffer~anonymous|0 $assembly/indexer/RuneId/RuneId.fromBytes~anonymous|0 $assembly/indexer/Edict/Edict.fromDeltaSeries~anonymous|0 $assembly/indexer/Indexer/Index.inspectTransaction~anonymous|0 $assembly/indexer/RuneId/RuneId.fromBytesU128~anonymous|0 $assembly/view/outpoint/balanceSheetToProtobuf~anonymous|0~anonymous|0 $assembly/view/outpoint/balanceSheetToProtobuf~anonymous|0 $assembly/view/outpoint/balanceSheetToProtobuf~anonymous|1 $assembly/view/runes/runes~anonymous|0~anonymous|0 $assembly/view/runes/runes~anonymous|0 $assembly/view/wallet/runesbyaddress~anonymous|0)
  (export "trap" (func $assembly/index/trap))
@@ -26727,7 +26723,7 @@
   i32.eqz
   if
    i32.const 8
-   i32.const 79
+   i32.const 80
    call $~lib/rt/stub/__new
    local.set $this
   end
@@ -26745,9 +26741,57 @@
   call $assembly/proto/metashrew-runes/__proto.Decoder#set:pos
   local.get $this
  )
+ (func $assembly/proto/metashrew-runes/__proto.SafeDecoder#set:_invalid (param $this i32) (param $_invalid i32)
+  local.get $this
+  local.get $_invalid
+  i32.store8 offset=8
+ )
+ (func $assembly/proto/metashrew-runes/__proto.SafeDecoder#constructor (param $this i32) (param $view i32) (result i32)
+  local.get $this
+  i32.eqz
+  if
+   i32.const 9
+   i32.const 79
+   call $~lib/rt/stub/__new
+   local.set $this
+  end
+  local.get $this
+  local.get $view
+  call $assembly/proto/metashrew-runes/__proto.Decoder#constructor
+  local.set $this
+  local.get $this
+  i32.const 0
+  call $assembly/proto/metashrew-runes/__proto.SafeDecoder#set:_invalid
+  local.get $this
+ )
+ (func $assembly/proto/metashrew-runes/__proto.SafeDecoder#get:_invalid (param $this i32) (result i32)
+  local.get $this
+  i32.load8_u offset=8
+ )
  (func $assembly/proto/metashrew-runes/__proto.Decoder#get:pos (param $this i32) (result i32)
   local.get $this
   i32.load offset=4
+ )
+ (func $assembly/proto/metashrew-runes/__proto.SafeDecoder#invalid (param $this i32) (result i32)
+  local.get $this
+  call $assembly/proto/metashrew-runes/__proto.SafeDecoder#get:_invalid
+  if
+   i32.const 1
+   return
+  end
+  local.get $this
+  call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+  global.get $assembly/proto/metashrew-runes/__proto.MAX_POS
+  i32.gt_s
+  if
+   local.get $this
+   i32.const 1
+   call $assembly/proto/metashrew-runes/__proto.SafeDecoder#set:_invalid
+   i32.const 1
+   return
+  end
+  i32.const 0
+  return
  )
  (func $assembly/proto/metashrew-runes/__proto.Decoder#get:view (param $this i32) (result i32)
   local.get $this
@@ -26756,6 +26800,27 @@
  (func $~lib/dataview/DataView#get:byteLength (param $this i32) (result i32)
   local.get $this
   i32.load offset=8
+ )
+ (func $assembly/proto/metashrew-runes/__proto.SafeDecoder#eof (param $this i32) (result i32)
+  (local $this|1 i32)
+  local.get $this
+  call $assembly/proto/metashrew-runes/__proto.SafeDecoder#invalid
+  if
+   i32.const 1
+   return
+  end
+  block $assembly/proto/metashrew-runes/__proto.Decoder#eof|inlined.0 (result i32)
+   local.get $this
+   local.set $this|1
+   local.get $this|1
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   local.get $this|1
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
+   call $~lib/dataview/DataView#get:byteLength
+   i32.ge_s
+   br $assembly/proto/metashrew-runes/__proto.Decoder#eof|inlined.0
+  end
+  return
  )
  (func $~lib/dataview/DataView#get:dataStart (param $this i32) (result i32)
   local.get $this
@@ -27572,7 +27637,7 @@
    i32.const 7216
    call $~lib/staticarray/StaticArray<~lib/string/String>#join
    i32.const 17168
-   i32.const 276
+   i32.const 278
    i32.const 7
    call $~lib/builtins/abort
    unreachable
@@ -27580,22 +27645,28 @@
   local.get $value
   return
  )
- (func $assembly/proto/metashrew-runes/__proto.Decoder#bytes (param $this i32) (result i32)
+ (func $assembly/proto/metashrew-runes/__proto.SafeDecoder#bytes (param $this i32) (result i32)
   (local $this|1 i32)
   (local $len i32)
   (local $this|3 i32)
-  (local $this|4 i32)
-  (local $5 i32)
   (local $a i32)
   (local $i i32)
-  (local $8 i32)
-  (local $this|9 i32)
+  (local $6 i32)
+  (local $this|7 i32)
   (local $byteOffset i32)
+  local.get $this
+  call $assembly/proto/metashrew-runes/__proto.SafeDecoder#invalid
+  if
+   i32.const 0
+   i32.const 0
+   call $~lib/array/Array<u8>#constructor
+   return
+  end
   block $assembly/proto/metashrew-runes/__proto.Decoder#uint32|inlined.1 (result i32)
    local.get $this
    local.set $this|1
    local.get $this|1
-   call $assembly/proto/metashrew-runes/__proto.Decoder#varint
+   call $assembly/proto/metashrew-runes/__proto.Decoder#varint@override
    i32.wrap_i64
    br $assembly/proto/metashrew-runes/__proto.Decoder#uint32|inlined.1
   end
@@ -27613,26 +27684,24 @@
    br $assembly/proto/metashrew-runes/__proto.Decoder#get:byteLength|inlined.1
   end
   i32.gt_s
+  if (result i32)
+   i32.const 1
+  else
+   local.get $this
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   local.get $len
+   i32.add
+   global.get $assembly/proto/metashrew-runes/__proto.MAX_POS
+   i32.gt_s
+  end
   if
    local.get $this
-   local.set $this|4
-   local.get $this|4
-   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
-   i32.const 10
-   call $~lib/number/I32#toString
-   local.set $5
-   i32.const 17264
    i32.const 1
-   local.get $5
-   call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-   i32.const 17264
-   i32.const 7216
-   call $~lib/staticarray/StaticArray<~lib/string/String>#join
-   i32.const 17168
-   i32.const 276
-   i32.const 7
-   call $~lib/builtins/abort
-   unreachable
+   call $assembly/proto/metashrew-runes/__proto.SafeDecoder#set:_invalid
+   i32.const 0
+   i32.const 0
+   call $~lib/array/Array<u8>#constructor
+   return
   end
   i32.const 0
   local.get $len
@@ -27649,17 +27718,17 @@
     local.get $i
     block $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.20 (result i32)
      local.get $this
-     local.set $this|9
+     local.set $this|7
      local.get $this
      local.get $this
      call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
-     local.tee $8
+     local.tee $6
      i32.const 1
      i32.add
      call $assembly/proto/metashrew-runes/__proto.Decoder#set:pos
-     local.get $8
+     local.get $6
      local.set $byteOffset
-     local.get $this|9
+     local.get $this|7
      call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
      local.get $byteOffset
      call $~lib/dataview/DataView#getUint8
@@ -27676,43 +27745,702 @@
   local.get $a
   return
  )
- (func $assembly/proto/metashrew-runes/__proto.Decoder#skip (param $this i32) (param $length i32)
+ (func $assembly/proto/metashrew-runes/__proto.SafeDecoder#varint (param $this i32) (result i64)
+  (local $value i64)
   (local $this|2 i32)
-  (local $this|3 i32)
+  (local $byteOffset i32)
   (local $4 i32)
+  (local $this|5 i32)
+  (local $byteOffset|6 i32)
+  (local $this|7 i32)
+  (local $byteOffset|8 i32)
+  (local $9 i32)
+  (local $this|10 i32)
+  (local $byteOffset|11 i32)
+  (local $this|12 i32)
+  (local $byteOffset|13 i32)
+  (local $14 i32)
+  (local $this|15 i32)
+  (local $byteOffset|16 i32)
+  (local $this|17 i32)
+  (local $byteOffset|18 i32)
+  (local $19 i32)
+  (local $this|20 i32)
+  (local $byteOffset|21 i32)
+  (local $this|22 i32)
+  (local $byteOffset|23 i32)
+  (local $24 i32)
+  (local $this|25 i32)
+  (local $byteOffset|26 i32)
+  (local $this|27 i32)
+  (local $byteOffset|28 i32)
+  (local $29 i32)
+  (local $this|30 i32)
+  (local $byteOffset|31 i32)
+  (local $this|32 i32)
+  (local $byteOffset|33 i32)
+  (local $34 i32)
+  (local $this|35 i32)
+  (local $byteOffset|36 i32)
+  (local $this|37 i32)
+  (local $byteOffset|38 i32)
+  (local $39 i32)
+  (local $this|40 i32)
+  (local $byteOffset|41 i32)
+  (local $this|42 i32)
+  (local $byteOffset|43 i32)
+  (local $44 i32)
+  (local $this|45 i32)
+  (local $byteOffset|46 i32)
+  (local $this|47 i32)
+  (local $byteOffset|48 i32)
+  (local $49 i32)
+  (local $this|50 i32)
+  (local $byteOffset|51 i32)
+  (local $this|52 i32)
   local.get $this
-  call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
-  local.get $length
-  i32.add
-  block $assembly/proto/metashrew-runes/__proto.Decoder#get:byteLength|inlined.2 (result i32)
+  call $assembly/proto/metashrew-runes/__proto.SafeDecoder#invalid
+  if
+   i64.const 0
+   return
+  end
+  block $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.21 (result i32)
    local.get $this
    local.set $this|2
+   local.get $this
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   local.set $byteOffset
    local.get $this|2
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
+   local.get $byteOffset
+   call $~lib/dataview/DataView#getUint8
+   br $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.21
+  end
+  i32.const 255
+  i32.and
+  i64.extend_i32_u
+  i64.const 127
+  i64.and
+  i64.const 0
+  i64.shr_u
+  local.set $value
+  block $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.22 (result i32)
+   local.get $this
+   local.set $this|5
+   local.get $this
+   local.get $this
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   local.tee $4
+   i32.const 1
+   i32.add
+   call $assembly/proto/metashrew-runes/__proto.Decoder#set:pos
+   local.get $4
+   local.set $byteOffset|6
+   local.get $this|5
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
+   local.get $byteOffset|6
+   call $~lib/dataview/DataView#getUint8
+   br $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.22
+  end
+  i32.const 255
+  i32.and
+  i32.const 128
+  i32.lt_u
+  if
+   local.get $value
+   return
+  end
+  local.get $value
+  block $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.23 (result i32)
+   local.get $this
+   local.set $this|7
+   local.get $this
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   local.set $byteOffset|8
+   local.get $this|7
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
+   local.get $byteOffset|8
+   call $~lib/dataview/DataView#getUint8
+   br $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.23
+  end
+  i32.const 255
+  i32.and
+  i64.extend_i32_u
+  i64.const 127
+  i64.and
+  i64.const 7
+  i64.shl
+  i64.or
+  i64.const 0
+  i64.shr_u
+  local.set $value
+  local.get $this
+  call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+  i32.const 1
+  i32.add
+  global.get $assembly/proto/metashrew-runes/__proto.MAX_POS
+  i32.gt_s
+  if
+   local.get $this
+   i32.const 1
+   call $assembly/proto/metashrew-runes/__proto.SafeDecoder#set:_invalid
+   i64.const 0
+   return
+  end
+  block $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.24 (result i32)
+   local.get $this
+   local.set $this|10
+   local.get $this
+   local.get $this
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   local.tee $9
+   i32.const 1
+   i32.add
+   call $assembly/proto/metashrew-runes/__proto.Decoder#set:pos
+   local.get $9
+   local.set $byteOffset|11
+   local.get $this|10
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
+   local.get $byteOffset|11
+   call $~lib/dataview/DataView#getUint8
+   br $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.24
+  end
+  i32.const 255
+  i32.and
+  i32.const 128
+  i32.lt_u
+  if
+   local.get $value
+   return
+  end
+  local.get $value
+  block $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.25 (result i32)
+   local.get $this
+   local.set $this|12
+   local.get $this
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   local.set $byteOffset|13
+   local.get $this|12
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
+   local.get $byteOffset|13
+   call $~lib/dataview/DataView#getUint8
+   br $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.25
+  end
+  i32.const 255
+  i32.and
+  i64.extend_i32_u
+  i64.const 127
+  i64.and
+  i64.const 14
+  i64.shl
+  i64.or
+  i64.const 0
+  i64.shr_u
+  local.set $value
+  local.get $this
+  call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+  i32.const 1
+  i32.add
+  global.get $assembly/proto/metashrew-runes/__proto.MAX_POS
+  i32.gt_s
+  if
+   local.get $this
+   i32.const 1
+   call $assembly/proto/metashrew-runes/__proto.SafeDecoder#set:_invalid
+   i64.const 0
+   return
+  end
+  block $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.26 (result i32)
+   local.get $this
+   local.set $this|15
+   local.get $this
+   local.get $this
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   local.tee $14
+   i32.const 1
+   i32.add
+   call $assembly/proto/metashrew-runes/__proto.Decoder#set:pos
+   local.get $14
+   local.set $byteOffset|16
+   local.get $this|15
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
+   local.get $byteOffset|16
+   call $~lib/dataview/DataView#getUint8
+   br $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.26
+  end
+  i32.const 255
+  i32.and
+  i32.const 128
+  i32.lt_u
+  if
+   local.get $value
+   return
+  end
+  local.get $value
+  block $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.27 (result i32)
+   local.get $this
+   local.set $this|17
+   local.get $this
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   local.set $byteOffset|18
+   local.get $this|17
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
+   local.get $byteOffset|18
+   call $~lib/dataview/DataView#getUint8
+   br $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.27
+  end
+  i32.const 255
+  i32.and
+  i64.extend_i32_u
+  i64.const 127
+  i64.and
+  i64.const 21
+  i64.shl
+  i64.or
+  i64.const 0
+  i64.shr_u
+  local.set $value
+  local.get $this
+  call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+  i32.const 1
+  i32.add
+  global.get $assembly/proto/metashrew-runes/__proto.MAX_POS
+  i32.gt_s
+  if
+   local.get $this
+   i32.const 1
+   call $assembly/proto/metashrew-runes/__proto.SafeDecoder#set:_invalid
+   i64.const 0
+   return
+  end
+  block $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.28 (result i32)
+   local.get $this
+   local.set $this|20
+   local.get $this
+   local.get $this
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   local.tee $19
+   i32.const 1
+   i32.add
+   call $assembly/proto/metashrew-runes/__proto.Decoder#set:pos
+   local.get $19
+   local.set $byteOffset|21
+   local.get $this|20
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
+   local.get $byteOffset|21
+   call $~lib/dataview/DataView#getUint8
+   br $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.28
+  end
+  i32.const 255
+  i32.and
+  i32.const 128
+  i32.lt_u
+  if
+   local.get $value
+   return
+  end
+  local.get $value
+  block $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.29 (result i32)
+   local.get $this
+   local.set $this|22
+   local.get $this
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   local.set $byteOffset|23
+   local.get $this|22
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
+   local.get $byteOffset|23
+   call $~lib/dataview/DataView#getUint8
+   br $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.29
+  end
+  i32.const 255
+  i32.and
+  i64.extend_i32_u
+  i64.const 127
+  i64.and
+  i64.const 28
+  i64.shl
+  i64.or
+  i64.const 0
+  i64.shr_u
+  local.set $value
+  local.get $this
+  call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+  i32.const 1
+  i32.add
+  global.get $assembly/proto/metashrew-runes/__proto.MAX_POS
+  i32.gt_s
+  if
+   local.get $this
+   i32.const 1
+   call $assembly/proto/metashrew-runes/__proto.SafeDecoder#set:_invalid
+   i64.const 0
+   return
+  end
+  block $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.30 (result i32)
+   local.get $this
+   local.set $this|25
+   local.get $this
+   local.get $this
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   local.tee $24
+   i32.const 1
+   i32.add
+   call $assembly/proto/metashrew-runes/__proto.Decoder#set:pos
+   local.get $24
+   local.set $byteOffset|26
+   local.get $this|25
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
+   local.get $byteOffset|26
+   call $~lib/dataview/DataView#getUint8
+   br $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.30
+  end
+  i32.const 255
+  i32.and
+  i32.const 128
+  i32.lt_u
+  if
+   local.get $value
+   return
+  end
+  local.get $value
+  block $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.31 (result i32)
+   local.get $this
+   local.set $this|27
+   local.get $this
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   local.set $byteOffset|28
+   local.get $this|27
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
+   local.get $byteOffset|28
+   call $~lib/dataview/DataView#getUint8
+   br $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.31
+  end
+  i32.const 255
+  i32.and
+  i64.extend_i32_u
+  i64.const 127
+  i64.and
+  i64.const 35
+  i64.shl
+  i64.or
+  i64.const 0
+  i64.shr_u
+  local.set $value
+  local.get $this
+  call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+  i32.const 1
+  i32.add
+  global.get $assembly/proto/metashrew-runes/__proto.MAX_POS
+  i32.gt_s
+  if
+   local.get $this
+   i32.const 1
+   call $assembly/proto/metashrew-runes/__proto.SafeDecoder#set:_invalid
+   i64.const 0
+   return
+  end
+  block $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.32 (result i32)
+   local.get $this
+   local.set $this|30
+   local.get $this
+   local.get $this
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   local.tee $29
+   i32.const 1
+   i32.add
+   call $assembly/proto/metashrew-runes/__proto.Decoder#set:pos
+   local.get $29
+   local.set $byteOffset|31
+   local.get $this|30
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
+   local.get $byteOffset|31
+   call $~lib/dataview/DataView#getUint8
+   br $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.32
+  end
+  i32.const 255
+  i32.and
+  i32.const 128
+  i32.lt_u
+  if
+   local.get $value
+   return
+  end
+  local.get $value
+  block $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.33 (result i32)
+   local.get $this
+   local.set $this|32
+   local.get $this
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   local.set $byteOffset|33
+   local.get $this|32
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
+   local.get $byteOffset|33
+   call $~lib/dataview/DataView#getUint8
+   br $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.33
+  end
+  i32.const 255
+  i32.and
+  i64.extend_i32_u
+  i64.const 127
+  i64.and
+  i64.const 42
+  i64.shl
+  i64.or
+  i64.const 0
+  i64.shr_u
+  local.set $value
+  block $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.34 (result i32)
+   local.get $this
+   local.set $this|35
+   local.get $this
+   local.get $this
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   local.tee $34
+   i32.const 1
+   i32.add
+   call $assembly/proto/metashrew-runes/__proto.Decoder#set:pos
+   local.get $34
+   local.set $byteOffset|36
+   local.get $this|35
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
+   local.get $byteOffset|36
+   call $~lib/dataview/DataView#getUint8
+   br $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.34
+  end
+  i32.const 255
+  i32.and
+  i32.const 128
+  i32.lt_u
+  if
+   local.get $value
+   return
+  end
+  local.get $value
+  block $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.35 (result i32)
+   local.get $this
+   local.set $this|37
+   local.get $this
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   local.set $byteOffset|38
+   local.get $this|37
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
+   local.get $byteOffset|38
+   call $~lib/dataview/DataView#getUint8
+   br $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.35
+  end
+  i32.const 255
+  i32.and
+  i64.extend_i32_u
+  i64.const 127
+  i64.and
+  i64.const 49
+  i64.shl
+  i64.or
+  i64.const 0
+  i64.shr_u
+  local.set $value
+  block $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.36 (result i32)
+   local.get $this
+   local.set $this|40
+   local.get $this
+   local.get $this
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   local.tee $39
+   i32.const 1
+   i32.add
+   call $assembly/proto/metashrew-runes/__proto.Decoder#set:pos
+   local.get $39
+   local.set $byteOffset|41
+   local.get $this|40
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
+   local.get $byteOffset|41
+   call $~lib/dataview/DataView#getUint8
+   br $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.36
+  end
+  i32.const 255
+  i32.and
+  i32.const 128
+  i32.lt_u
+  if
+   local.get $value
+   return
+  end
+  local.get $value
+  block $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.37 (result i32)
+   local.get $this
+   local.set $this|42
+   local.get $this
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   local.set $byteOffset|43
+   local.get $this|42
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
+   local.get $byteOffset|43
+   call $~lib/dataview/DataView#getUint8
+   br $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.37
+  end
+  i32.const 255
+  i32.and
+  i64.extend_i32_u
+  i64.const 127
+  i64.and
+  i64.const 28
+  i64.shl
+  i64.or
+  i64.const 0
+  i64.shr_u
+  local.set $value
+  block $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.38 (result i32)
+   local.get $this
+   local.set $this|45
+   local.get $this
+   local.get $this
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   local.tee $44
+   i32.const 1
+   i32.add
+   call $assembly/proto/metashrew-runes/__proto.Decoder#set:pos
+   local.get $44
+   local.set $byteOffset|46
+   local.get $this|45
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
+   local.get $byteOffset|46
+   call $~lib/dataview/DataView#getUint8
+   br $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.38
+  end
+  i32.const 255
+  i32.and
+  i32.const 128
+  i32.lt_u
+  if
+   local.get $value
+   return
+  end
+  local.get $value
+  block $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.39 (result i32)
+   local.get $this
+   local.set $this|47
+   local.get $this
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   local.set $byteOffset|48
+   local.get $this|47
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
+   local.get $byteOffset|48
+   call $~lib/dataview/DataView#getUint8
+   br $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.39
+  end
+  i32.const 255
+  i32.and
+  i64.extend_i32_u
+  i64.const 127
+  i64.and
+  i64.const 35
+  i64.shl
+  i64.or
+  i64.const 0
+  i64.shr_u
+  local.set $value
+  local.get $this
+  call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+  i32.const 1
+  i32.add
+  global.get $assembly/proto/metashrew-runes/__proto.MAX_POS
+  i32.gt_s
+  if
+   local.get $this
+   i32.const 1
+   call $assembly/proto/metashrew-runes/__proto.SafeDecoder#set:_invalid
+   i64.const 0
+   return
+  end
+  block $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.40 (result i32)
+   local.get $this
+   local.set $this|50
+   local.get $this
+   local.get $this
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   local.tee $49
+   i32.const 1
+   i32.add
+   call $assembly/proto/metashrew-runes/__proto.Decoder#set:pos
+   local.get $49
+   local.set $byteOffset|51
+   local.get $this|50
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
+   local.get $byteOffset|51
+   call $~lib/dataview/DataView#getUint8
+   br $assembly/proto/metashrew-runes/__proto.Decoder#u8at|inlined.40
+  end
+  i32.const 255
+  i32.and
+  i32.const 128
+  i32.lt_u
+  if
+   local.get $value
+   return
+  end
+  local.get $this
+  call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+  block $assembly/proto/metashrew-runes/__proto.Decoder#get:byteLength|inlined.2 (result i32)
+   local.get $this
+   local.set $this|52
+   local.get $this|52
    call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
    call $~lib/dataview/DataView#get:byteLength
    br $assembly/proto/metashrew-runes/__proto.Decoder#get:byteLength|inlined.2
   end
   i32.gt_s
+  if (result i32)
+   i32.const 1
+  else
+   local.get $this
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   global.get $assembly/proto/metashrew-runes/__proto.MAX_POS
+   i32.gt_s
+  end
   if
    local.get $this
-   local.set $this|3
-   local.get $this|3
-   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
-   i32.const 10
-   call $~lib/number/I32#toString
-   local.set $4
-   i32.const 17296
    i32.const 1
-   local.get $4
-   call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-   i32.const 17296
-   i32.const 7216
-   call $~lib/staticarray/StaticArray<~lib/string/String>#join
-   i32.const 17168
-   i32.const 276
-   i32.const 7
-   call $~lib/builtins/abort
-   unreachable
+   call $assembly/proto/metashrew-runes/__proto.SafeDecoder#set:_invalid
+   i64.const 0
+   return
+  end
+  local.get $value
+  return
+ )
+ (func $assembly/proto/metashrew-runes/__proto.SafeDecoder#skip (param $this i32) (param $length i32)
+  (local $this|2 i32)
+  local.get $this
+  call $assembly/proto/metashrew-runes/__proto.SafeDecoder#invalid
+  if
+   return
+  end
+  local.get $this
+  call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+  local.get $length
+  i32.add
+  block $assembly/proto/metashrew-runes/__proto.Decoder#get:byteLength|inlined.3 (result i32)
+   local.get $this
+   local.set $this|2
+   local.get $this|2
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
+   call $~lib/dataview/DataView#get:byteLength
+   br $assembly/proto/metashrew-runes/__proto.Decoder#get:byteLength|inlined.3
+  end
+  i32.gt_s
+  if (result i32)
+   i32.const 1
+  else
+   local.get $this
+   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
+   local.get $length
+   i32.add
+   global.get $assembly/proto/metashrew-runes/__proto.MAX_POS
+   i32.gt_s
+  end
+  if
+   local.get $this
+   i32.const 1
+   call $assembly/proto/metashrew-runes/__proto.SafeDecoder#set:_invalid
   end
   local.get $this
   local.get $this
@@ -27721,12 +28449,15 @@
   i32.add
   call $assembly/proto/metashrew-runes/__proto.Decoder#set:pos
  )
- (func $assembly/proto/metashrew-runes/__proto.Decoder#skipType (param $this i32) (param $wireType i32)
+ (func $assembly/proto/metashrew-runes/__proto.SafeDecoder#skipType (param $this i32) (param $wireType i32)
   (local $2 i32)
   (local $this|3 i32)
   (local $this|4 i32)
-  (local $5 i32)
-  (local $6 i32)
+  local.get $this
+  call $assembly/proto/metashrew-runes/__proto.SafeDecoder#invalid
+  if
+   return
+  end
   block $break|0
    block $case5|0
     block $case4|0
@@ -27759,13 +28490,13 @@
          br $case5|0
         end
         local.get $this
-        call $assembly/proto/metashrew-runes/__proto.Decoder#varint
+        call $assembly/proto/metashrew-runes/__proto.SafeDecoder#varint
         drop
         br $break|0
        end
        local.get $this
        i32.const 8
-       call $assembly/proto/metashrew-runes/__proto.Decoder#skip
+       call $assembly/proto/metashrew-runes/__proto.SafeDecoder#skip
        br $break|0
       end
       local.get $this
@@ -27773,11 +28504,11 @@
        local.get $this
        local.set $this|3
        local.get $this|3
-       call $assembly/proto/metashrew-runes/__proto.Decoder#varint
+       call $assembly/proto/metashrew-runes/__proto.Decoder#varint@override
        i32.wrap_i64
        br $assembly/proto/metashrew-runes/__proto.Decoder#uint32|inlined.3
       end
-      call $assembly/proto/metashrew-runes/__proto.Decoder#skip
+      call $assembly/proto/metashrew-runes/__proto.SafeDecoder#skip
       br $break|0
      end
      loop $while-continue|1
@@ -27785,7 +28516,7 @@
        local.get $this
        local.set $this|4
        local.get $this|4
-       call $assembly/proto/metashrew-runes/__proto.Decoder#varint
+       call $assembly/proto/metashrew-runes/__proto.Decoder#varint@override
        i32.wrap_i64
        br $assembly/proto/metashrew-runes/__proto.Decoder#uint32|inlined.4
       end
@@ -27797,7 +28528,7 @@
       if
        local.get $this
        local.get $wireType
-       call $assembly/proto/metashrew-runes/__proto.Decoder#skipType
+       call $assembly/proto/metashrew-runes/__proto.SafeDecoder#skipType
        br $while-continue|1
       end
      end
@@ -27805,34 +28536,13 @@
     end
     local.get $this
     i32.const 4
-    call $assembly/proto/metashrew-runes/__proto.Decoder#skip
+    call $assembly/proto/metashrew-runes/__proto.SafeDecoder#skip
     br $break|0
    end
-   local.get $wireType
-   i32.const 10
-   call $~lib/number/U32#toString
-   local.set $5
    local.get $this
-   call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
-   i32.const 10
-   call $~lib/number/I32#toString
-   local.set $6
-   i32.const 17440
    i32.const 1
-   local.get $5
-   call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-   i32.const 17440
-   i32.const 3
-   local.get $6
-   call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-   i32.const 17440
-   i32.const 7216
-   call $~lib/staticarray/StaticArray<~lib/string/String>#join
-   i32.const 17168
-   i32.const 254
-   i32.const 11
-   call $~lib/builtins/abort
-   unreachable
+   call $assembly/proto/metashrew-runes/__proto.SafeDecoder#set:_invalid
+   br $break|0
   end
  )
  (func $assembly/proto/metashrew-runes/metashrew_runes.Outpoint.decodeDataView (param $view i32) (result i32)
@@ -27840,40 +28550,30 @@
   (local $obj i32)
   (local $this i32)
   (local $this|4 i32)
-  (local $this|5 i32)
   (local $tag i32)
   (local $number i32)
-  (local $8 i32)
-  (local $this|9 i32)
+  (local $7 i32)
+  (local $this|8 i32)
   i32.const 0
   local.get $view
-  call $assembly/proto/metashrew-runes/__proto.Decoder#constructor
+  call $assembly/proto/metashrew-runes/__proto.SafeDecoder#constructor
   local.set $decoder
   i32.const 0
   call $assembly/proto/metashrew-runes/metashrew_runes.Outpoint#constructor
   local.set $obj
   loop $while-continue|0
-   block $assembly/proto/metashrew-runes/__proto.Decoder#eof|inlined.0 (result i32)
-    local.get $decoder
-    local.set $this
-    local.get $this
-    call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
-    local.get $this
-    call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
-    call $~lib/dataview/DataView#get:byteLength
-    i32.ge_s
-    br $assembly/proto/metashrew-runes/__proto.Decoder#eof|inlined.0
-   end
+   local.get $decoder
+   call $assembly/proto/metashrew-runes/__proto.SafeDecoder#eof
    i32.eqz
    if
     block $assembly/proto/metashrew-runes/__proto.Decoder#tag|inlined.0 (result i32)
      local.get $decoder
-     local.set $this|4
+     local.set $this
      block $assembly/proto/metashrew-runes/__proto.Decoder#uint32|inlined.0 (result i32)
+      local.get $this
+      local.set $this|4
       local.get $this|4
-      local.set $this|5
-      local.get $this|5
-      call $assembly/proto/metashrew-runes/__proto.Decoder#varint
+      call $assembly/proto/metashrew-runes/__proto.Decoder#varint@override
       i32.wrap_i64
       br $assembly/proto/metashrew-runes/__proto.Decoder#uint32|inlined.0
      end
@@ -27889,12 +28589,12 @@
       block $case1|1
        block $case0|1
         local.get $number
-        local.set $8
-        local.get $8
+        local.set $7
+        local.get $7
         i32.const 1
         i32.eq
         br_if $case0|1
-        local.get $8
+        local.get $7
         i32.const 2
         i32.eq
         br_if $case1|1
@@ -27902,16 +28602,16 @@
        end
        local.get $obj
        local.get $decoder
-       call $assembly/proto/metashrew-runes/__proto.Decoder#bytes
+       call $assembly/proto/metashrew-runes/__proto.SafeDecoder#bytes
        call $assembly/proto/metashrew-runes/metashrew_runes.Outpoint#set:txid
        br $break|1
       end
       local.get $obj
       block $assembly/proto/metashrew-runes/__proto.Decoder#uint32|inlined.2 (result i32)
        local.get $decoder
-       local.set $this|9
-       local.get $this|9
-       call $assembly/proto/metashrew-runes/__proto.Decoder#varint
+       local.set $this|8
+       local.get $this|8
+       call $assembly/proto/metashrew-runes/__proto.Decoder#varint@override
        i32.wrap_i64
        br $assembly/proto/metashrew-runes/__proto.Decoder#uint32|inlined.2
       end
@@ -27922,11 +28622,17 @@
      local.get $tag
      i32.const 7
      i32.and
-     call $assembly/proto/metashrew-runes/__proto.Decoder#skipType
+     call $assembly/proto/metashrew-runes/__proto.SafeDecoder#skipType
      br $break|1
     end
     br $while-continue|0
    end
+  end
+  local.get $decoder
+  call $assembly/proto/metashrew-runes/__proto.SafeDecoder#invalid
+  if
+   i32.const 0
+   return
   end
   local.get $obj
   return
@@ -29361,7 +30067,7 @@
   i32.eqz
   if
    i32.const 4
-   i32.const 81
+   i32.const 82
    call $~lib/rt/stub/__new
    local.set $this
   end
@@ -29433,7 +30139,7 @@
   i32.eqz
   if
    i32.const 8
-   i32.const 82
+   i32.const 83
    call $~lib/rt/stub/__new
    local.set $this
   end
@@ -29453,41 +30159,31 @@
   (local $obj i32)
   (local $this i32)
   (local $this|4 i32)
-  (local $this|5 i32)
   (local $tag i32)
   (local $number i32)
-  (local $8 i32)
+  (local $7 i32)
+  (local $this|8 i32)
   (local $this|9 i32)
-  (local $this|10 i32)
   i32.const 0
   local.get $view
-  call $assembly/proto/metashrew-runes/__proto.Decoder#constructor
+  call $assembly/proto/metashrew-runes/__proto.SafeDecoder#constructor
   local.set $decoder
   i32.const 0
   call $assembly/proto/metashrew-runes/metashrew_runes.PaginationInput#constructor
   local.set $obj
   loop $while-continue|0
-   block $assembly/proto/metashrew-runes/__proto.Decoder#eof|inlined.1 (result i32)
-    local.get $decoder
-    local.set $this
-    local.get $this
-    call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
-    local.get $this
-    call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
-    call $~lib/dataview/DataView#get:byteLength
-    i32.ge_s
-    br $assembly/proto/metashrew-runes/__proto.Decoder#eof|inlined.1
-   end
+   local.get $decoder
+   call $assembly/proto/metashrew-runes/__proto.SafeDecoder#eof
    i32.eqz
    if
     block $assembly/proto/metashrew-runes/__proto.Decoder#tag|inlined.1 (result i32)
      local.get $decoder
-     local.set $this|4
+     local.set $this
      block $assembly/proto/metashrew-runes/__proto.Decoder#uint32|inlined.5 (result i32)
+      local.get $this
+      local.set $this|4
       local.get $this|4
-      local.set $this|5
-      local.get $this|5
-      call $assembly/proto/metashrew-runes/__proto.Decoder#varint
+      call $assembly/proto/metashrew-runes/__proto.Decoder#varint@override
       i32.wrap_i64
       br $assembly/proto/metashrew-runes/__proto.Decoder#uint32|inlined.5
      end
@@ -29503,12 +30199,12 @@
       block $case1|1
        block $case0|1
         local.get $number
-        local.set $8
-        local.get $8
+        local.set $7
+        local.get $7
         i32.const 1
         i32.eq
         br_if $case0|1
-        local.get $8
+        local.get $7
         i32.const 2
         i32.eq
         br_if $case1|1
@@ -29517,9 +30213,9 @@
        local.get $obj
        block $assembly/proto/metashrew-runes/__proto.Decoder#uint32|inlined.6 (result i32)
         local.get $decoder
-        local.set $this|9
-        local.get $this|9
-        call $assembly/proto/metashrew-runes/__proto.Decoder#varint
+        local.set $this|8
+        local.get $this|8
+        call $assembly/proto/metashrew-runes/__proto.Decoder#varint@override
         i32.wrap_i64
         br $assembly/proto/metashrew-runes/__proto.Decoder#uint32|inlined.6
        end
@@ -29529,9 +30225,9 @@
       local.get $obj
       block $assembly/proto/metashrew-runes/__proto.Decoder#uint32|inlined.7 (result i32)
        local.get $decoder
-       local.set $this|10
-       local.get $this|10
-       call $assembly/proto/metashrew-runes/__proto.Decoder#varint
+       local.set $this|9
+       local.get $this|9
+       call $assembly/proto/metashrew-runes/__proto.Decoder#varint@override
        i32.wrap_i64
        br $assembly/proto/metashrew-runes/__proto.Decoder#uint32|inlined.7
       end
@@ -29542,11 +30238,17 @@
      local.get $tag
      i32.const 7
      i32.and
-     call $assembly/proto/metashrew-runes/__proto.Decoder#skipType
+     call $assembly/proto/metashrew-runes/__proto.SafeDecoder#skipType
      br $break|1
     end
     br $while-continue|0
    end
+  end
+  local.get $decoder
+  call $assembly/proto/metashrew-runes/__proto.SafeDecoder#invalid
+  if
+   i32.const 0
+   return
   end
   local.get $obj
   return
@@ -29656,7 +30358,7 @@
   global.set $~argumentsLength
   i32.const 0
   call $~lib/typedarray/Uint8Array.wrap@varargs
-  i32.const 17488
+  i32.const 17264
   i32.const 0
   i32.const 0
   call $~lib/array/Array<u8>#constructor
@@ -29770,7 +30472,7 @@
   i32.eqz
   if
    i32.const 4
-   i32.const 84
+   i32.const 85
    call $~lib/rt/stub/__new
    local.set $this
   end
@@ -29942,7 +30644,7 @@
    end
   end
   local.get $_list
-  i32.const 17520
+  i32.const 17296
   call $~lib/array/Array<~lib/arraybuffer/ArrayBuffer>#map<assembly/proto/metashrew-runes/metashrew_runes.Rune>
   local.set $list
   i32.const 0
@@ -30163,7 +30865,7 @@
  )
  (func $assembly/view/wallet/wallet_test (result i32)
   (local $address i32)
-  i32.const 17552
+  i32.const 17328
   i32.const 0
   i32.const 1
   global.set $~argumentsLength
@@ -30192,7 +30894,7 @@
   i32.eqz
   if
    i32.const 4
-   i32.const 85
+   i32.const 86
    call $~lib/rt/stub/__new
    local.set $this
   end
@@ -30211,39 +30913,29 @@
   (local $obj i32)
   (local $this i32)
   (local $this|4 i32)
-  (local $this|5 i32)
   (local $tag i32)
   (local $number i32)
-  (local $8 i32)
+  (local $7 i32)
   i32.const 0
   local.get $view
-  call $assembly/proto/metashrew-runes/__proto.Decoder#constructor
+  call $assembly/proto/metashrew-runes/__proto.SafeDecoder#constructor
   local.set $decoder
   i32.const 0
   call $assembly/proto/metashrew-runes/metashrew_runes.WalletRequest#constructor
   local.set $obj
   loop $while-continue|0
-   block $assembly/proto/metashrew-runes/__proto.Decoder#eof|inlined.2 (result i32)
-    local.get $decoder
-    local.set $this
-    local.get $this
-    call $assembly/proto/metashrew-runes/__proto.Decoder#get:pos
-    local.get $this
-    call $assembly/proto/metashrew-runes/__proto.Decoder#get:view
-    call $~lib/dataview/DataView#get:byteLength
-    i32.ge_s
-    br $assembly/proto/metashrew-runes/__proto.Decoder#eof|inlined.2
-   end
+   local.get $decoder
+   call $assembly/proto/metashrew-runes/__proto.SafeDecoder#eof
    i32.eqz
    if
     block $assembly/proto/metashrew-runes/__proto.Decoder#tag|inlined.2 (result i32)
      local.get $decoder
-     local.set $this|4
+     local.set $this
      block $assembly/proto/metashrew-runes/__proto.Decoder#uint32|inlined.8 (result i32)
+      local.get $this
+      local.set $this|4
       local.get $this|4
-      local.set $this|5
-      local.get $this|5
-      call $assembly/proto/metashrew-runes/__proto.Decoder#varint
+      call $assembly/proto/metashrew-runes/__proto.Decoder#varint@override
       i32.wrap_i64
       br $assembly/proto/metashrew-runes/__proto.Decoder#uint32|inlined.8
      end
@@ -30258,8 +30950,8 @@
      block $case1|1
       block $case0|1
        local.get $number
-       local.set $8
-       local.get $8
+       local.set $7
+       local.get $7
        i32.const 1
        i32.eq
        br_if $case0|1
@@ -30267,7 +30959,7 @@
       end
       local.get $obj
       local.get $decoder
-      call $assembly/proto/metashrew-runes/__proto.Decoder#bytes
+      call $assembly/proto/metashrew-runes/__proto.SafeDecoder#bytes
       call $assembly/proto/metashrew-runes/metashrew_runes.WalletRequest#set:wallet
       br $break|1
      end
@@ -30275,11 +30967,17 @@
      local.get $tag
      i32.const 7
      i32.and
-     call $assembly/proto/metashrew-runes/__proto.Decoder#skipType
+     call $assembly/proto/metashrew-runes/__proto.SafeDecoder#skipType
      br $break|1
     end
     br $while-continue|0
    end
+  end
+  local.get $decoder
+  call $assembly/proto/metashrew-runes/__proto.SafeDecoder#invalid
+  if
+   i32.const 0
+   return
   end
   local.get $obj
   return
@@ -30332,7 +31030,7 @@
   i32.eqz
   if
    i32.const 16
-   i32.const 86
+   i32.const 87
    call $~lib/rt/stub/__new
    local.set $this
   end
@@ -30598,7 +31296,7 @@
   i32.eqz
   if
    i32.const 8
-   i32.const 87
+   i32.const 88
    call $~lib/rt/stub/__new
    local.set $this
   end
@@ -31058,7 +31756,7 @@
   call $assembly/proto/metashrew-runes/metashrew_runes.WalletResponse#set:outpoints
   local.get $message
   local.get $balanceSheets
-  i32.const 17872
+  i32.const 17648
   i32.const 0
   call $assembly/indexer/BalanceSheet/BalanceSheet#constructor
   call $~lib/array/Array<assembly/indexer/BalanceSheet/BalanceSheet>#reduce<assembly/indexer/BalanceSheet/BalanceSheet>
@@ -31115,6 +31813,28 @@
   drop
   local.get $0
   call $~lib/as-bignum/assembly/integer/u128/u128#preInc
+ )
+ (func $assembly/proto/metashrew-runes/__proto.Decoder#varint@override (param $0 i32) (result i64)
+  (local $1 i32)
+  block $default
+   block $case0
+    local.get $0
+    i32.const 8
+    i32.sub
+    i32.load
+    local.set $1
+    local.get $1
+    i32.const 79
+    i32.eq
+    br_if $case0
+    br $default
+   end
+   local.get $0
+   call $assembly/proto/metashrew-runes/__proto.SafeDecoder#varint
+   return
+  end
+  local.get $0
+  call $assembly/proto/metashrew-runes/__proto.Decoder#varint
  )
  (func $~start
   call $start:assembly/index
