@@ -166,7 +166,7 @@ describe("metashrew-runes", () => {
       etching: {
         divisibility: 8,
         premine: 2100000000000000n,
-        name: "GENESNS•RUNE•FR",
+        runeName: "GENESIS•RUNE•FR",
         symbol: "G",
       },
       pointer: 1,
