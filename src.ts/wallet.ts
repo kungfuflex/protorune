@@ -2,14 +2,15 @@ import { WalletResponse, WalletRequest } from "./proto/metashrew-runes";
 import { decodeOutpointViewBase } from "./outpoint";
 import { decodeRunes, OutPoint, RuneOutput } from "./outpoint";
 
+const stripHexPrefix = (s) => s.substr(0, 2) === '0x' ? s.substr(2) : s;
+
 export function decodeWalletOutput(hex: string): {
   outpoints: OutPoint[];
   balanceSheet: RuneOutput[];
 } {
   const wo = WalletResponse.fromBinary(
-    Uint8Array.from(Buffer.from(hex, "hex"))
+    Uint8Array.from(Buffer.from(stripHexPrefix(hex), "hex"))
   );
-
   return {
     outpoints: wo.outpoints.map((op) => decodeOutpointViewBase(op)),
     balanceSheet: decodeRunes(wo.balances),

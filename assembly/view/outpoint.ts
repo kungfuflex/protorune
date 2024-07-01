@@ -17,6 +17,7 @@ import { OUTPOINT_TO_OUTPUT } from "metashrew-spendables/assembly/tables";
 import { metashrew_runes as protobuf } from "../proto/metashrew-runes";
 import { u128 } from "as-bignum/assembly";
 import { fromArrayBuffer, fieldToName } from "../utils";
+import { console } from "metashrew-as/assembly/utils/logging";
 
 export function txindexForOutpoint(outpoint: ArrayBuffer): u32 {
   const box = Box.from(outpoint);

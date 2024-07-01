@@ -46,8 +46,14 @@ const formatKey = (key: string) => {
   }, '');
 };
 
+const formatValue = (v) => {
+  const token = Buffer.from(v.substr(2), 'hex').toString('utf8');
+  if (token.match(/^[0-9a-zA-Z]+$/)) return token;
+  return v;
+};
+
 const formatKv = (kv: any) => {
-  return Object.fromEntries(Object.entries(kv).map(([key, value]) => [ formatKey(key), value ]));
+  return Object.fromEntries(Object.entries(kv).map(([key, value]) => [ formatKey(key), formatValue(value) ]));
 };
 
 
@@ -204,13 +210,6 @@ describe("metashrew-runes", () => {
     block.transactions.push(transaction);
     program.setBlock(block.toHex());
     await program.run("_start");
-    console.log(formatKv(program.kv));
-    /*
-    const r = require('repl').start('> ');
-    r.context.program = program;
-    await new Promise((resolve, reject) => {});
-   */
-
     console.log(await runesbyaddress(program, TEST_BTC_ADDRESS1));
   });
 });

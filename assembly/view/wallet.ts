@@ -50,7 +50,9 @@ export function runesbyaddress(): ArrayBuffer {
     );
     inp.vout = parsePrimitive<u32>(Box.from(_outpoints[i].slice(32)));
     const op = outpointBase(inp);
-    if (op.balances.entries.length == 0) continue;
+    if (op.balances.entries.length == 0) {
+      continue;
+    }
     balanceSheets.push(
       BalanceSheet.load(OUTPOINT_TO_RUNES.select(_outpoints[i])),
     );

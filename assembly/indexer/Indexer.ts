@@ -74,8 +74,10 @@ export class Index {
     const message = RunestoneMessage.parse(payload);
     if (changetype<usize>(message) === 0) return;
     const commitment = Index.findCommitment(stripNullRight(name), tx, height);
+    /*
     if (commitment) console.log("no commitment");
     else console.log("commitment found");
+   */
   }
   static indexBlock(height: u32, _block: Block): void {
     if (height == GENESIS) {
