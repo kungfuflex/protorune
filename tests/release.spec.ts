@@ -88,20 +88,23 @@ const runTest = (s) =>
     return program;
   });
 
-
-const runesbyaddress = async (program: IndexerProgram, address: string): any => {
+const runesbyaddress = async (
+  program: IndexerProgram,
+  address: string,
+): any => {
   const cloned = program; // just mutate it
-  const result = await MetashrewRunes.prototype.runesbyaddress.call({
-    async _call({
-      input
-    }) {
-      cloned.setBlock(input);
-      const ptr = await cloned.run('runesbyaddress');
-      return readArrayBufferAsHex(cloned.memory, ptr);
-    }
-  }, { address });
+  const result = await MetashrewRunes.prototype.runesbyaddress.call(
+    {
+      async _call({ input }) {
+        cloned.setBlock(input);
+        const ptr = await cloned.run("runesbyaddress");
+        return readArrayBufferAsHex(cloned.memory, ptr);
+      },
+    },
+    { address },
+  );
   return result;
-}
+};
 
 describe("metashrew-runes", () => {
   it("should check runes witness script", async () => {
@@ -124,12 +127,19 @@ describe("metashrew-runes", () => {
         divisibility: 8,
         premine: 2100000000000000n,
         name: "GENESNS•RUNE•FR",
-	      symbol: 'G'
+        symbol: "G",
       },
       pointer: 1,
     }).encodedRunestone;
     const transaction = buildTransaction(
-      [{ hash: coinbase.getHash(), index: 0, witness: EMPTY_WITNESS, script: EMPTY_BUFFER }],
+      [
+        {
+          hash: coinbase.getHash(),
+          index: 0,
+          witness: EMPTY_WITNESS,
+          script: EMPTY_BUFFER,
+        },
+      ],
       [
         {
           script: runesGenesis,
@@ -155,6 +165,6 @@ describe("metashrew-runes", () => {
     program.setBlock(block.toHex());
     await program.run("_start");
 
-    console.log(await runesbyaddress(program, TEST_BTC_ADDRESS1))
+    console.log(await runesbyaddress(program, TEST_BTC_ADDRESS1));
   });
 });
