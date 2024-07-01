@@ -4,12 +4,13 @@ import { Block } from "metashrew-as/assembly/blockdata/block";
 import { Transaction } from "metashrew-as/assembly/blockdata/transaction";
 import { Box } from "metashrew-as/assembly/utils/box";
 import { decodeHex } from "metashrew-as/assembly";
-import { GENESIS, TWENTY_SIX } from "./indexer/constants";
+import { GENESIS, TWENTY_SIX, RUNE_ID_TO_ETCHING } from "./indexer/constants";
 import { fieldToName, fromArrayBuffer, nameToArrayBuffer } from "./utils";
 import { parsePrimitive } from "metashrew-as/assembly/utils/utils";
 import { u128 } from "as-bignum/assembly";
 import { console } from "metashrew-as/assembly/utils/logging";
 import { RunesBlock } from "./indexer/RunesBlock";
+import { RuneId } from "./indexer/RuneId";
 
 export function testCommitment(): void {
   const data = input();
@@ -32,7 +33,10 @@ export function testOverwrite(): void {
   const tx1 = block.getTransaction(142);
   const tx2 = block.getTransaction(158);
   Index.processRunesTransaction(tx1, tx1.txid(), height, 142);
-  Index.processRunesTransaction(tx2, tx2.txid(), height, 158);
+  RUNE_ID_TO_ETCHING.select(new RuneId(840000, 158).toBytes()).setValue<u32>(
+    10,
+  );
+  // Index.processRunesTransaction(tx2, tx2.txid(), height, 158);
   _flush();
 }
 

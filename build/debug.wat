@@ -23765,12 +23765,15 @@
   local.get $height
   i32.const 142
   call $assembly/indexer/Indexer/Index.processRunesTransaction
-  local.get $tx2
-  local.get $tx2
-  call $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#txid
-  local.get $height
+  global.get $assembly/indexer/constants/index/RUNE_ID_TO_ETCHING
+  i32.const 0
+  i64.const 840000
   i32.const 158
-  call $assembly/indexer/Indexer/Index.processRunesTransaction
+  call $assembly/indexer/RuneId/RuneId#constructor
+  call $assembly/indexer/RuneId/RuneId#toBytes
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
+  i32.const 10
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u32>
   call $~lib/metashrew-as/assembly/indexer/index/_flush
  )
  (func $~lib/string/String.fromCharCode (param $unit i32) (param $surr i32) (result i32)
