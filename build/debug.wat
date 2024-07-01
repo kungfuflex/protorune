@@ -8,20 +8,20 @@
  (type $6 (func (param i32 i32 i32)))
  (type $7 (func (param i32) (result i64)))
  (type $8 (func (param i32 i64)))
- (type $9 (func (param i32)))
- (type $10 (func (result i32)))
- (type $11 (func (param i32 i32 i32 i32 i32) (result i32)))
- (type $12 (func (param i32 i32 i32 i32)))
+ (type $9 (func (param i32 i32 i32 i32)))
+ (type $10 (func (param i32)))
+ (type $11 (func (result i32)))
+ (type $12 (func (param i32 i32 i32 i32 i32) (result i32)))
  (type $13 (func (param i64 i64 i64 i64) (result i64)))
- (type $14 (func (param i32 i32 i32 i32 i32)))
- (type $15 (func (param i32 i64 i32) (result i32)))
- (type $16 (func (param i32 i64) (result i32)))
- (type $17 (func (param i64 i32) (result i32)))
- (type $18 (func (param i64) (result i32)))
- (type $19 (func (param i32 i32) (result f64)))
- (type $20 (func (param i32 i64 i64) (result i32)))
- (type $21 (func (param i32 i64 i32)))
- (type $22 (func (param i32 i64 i32 i32)))
+ (type $14 (func (param i32 i64 i32 i32)))
+ (type $15 (func (param i32 i32 i32 i32 i32)))
+ (type $16 (func (param i32 i64 i32) (result i32)))
+ (type $17 (func (param i32 i64) (result i32)))
+ (type $18 (func (param i64 i32) (result i32)))
+ (type $19 (func (param i64) (result i32)))
+ (type $20 (func (param i32 i32) (result f64)))
+ (type $21 (func (param i32 i64 i64) (result i32)))
+ (type $22 (func (param i32 i64 i32)))
  (type $23 (func (param i64) (result i64)))
  (type $24 (func (param i32 i64 i32 i32 i32) (result i32)))
  (type $25 (func (param i32 i64 i64 i64 i64) (result i32)))
@@ -7575,6 +7575,54 @@
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer.wrap
   return
  )
+ (func $~lib/metashrew-as/assembly/utils/hex/encodeHexUTF8 (param $start i32) (param $len i32) (result i32)
+  (local $result i32)
+  (local $i i32)
+  i32.const 0
+  i32.const 2
+  local.get $len
+  i32.const 2
+  i32.mul
+  i32.add
+  call $~lib/arraybuffer/ArrayBuffer#constructor
+  local.set $result
+  local.get $result
+  i32.const 30768
+  i32.store16
+  i32.const 0
+  local.set $i
+  loop $for-loop|0
+   local.get $i
+   local.get $len
+   i32.lt_u
+   if
+    i32.const 2
+    local.get $result
+    i32.add
+    local.get $i
+    i32.const 2
+    i32.mul
+    i32.add
+    global.get $~lib/metashrew-as/assembly/utils/hex/hexLookupTable
+    i32.const 2
+    local.get $start
+    local.get $i
+    i32.add
+    i32.load8_u
+    i32.mul
+    i32.add
+    i32.load16_u
+    i32.store16
+    local.get $i
+    i32.const 1
+    i32.add
+    local.set $i
+    br $for-loop|0
+   end
+  end
+  local.get $result
+  return
+ )
  (func $~lib/string/String.UTF8.decodeUnsafe (param $buf i32) (param $len i32) (param $nullTerminated i32) (result i32)
   (local $bufOff i32)
   (local $bufEnd i32)
@@ -7796,10 +7844,26 @@
   call $~lib/string/String.UTF8.decodeUnsafe
   return
  )
- (func $~lib/metashrew-as/assembly/indexer/index/hash (param $k i32) (result i32)
-  local.get $k
+ (func $~lib/metashrew-as/assembly/utils/hex/encodeHex (param $start i32) (param $len i32) (result i32)
+  local.get $start
+  local.get $len
+  call $~lib/metashrew-as/assembly/utils/hex/encodeHexUTF8
   i32.const 0
   call $~lib/string/String.UTF8.decode
+  return
+ )
+ (func $~lib/metashrew-as/assembly/utils/box/Box#toHexString (param $this i32) (result i32)
+  local.get $this
+  call $~lib/metashrew-as/assembly/utils/box/Box#get:start
+  local.get $this
+  call $~lib/metashrew-as/assembly/utils/box/Box#get:len
+  call $~lib/metashrew-as/assembly/utils/hex/encodeHex
+  return
+ )
+ (func $~lib/metashrew-as/assembly/indexer/index/hash (param $k i32) (result i32)
+  local.get $k
+  call $~lib/metashrew-as/assembly/utils/box/Box.from
+  call $~lib/metashrew-as/assembly/utils/box/Box#toHexString
   return
  )
  (func $"~lib/map/MapEntry<~lib/string/String,~lib/arraybuffer/ArrayBuffer>#set:value" (param $this i32) (param $value i32)
@@ -8075,7 +8139,7 @@
   local.get $this
   return
  )
- (func $~lib/metashrew-as/assembly/indexer/index/set (param $k i32) (param $v i32)
+ (func $~lib/metashrew-as/assembly/indexer/index/set (param $k i32) (param $v i32) (param $log i32) (param $cmp i32)
   (local $h i32)
   local.get $k
   call $~lib/metashrew-as/assembly/indexer/index/hash
@@ -8091,18 +8155,50 @@
   call $"~lib/map/Map<~lib/string/String,~lib/arraybuffer/ArrayBuffer>#set"
   drop
  )
- (func $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set (param $this i32) (param $v i32)
+ (func $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set (param $this i32) (param $v i32) (param $log i32) (param $cmp i32)
   local.get $this
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#unwrap
   local.get $v
+  local.get $log
+  local.get $cmp
   call $~lib/metashrew-as/assembly/indexer/index/set
+ )
+ (func $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set@varargs (param $this i32) (param $v i32) (param $log i32) (param $cmp i32)
+  block $2of2
+   block $1of2
+    block $0of2
+     block $outOfRange
+      global.get $~argumentsLength
+      i32.const 1
+      i32.sub
+      br_table $0of2 $1of2 $2of2 $outOfRange
+     end
+     unreachable
+    end
+    i32.const 0
+    local.set $log
+   end
+   i32.const 0
+   i32.const 0
+   call $~lib/arraybuffer/ArrayBuffer#constructor
+   local.set $cmp
+  end
+  local.get $this
+  local.get $v
+  local.get $log
+  local.get $cmp
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
  )
  (func $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#nullify (param $this i32)
   local.get $this
   i32.const 0
   i32.const 0
   call $~lib/arraybuffer/ArrayBuffer#constructor
-  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set@varargs
  )
  (func $~lib/metashrew-as/assembly/blockdata/transaction/Transaction#get:_txid (param $this i32) (result i32)
   local.get $this
@@ -11690,7 +11786,7 @@
   i32.load
   return
  )
- (func $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u32> (param $this i32) (param $v i32)
+ (func $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u32> (param $this i32) (param $v i32) (param $log i32) (param $cmp i32)
   (local $value i32)
   i32.const 0
   i32.const 4
@@ -11701,7 +11797,35 @@
   i32.store
   local.get $this
   local.get $value
+  local.get $log
+  local.get $cmp
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
+ )
+ (func $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u32>@varargs (param $this i32) (param $v i32) (param $log i32) (param $cmp i32)
+  block $2of2
+   block $1of2
+    block $0of2
+     block $outOfRange
+      global.get $~argumentsLength
+      i32.const 1
+      i32.sub
+      br_table $0of2 $1of2 $2of2 $outOfRange
+     end
+     unreachable
+    end
+    i32.const 0
+    local.set $log
+   end
+   i32.const 0
+   i32.const 0
+   call $~lib/arraybuffer/ArrayBuffer#constructor
+   local.set $cmp
+  end
+  local.get $this
+  local.get $v
+  local.get $log
+  local.get $cmp
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u32>
  )
  (func $~lib/util/number/utoa32 (param $value i32) (param $radix i32) (result i32)
   (local $out i32)
@@ -11901,7 +12025,11 @@
   local.get $length
   i32.const 1
   i32.add
-  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u32>
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u32>@varargs
   local.get $this
   local.get $length
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#selectIndex
@@ -11911,7 +12039,11 @@
   local.get $this
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#extend
   local.get $v
-  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set@varargs
  )
  (func $~lib/metashrew-spendables/assembly/indexer/Index.indexBlock (param $height i32) (param $block i32)
   (local $i i32)
@@ -12011,7 +12143,11 @@
       local.get $output|10
       call $~lib/metashrew-as/assembly/blockdata/transaction/Output#get:bytes
       call $~lib/metashrew-as/assembly/utils/box/Box#toArrayBuffer
-      call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
+      i32.const 0
+      i32.const 1
+      global.set $~argumentsLength
+      i32.const 0
+      call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set@varargs
       local.get $address
       if
        global.get $~lib/metashrew-spendables/assembly/tables/OUTPOINTS_FOR_ADDRESS
@@ -12023,7 +12159,11 @@
        local.get $outpoint
        call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
        local.get $address
-       call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
+       i32.const 0
+       i32.const 1
+       global.set $~argumentsLength
+       i32.const 0
+       call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set@varargs
       end
       local.get $i|9
       i32.const 1
@@ -12454,7 +12594,7 @@
   call $assembly/utils/toArrayBuffer
   return
  )
- (func $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u8> (param $this i32) (param $v i32)
+ (func $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u8> (param $this i32) (param $v i32) (param $log i32) (param $cmp i32)
   (local $value i32)
   i32.const 0
   i32.const 1
@@ -12465,9 +12605,37 @@
   i32.store8
   local.get $this
   local.get $value
+  local.get $log
+  local.get $cmp
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
  )
- (func $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u64> (param $this i32) (param $v i64)
+ (func $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u8>@varargs (param $this i32) (param $v i32) (param $log i32) (param $cmp i32)
+  block $2of2
+   block $1of2
+    block $0of2
+     block $outOfRange
+      global.get $~argumentsLength
+      i32.const 1
+      i32.sub
+      br_table $0of2 $1of2 $2of2 $outOfRange
+     end
+     unreachable
+    end
+    i32.const 0
+    local.set $log
+   end
+   i32.const 0
+   i32.const 0
+   call $~lib/arraybuffer/ArrayBuffer#constructor
+   local.set $cmp
+  end
+  local.get $this
+  local.get $v
+  local.get $log
+  local.get $cmp
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u8>
+ )
+ (func $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u64> (param $this i32) (param $v i64) (param $log i32) (param $cmp i32)
   (local $value i32)
   i32.const 0
   i32.const 8
@@ -12478,7 +12646,35 @@
   i64.store
   local.get $this
   local.get $value
+  local.get $log
+  local.get $cmp
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
+ )
+ (func $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u64>@varargs (param $this i32) (param $v i64) (param $log i32) (param $cmp i32)
+  block $2of2
+   block $1of2
+    block $0of2
+     block $outOfRange
+      global.get $~argumentsLength
+      i32.const 1
+      i32.sub
+      br_table $0of2 $1of2 $2of2 $outOfRange
+     end
+     unreachable
+    end
+    i32.const 0
+    local.set $log
+   end
+   i32.const 0
+   i32.const 0
+   call $~lib/arraybuffer/ArrayBuffer#constructor
+   local.set $cmp
+  end
+  local.get $this
+  local.get $v
+  local.get $log
+  local.get $cmp
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u64>
  )
  (func $assembly/indexer/RunestoneMessage/RunestoneMessage.etchGenesisRune
   (local $name i32)
@@ -12498,22 +12694,38 @@
   local.get $name
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
   local.get $runeId
-  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set@varargs
   global.get $assembly/indexer/constants/index/RUNE_ID_TO_ETCHING
   local.get $runeId
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
   local.get $name
-  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set@varargs
   global.get $assembly/indexer/constants/index/RUNE_ID_TO_HEIGHT
   local.get $runeId
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
   global.get $assembly/indexer/constants/index/GENESIS
-  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u32>
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u32>@varargs
   global.get $assembly/indexer/constants/index/DIVISIBILITY
   local.get $name
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
   i32.const 1
-  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u8>
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u8>@varargs
   global.get $assembly/indexer/constants/index/AMOUNT
   local.get $name
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
@@ -12547,7 +12759,11 @@
    br $~lib/as-bignum/assembly/integer/u128/u128.from<i32>|inlined.4
   end
   call $assembly/utils/toArrayBuffer
-  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set@varargs
   global.get $assembly/indexer/constants/index/CAP
   local.get $name
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
@@ -12559,7 +12775,11 @@
    br $~lib/as-bignum/assembly/integer/u128/u128.get:Max|inlined.0
   end
   call $assembly/utils/toArrayBuffer
-  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set@varargs
   global.get $assembly/indexer/constants/index/MINTS_REMAINING
   local.get $name
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
@@ -12571,25 +12791,41 @@
    br $~lib/as-bignum/assembly/integer/u128/u128.get:Max|inlined.1
   end
   call $assembly/utils/toArrayBuffer
-  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set@varargs
   global.get $assembly/indexer/constants/index/OFFSETEND
   local.get $name
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
   global.get $~lib/metashrew-as/assembly/utils/constant/SUBSIDY_HALVING_INTERVAL
   i64.extend_i32_u
-  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u64>
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u64>@varargs
   global.get $assembly/indexer/constants/index/SPACERS
   local.get $name
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
   i32.const 128
-  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u32>
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u32>@varargs
   global.get $assembly/indexer/constants/index/SYMBOL
   local.get $name
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
   i32.const 7296
   i32.const 0
   call $~lib/string/String#charCodeAt
-  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u8>
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u8>@varargs
   global.get $assembly/indexer/constants/index/ETCHINGS
   local.get $name
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#append
@@ -12812,7 +13048,11 @@
     call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#toArrayBuffer
     call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
     local.get $height
-    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u32>
+    i32.const 0
+    i32.const 1
+    global.set $~argumentsLength
+    i32.const 0
+    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u32>@varargs
     local.get $i
     i32.const 1
     i32.add
@@ -16970,7 +17210,11 @@
       br $~lib/as-bignum/assembly/integer/u128/u128.sub|inlined.0
      end
      call $assembly/utils/toArrayBuffer
-     call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
+     i32.const 0
+     i32.const 1
+     global.set $~argumentsLength
+     i32.const 0
+     call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set@varargs
      local.get $balanceSheet
      local.get $mintTo
      global.get $assembly/indexer/constants/index/AMOUNT
@@ -18761,18 +19005,30 @@
   local.get $runeId
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
   local.get $name
-  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set@varargs
   global.get $assembly/indexer/constants/index/ETCHING_TO_RUNE_ID
   local.get $name
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
   local.get $runeId
-  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set@varargs
   global.get $assembly/indexer/constants/index/RUNE_ID_TO_HEIGHT
   local.get $runeId
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
   local.get $height
   i32.wrap_i64
-  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u32>
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u32>@varargs
   local.get $this
   call $assembly/indexer/RunestoneMessage/RunestoneMessage#get:fields
   global.get $assembly/indexer/Field/Field.DIVISIBILITY
@@ -18786,7 +19042,11 @@
    global.get $assembly/indexer/Field/Field.DIVISIBILITY
    call $"~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#get"
    call $assembly/utils/fieldTo<u8>
-   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u8>
+   i32.const 0
+   i32.const 1
+   global.set $~argumentsLength
+   i32.const 0
+   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u8>@varargs
   end
   local.get $this
   call $assembly/indexer/RunestoneMessage/RunestoneMessage#get:fields
@@ -18835,7 +19095,11 @@
    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
    local.get $premine
    call $assembly/utils/toArrayBuffer
-   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
+   i32.const 0
+   i32.const 1
+   global.set $~argumentsLength
+   i32.const 0
+   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set@varargs
   end
   local.get $this
   global.get $assembly/indexer/Flag/Flag.TERMS
@@ -18855,7 +19119,11 @@
     call $"~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#get"
     call $assembly/utils/fieldToU128
     call $assembly/utils/toArrayBuffer
-    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
+    i32.const 0
+    i32.const 1
+    global.set $~argumentsLength
+    i32.const 0
+    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set@varargs
    end
    local.get $this
    call $assembly/indexer/RunestoneMessage/RunestoneMessage#get:fields
@@ -18871,7 +19139,11 @@
     call $"~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#get"
     call $assembly/utils/fieldToU128
     call $assembly/utils/toArrayBuffer
-    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
+    i32.const 0
+    i32.const 1
+    global.set $~argumentsLength
+    i32.const 0
+    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set@varargs
     global.get $assembly/indexer/constants/index/MINTS_REMAINING
     local.get $name
     call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
@@ -18880,7 +19152,11 @@
     global.get $assembly/indexer/Field/Field.CAP
     call $"~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#get"
     call $assembly/utils/fieldToArrayBuffer
-    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
+    i32.const 0
+    i32.const 1
+    global.set $~argumentsLength
+    i32.const 0
+    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set@varargs
    end
    local.get $this
    call $assembly/indexer/RunestoneMessage/RunestoneMessage#get:fields
@@ -18895,7 +19171,11 @@
     global.get $assembly/indexer/Field/Field.HEIGHTSTART
     call $"~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#get"
     call $assembly/utils/fieldTo<u64>
-    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u64>
+    i32.const 0
+    i32.const 1
+    global.set $~argumentsLength
+    i32.const 0
+    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u64>@varargs
    end
    local.get $this
    call $assembly/indexer/RunestoneMessage/RunestoneMessage#get:fields
@@ -18910,7 +19190,11 @@
     global.get $assembly/indexer/Field/Field.HEIGHTEND
     call $"~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#get"
     call $assembly/utils/fieldTo<u64>
-    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u64>
+    i32.const 0
+    i32.const 1
+    global.set $~argumentsLength
+    i32.const 0
+    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u64>@varargs
    end
    local.get $this
    call $assembly/indexer/RunestoneMessage/RunestoneMessage#get:fields
@@ -18925,7 +19209,11 @@
     global.get $assembly/indexer/Field/Field.OFFSETSTART
     call $"~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#get"
     call $assembly/utils/fieldTo<u64>
-    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u64>
+    i32.const 0
+    i32.const 1
+    global.set $~argumentsLength
+    i32.const 0
+    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u64>@varargs
    end
    local.get $this
    call $assembly/indexer/RunestoneMessage/RunestoneMessage#get:fields
@@ -18940,7 +19228,11 @@
     global.get $assembly/indexer/Field/Field.OFFSETEND
     call $"~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#get"
     call $assembly/utils/fieldTo<u64>
-    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u64>
+    i32.const 0
+    i32.const 1
+    global.set $~argumentsLength
+    i32.const 0
+    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u64>@varargs
    end
   end
   local.get $this
@@ -18956,7 +19248,11 @@
    global.get $assembly/indexer/Field/Field.SPACERS
    call $"~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#get"
    call $assembly/utils/fieldTo<u32>
-   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u32>
+   i32.const 0
+   i32.const 1
+   global.set $~argumentsLength
+   i32.const 0
+   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u32>@varargs
   end
   local.get $this
   call $assembly/indexer/RunestoneMessage/RunestoneMessage#get:fields
@@ -18971,7 +19267,11 @@
    global.get $assembly/indexer/Field/Field.SYMBOL
    call $"~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#get"
    call $assembly/utils/fieldTo<u8>
-   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u8>
+   i32.const 0
+   i32.const 1
+   global.set $~argumentsLength
+   i32.const 0
+   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u8>@varargs
   end
   global.get $assembly/indexer/constants/index/ETCHINGS
   local.get $name
@@ -22091,13 +22391,21 @@
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#selectValue<u32>
   local.get $block
   call $~lib/metashrew-as/assembly/blockdata/block/Block#blockhash
-  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#set@varargs
   global.get $assembly/indexer/constants/index/BLOCKHASH_TO_HEIGHT
   local.get $block
   call $~lib/metashrew-as/assembly/blockdata/block/Block#blockhash
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
   local.get $height
-  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u32>
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u32>@varargs
   local.get $block
   local.get $height
   call $assembly/indexer/RunesBlock/RunesBlock#saveTransactions
@@ -23723,6 +24031,7 @@
   (local $this|7 i32)
   (local $index|8 i32)
   (local $tx2 i32)
+  (local $testBytes i32)
   call $~lib/metashrew-as/assembly/indexer/index/input
   local.set $data
   local.get $data
@@ -23765,14 +24074,18 @@
   local.get $height
   i32.const 142
   call $assembly/indexer/Indexer/Index.processRunesTransaction
-  global.get $assembly/indexer/constants/index/RUNE_ID_TO_ETCHING
   i32.const 0
   i64.const 840000
   i32.const 158
   call $assembly/indexer/RuneId/RuneId#constructor
   call $assembly/indexer/RuneId/RuneId#toBytes
+  local.set $testBytes
+  global.get $assembly/indexer/constants/index/RUNE_ID_TO_ETCHING
+  local.get $testBytes
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
   i32.const 10
+  i32.const 1
+  local.get $testBytes
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#setValue<u32>
   call $~lib/metashrew-as/assembly/indexer/index/_flush
  )

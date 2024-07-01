@@ -160,7 +160,11 @@ describe("metashrew-runes", () => {
     program.setBlockHeight(840000);
     program.on("log", console.log);
     await program.run("testOverwrite");
-    console.log(formatKv(program.kv));
+    expect(
+      Object.keys(formatKv(program.kv)).filter((d) =>
+        d.includes("/etching/byruneid"),
+      ),
+    ).to.be.equal(2);
   });
   it("should index Runestone", async () => {
     const program = buildProgram();

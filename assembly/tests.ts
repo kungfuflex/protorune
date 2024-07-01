@@ -33,9 +33,8 @@ export function testOverwrite(): void {
   const tx1 = block.getTransaction(142);
   const tx2 = block.getTransaction(158);
   Index.processRunesTransaction(tx1, tx1.txid(), height, 142);
-  RUNE_ID_TO_ETCHING.select(new RuneId(840000, 158).toBytes()).setValue<u32>(
-    10,
-  );
+  const testBytes = new RuneId(840000, 158).toBytes();
+  RUNE_ID_TO_ETCHING.select(testBytes).setValue<u32>(10);
   // Index.processRunesTransaction(tx2, tx2.txid(), height, 158);
   _flush();
 }
