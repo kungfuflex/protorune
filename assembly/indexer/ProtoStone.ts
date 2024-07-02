@@ -1,5 +1,5 @@
 import { u128 } from "as-bignum/assembly";
-import { Field } from "./Field";
+import { Field } from "./fields";
 import { Box } from "metashrew-as/assembly/utils/box";
 import { readULEB128ToU128 } from "../leb128";
 import {
