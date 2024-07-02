@@ -90,7 +90,7 @@ export class BalanceSheet {
       new BalanceSheet(),
     );
   }
-  saveToAtomicTx(ptr: IndexPointer, tx: AtomicTransaction) {
+  saveToAtomicTx(ptr: IndexPointer, tx: AtomicTransaction): void {
     const runesPtr = ptr.keyword("/runes");
     const balancesPtr = ptr.keyword("/balances");
 

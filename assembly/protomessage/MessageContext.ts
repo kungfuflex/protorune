@@ -34,7 +34,7 @@ export class MessageContext {
     this.transaction = transaction;
     this.block = block;
     this.height = height;
-    this.txid = this.transaction.txid();
+    this.txid = transaction.txid();
     this.outpoint = OutPoint.from(this.txid, index);
     this.pointer = OutPoint.from(this.txid, message.pointer);
     this.refund_pointer = OutPoint.from(this.txid, message.refund_pointer);

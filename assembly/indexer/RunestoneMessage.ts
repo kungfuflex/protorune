@@ -50,6 +50,7 @@ import {
   SUBSIDY_HALVING_INTERVAL,
 } from "metashrew-as/assembly/utils";
 import { console } from "metashrew-as/assembly/utils/logging";
+import { ProtoBurn } from "./ProtoBurn";
 
 export class RunestoneMessage {
   public fields: Map<u64, Array<u128>>;

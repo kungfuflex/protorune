@@ -18,6 +18,7 @@ import { protorune } from "../proto/protorune";
 import { stripNullRight } from "../utils";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils";
 import { ProtoMessage, MessageContext } from "../protomessage";
+import { BalanceSheet } from "./BalanceSheet";
 
 export class Index {
   static indexOutpoints(
@@ -86,7 +87,7 @@ export class Index {
     txid: ArrayBuffer,
     txindex: u32,
     outputIndex: i32,
-  ): void {
+  ): Map<u32, BalanceSheet> {
     if (outputIndex > -1) {
       const runestoneOutput = tx.outs[outputIndex];
       const parsed = scriptParse(runestoneOutput.script).slice(2);
@@ -95,15 +96,16 @@ export class Index {
           return v.start === usize.MAX_VALUE;
         }) !== -1
       )
-        return;
+        return new Map<u32, BalanceSheet>();
       const payload = Box.concat(parsed);
       const message = RunestoneMessage.parse(payload);
-      if (changetype<usize>(message) === 0) return;
+      if (changetype<usize>(message) === 0) return new Map<u32, BalanceSheet>();
 
       //process message here
       //@ts-ignore
       changetype<T>(message).process(tx, txid, <u32>height, txindex);
     }
+    return new Map<u32, BalanceSheet>();
   }
   static processRunesTransaction(
     _block: Block,
@@ -112,61 +114,57 @@ export class Index {
     height: u32,
     i: u32,
   ): void {
-      tx.processRunestones();
-      if (height >= GENESIS) {
-        let protoMessage: Map<u16, protorune.ProtoMessage> = new Map<
-          u16,
-          protorune.ProtoMessage
-        >();
+    tx.processRunestones();
+    if (height >= GENESIS) {
+      Index.processMessage<RunestoneMessage>(
+        height,
+        tx,
+        txid,
+        i,
+        tx.tags.runestone,
+      );
 
-        Index.processMessage<RunestoneMessage>(
-          height,
-          tx,
-          txid,
-          i,
-          tx.tags.runestone,
+      const sheets = Index.processMessage<ProtoruneMessage>(
+        height,
+        tx,
+        txid,
+        i,
+        tx.tags.protorunestone,
+      );
+
+      const protoMessages: Map<u16, ProtoMessage> = new Map<
+        u16,
+        ProtoMessage
+      >();
+      // parse protomessages
+      const protomessageKeys = tx.tags.protomessage.keys();
+      for (let m = 0; m < protomessageKeys.length; m++) {
+        const index = tx.tags.protomessage[protomessageKeys[m]];
+        const out = tx.outs[index];
+        const parsed = scriptParse(out.script).slice(2);
+        const message = protorune.ProtoMessage.decode(Box.concat(parsed));
+        protoMessages.set(
+          protomessageKeys[m],
+          new ProtoMessage(message, index, sheets),
         );
-
-        Index.processMessage<ProtoruneMessage>(
-          height,
-          tx,
-          txid,
-          i,
-          tx.tags.protorunestone,
-        );
-
-        const protoMessages: Map<u16, protorune.ProtoMessage> = new Map<
-          u16,
-          protorune.ProtoMessage
-        >();
-        // parse protomessages
-        const protomessageKeys = tx.tags.protomessage.keys();
-        for (let m = 0; m < protomessageKeys.length; m++) {
-          const out = tx.outs[tx.tags.protomessage[protomessageKeys[m]]];
-          const parsed = scriptParse(out.script).slice(2);
-          const message = protorune.ProtoMessage.decode(Box.concat(parsed));
-          protoMessages.set(
-            protomessageKeys[m],
-            new ProtoMessage(message, index, sheets),
-          );
-        }
-
-        //parse protosplit
-        const protosplitKeys = tx.tags.protosplits.keys();
-        for (let k = 0; k < protosplitKeys.length; k++) {
-          const outs = tx.tags.protosplits.get(protosplitKeys[k]);
-          for (let o = 0; o < outs.length; o++) {}
-          //parse only one protocols protosplit message
-          break;
-        }
-
-        // process protomessage
-        const protoMessageTypes = protoMessages.keys();
-        for (let m = 0; m < protoMessageTypes.length; m++) {
-          const message = protoMessages.get(protoMessageTypes[m]);
-          ProtoMessage.handle<MessageContext>(message, tx, _block, height, i);
-        }
       }
+
+      //parse protosplit
+      const protosplitKeys = tx.tags.protosplits.keys();
+      for (let k = 0; k < protosplitKeys.length; k++) {
+        const outs = tx.tags.protosplits.get(protosplitKeys[k]);
+        for (let o = 0; o < outs.length; o++) {}
+        //parse only one protocols protosplit message
+        break;
+      }
+
+      // process protomessage
+      const protoMessageTypes = protoMessages.keys();
+      for (let m = 0; m < protoMessageTypes.length; m++) {
+        const message = protoMessages.get(protoMessageTypes[m]);
+        message.handle<MessageContext>(tx, _block, height, i);
+      }
+    }
   }
   static indexBlock(height: u32, _block: Block): void {
     if (height == GENESIS) {
