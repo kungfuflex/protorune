@@ -1,5 +1,5 @@
 import { u128 } from "as-bignum/assembly";
-import { Field } from "./fields";
+import { Field } from "./fields/ProtoruneField";
 import { Box } from "metashrew-as/assembly/utils/box";
 import { readULEB128ToU128 } from "../leb128";
 import {
@@ -15,7 +15,7 @@ import {
   getReservedNameFor,
   fieldToName,
 } from "../utils";
-import { Flag } from "./flags";
+import { Flag } from "./flags/ProtoruneFlag";
 import { RuneId } from "./RuneId";
 import { Edict } from "./Edict";
 import {
