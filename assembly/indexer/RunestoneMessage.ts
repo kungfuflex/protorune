@@ -201,33 +201,8 @@ export class RunestoneMessage {
     name = toArrayBuffer(nameU128);
     if (ETCHING_TO_RUNE_ID.select(name).get().byteLength !== 0) return false; // already taken / commitment not foun
     const runeId = new RuneId(height, tx).toBytes();
-    const testRuneId = new RuneId(840000, 142).toBytes();
-    const b = RUNE_ID_TO_ETCHING.select(testRuneId).unwrap();
-    console.log(
-      memory
-        .compare(
-          changetype<usize>(b),
-          changetype<usize>(RUNE_ID_TO_ETCHING.select(runeId).unwrap()),
-          b.byteLength,
-        )
-        .toString(),
-    );
-    if (tx == 158) {
-      console.log(
-        fieldToName(
-          fromArrayBuffer(RUNE_ID_TO_ETCHING.select(testRuneId).get()),
-        ),
-      );
-    }
     RUNE_ID_TO_ETCHING.select(runeId).set(name);
     ETCHING_TO_RUNE_ID.select(name).set(runeId);
-    if (tx == 158) {
-      console.log(
-        fieldToName(
-          fromArrayBuffer(RUNE_ID_TO_ETCHING.select(testRuneId).get()),
-        ),
-      );
-    }
     RUNE_ID_TO_HEIGHT.select(runeId).setValue<u32>(<u32>height);
     if (this.fields.has(Field.DIVISIBILITY))
       DIVISIBILITY.select(name).setValue<u8>(
@@ -348,6 +323,5 @@ export class RunestoneMessage {
         isCenotaph,
       );
     }
-    if (height == 840000 && txindex == 158) unreachable();
   }
 }
