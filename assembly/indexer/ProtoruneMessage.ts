@@ -1,4 +1,4 @@
-import { Field } from "./Field";
+import { Field } from "./fields";
 import { fieldTo, toPrimitive, min } from "../utils";
 import { Edict } from "./Edict";
 import { OUTPOINT_TO_RUNES } from "./constants/protorune";
