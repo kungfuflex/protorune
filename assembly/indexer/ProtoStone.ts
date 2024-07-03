@@ -74,9 +74,13 @@ export class ProtoStone {
   isEtching(): bool {
     return this.getFlag(Flag.ETCHING);
   }
-  mintTo(): ArrayBuffer {
-    if (!this.fields.has(Field.MINT)) return changetype<ArrayBuffer>(0);
-    return fieldToArrayBuffer(this.fields.get(Field.MINT));
+  splits(): Array<u32> {
+    const splits = this.fields.get(Field.SPLIT);
+
+    if (splits.length > 0) {
+      return splits.map<u32>((d) => d.toU32());
+    }
+    return changetype<Array<u32>>(0);
   }
   static parse(data: ArrayBuffer): ProtoStone {
     const input = Box.from(data);
@@ -116,120 +120,5 @@ export class ProtoStone {
       }
     }
     return new ProtoStone(fields, edicts);
-  }
-
-  mint(height: u32, balanceSheet: BalanceSheet): bool {
-    return false;
-  }
-  etch(
-    height: u64,
-    tx: u32,
-    initialBalanceSheet: BalanceSheet,
-    transaction: RunesTransaction,
-  ): bool {
-    if (!this.isEtching()) return false;
-    let name: ArrayBuffer;
-    let nameU128: u128;
-    if (this.fields.has(Field.RUNE)) nameU128 = this.fields.get(Field.RUNE)[0];
-    else nameU128 = getReservedNameFor(height, tx);
-    let interval: i64 = (height - GENESIS) / HEIGHT_INTERVAL;
-    let minimum_name = MINIMUM_NAME;
-    if (interval > 0)
-      while (interval > 0) {
-        minimum_name = --minimum_name / TWENTY_SIX;
-        interval--;
-      }
-    if (nameU128 < minimum_name || nameU128 >= RESERVED_NAME) return false;
-    name = toArrayBuffer(nameU128);
-    if (ETCHING_TO_RUNE_ID.select(name).get().byteLength !== 0) return false; // already taken / commitment not foun
-    const runeId = new RuneId(height, tx).toBytes();
-    RUNE_ID_TO_ETCHING.select(runeId).set(name);
-    ETCHING_TO_RUNE_ID.select(name).set(runeId);
-    RUNE_ID_TO_HEIGHT.select(runeId).setValue<u32>(<u32>height);
-    if (this.fields.has(Field.DIVISIBILITY))
-      DIVISIBILITY.select(name).setValue<u8>(
-        fieldTo<u8>(this.fields.get(Field.DIVISIBILITY)),
-      );
-    if (this.fields.has(Field.SPACERS))
-      SPACERS.select(name).setValue<u32>(
-        fieldTo<u32>(this.fields.get(Field.SPACERS)),
-      );
-    if (this.fields.has(Field.SYMBOL))
-      SYMBOL.select(name).setValue<u8>(
-        fieldTo<u8>(this.fields.get(Field.SYMBOL)),
-      );
-    ETCHINGS.append(name);
-    return true;
-  }
-
-  processEdicts(
-    balancesByOutput: Map<u32, BalanceSheet>,
-    balanceSheet: BalanceSheet,
-    txid: ArrayBuffer,
-  ): bool {
-    let isCenotaph: bool = false;
-    const edicts = Edict.fromDeltaSeries(this.edicts);
-    for (let e = 0; e < edicts.length; e++) {
-      const edict = edicts[e];
-      const edictOutput = toPrimitive<u32>(edict.output);
-
-      const runeId = edict.runeId().toBytes();
-      let outputBalanceSheet = changetype<BalanceSheet>(0);
-      if (!balancesByOutput.has(edictOutput)) {
-        balancesByOutput.set(
-          edictOutput,
-          (outputBalanceSheet = new BalanceSheet()),
-        );
-      } else outputBalanceSheet = balancesByOutput.get(edictOutput);
-      const amount = min(edict.amount, balanceSheet.get(runeId));
-
-      const canDecrease = balanceSheet.decrease(runeId, amount);
-      if (!canDecrease) isCenotaph = true;
-      outputBalanceSheet.increase(runeId, amount);
-    }
-    return isCenotaph;
-  }
-  process(
-    tx: RunesTransaction,
-    txid: ArrayBuffer,
-    height: u32,
-    txindex: u32,
-  ): Map<u32, BalanceSheet> {
-    // collect all protoburns
-    let balanceSheet = BalanceSheet.concat(
-      tx.ins.map<BalanceSheet>((v: Input, i: i32, ary: Array<Input>) =>
-        BalanceSheet.load(
-          OUTPOINT_TO_RUNES.select(v.previousOutput().toArrayBuffer()),
-        ),
-      ),
-    );
-    const balancesByOutput = new Map<u32, BalanceSheet>();
-
-    // this.mint(height, balanceSheet);
-    this.etch(<u64>height, <u32>txindex, balanceSheet, tx);
-
-    const unallocatedTo = this.fields.has(Field.POINTER)
-      ? fieldTo<u32>(this.fields.get(Field.POINTER))
-      : <u32>tx.defaultOutput();
-    if (balancesByOutput.has(unallocatedTo)) {
-      balanceSheet.pipe(balancesByOutput.get(unallocatedTo));
-    } else {
-      balancesByOutput.set(unallocatedTo, balanceSheet);
-    }
-
-    const isCenotaph = this.processEdicts(balancesByOutput, balanceSheet, txid);
-
-    const runesToOutputs = balancesByOutput.keys();
-
-    for (let x = 0; x < runesToOutputs.length; x++) {
-      const sheet = balancesByOutput.get(runesToOutputs[x]);
-      sheet.save(
-        OUTPOINT_TO_RUNES.select(
-          OutPoint.from(txid, runesToOutputs[x]).toArrayBuffer(),
-        ),
-        isCenotaph,
-      );
-    }
-    return balancesByOutput;
   }
 }

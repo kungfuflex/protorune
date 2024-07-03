@@ -13,12 +13,13 @@ import {
   GENESIS,
 } from "./constants";
 import { PROTOCOL_TAG } from "./constants/protorune";
-import { OutPoint } from "metashrew-as/assembly/blockdata/transaction";
+import { OutPoint, Output } from "metashrew-as/assembly/blockdata/transaction";
 import { protorune } from "../proto/protorune";
 import { stripNullRight } from "../utils";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils";
 import { ProtoMessage, MessageContext } from "../protomessage";
 import { BalanceSheet } from "./BalanceSheet";
+import { ProtoStone } from "./ProtoStone";
 
 export class Index {
   static indexOutpoints(
@@ -81,6 +82,17 @@ export class Index {
    */
   }
 
+  static getMessagePayload(output: Output, skip: u32 = 2): ArrayBuffer {
+    const parsed = scriptParse(output.script).slice(skip);
+    if (
+      parsed.findIndex((v: Box, i: i32, ary: Array<Box>) => {
+        return v.start === usize.MAX_VALUE;
+      }) !== -1
+    )
+      return new ArrayBuffer(0);
+    return Box.concat(parsed);
+  }
+
   static processMessage<T>(
     height: u64,
     tx: RunesTransaction,
@@ -90,14 +102,8 @@ export class Index {
   ): Map<u32, BalanceSheet> {
     if (outputIndex > -1) {
       const runestoneOutput = tx.outs[outputIndex];
-      const parsed = scriptParse(runestoneOutput.script).slice(2);
-      if (
-        parsed.findIndex((v: Box, i: i32, ary: Array<Box>) => {
-          return v.start === usize.MAX_VALUE;
-        }) !== -1
-      )
-        return new Map<u32, BalanceSheet>();
-      const payload = Box.concat(parsed);
+      const payload = Index.getMessagePayload(runestoneOutput);
+      if (changetype<usize>(payload) == 0) return new Map<u32, BalanceSheet>();
       const message = RunestoneMessage.parse(payload);
       if (changetype<usize>(message) === 0) return new Map<u32, BalanceSheet>();
 
@@ -106,6 +112,24 @@ export class Index {
       changetype<T>(message).process(tx, txid, <u32>height, txindex);
     }
     return new Map<u32, BalanceSheet>();
+  }
+  static parseProtosplit(
+    tx: RunesTransaction,
+    startOutpoint: u32,
+    message: ArrayBuffer,
+  ): ArrayBuffer {
+    const payload = Index.getMessagePayload(tx.outs[startOutpoint]);
+    if (changetype<usize>(payload) == 0) return message;
+    const protostone = ProtoStone.parse(payload);
+    if (changetype<usize>(protostone) == 0)
+      Box.concat([Box.from(message), Box.from(payload)]);
+    const splits = protostone.splits();
+    if (splits.length > 0) {
+      for (let i = 0; i < splits.length; i++) {
+        return Index.parseProtosplit(tx, splits[i], message);
+      }
+    }
+    return message;
   }
   static processRunesTransaction(
     _block: Block,
@@ -151,11 +175,17 @@ export class Index {
 
       //parse protosplit
       const protosplitKeys = tx.tags.protosplits.keys();
+      const protoSplitData = new Map<u16, ArrayBuffer>();
       for (let k = 0; k < protosplitKeys.length; k++) {
         const outs = tx.tags.protosplits.get(protosplitKeys[k]);
-        for (let o = 0; o < outs.length; o++) {}
-        //parse only one protocols protosplit message
-        break;
+        let message = new ArrayBuffer(0);
+        for (let o = 0; o < outs.length; o++) {
+          message = Box.concat([
+            Box.from(message),
+            Box.from(Index.parseProtosplit(tx, outs[o], message)),
+          ]);
+        }
+        protoSplitData.set(protosplitKeys[k], message);
       }
 
       // process protomessage
@@ -166,6 +196,7 @@ export class Index {
       }
     }
   }
+
   static indexBlock(height: u32, _block: Block): void {
     if (height == GENESIS) {
       RunestoneMessage.etchGenesisRune();
