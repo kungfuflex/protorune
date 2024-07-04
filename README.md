@@ -6,7 +6,7 @@ NO protoburn shall be honored prior to the first on-chain protoburn of QUORUM•
 
 The first protoburn of QUORUM•GENESIS•PROTORUNE signifies maturity of the protorune specification, as defined in this document.
 
-[https://github.com/sandshrewmetaprotocols/quorumgenesisprotorune](https://github.com/sandshrewmetaprotocols/quorumgenesisprotorune)
+[https://github.com/kungfuflex/quorumgenesisprotorune](https://github.com/kungfuflex/quorumgenesisprotorune)
 
 #### NOTE: protorune does not have a token
 
