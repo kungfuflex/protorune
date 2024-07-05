@@ -17,7 +17,7 @@ import { OutPoint, Output } from "metashrew-as/assembly/blockdata/transaction";
 import { protorune } from "../proto/protorune";
 import { stripNullRight } from "../utils";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils";
-import { ProtoMessage, MessageContext } from "../protomessage";
+import { ProtoMessage, MessageContext } from "./protomessage";
 import { BalanceSheet } from "./BalanceSheet";
 import { ProtoStone } from "./ProtoStone";
 
@@ -172,7 +172,6 @@ export class Index {
           new ProtoMessage(message, index, sheets),
         );
       }
-
       //parse protosplit
       const protosplitKeys = tx.tags.protosplits.keys();
       const protoSplitData = new Map<u16, ArrayBuffer>();
