@@ -138,7 +138,6 @@ export class Index {
     height: u32,
     i: u32,
   ): void {
-    tx.processRunestones();
     if (height >= GENESIS) {
       Index.processMessage<RunestoneMessage>(
         height,
@@ -147,55 +146,58 @@ export class Index {
         i,
         tx.tags.runestone,
       );
-
-      const sheets = Index.processMessage<ProtoruneMessage>(
-        height,
-        tx,
-        txid,
-        i,
-        tx.tags.protorunestone,
-      );
-
-      const protoMessages: Map<u16, ProtoMessage> = new Map<
-        u16,
-        ProtoMessage
-      >();
-      // parse protomessages
-      const protomessageKeys = tx.tags.protomessage.keys();
-      for (let m = 0; m < protomessageKeys.length; m++) {
-        const index = tx.tags.protomessage[protomessageKeys[m]];
-        const out = tx.outs[index];
-        const parsed = scriptParse(out.script).slice(2);
-        const message = protorune.ProtoMessage.decode(Box.concat(parsed));
-        protoMessages.set(
-          protomessageKeys[m],
-          new ProtoMessage(message, index, sheets),
-        );
-      }
-      //parse protosplit
-      const protosplitKeys = tx.tags.protosplits.keys();
-      const protoSplitData = new Map<u16, ArrayBuffer>();
-      for (let k = 0; k < protosplitKeys.length; k++) {
-        const outs = tx.tags.protosplits.get(protosplitKeys[k]);
-        let message = new ArrayBuffer(0);
-        for (let o = 0; o < outs.length; o++) {
-          message = Box.concat([
-            Box.from(message),
-            Box.from(Index.parseProtosplit(tx, outs[o], message)),
-          ]);
-        }
-        protoSplitData.set(protosplitKeys[k], message);
-      }
-
-      // process protomessage
-      const protoMessageTypes = protoMessages.keys();
-      for (let m = 0; m < protoMessageTypes.length; m++) {
-        const message = protoMessages.get(protoMessageTypes[m]);
-        message.handle<MessageContext>(tx, _block, height, i);
-      }
     }
   }
+  static processProtocol<T extends MessageContext>(
+    block: RunesBlock,
+    tx: RunesTransaction,
+    txid: ArrayBuffer,
+    height: u64,
+    i: u32,
+  ): void {
+    const sheets = Index.processMessage<ProtoruneMessage>(
+      height,
+      tx,
+      txid,
+      i,
+      tx.tags.protorunestone,
+    );
+    const protoMessages: Map<u16, ProtoMessage> = new Map<u16, ProtoMessage>();
 
+    // parse protomessages
+    const protomessageKeys = tx.tags.protomessage.keys();
+    for (let m = 0; m < protomessageKeys.length; m++) {
+      const index = tx.tags.protomessage[protomessageKeys[m]];
+      const out = tx.outs[index];
+      const parsed = scriptParse(out.script).slice(2);
+      const message = protorune.ProtoMessage.decode(Box.concat(parsed));
+      protoMessages.set(
+        protomessageKeys[m],
+        new ProtoMessage(message, index, sheets),
+      );
+    }
+    //parse protosplit
+    const protosplitKeys = tx.tags.protosplits.keys();
+    const protoSplitData = new Map<u16, ArrayBuffer>();
+    for (let k = 0; k < protosplitKeys.length; k++) {
+      const outs = tx.tags.protosplits.get(protosplitKeys[k]);
+      let message = new ArrayBuffer(0);
+      for (let o = 0; o < outs.length; o++) {
+        message = Box.concat([
+          Box.from(message),
+          Box.from(Index.parseProtosplit(tx, outs[o], message)),
+        ]);
+      }
+      protoSplitData.set(protosplitKeys[k], message);
+    }
+
+    // process protomessage
+    const protoMessageTypes = protoMessages.keys();
+    for (let m = 0; m < protoMessageTypes.length; m++) {
+      const message = protoMessages.get(protoMessageTypes[m]);
+      message.handle<T>(tx, block, height, i);
+    }
+  }
   static indexBlock(height: u32, _block: Block): void {
     if (height == GENESIS) {
       RunestoneMessage.etchGenesisRune();
@@ -208,8 +210,10 @@ export class Index {
     for (let i: i32 = 0; i < block.transactions.length; i++) {
       const tx = block.getTransaction(i);
       const txid = tx.txid();
+      tx.processRunestones();
       Index.indexOutpoints(tx, txid, height);
       Index.processRunesTransaction(_block, tx, txid, height, i);
+      Index.processProtocol<MessageContext>(block, tx, txid, height, i);
     }
   }
 }

@@ -1,13 +1,15 @@
 import { Field } from "./fields";
 import { fieldTo, toPrimitive, min } from "../utils";
 import { Edict } from "./Edict";
-import { OUTPOINT_TO_RUNES } from "./constants/protorune";
+import { PROTORUNE_TABLE } from "./tables/protorune";
 import { BalanceSheet } from "./BalanceSheet";
 import { RunesTransaction } from "./RunesTransaction";
 import { Input, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
 import { RunestoneMessage } from "./RunestoneMessage";
 
 export class ProtoruneMessage extends RunestoneMessage {
+  //@ts-ignore
+  table: PROTORUNE_TABLE;
   processEdicts(
     balancesByOutput: Map<u32, BalanceSheet>,
     balanceSheet: BalanceSheet,
@@ -43,7 +45,9 @@ export class ProtoruneMessage extends RunestoneMessage {
     let balanceSheet = BalanceSheet.concat(
       tx.ins.map<BalanceSheet>((v: Input, i: i32, ary: Array<Input>) =>
         BalanceSheet.load(
-          OUTPOINT_TO_RUNES.select(v.previousOutput().toArrayBuffer()),
+          this.table.OUTPOINT_TO_RUNES.select(
+            v.previousOutput().toArrayBuffer(),
+          ),
         ),
       ),
     );

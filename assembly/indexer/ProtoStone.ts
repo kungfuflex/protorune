@@ -16,26 +16,6 @@ import {
   fieldToName,
 } from "../utils";
 import { Flag } from "./flags/ProtoruneFlag";
-import { RuneId } from "./RuneId";
-import { Edict } from "./Edict";
-import {
-  SPACERS,
-  RUNE_ID_TO_ETCHING,
-  ETCHING_TO_RUNE_ID,
-  RUNE_ID_TO_HEIGHT,
-  DIVISIBILITY,
-  SYMBOL,
-  ETCHINGS,
-  OUTPOINT_TO_RUNES,
-  GENESIS,
-  HEIGHT_INTERVAL,
-  MINIMUM_NAME,
-  TWENTY_SIX,
-  RESERVED_NAME,
-} from "./constants";
-import { BalanceSheet } from "./BalanceSheet";
-import { RunesTransaction } from "./RunesTransaction";
-import { Input, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
 
 export class ProtoStone {
   public fields: Map<u64, Array<u128>>;
@@ -82,6 +62,7 @@ export class ProtoStone {
     }
     return changetype<Array<u32>>(0);
   }
+
   static parse(data: ArrayBuffer): ProtoStone {
     const input = Box.from(data);
     let fields = new Map<u64, Array<u128>>();

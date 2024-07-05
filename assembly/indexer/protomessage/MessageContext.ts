@@ -1,10 +1,10 @@
 import { Block, OutPoint, Transaction } from "metashrew-as/assembly/blockdata";
 import { IncomingRune } from "./IncomingRune";
 import { AtomicTransaction } from "metashrew-as/assembly/indexer/atomic";
-import { protorune } from "../proto/protorune";
-import { RuneId } from "../indexer/RuneId";
-import { BalanceSheet } from "../indexer/BalanceSheet";
-import { OUTPOINT_TO_RUNES } from "../indexer/constants/protorune";
+import { protorune } from "../../proto/protorune";
+import { RuneId } from "../RuneId";
+import { BalanceSheet } from "../BalanceSheet";
+import { OUTPOINT_TO_RUNES } from "../constants/protorune";
 
 export class MessageContext {
   runtime: AtomicTransaction = new AtomicTransaction();
