@@ -1,10 +1,9 @@
 import { Block, OutPoint, Transaction } from "metashrew-as/assembly/blockdata";
 import { IncomingRune } from "./IncomingRune";
 import { AtomicTransaction } from "metashrew-as/assembly/indexer/atomic";
-import { protorune } from "../../proto/protorune";
 import { RuneId } from "../RuneId";
 import { BalanceSheet } from "../BalanceSheet";
-import { OUTPOINT_TO_RUNES } from "../constants/protorune";
+import { PROTORUNE_TABLE, PROTOCOLS_TO_INDEX } from "../tables/protorune";
 
 export class MessageContext {
   runtime: AtomicTransaction = new AtomicTransaction();
@@ -19,8 +18,8 @@ export class MessageContext {
   sheets: Map<u32, BalanceSheet>;
   txid: ArrayBuffer;
   baseSheet: BalanceSheet;
-  protocol: u16 = 0;
   runeIdToIndex: Map<ArrayBuffer, i32> = new Map<ArrayBuffer, i32>();
+  table: PROTORUNE_TABLE;
 
   constructor(
     transaction: Transaction,
@@ -42,6 +41,7 @@ export class MessageContext {
     this.pointer = OutPoint.from(this.txid, pointer);
     this.refund_pointer = OutPoint.from(this.txid, refund_pointer);
     this.calldata = calldata;
+    this.table = PROTORUNE_TABLE.for(MessageContext.protocol_tag());
     if (sheets.has(index)) {
       const sheet = sheets.get(index);
       for (let i = 0; i < sheet.runes.length; i++) {
@@ -53,21 +53,25 @@ export class MessageContext {
       }
     }
   }
-  static initialiseProtocol() {}
+  static initialiseProtocol(): u16 {
+    const tag = MessageContext.protocol_tag();
+    PROTOCOLS_TO_INDEX.add(tag);
+    return tag;
+  }
   checkBalances(): bool {
     const checkingSheet = BalanceSheet.loadFromAtomicTx(
-      OUTPOINT_TO_RUNES.select(this.refund_pointer.toArrayBuffer()),
+      this.table.OUTPOINT_TO_RUNES.select(this.refund_pointer.toArrayBuffer()),
       this.runtime,
     );
     checkingSheet.pipe(
       BalanceSheet.loadFromAtomicTx(
-        OUTPOINT_TO_RUNES.select(this.pointer.toArrayBuffer()),
+        this.table.OUTPOINT_TO_RUNES.select(this.pointer.toArrayBuffer()),
         this.runtime,
       ),
     );
     checkingSheet.pipe(
       BalanceSheet.loadFromAtomicTx(
-        OUTPOINT_TO_RUNES.select(this.outpoint.toArrayBuffer()),
+        this.table.OUTPOINT_TO_RUNES.select(this.outpoint.toArrayBuffer()),
         this.runtime,
       ),
     );
@@ -91,7 +95,7 @@ export class MessageContext {
         }
       }
       sheet.saveToAtomicTx(
-        OUTPOINT_TO_RUNES.select(this.pointer.toArrayBuffer()),
+        this.table.OUTPOINT_TO_RUNES.select(this.pointer.toArrayBuffer()),
         this.runtime,
       );
       this.baseSheet.pipe(sheet);
@@ -111,7 +115,9 @@ export class MessageContext {
         }
       }
       sheet.saveToAtomicTx(
-        OUTPOINT_TO_RUNES.select(this.refund_pointer.toArrayBuffer()),
+        this.table.OUTPOINT_TO_RUNES.select(
+          this.refund_pointer.toArrayBuffer(),
+        ),
         this.runtime,
       );
       this.baseSheet.pipe(sheet);
@@ -130,5 +136,8 @@ export class MessageContext {
 
   handle(): bool {
     return false;
+  }
+  static protocol_tag(): u16 {
+    return 0x6a6d;
   }
 }

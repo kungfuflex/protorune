@@ -154,6 +154,7 @@ export class Index {
     txid: ArrayBuffer,
     height: u64,
     i: u32,
+    protocol: u16,
   ): void {
     const sheets = Index.processMessage<ProtoruneMessage>(
       height,
@@ -167,9 +168,10 @@ export class Index {
     // parse protomessages
     const protomessageKeys = tx.tags.protomessage.keys();
     for (let m = 0; m < protomessageKeys.length; m++) {
+      if (protomessageKeys[m] != protocol) continue;
       const index = tx.tags.protomessage[protomessageKeys[m]];
       const out = tx.outs[index];
-      const payload = Index.getMessagePayload(out, 3);
+      const payload = Index.getMessagePayload(out, 5);
       if (changetype<usize>(payload) == 0) continue;
       const protostone = ProtoStone.parse(payload);
       protoMessages.set(
@@ -214,7 +216,14 @@ export class Index {
       tx.processRunestones();
       Index.indexOutpoints(tx, txid, height);
       Index.processRunesTransaction(_block, tx, txid, height, i);
-      Index.processProtocol<MessageContext>(block, tx, txid, height, i);
+      Index.processProtocol<MessageContext>(
+        block,
+        tx,
+        txid,
+        height,
+        i,
+        MessageContext.protocol_tag(),
+      );
     }
   }
 }
