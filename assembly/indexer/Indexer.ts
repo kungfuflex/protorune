@@ -169,11 +169,12 @@ export class Index {
     for (let m = 0; m < protomessageKeys.length; m++) {
       const index = tx.tags.protomessage[protomessageKeys[m]];
       const out = tx.outs[index];
-      const parsed = scriptParse(out.script).slice(2);
-      const message = protorune.ProtoMessage.decode(Box.concat(parsed));
+      const payload = Index.getMessagePayload(out, 3);
+      if (changetype<usize>(payload) == 0) continue;
+      const protostone = ProtoStone.parse(payload);
       protoMessages.set(
         protomessageKeys[m],
-        new ProtoMessage(message, index, sheets),
+        ProtoMessage.from(protostone, index, sheets),
       );
     }
     //parse protosplit

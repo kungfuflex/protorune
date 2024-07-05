@@ -19,15 +19,18 @@ export class MessageContext {
   sheets: Map<u32, BalanceSheet>;
   txid: ArrayBuffer;
   baseSheet: BalanceSheet;
+  protocol: u16 = 0;
   runeIdToIndex: Map<ArrayBuffer, i32> = new Map<ArrayBuffer, i32>();
 
   constructor(
-    message: protorune.ProtoMessage,
     transaction: Transaction,
     block: Block,
     height: u64,
     index: u32,
     sheets: Map<u32, BalanceSheet>,
+    pointer: u32,
+    refund_pointer: u32,
+    calldata: ArrayBuffer,
   ) {
     this.sheets = sheets;
     this.baseSheet = new BalanceSheet();
@@ -36,9 +39,9 @@ export class MessageContext {
     this.height = height;
     this.txid = transaction.txid();
     this.outpoint = OutPoint.from(this.txid, index);
-    this.pointer = OutPoint.from(this.txid, message.pointer);
-    this.refund_pointer = OutPoint.from(this.txid, message.refund_pointer);
-    this.calldata = changetype<Uint8Array>(message.calldata).buffer;
+    this.pointer = OutPoint.from(this.txid, pointer);
+    this.refund_pointer = OutPoint.from(this.txid, refund_pointer);
+    this.calldata = calldata;
     if (sheets.has(index)) {
       const sheet = sheets.get(index);
       for (let i = 0; i < sheet.runes.length; i++) {
@@ -50,7 +53,7 @@ export class MessageContext {
       }
     }
   }
-
+  static initialiseProtocol() {}
   checkBalances(): bool {
     const checkingSheet = BalanceSheet.loadFromAtomicTx(
       OUTPOINT_TO_RUNES.select(this.refund_pointer.toArrayBuffer()),

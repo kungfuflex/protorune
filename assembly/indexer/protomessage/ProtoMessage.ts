@@ -1,21 +1,29 @@
 import { Block } from "metashrew-as/assembly/blockdata";
-import { RunesTransaction } from "../indexer/RunesTransaction";
-import { protorune } from "../proto/protorune";
+import { RunesTransaction } from "../RunesTransaction";
 import { MessageContext } from "./MessageContext";
-import { BalanceSheet } from "../indexer/BalanceSheet";
+import { BalanceSheet } from "../BalanceSheet";
+import { ProtoStone } from "../ProtoStone";
+import { Field } from "../fields/ProtoruneField";
+import { fieldTo, fieldToArrayBuffer } from "../../utils";
 
 export class ProtoMessage {
-  message: protorune.ProtoMessage;
   outpoint: u32;
   sheets: Map<u32, BalanceSheet>;
+  calldata: ArrayBuffer;
+  pointer: u32;
+  refund_pointer: u32;
   constructor(
-    message: protorune.ProtoMessage,
     outpoint: u32,
     sheets: Map<u32, BalanceSheet>,
+    pointer: u32,
+    refund_pointer: u32,
+    calldata: ArrayBuffer,
   ) {
-    this.message = message;
     this.outpoint = outpoint;
     this.sheets = sheets;
+    this.pointer = pointer;
+    this.refund_pointer = refund_pointer;
+    this.calldata = calldata;
   }
   handle<T extends MessageContext>(
     tx: RunesTransaction,
@@ -24,14 +32,39 @@ export class ProtoMessage {
     i: u32,
   ): void {
     const context = new MessageContext(
-      this.message,
       tx,
       block,
       height,
       i,
       this.sheets,
+      this.pointer,
+      this.refund_pointer,
+      this.calldata,
     );
 
     changetype<T>(context).run();
+  }
+  static from(
+    protostone: ProtoStone,
+    outpoint: u32,
+    sheets: Map<u32, BalanceSheet>,
+  ): ProtoMessage {
+    if (
+      !protostone.fields.has(Field.MESSAGE) ||
+      !protostone.fields.has(Field.POINTER) ||
+      !protostone.fields.has(Field.REFUND)
+    )
+      return changetype<ProtoMessage>(0);
+
+    let calldata: ArrayBuffer = fieldToArrayBuffer(
+      protostone.fields.get(Field.MESSAGE),
+    );
+    return new ProtoMessage(
+      outpoint,
+      sheets,
+      fieldTo<u32>(protostone.fields.get(Field.POINTER)),
+      fieldTo<u32>(protostone.fields.get(Field.REFUND)),
+      calldata,
+    );
   }
 }

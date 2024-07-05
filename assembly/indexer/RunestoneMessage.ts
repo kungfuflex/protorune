@@ -1,5 +1,6 @@
 import { u128 } from "as-bignum/assembly";
 import { Field } from "./fields";
+import { Field as ProtoruneField } from "./fields/ProtoruneField";
 import { Box } from "metashrew-as/assembly/utils/box";
 import { readULEB128ToU128 } from "../leb128";
 import {
@@ -40,8 +41,8 @@ import {
   MINIMUM_NAME,
   TWENTY_SIX,
   RESERVED_NAME,
-  PROTOCOLS_TO_INDEX,
 } from "./constants";
+import { PROTOCOLS_TO_INDEX } from "./tables/protorune";
 import { BalanceSheet } from "./BalanceSheet";
 import { RunesTransaction } from "./RunesTransaction";
 import { Input, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
@@ -51,6 +52,8 @@ import {
 } from "metashrew-as/assembly/utils";
 import { console } from "metashrew-as/assembly/utils/logging";
 import { ProtoBurn } from "./ProtoBurn";
+import { ProtoStone } from "./ProtoStone";
+import { Index } from "./Indexer";
 
 export class RunestoneMessage {
   public fields: Map<u64, Array<u128>>;
@@ -308,7 +311,18 @@ export class RunestoneMessage {
       for (let i = 0; i < tx.tags.protoburn.length; i++) {
         const protoburnOut = tx.tags.protoburn[i];
         const out = tx.outs[protoburnOut];
-        const protoburn = ProtoBurn.from(out.script);
+        const payload = Index.getMessagePayload(out);
+        if (changetype<usize>(payload) == 0) continue;
+        const protostone = ProtoStone.parse(payload);
+        if (
+          !protostone.fields.has(ProtoruneField.BURN) ||
+          !protostone.fields.has(ProtoruneField.POINTER)
+        )
+          continue;
+        const protoburn = new ProtoBurn([
+          protostone.fields.get(ProtoruneField.BURN)[0],
+          protostone.fields.get(ProtoruneField.POINTER)[0],
+        ]);
         if (PROTOCOLS_TO_INDEX.has(protoburn.protocol_tag)) {
           let ary = new Array<ProtoBurn>();
           if (this.protoBurns.has(protoburnOut))

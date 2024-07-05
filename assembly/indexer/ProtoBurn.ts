@@ -1,23 +1,15 @@
-import { protorune } from "../proto/protorune";
-import { scriptParse } from "metashrew-as/assembly/utils/yabsp";
 import { BalanceSheet } from "./BalanceSheet";
-import { Box } from "metashrew-as/assembly/utils/box";
 import { PROTORUNE_TABLE } from "./tables/protorune";
-
 import * as base from "./constants";
+import { u128 } from "as-bignum";
 
 export class ProtoBurn {
   protocol_tag: u16;
   pointer: u32;
   table: PROTORUNE_TABLE;
-  constructor(data: ArrayBuffer) {
-    const res = protorune.ProtoBurn.decode(data);
-    this.protocol_tag = bswap<u16>(
-      load<u16>(
-        changetype<usize>(changetype<Uint8Array>(res.protocol_tag).buffer),
-      ),
-    );
-    this.pointer = res.pointer;
+  constructor(data: Array<u128>) {
+    this.protocol_tag = data[0].toU32();
+    this.pointer = data[1].toU32();
     this.table = PROTORUNE_TABLE.for(this.protocol_tag);
   }
 
@@ -35,9 +27,5 @@ export class ProtoBurn {
       this.table.ETCHINGS.append(name);
       balanceSheet.save(this.table.OUTPOINT_TO_RUNES.select(outpoint));
     }
-  }
-
-  static from(script: Box): ProtoBurn {
-    return new ProtoBurn(Box.concat(scriptParse(script).slice(2)));
   }
 }
