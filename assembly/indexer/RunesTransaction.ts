@@ -13,11 +13,11 @@ import {
 import { PROTOCOLS_TO_INDEX } from "./tables/protorune";
 
 class TagOutput {
-  runestone: i32 = -1;
+  runestone: Map<u16, i32> = new Map<u16, i32>();
   protoburn: Array<i32> = new Array<i32>();
   protomessage: Map<u16, i32> = new Map<u16, i32>();
-  protorunestone: i32 = -1;
   protosplits: Map<u16, Array<i32>> = new Map<u16, Array<i32>>();
+  runestoneOrder: Array<u16> = new Array<u16>();
 }
 
 @final
@@ -31,7 +31,10 @@ export class RunesTransaction extends Transaction {
       const next2 = load<u16>(this.outs[i].script.start + sizeof<u16>());
       switch (op) {
         case RUNESTONE_TAG:
-          if (output.runestone == -1) output.runestone = i;
+          if (!output.runestone.has(0)) {
+            output.runestone.set(0, i);
+            output.runestoneOrder.push(0);
+          }
           break;
         case PROTOBURN_TAG:
           output.protoburn.push(i);
@@ -56,8 +59,10 @@ export class RunesTransaction extends Transaction {
           }
           break;
         default:
-          if (output.protorunestone == -1 && PROTOCOLS_TO_INDEX.has(op))
-            output.protorunestone = i;
+          if (!output.runestone.has(op) && PROTOCOLS_TO_INDEX.has(op)) {
+            output.runestone.set(op, i);
+            output.runestoneOrder.push(op);
+          }
           break;
       }
     }

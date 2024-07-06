@@ -89,6 +89,9 @@ export class RunestoneMessage {
   isEtching(): bool {
     return this.getFlag(Flag.ETCHING);
   }
+  static parseProtocol(data: ArrayBuffer, protocol: u16): RunestoneMessage {
+    return RunestoneMessage.parse(data);
+  }
   mintTo(): ArrayBuffer {
     if (!this.fields.has(Field.MINT)) return changetype<ArrayBuffer>(0);
     return fieldToArrayBuffer(this.fields.get(Field.MINT));

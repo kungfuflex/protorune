@@ -14,14 +14,14 @@ export class PROTORUNE_TABLE {
   ETCHING_TO_RUNE_ID: IndexPointer;
   constructor(ptr: IndexPointer) {
     this.ptr = ptr;
-    this.OUTPOINT_TO_RUNES = this.ptr.keyword("/runes/byoutpoint/");
-    this.HEIGHT_TO_TRANSACTION_IDS = this.ptr.keyword("/txids/byheight");
-    this.SYMBOL = this.ptr.keyword("/runes/symbol/");
-    this.SPACERS = this.ptr.keyword("/runes/spaces/");
-    this.DIVISIBILITY = this.ptr.keyword("/runes/divisibility/");
-    this.ETCHINGS = this.ptr.keyword("/runes/names");
-    this.RUNE_ID_TO_ETCHING = this.ptr.keyword("/etching/byruneid/");
-    this.ETCHING_TO_RUNE_ID = this.ptr.keyword("/runeid/byetching/");
+    this.OUTPOINT_TO_RUNES = ptr.keyword("/runes/byoutpoint/");
+    this.HEIGHT_TO_TRANSACTION_IDS = ptr.keyword("/txids/byheight");
+    this.SYMBOL = ptr.keyword("/runes/symbol/");
+    this.SPACERS = ptr.keyword("/runes/spaces/");
+    this.DIVISIBILITY = ptr.keyword("/runes/divisibility/");
+    this.ETCHINGS = ptr.keyword("/runes/names");
+    this.RUNE_ID_TO_ETCHING = ptr.keyword("/etching/byruneid/");
+    this.ETCHING_TO_RUNE_ID = ptr.keyword("/runeid/byetching/");
   }
   static for(protocol: u16): PROTORUNE_TABLE {
     const buf = new ArrayBuffer(2);

@@ -36,12 +36,13 @@ export class MessageContext {
     this.transaction = transaction;
     this.block = block;
     this.height = height;
-    this.txid = transaction.txid();
-    this.outpoint = OutPoint.from(this.txid, index);
-    this.pointer = OutPoint.from(this.txid, pointer);
-    this.refund_pointer = OutPoint.from(this.txid, refund_pointer);
+    const txid = transaction.txid();
+    this.outpoint = OutPoint.from(txid, index);
+    this.pointer = OutPoint.from(txid, pointer);
+    this.refund_pointer = OutPoint.from(txid, refund_pointer);
     this.calldata = calldata;
     this.table = PROTORUNE_TABLE.for(MessageContext.protocol_tag());
+    this.txid = txid;
     if (sheets.has(index)) {
       const sheet = sheets.get(index);
       for (let i = 0; i < sheet.runes.length; i++) {

@@ -5,10 +5,34 @@ import { BalanceSheet } from "./BalanceSheet";
 import { RunesTransaction } from "./RunesTransaction";
 import { Input } from "metashrew-as/assembly/blockdata/transaction";
 import { RunestoneMessage } from "./RunestoneMessage";
+import { u128 } from "as-bignum/assembly";
 
 export class ProtoruneMessage extends RunestoneMessage {
-  //@ts-ignore
-  table: PROTORUNE_TABLE;
+  table: PROTORUNE_TABLE = changetype<PROTORUNE_TABLE>(0);
+  constructor(
+    fields: Map<u64, Array<u128>>,
+    edicts: Array<StaticArray<u128>>,
+    table: PROTORUNE_TABLE,
+  ) {
+    super(fields, edicts);
+    this.table = table;
+  }
+
+  static parseProtocol(
+    data: ArrayBuffer,
+    protocol: u16,
+  ): ProtoruneMessage | RunestoneMessage {
+    const message = super.parse(data);
+    if (protocol == 0) {
+      return message;
+    }
+    return new ProtoruneMessage(
+      message.fields,
+      message.edicts,
+      PROTORUNE_TABLE.for(protocol),
+    );
+  }
+
   processEdicts(
     balancesByOutput: Map<u32, BalanceSheet>,
     balanceSheet: BalanceSheet,
