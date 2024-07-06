@@ -1,26 +1,30 @@
-import { ProtoBurn as ProtoBurnLayout } from "./proto/protorune";
 import {
   MAX_SCRIPT_ELEMENT_SIZE,
   OP_RETURN,
 } from "@magiceden-oss/runestone-lib/dist/src/constants";
 import { script } from "@magiceden-oss/runestone-lib/dist/src/script";
+import { u128, u32 } from "@magiceden-oss/runestone-lib/dist/src/integer";
+import { Tag } from "./tag";
+import { Some, Option } from "@magiceden-oss/runestone-lib/dist/src/monads";
 
-export class ProtoBurn implements ProtoBurnLayout {
-  protocolTag: Uint8Array;
-  pointer: number;
+export class ProtoBurn {
+  protocolTag: Option<u32>;
+  pointer: Option<u32>;
 
-  constructor(obj: ProtoBurnLayout) {
-    this.protocolTag = obj.protocolTag;
-    this.pointer = obj.pointer;
+  constructor(obj: { protocolTag: number; pointer: number }) {
+    this.protocolTag = Some<u32>(u32(obj.protocolTag));
+    this.pointer = Some<u32>(u32(obj.pointer));
   }
 
   encipher() {
     const stack: (Buffer | number)[] = [];
-    const payload = Buffer.from(ProtoBurnLayout.toBinary(this));
+    let payloads: Buffer[] = [];
 
+    payloads.push(Tag.encodeOptionInt(Tag.POINTER, this.pointer.map(u128)));
+    payloads.push(Tag.encodeOptionInt(Tag.BURN, this.protocolTag.map(u128)));
     stack.push(OP_RETURN);
     stack.push(OP_RETURN);
-
+    const payload = Buffer.concat(payloads);
     for (let i = 0; i < payload.length; i += MAX_SCRIPT_ELEMENT_SIZE) {
       stack.push(payload.subarray(i, i + MAX_SCRIPT_ELEMENT_SIZE));
     }
