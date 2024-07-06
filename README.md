@@ -7,7 +7,7 @@
 
 AssemblyScript boilerplate for architecting protorunes-compatible subprotocols. 
 
-The protorunes specification is hosted at:
+_The protorunes specification is hosted at_:
 
 [https://github.com/kungfuflex/protorune/wiki](https://github.com/kungfuflex/protorune/wiki)
 
