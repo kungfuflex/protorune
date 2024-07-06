@@ -14,7 +14,6 @@ import {
   min,
   nameToArrayBuffer,
   getReservedNameFor,
-  fieldToName,
 } from "../utils";
 import { Flag } from "./flags";
 import { RuneId } from "./RuneId";
@@ -46,11 +45,7 @@ import { PROTOCOLS_TO_INDEX } from "./tables/protorune";
 import { BalanceSheet } from "./BalanceSheet";
 import { RunesTransaction } from "./RunesTransaction";
 import { Input, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
-import {
-  encodeHexFromBuffer,
-  SUBSIDY_HALVING_INTERVAL,
-} from "metashrew-as/assembly/utils";
-import { console } from "metashrew-as/assembly/utils/logging";
+import { SUBSIDY_HALVING_INTERVAL } from "metashrew-as/assembly/utils";
 import { ProtoBurn } from "./ProtoBurn";
 import { ProtoStone } from "./ProtoStone";
 import { Index } from "./Indexer";

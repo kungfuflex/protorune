@@ -1,4 +1,3 @@
-import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
 import { Block } from "metashrew-as/assembly/blockdata/block";
 import { RunesTransaction } from "./RunesTransaction";
 import { HEIGHT_TO_TRANSACTION_IDS } from "./constants";

@@ -8,9 +8,9 @@ import {
   OP_RETURN,
   PROTOBURN_TAG,
   PROTOMESSAGE_TAG,
-  PROTOCOLS_TO_INDEX,
   PROTOSPLIT_TAG,
 } from "./constants";
+import { PROTOCOLS_TO_INDEX } from "./tables/protorune";
 
 class TagOutput {
   runestone: i32 = -1;

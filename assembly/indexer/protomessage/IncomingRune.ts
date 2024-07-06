@@ -1,9 +1,9 @@
 import { AtomicTransaction } from "metashrew-as/assembly/indexer/atomic";
-import { RuneId } from "../indexer/RuneId";
+import { RuneId } from "../RuneId";
 import { u128 } from "as-bignum/assembly";
 import { MessageContext } from "./MessageContext";
-import { OUTPOINT_TO_RUNES } from "../indexer/constants/protorune";
-import { fromArrayBuffer, toArrayBuffer } from "../utils";
+import { PROTORUNE_TABLE } from "../tables/protorune";
+import { fromArrayBuffer, toArrayBuffer } from "../../utils";
 
 export class IncomingRune {
   runeId: RuneId;
@@ -13,21 +13,28 @@ export class IncomingRune {
   refund_pointer_index: i32 = -1;
   runtime: AtomicTransaction = new AtomicTransaction();
   context: MessageContext = changetype<MessageContext>(0);
-  constructor(context: MessageContext, runeId: RuneId, amount: u128) {
+  table: PROTORUNE_TABLE;
+  constructor(
+    context: MessageContext,
+    runeId: RuneId,
+    amount: u128,
+    table: PROTORUNE_TABLE,
+  ) {
     this.context = context;
     this.runeId = runeId;
     this.initialAmount = amount;
     this.amount = new u128(amount.lo, amount.hi);
+    this.table = table;
   }
 
   refundAll(): bool {
     return this.refund(this.initialAmount - this.amount);
   }
   refund(value: u128): bool {
-    const refundPtr = OUTPOINT_TO_RUNES.select(
+    const refundPtr = this.table.OUTPOINT_TO_RUNES.select(
       this.context.refund_pointer.toArrayBuffer(),
     ).keyword("/balances");
-    const ptr = OUTPOINT_TO_RUNES.select(
+    const ptr = this.table.OUTPOINT_TO_RUNES.select(
       this.context.pointer.toArrayBuffer(),
     ).keyword("/balances");
     if (this.pointer_index == -1) return false;
@@ -36,7 +43,7 @@ export class IncomingRune {
     if (value > currentValue || currentValue + value > this.initialAmount)
       return false;
     const newValue: u128 = currentValue - value;
-    if (newValue > 0) {
+    if (newValue > u128.Zero) {
       this.context.runtime.set(index, toArrayBuffer(newValue));
     } else {
       this.context.runtime.set(index, new ArrayBuffer(0));
@@ -48,10 +55,10 @@ export class IncomingRune {
     return true;
   }
   forward(value: u128): bool {
-    const refundPtr = OUTPOINT_TO_RUNES.select(
+    const refundPtr = this.table.OUTPOINT_TO_RUNES.select(
       this.context.refund_pointer.toArrayBuffer(),
     ).keyword("/balances");
-    const ptr = OUTPOINT_TO_RUNES.select(
+    const ptr = this.table.OUTPOINT_TO_RUNES.select(
       this.context.pointer.toArrayBuffer(),
     ).keyword("/balances");
     if (this.refund_pointer_index == -1) return false;
@@ -59,7 +66,7 @@ export class IncomingRune {
     const currentValue = fromArrayBuffer(this.context.runtime.get(index));
     if (value > this.amount || value > currentValue) return false;
     const newValue: u128 = currentValue - value;
-    if (newValue > 0) {
+    if (newValue > u128.Zero) {
       this.context.runtime.set(index, toArrayBuffer(newValue));
     } else {
       this.context.runtime.set(index, new ArrayBuffer(0));

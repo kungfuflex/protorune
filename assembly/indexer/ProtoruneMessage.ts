@@ -1,10 +1,9 @@
-import { Field } from "./fields";
-import { fieldTo, toPrimitive, min } from "../utils";
+import { toPrimitive, min } from "../utils";
 import { Edict } from "./Edict";
 import { PROTORUNE_TABLE } from "./tables/protorune";
 import { BalanceSheet } from "./BalanceSheet";
 import { RunesTransaction } from "./RunesTransaction";
-import { Input, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
+import { Input } from "metashrew-as/assembly/blockdata/transaction";
 import { RunestoneMessage } from "./RunestoneMessage";
 
 export class ProtoruneMessage extends RunestoneMessage {
@@ -55,7 +54,8 @@ export class ProtoruneMessage extends RunestoneMessage {
 
     this.processEdicts(balancesByOutput, balanceSheet, txid);
 
-    const runesToOutputs = balancesByOutput.keys();
+    //@TODO: save sheet properly
+    // const runesToOutputs = balancesByOutput.keys();
 
     // for (let x = 0; x < runesToOutputs.length; x++) {
     //   const sheet = balancesByOutput.get(runesToOutputs[x]);

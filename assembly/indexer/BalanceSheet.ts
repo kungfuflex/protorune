@@ -3,7 +3,6 @@ import { AtomicTransaction } from "metashrew-as/assembly/indexer/atomic";
 import { u128 } from "as-bignum/assembly";
 import { fromArrayBuffer } from "../utils";
 import { RuneId } from "./RuneId";
-import { console } from "metashrew-as/assembly/utils";
 
 export class BalanceSheet {
   public runes: Array<ArrayBuffer>;

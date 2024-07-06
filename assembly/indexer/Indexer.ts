@@ -12,11 +12,8 @@ import {
   BLOCKHASH_TO_HEIGHT,
   GENESIS,
 } from "./constants";
-import { PROTOCOL_TAG } from "./constants/protorune";
 import { OutPoint, Output } from "metashrew-as/assembly/blockdata/transaction";
-import { protorune } from "../proto/protorune";
 import { stripNullRight } from "../utils";
-import { encodeHexFromBuffer } from "metashrew-as/assembly/utils";
 import { ProtoMessage, MessageContext } from "./protomessage";
 import { BalanceSheet } from "./BalanceSheet";
 import { ProtoStone } from "./ProtoStone";

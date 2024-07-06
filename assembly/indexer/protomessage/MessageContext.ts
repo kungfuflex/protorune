@@ -47,7 +47,12 @@ export class MessageContext {
       for (let i = 0; i < sheet.runes.length; i++) {
         const runeId = RuneId.fromBytesU128(sheet.runes[i]);
         this.runeIdToIndex.set(sheet.runes[i], i);
-        const rune = new IncomingRune(this, runeId, sheet.balances[i]);
+        const rune = new IncomingRune(
+          this,
+          runeId,
+          sheet.balances[i],
+          this.table,
+        );
         this.runes.push(rune);
         this.baseSheet.pipe(sheet);
       }
