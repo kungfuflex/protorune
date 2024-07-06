@@ -222,7 +222,7 @@ export class Index {
         txid,
         height,
         i,
-        MessageContext.protocol_tag(),
+        MessageContext.initialiseProtocol(),
       );
     }
   }
