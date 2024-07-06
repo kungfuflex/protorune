@@ -1,6 +1,7 @@
 # protorunes
 
-[![Publish CI](https://github.com/AssemblyScript/assemblyscript/actions/workflow/publish.yml)](https://img.shields.io/github/actions/workflow/status/AssemblyScript/assemblyscript/publish.yml?branch=main&label=publish&logo=github)
+[![Tests](https://img.shields.io/github/actions/workflow/status/AssemblyScript/assemblyscript/test.yml?branch=main&label=test&logo=github)
+[![Publish](https://img.shields.io/github/actions/workflow/status/AssemblyScript/assemblyscript/publish.yml?branch=main&label=publish&logo=github)
 [![npm version](https://img.shields.io/npm/v/assemblyscript.svg?color=007acc&logo=npm)](https://www.npmjs.com/package/protorune)
 [![Downloads](https://img.shields.io/npm/dm/typescript.svg)](https://www.npmjs.com/package/protorune)
 
