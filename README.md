@@ -1,7 +1,7 @@
 # protorunes
 
-[![GitHub Actions CI](https://github.com/microsoft/TypeScript/workflows/CI/badge.svg)](https://github.com/microsoft/TypeScript/actions?query=workflow%3ACI)
-[![npm version](https://badge.fury.io/js/typescript.svg)](https://www.npmjs.com/package/protorune)
+[![Publish CI](https://github.com/AssemblyScript/assemblyscript/actions/workflow/publish.yml)](https://img.shields.io/github/actions/workflow/status/AssemblyScript/assemblyscript/publish.yml?branch=main&label=publish&logo=github)
+[![npm version](https://img.shields.io/npm/v/assemblyscript.svg?color=007acc&logo=npm)](https://www.npmjs.com/package/protorune)
 [![Downloads](https://img.shields.io/npm/dm/typescript.svg)](https://www.npmjs.com/package/protorune)
 
 AssemblyScript boilerplate for architecting protorunes-compatible subprotocols. 
