@@ -1,6 +1,7 @@
 import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
+import { u128 } from "as-bignum/assembly";
 
-export const PROTOCOLS_TO_INDEX = new Set<u16>();
+export const PROTOCOLS_TO_INDEX = new Set<u128>();
 
 export class PROTORUNE_TABLE {
   ptr: IndexPointer;
@@ -23,10 +24,10 @@ export class PROTORUNE_TABLE {
     this.RUNE_ID_TO_ETCHING = ptr.keyword("/etching/byruneid/");
     this.ETCHING_TO_RUNE_ID = ptr.keyword("/runeid/byetching/");
   }
-  static for(protocol: u16): PROTORUNE_TABLE {
-    const buf = new ArrayBuffer(2);
-    store<u16>(changetype<usize>(buf), protocol);
-    return new PROTORUNE_TABLE(IndexPointer.for("/runes/proto").select(buf));
+  static for(protocol: u128): PROTORUNE_TABLE {
+    return new PROTORUNE_TABLE(
+      IndexPointer.for("/runes/proto").keyword(protocol.toString()),
+    );
   }
   unwrap(): IndexPointer {
     return this.ptr;

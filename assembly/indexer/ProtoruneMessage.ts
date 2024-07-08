@@ -8,29 +8,17 @@ import { RunestoneMessage } from "./RunestoneMessage";
 import { u128 } from "as-bignum/assembly";
 
 export class ProtoruneMessage extends RunestoneMessage {
-  table: PROTORUNE_TABLE = changetype<PROTORUNE_TABLE>(0);
-  constructor(
-    fields: Map<u64, Array<u128>>,
-    edicts: Array<StaticArray<u128>>,
-    table: PROTORUNE_TABLE,
-  ) {
-    super(fields, edicts);
-    this.table = table;
-  }
-
-  static parseProtocol(
-    data: ArrayBuffer,
-    protocol: u16,
-  ): ProtoruneMessage | RunestoneMessage {
-    const message = super.parse(data);
-    if (protocol == 0) {
+  static parseProtocol(data: ArrayBuffer, protocol: u128): RunestoneMessage {
+    const message = this.parse(data);
+    if (protocol == u128.Zero) {
       return message;
     }
-    return new ProtoruneMessage(
+    let protorunemessage = new ProtoruneMessage(
       message.fields,
       message.edicts,
       PROTORUNE_TABLE.for(protocol),
     );
+    return protorunemessage;
   }
 
   processEdicts(
@@ -65,15 +53,17 @@ export class ProtoruneMessage extends RunestoneMessage {
     _height: u32,
     _txindex: u32,
   ): Map<u32, BalanceSheet> {
-    let balanceSheet = BalanceSheet.concat(
-      tx.ins.map<BalanceSheet>((v: Input, i: i32, ary: Array<Input>) =>
+    let sheets = new Array<BalanceSheet>();
+    for (let i = 0; i < tx.ins.length; i++) {
+      sheets.push(
         BalanceSheet.load(
           this.table.OUTPOINT_TO_RUNES.select(
-            v.previousOutput().toArrayBuffer(),
+            tx.ins[i].previousOutput().toArrayBuffer(),
           ),
         ),
-      ),
-    );
+      );
+    }
+    let balanceSheet = BalanceSheet.concat(sheets);
     const balancesByOutput = new Map<u32, BalanceSheet>();
 
     this.processEdicts(balancesByOutput, balanceSheet, txid);

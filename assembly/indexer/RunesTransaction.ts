@@ -11,13 +11,15 @@ import {
   PROTOSPLIT_TAG,
 } from "./constants";
 import { PROTOCOLS_TO_INDEX } from "./tables/protorune";
+import { readULEB128ToU128 } from "../leb128";
+import { u128 } from "as-bignum/assembly";
 
 class TagOutput {
-  runestone: Map<u16, i32> = new Map<u16, i32>();
+  runestone: Map<string, i32> = new Map<string, i32>();
   protoburn: Array<i32> = new Array<i32>();
-  protomessage: Map<u16, i32> = new Map<u16, i32>();
-  protosplits: Map<u16, Array<i32>> = new Map<u16, Array<i32>>();
-  runestoneOrder: Array<u16> = new Array<u16>();
+  protomessage: Map<string, i32> = new Map<string, i32>();
+  protosplits: Map<string, Array<i32>> = new Map<string, Array<i32>>();
+  runestoneOrder: Array<u128> = new Array<u128>();
 }
 
 @final
@@ -27,41 +29,44 @@ export class RunesTransaction extends Transaction {
     const output = new TagOutput();
     for (let i = 0; i < this.outs.length; i++) {
       const op = load<u16>(this.outs[i].script.start);
-      const next = load<u8>(this.outs[i].script.start + sizeof<u16>() * 2);
-      const next2 = load<u16>(this.outs[i].script.start + sizeof<u16>());
+      let tag = u128.from(0);
+      readULEB128ToU128(this.outs[i].script, tag);
       switch (op) {
         case RUNESTONE_TAG:
-          if (!output.runestone.has(0)) {
-            output.runestone.set(0, i);
-            output.runestoneOrder.push(0);
+          if (!output.runestone.has(u128.Zero.toString())) {
+            output.runestone.set(u128.Zero.toString(), i);
+            output.runestoneOrder.push(u128.Zero);
           }
           break;
         case PROTOBURN_TAG:
           output.protoburn.push(i);
           break;
         case PROTOMESSAGE_TAG:
-          if (PROTOCOLS_TO_INDEX.has(next2) && next == 0)
-            if (!output.protomessage.has(next2))
-              output.protomessage.set(next2, i);
+          readULEB128ToU128(this.outs[i].script.shrinkFront(2), tag);
+          if (PROTOCOLS_TO_INDEX.has(tag))
+            if (!output.protomessage.has(tag.toString()))
+              output.protomessage.set(tag.toString(), i);
 
           break;
         case PROTOSPLIT_TAG:
-          if (PROTOCOLS_TO_INDEX.has(next2)) {
-            if (output.protosplits.has(next2)) {
-              const ary = output.protosplits.get(next2);
+          readULEB128ToU128(this.outs[i].script.shrinkFront(2), tag);
+          if (PROTOCOLS_TO_INDEX.has(tag)) {
+            if (output.protosplits.has(tag.toString())) {
+              const ary = output.protosplits.get(tag.toString());
               ary.push(i);
-              output.protosplits.set(next2, ary);
+              output.protosplits.set(tag.toString(), ary);
             } else {
               const ary = new Array<i32>();
               ary.push(i);
-              output.protosplits.set(next2, ary);
+              output.protosplits.set(tag.toString(), ary);
             }
           }
           break;
         default:
-          if (!output.runestone.has(op) && PROTOCOLS_TO_INDEX.has(op)) {
-            output.runestone.set(op, i);
-            output.runestoneOrder.push(op);
+          const tagStr = tag.toString();
+          if (output.runestone.has(tagStr) && PROTOCOLS_TO_INDEX.has(tag)) {
+            output.runestone.set(tagStr, i);
+            output.runestoneOrder.push(tag);
           }
           break;
       }

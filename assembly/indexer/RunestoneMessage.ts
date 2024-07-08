@@ -41,7 +41,7 @@ import {
   TWENTY_SIX,
   RESERVED_NAME,
 } from "./constants";
-import { PROTOCOLS_TO_INDEX } from "./tables/protorune";
+import { PROTOCOLS_TO_INDEX, PROTORUNE_TABLE } from "./tables/protorune";
 import { BalanceSheet } from "./BalanceSheet";
 import { RunesTransaction } from "./RunesTransaction";
 import { Input, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
@@ -54,10 +54,16 @@ export class RunestoneMessage {
   public fields: Map<u64, Array<u128>>;
   public edicts: Array<StaticArray<u128>>;
   protoBurns: Map<u32, Array<ProtoBurn>>;
-  constructor(fields: Map<u64, Array<u128>>, edicts: Array<StaticArray<u128>>) {
+  table: PROTORUNE_TABLE;
+  constructor(
+    fields: Map<u64, Array<u128>>,
+    edicts: Array<StaticArray<u128>>,
+    table: PROTORUNE_TABLE,
+  ) {
     this.fields = fields;
     this.edicts = edicts;
     this.protoBurns = new Map<u32, Array<ProtoBurn>>();
+    this.table = table;
   }
   inspect(): string {
     let result = "RunestoneMessage {\n";
@@ -89,7 +95,7 @@ export class RunestoneMessage {
   isEtching(): bool {
     return this.getFlag(Flag.ETCHING);
   }
-  static parseProtocol(data: ArrayBuffer, protocol: u16): RunestoneMessage {
+  static parseProtocol(data: ArrayBuffer, protocol: u128): RunestoneMessage {
     return RunestoneMessage.parse(data);
   }
   mintTo(): ArrayBuffer {
@@ -134,7 +140,7 @@ export class RunestoneMessage {
         field.push(value);
       }
     }
-    return new RunestoneMessage(fields, edicts);
+    return new RunestoneMessage(fields, edicts, changetype<PROTORUNE_TABLE>(0));
   }
 
   mint(height: u32, balanceSheet: BalanceSheet): bool {
@@ -271,7 +277,6 @@ export class RunestoneMessage {
     for (let e = 0; e < edicts.length; e++) {
       const edict = edicts[e];
       const edictOutput = toPrimitive<u32>(edict.output);
-
       const runeId = edict.runeId().toBytes();
       let outputBalanceSheet = changetype<BalanceSheet>(0);
       if (!balancesByOutput.has(edictOutput)) {

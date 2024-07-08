@@ -4,6 +4,7 @@ import { AtomicTransaction } from "metashrew-as/assembly/indexer/atomic";
 import { RuneId } from "../RuneId";
 import { BalanceSheet } from "../BalanceSheet";
 import { PROTORUNE_TABLE, PROTOCOLS_TO_INDEX } from "../tables/protorune";
+import { u128 } from "as-bignum/assembly";
 
 export class MessageContext {
   runtime: AtomicTransaction = new AtomicTransaction();
@@ -59,7 +60,7 @@ export class MessageContext {
       }
     }
   }
-  static initialiseProtocol(): u16 {
+  static initialiseProtocol(): u128 {
     const tag = MessageContext.protocol_tag();
     PROTOCOLS_TO_INDEX.add(tag);
     return tag;
@@ -143,7 +144,8 @@ export class MessageContext {
   handle(): bool {
     return false;
   }
-  static protocol_tag(): u16 {
-    return 0x6a6d;
+  static protocol_tag(): u128 {
+    //change value here
+    return new u128(0, 64);
   }
 }

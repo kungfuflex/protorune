@@ -17,6 +17,7 @@ import { stripNullRight } from "../utils";
 import { ProtoMessage, MessageContext } from "./protomessage";
 import { BalanceSheet } from "./BalanceSheet";
 import { ProtoStone } from "./ProtoStone";
+import { u128 } from "as-bignum/assembly";
 
 export class Index {
   static indexOutpoints(
@@ -60,8 +61,9 @@ export class Index {
     const tx = block.getTransaction(txindex);
     tx.processRunestones();
 
-    if (!tx.tags.runestone.has(0)) return;
-    const runestoneOutputIndex = tx.tags.runestone.get(0);
+    const zero = u128.Zero.toString();
+    if (!tx.tags.runestone.has(zero)) return;
+    const runestoneOutputIndex = tx.tags.runestone.get(zero);
     const runestoneOutput = tx.outs[runestoneOutputIndex];
     const parsed = scriptParse(runestoneOutput.script).slice(2);
     if (
@@ -97,7 +99,7 @@ export class Index {
     txid: ArrayBuffer,
     txindex: u32,
     outputIndex: i32,
-    protocol: u16,
+    protocol: u128,
   ): Map<u32, BalanceSheet> {
     if (outputIndex > -1) {
       const runestoneOutput = tx.outs[outputIndex];
@@ -138,27 +140,28 @@ export class Index {
     txid: ArrayBuffer,
     height: u32,
     i: u32,
-    protocol: u16,
+    protocol: u128,
   ): void {
-    if (height >= GENESIS && tx.tags.runestone.has(protocol)) {
+    const p = protocol.toString();
+    if (height >= GENESIS && tx.tags.runestone.has(p)) {
       const sheets = Index.processMessage<T>(
         height,
         tx,
         txid,
         i,
-        tx.tags.runestone.get(protocol),
+        tx.tags.runestone.get(p),
         protocol,
       );
-      if (protocol > 0) {
-        const protoMessages: Map<u16, ProtoMessage> = new Map<
-          u16,
+      if (protocol > u128.Zero) {
+        const protoMessages: Map<string, ProtoMessage> = new Map<
+          string,
           ProtoMessage
         >();
 
         // parse protomessages
         const protomessageKeys = tx.tags.protomessage.keys();
         for (let m = 0; m < protomessageKeys.length; m++) {
-          if (protomessageKeys[m] != protocol) continue;
+          if (protomessageKeys[m] != p) continue;
           const index = tx.tags.protomessage[protomessageKeys[m]];
           const out = tx.outs[index];
           const payload = Index.getMessagePayload(out, 5);
@@ -171,7 +174,7 @@ export class Index {
         }
         //parse protosplit
         const protosplitKeys = tx.tags.protosplits.keys();
-        const protoSplitData = new Map<u16, ArrayBuffer>();
+        const protoSplitData = new Map<string, ArrayBuffer>();
         for (let k = 0; k < protosplitKeys.length; k++) {
           const outs = tx.tags.protosplits.get(protosplitKeys[k]);
           let message = new ArrayBuffer(0);
@@ -199,7 +202,7 @@ export class Index {
     txid: ArrayBuffer,
     height: u32,
     i: u32,
-    protocol: u16,
+    protocol: u128,
   ): void {
     Index.processRunesTransaction<ProtoruneMessage, C>(
       block,
@@ -223,7 +226,7 @@ export class Index {
       txid,
       height,
       i,
-      0,
+      u128.Zero,
     );
   }
   static indexBlock(height: u32, _block: Block): void {
@@ -241,19 +244,19 @@ export class Index {
       tx.processRunestones();
       Index.indexOutpoints(tx, txid, height);
       for (let r = 0; r < tx.tags.runestoneOrder.length; r++) {
-        switch (tx.tags.runestoneOrder[r]) {
-          case 0:
-            Index.processRunes(_block, tx, txid, height, i);
-            break;
-          case MessageContext.initialiseProtocol():
-            Index.processProtocol<MessageContext>(
-              block,
-              tx,
-              txid,
-              height,
-              i,
-              tx.tags.runestoneOrder[r],
-            );
+        if (tx.tags.runestoneOrder[r] == u128.Zero) {
+          Index.processRunes(_block, tx, txid, height, i);
+        } else if (
+          tx.tags.runestoneOrder[r] == MessageContext.initialiseProtocol()
+        ) {
+          Index.processProtocol<MessageContext>(
+            block,
+            tx,
+            txid,
+            height,
+            i,
+            tx.tags.runestoneOrder[r],
+          );
         }
       }
     }

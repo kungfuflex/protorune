@@ -4,11 +4,11 @@ import * as base from "./constants";
 import { u128 } from "as-bignum/assembly";
 
 export class ProtoBurn {
-  protocol_tag: u16;
+  protocol_tag: u128;
   pointer: u32;
   table: PROTORUNE_TABLE;
   constructor(data: Array<u128>) {
-    const protocol_tag = <u16>data[0].toU32();
+    const protocol_tag = data[0];
     this.pointer = data[1].toU32();
     this.protocol_tag = protocol_tag;
     this.table = PROTORUNE_TABLE.for(protocol_tag);
