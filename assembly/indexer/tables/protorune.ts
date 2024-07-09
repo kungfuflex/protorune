@@ -29,6 +29,11 @@ export class PROTORUNE_TABLE {
       IndexPointer.for("/runes/proto").keyword(protocol.toString()),
     );
   }
+  static for_str(protocol: string): PROTORUNE_TABLE {
+    return new PROTORUNE_TABLE(
+      IndexPointer.for("/runes/proto").keyword(protocol),
+    );
+  }
   unwrap(): IndexPointer {
     return this.ptr;
   }

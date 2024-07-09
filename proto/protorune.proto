@@ -56,6 +56,11 @@ message WalletResponse {
   BalanceSheet balances = 2;
 }
 
+message ProtorunesWalletRequest {
+  bytes wallet = 1;
+  bytes protocol_tag = 2;
+}
+
 message RunesResponse {
   repeated Rune runes = 1;
 }
