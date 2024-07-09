@@ -118,7 +118,10 @@ export class Index {
     startOutpoint: u32,
     message: ArrayBuffer,
   ): ArrayBuffer {
-    const payload = Index.getMessagePayload(tx.outs[startOutpoint]);
+    const payload = Index.getMessagePayload(
+      tx.outs[startOutpoint],
+      tx.tags.payloadSkip.get(startOutpoint),
+    );
     if (changetype<usize>(payload) == 0) return message;
     const protostone = ProtoStone.parse(payload);
     if (changetype<usize>(protostone) == 0)
@@ -164,7 +167,10 @@ export class Index {
           if (protomessageKeys[m] != p) continue;
           const index = tx.tags.protomessage[protomessageKeys[m]];
           const out = tx.outs[index];
-          const payload = Index.getMessagePayload(out, 5);
+          const payload = Index.getMessagePayload(
+            out,
+            tx.tags.payloadSkip.get(index),
+          );
           if (changetype<usize>(payload) == 0) continue;
           const protostone = ProtoStone.parse(payload);
           protoMessages.set(
