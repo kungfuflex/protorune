@@ -1301,6 +1301,12 @@ memorystream@^0.3.1:
     fast-sha256-as "https://github.com/sandshrewmetaprotocols/fast-sha256-as"
     lodash "^4.17.21"
 
+"metashrew-runes@https://github.com/sandshrewmetaprotocols/metashrew-runes":
+  version "0.1.0"
+  resolved "https://github.com/sandshrewmetaprotocols/metashrew-runes#45ffa06fe0886faa9b47a59305c38454ee8f79f4"
+  dependencies:
+    "@protobuf-ts/runtime" "^2.9.4"
+
 "metashrew-spendables@https://github.com/sandshrewmetaprotocols/metashrew-spendables":
   version "0.1.0"
   resolved "https://github.com/sandshrewmetaprotocols/metashrew-spendables#6a31930598f8a4943cfe5ed3ff285a5b163676c6"

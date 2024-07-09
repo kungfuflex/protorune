@@ -24,7 +24,7 @@ export class Edict {
       previous.block + values[0],
       values[0].isZero() ? values[1] : previous.transactionIndex + values[1],
       values[2],
-      values[3]
+      values[3],
     );
   }
   static fromDeltaSeries(deltas: Array<StaticArray<u128>>): Array<Edict> {
