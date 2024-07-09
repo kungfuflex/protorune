@@ -192,7 +192,11 @@ export class Index {
               Box.from(Index.parseProtosplit(tx, outs[o], message)),
             ]);
           }
-          protoSplitData.set(protosplitKeys[k], message);
+          const protostone = ProtoStone.parse(message);
+          protoMessages.set(
+            protosplitKeys[k],
+            ProtoMessage.from(protostone, outs[0], sheets),
+          );
         }
 
         // process protomessage
