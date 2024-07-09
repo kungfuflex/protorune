@@ -124,14 +124,16 @@ export class Index {
     );
     if (changetype<usize>(payload) == 0) return message;
     const protostone = ProtoStone.parse(payload);
-    if (changetype<usize>(protostone) == 0)
-      Box.concat([Box.from(message), Box.from(payload)]);
+    if (changetype<usize>(protostone) == 0) return message;
     const splits = protostone.splits();
     if (splits.length > 0) {
       for (let i = 0; i < splits.length; i++) {
         return Index.parseProtosplit(tx, splits[i], message);
       }
     }
+    const chunk = protostone.chunk();
+    if (chunk.byteLength > 0)
+      return Box.concat([Box.from(chunk), Box.from(payload)]);
     return message;
   }
   static processRunesTransaction<
@@ -190,7 +192,11 @@ export class Index {
               Box.from(Index.parseProtosplit(tx, outs[o], message)),
             ]);
           }
-          protoSplitData.set(protosplitKeys[k], message);
+          const protostone = ProtoStone.parse(message);
+          protoMessages.set(
+            protosplitKeys[k],
+            ProtoMessage.from(protostone, outs[0], sheets),
+          );
         }
 
         // process protomessage
