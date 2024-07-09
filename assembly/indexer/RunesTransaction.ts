@@ -20,6 +20,7 @@ class TagOutput {
   protomessage: Map<string, i32> = new Map<string, i32>();
   protosplits: Map<string, Array<i32>> = new Map<string, Array<i32>>();
   runestoneOrder: Array<u128> = new Array<u128>();
+  payloadSkip: Map<u32, u32> = new Map<u32, u32>();
 }
 
 @final
@@ -30,7 +31,8 @@ export class RunesTransaction extends Transaction {
     for (let i = 0; i < this.outs.length; i++) {
       const op = load<u16>(this.outs[i].script.start);
       let tag = u128.from(0);
-      readULEB128ToU128(this.outs[i].script, tag);
+      let len = 0;
+      len = <u32>readULEB128ToU128(this.outs[i].script, tag);
       switch (op) {
         case RUNESTONE_TAG:
           if (!output.runestone.has(u128.Zero.toString())) {
@@ -42,14 +44,16 @@ export class RunesTransaction extends Transaction {
           output.protoburn.push(i);
           break;
         case PROTOMESSAGE_TAG:
-          readULEB128ToU128(this.outs[i].script.shrinkFront(2), tag);
+          len = <u32>readULEB128ToU128(this.outs[i].script.shrinkFront(2), tag);
           if (PROTOCOLS_TO_INDEX.has(tag))
-            if (!output.protomessage.has(tag.toString()))
+            if (!output.protomessage.has(tag.toString())) {
               output.protomessage.set(tag.toString(), i);
+              output.payloadSkip.set(i, len + 2);
+            }
 
           break;
         case PROTOSPLIT_TAG:
-          readULEB128ToU128(this.outs[i].script.shrinkFront(2), tag);
+          len = readULEB128ToU128(this.outs[i].script.shrinkFront(2), tag);
           if (PROTOCOLS_TO_INDEX.has(tag)) {
             if (output.protosplits.has(tag.toString())) {
               const ary = output.protosplits.get(tag.toString());
@@ -60,6 +64,7 @@ export class RunesTransaction extends Transaction {
               ary.push(i);
               output.protosplits.set(tag.toString(), ary);
             }
+            output.payloadSkip.set(i, len + 2);
           }
           break;
         default:
@@ -67,6 +72,7 @@ export class RunesTransaction extends Transaction {
           if (output.runestone.has(tagStr) && PROTOCOLS_TO_INDEX.has(tag)) {
             output.runestone.set(tagStr, i);
             output.runestoneOrder.push(tag);
+            output.payloadSkip.set(i, len);
           }
           break;
       }
