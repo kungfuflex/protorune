@@ -2,7 +2,7 @@ import { u128 } from "as-bignum/assembly";
 import { Field } from "./fields/ProtoruneField";
 import { Box } from "metashrew-as/assembly/utils/box";
 import { readULEB128ToU128 } from "../leb128";
-import { u128ToHex, fieldToU128 } from "../utils";
+import { u128ToHex, fieldToU128, fieldToArrayBuffer } from "../utils";
 import { Flag } from "./flags/ProtoruneFlag";
 
 export class ProtoStone {
@@ -13,7 +13,7 @@ export class ProtoStone {
     this.edicts = edicts;
   }
   inspect(): string {
-    let result = "RunestoneMessage {\n";
+    let result = "ProtoStone {\n";
     let fieldInts = this.fields.keys();
     for (let i = 0; i < fieldInts.length; i++) {
       result += "  " + fieldInts[i].toString(10) + ": [\n";
@@ -39,9 +39,13 @@ export class ProtoStone {
     const flags = fieldToU128(this.fields.get(Field.FLAGS));
     return !u128.and(flags, u128.from(1) << (<i32>position)).isZero();
   }
-  isEtching(): bool {
-    return this.getFlag(Flag.ETCHING);
+
+  chunk(): ArrayBuffer {
+    const chunks = this.fields.get(Field.CHUNK);
+    if (chunks.length == 0) return new ArrayBuffer(0);
+    return fieldToArrayBuffer(chunks);
   }
+
   splits(): Array<u32> {
     const splits = this.fields.get(Field.SPLIT);
 
