@@ -216,6 +216,7 @@ export class Index {
     i: u32,
     protocol: u128,
   ): void {
+    console.log("Protocol activated, processing ProtoruneMessage");
     Index.processRunesTransaction<ProtoruneMessage, C>(
       block,
       tx,
@@ -232,6 +233,7 @@ export class Index {
     height: u32,
     i: u32,
   ): void {
+    console.log("Protocol not activated, processing RunestoneMessage");
     Index.processRunesTransaction<RunestoneMessage, MessageContext>(
       block,
       tx,
@@ -256,6 +258,7 @@ export class Index {
       tx.processRunestones();
       Index.indexOutpoints(tx, txid, height);
       for (let r = 0; r < tx.tags.runestoneOrder.length; r++) {
+        console.log("printing runestone order " + tx.tags.runestoneOrder[r].toString())
         if (tx.tags.runestoneOrder[r] == u128.Zero) {
           Index.processRunes(_block, tx, txid, height, i);
         } else if (

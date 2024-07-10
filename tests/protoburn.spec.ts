@@ -21,8 +21,11 @@ import {
 import { constructProtoburnTransaction } from "./utils/protoburn";
 import { protorunesbyaddress } from "./utils/view-helpers";
 import { DEBUG_WASM } from "./utils/general";
+import { uint128 } from "../src.ts/proto/protorune";
 
-const TEST_PROTOCOL_TAG = parseInt("0x112233445566778899aabbccddeeff10", 16);
+// const TEST_PROTOCOL_TAG = parseInt("0x112233445566778899aabbccddeeff10", 16);
+const TEST_PROTOCOL_TAG = parseInt("0x400000000000000000", 16);
+console.log(TEST_PROTOCOL_TAG.toString(16))
 
 describe("protoburns", () => {
   it("should not index before QUORUM•GENESIS•PROTORUNE", async () => {
