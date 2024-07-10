@@ -67,7 +67,6 @@ export const constructProtoburnTransaction = (
     edicts: edicts,
     pointer: 1, // default output for leftover runes, default goes to the protoburn
   }).encodedRunestone;
-
   const protoburn = new ProtoBurn({
     protocolTag: protocolTag,
     pointer: outputIndexToReceiveProtorunes,
