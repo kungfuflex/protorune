@@ -19,10 +19,11 @@ import {
   buildCoinbaseToAddress,
   buildDefaultBlock,
 } from "metashrew-runes/lib/tests/utils/block-helpers";
+import { DEBUG_WASM } from "./utils/general";
 
 describe("metashrew-runes", () => {
   it("should check if duplicate keys are not being set", async () => {
-    const program = buildProgram();
+    const program = buildProgram(DEBUG_WASM);
     program.setBlock(
       fs.readFileSync(path.join(__dirname, "runes-genesis.hex"), "utf8"),
     );
@@ -36,7 +37,7 @@ describe("metashrew-runes", () => {
     ).to.be.equal(2);
   });
   it("should not index before 840000", async () => {
-    const program = buildProgram();
+    const program = buildProgram(DEBUG_WASM);
     program.setBlockHeight(839000);
     const premineAmount = 2100000005000000n;
     const outputs = [
@@ -71,7 +72,7 @@ describe("metashrew-runes", () => {
     expect(resultAddress2.balanceSheet.length).equals(0);
   });
   it("index Runestone on etching and premine", async () => {
-    const program = buildProgram();
+    const program = buildProgram(DEBUG_WASM);
     program.setBlockHeight(840001);
     const premineAmount = 2100000005000000n;
     const outputs = [
@@ -112,7 +113,7 @@ describe("metashrew-runes", () => {
     );
   });
   it("Runestone transfer invalid funds", async () => {
-    const program = buildProgram();
+    const program = buildProgram(DEBUG_WASM);
     program.setBlockHeight(840000);
     const premineAmount = 2100000005000000n;
 
@@ -169,7 +170,7 @@ describe("metashrew-runes", () => {
     );
   });
   it("index Runestone on transfer and refund to another address", async () => {
-    const program = buildProgram();
+    const program = buildProgram(DEBUG_WASM);
     program.setBlockHeight(840000);
     const premineAmount = 2100000005000000n;
     const outputs = [
@@ -247,7 +248,7 @@ describe("metashrew-runes", () => {
     );
   });
   it("index Runestone on transfer and refund to self", async () => {
-    const program = buildProgram();
+    const program = buildProgram(DEBUG_WASM);
     program.setBlockHeight(840000);
     const premineAmount = 2100000005000000n;
     const outputs = [
@@ -322,7 +323,7 @@ describe("metashrew-runes", () => {
     );
   });
   it("try to send runes from output that doesn't have runes", async () => {
-    const program = buildProgram();
+    const program = buildProgram(DEBUG_WASM);
     program.setBlockHeight(840000);
     const premineAmount = 2100000005000000n;
     const outputs = [
@@ -410,7 +411,7 @@ describe("metashrew-runes", () => {
     );
   });
   it("index Runestone on burn", async () => {
-    const program = buildProgram();
+    const program = buildProgram(DEBUG_WASM);
     program.setBlockHeight(840000);
     const premineAmount = 2100000005000000n;
     const outputs = [
@@ -481,7 +482,7 @@ describe("metashrew-runes", () => {
     );
   });
   it("index Runestone integration test", async () => {
-    const program = buildProgram();
+    const program = buildProgram(DEBUG_WASM);
     program.setBlockHeight(840000);
     const premineAmount = 2100000005000000n;
     const outputs = [

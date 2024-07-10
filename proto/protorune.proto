@@ -29,6 +29,11 @@ message Outpoint {
   uint32 vout = 2;
 }
 
+message OutpointWithProtocol {
+  bytes txid = 1;
+  uint32 vout = 2;
+  bytes protocol = 3;
+}
 message Output {
   bytes script = 1;
   uint64 value = 2;
@@ -54,6 +59,11 @@ message WalletRequest {
 message WalletResponse {
   repeated OutpointResponse outpoints = 1;
   BalanceSheet balances = 2;
+}
+
+message ProtorunesWalletRequest {
+  bytes wallet = 1;
+  bytes protocol_tag = 2;
 }
 
 message RunesResponse {

@@ -18,6 +18,7 @@ import {
 import { Flag } from "./flags";
 import { RuneId } from "./RuneId";
 import { Edict } from "./Edict";
+import { console } from "metashrew-as/assembly/utils/logging";
 import {
   AMOUNT,
   SPACERS,
@@ -296,7 +297,7 @@ export class RunestoneMessage {
           const protoBurn = ary[i];
           protoBurn.process(
             outputBalanceSheet,
-            OutPoint.from(txid, edictOutput).toArrayBuffer(),
+            OutPoint.from(txid, protoBurn.pointer).toArrayBuffer(),
           );
         }
       }
@@ -316,6 +317,7 @@ export class RunestoneMessage {
         const out = tx.outs[protoburnOut];
         const payload = Index.getMessagePayload(out);
         if (changetype<usize>(payload) == 0) continue;
+
         const protostone = ProtoStone.parse(payload);
         if (
           !protostone.fields.has(ProtoruneField.BURN) ||
@@ -327,6 +329,7 @@ export class RunestoneMessage {
           protostone.fields.get(ProtoruneField.POINTER)[0],
         ]);
         if (PROTOCOLS_TO_INDEX.has(protoburn.protocol_tag)) {
+          console.log("protoburn detected");
           let ary = new Array<ProtoBurn>();
           if (this.protoBurns.has(protoburnOut))
             ary = this.protoBurns.get(protoburnOut);

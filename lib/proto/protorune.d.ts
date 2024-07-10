@@ -151,6 +151,19 @@ export interface WalletResponse {
     balances?: BalanceSheet;
 }
 /**
+ * @generated from protobuf message protorune.ProtorunesWalletRequest
+ */
+export interface ProtorunesWalletRequest {
+    /**
+     * @generated from protobuf field: bytes wallet = 1;
+     */
+    wallet: Uint8Array;
+    /**
+     * @generated from protobuf field: bytes protocol_tag = 2;
+     */
+    protocolTag: Uint8Array;
+}
+/**
  * @generated from protobuf message protorune.RunesResponse
  */
 export interface RunesResponse {
@@ -328,6 +341,16 @@ declare class WalletResponse$Type extends MessageType<WalletResponse> {
  * @generated MessageType for protobuf message protorune.WalletResponse
  */
 export declare const WalletResponse: WalletResponse$Type;
+declare class ProtorunesWalletRequest$Type extends MessageType<ProtorunesWalletRequest> {
+    constructor();
+    create(value?: PartialMessage<ProtorunesWalletRequest>): ProtorunesWalletRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ProtorunesWalletRequest): ProtorunesWalletRequest;
+    internalBinaryWrite(message: ProtorunesWalletRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protorune.ProtorunesWalletRequest
+ */
+export declare const ProtorunesWalletRequest: ProtorunesWalletRequest$Type;
 declare class RunesResponse$Type extends MessageType<RunesResponse> {
     constructor();
     create(value?: PartialMessage<RunesResponse>): RunesResponse;

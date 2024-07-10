@@ -11,13 +11,16 @@ import {
   SPACERS,
   SYMBOL,
 } from "../indexer/constants";
+import { PROTORUNE_TABLE } from "../indexer/tables/protorune";
 import { OutPoint, Output } from "metashrew-as/assembly/blockdata/transaction";
 import { arrayBufferToArray } from "metashrew-spendables/assembly/indexer";
 import { OUTPOINT_TO_OUTPUT } from "metashrew-spendables/assembly/tables";
 import { metashrew_runes as protobuf } from "../proto/metashrew-runes";
+import { protorune as protobuf_protorune } from "../proto/protorune";
 import { u128 } from "as-bignum/assembly";
 import { fromArrayBuffer, fieldToName } from "../utils";
 import { console } from "metashrew-as/assembly/utils/logging";
+import { encodeHexFromBuffer } from "metashrew-as/assembly/utils";
 
 export function txindexForOutpoint(outpoint: ArrayBuffer): u32 {
   const box = Box.from(outpoint);
@@ -78,6 +81,45 @@ export function balanceSheetToProtobuf(
   return balanceSheet;
 }
 
+export function balanceSheetToProtobufForProtocol(
+  sheet: BalanceSheet,
+  table: PROTORUNE_TABLE,
+): protobuf.BalanceSheet {
+  const runes = new Array<protobuf.Rune>();
+  for (let i = 0; i < sheet.runes.length; i++) {
+    const d = sheet.runes[i];
+    const _runeId = RuneId.fromBytesU128(d);
+    const name = table.RUNE_ID_TO_ETCHING.select(d).get();
+    const spacers = table.SPACERS.select(name);
+    const divisibility = <u32>table.DIVISIBILITY.select(name).getValue<u8>();
+    const rune = new protobuf.Rune();
+    const runeId = new protobuf.RuneId();
+    runeId.height = <u32>_runeId.block;
+    runeId.txindex = _runeId.tx;
+    rune.runeId = runeId;
+    rune.name = Uint8Array.wrap(
+      String.UTF8.encode(fieldToName(fromArrayBuffer(name))),
+    ).reduce<Array<u8>>((a, d) => {
+      a.push(d);
+      return a;
+    }, new Array<u8>());
+    rune.divisibility = divisibility;
+    rune.symbol = <u32>table.SYMBOL.select(name).getValue<u8>();
+    rune.spacers = table.SPACERS.select(name).getValue<u32>();
+    runes.push(rune);
+  }
+  const balances = sheet.balances.map<Array<u8>>((d, i, ary: Array<u128>) => {
+    return d.toBytes(true);
+  });
+  const balanceSheet = new protobuf.BalanceSheet();
+  for (let i = 0; i < balances.length; i++) {
+    const entry = new protobuf.BalanceSheetItem();
+    entry.rune = runes[i];
+    entry.balance = balances[i];
+    balanceSheet.entries.push(entry);
+  }
+  return balanceSheet;
+}
 export function outpointBase(
   inp: protobuf.Outpoint,
 ): protobuf.OutpointResponse {
@@ -93,6 +135,32 @@ export function outpointBase(
 
   const message = new protobuf.OutpointResponse();
   message.outpoint = inp;
+  message.output.script = arrayBufferToArray(output.script.toArrayBuffer());
+  message.output.value = output.value;
+  message.balances = balanceSheet;
+  message.height = OUTPOINT_TO_HEIGHT.select(outpoint).getValue<u32>();
+  message.txindex = txindexForOutpoint(outpoint);
+  return message;
+}
+export function outpointBaseForProtocol(
+  inp: protobuf_protorune.OutpointWithProtocol,
+): protobuf.OutpointResponse {
+  const txid = changetype<Uint8Array>(inp.txid).buffer;
+  const pos = inp.vout;
+  const outpoint = OutPoint.from(txid, pos).toArrayBuffer();
+  const table = PROTORUNE_TABLE.for_str(
+    String.UTF8.decode(changetype<Uint8Array>(inp.protocol).buffer),
+  );
+  const op = table.OUTPOINT_TO_RUNES.select(outpoint);
+  const output = new Output(
+    Box.from(OUTPOINT_TO_OUTPUT.select(outpoint).get()),
+  );
+  const balanceSheet = balanceSheetToProtobuf(BalanceSheet.load(op));
+
+  const message = new protobuf.OutpointResponse();
+  message.outpoint = new protobuf.Outpoint();
+  message.outpoint.txid = inp.txid;
+  message.outpoint.vout = inp.vout;
   message.output.script = arrayBufferToArray(output.script.toArrayBuffer());
   message.output.value = output.value;
   message.balances = balanceSheet;

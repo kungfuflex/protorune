@@ -84,6 +84,23 @@ export interface Outpoint {
     vout: number;
 }
 /**
+ * @generated from protobuf message protorune.OutpointWithProtocol
+ */
+export interface OutpointWithProtocol {
+    /**
+     * @generated from protobuf field: bytes txid = 1;
+     */
+    txid: Uint8Array;
+    /**
+     * @generated from protobuf field: uint32 vout = 2;
+     */
+    vout: number;
+    /**
+     * @generated from protobuf field: bytes protocol = 3;
+     */
+    protocol: Uint8Array;
+}
+/**
  * @generated from protobuf message protorune.Output
  */
 export interface Output {
@@ -155,6 +172,19 @@ export interface WalletResponse {
      * @generated from protobuf field: protorune.BalanceSheet balances = 2;
      */
     balances?: BalanceSheet;
+}
+/**
+ * @generated from protobuf message protorune.ProtorunesWalletRequest
+ */
+export interface ProtorunesWalletRequest {
+    /**
+     * @generated from protobuf field: bytes wallet = 1;
+     */
+    wallet: Uint8Array;
+    /**
+     * @generated from protobuf field: bytes protocol_tag = 2;
+     */
+    protocolTag: Uint8Array;
 }
 /**
  * @generated from protobuf message protorune.RunesResponse
@@ -524,6 +554,69 @@ class Outpoint$Type extends MessageType<Outpoint> {
  */
 export const Outpoint = new Outpoint$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class OutpointWithProtocol$Type extends MessageType<OutpointWithProtocol> {
+    constructor() {
+        super("protorune.OutpointWithProtocol", [
+            { no: 1, name: "txid", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 2, name: "vout", kind: "scalar", T: 13 /*ScalarType.UINT32*/ },
+            { no: 3, name: "protocol", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+        ]);
+    }
+    create(value?: PartialMessage<OutpointWithProtocol>): OutpointWithProtocol {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.txid = new Uint8Array(0);
+        message.vout = 0;
+        message.protocol = new Uint8Array(0);
+        if (value !== undefined)
+            reflectionMergePartial<OutpointWithProtocol>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: OutpointWithProtocol): OutpointWithProtocol {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bytes txid */ 1:
+                    message.txid = reader.bytes();
+                    break;
+                case /* uint32 vout */ 2:
+                    message.vout = reader.uint32();
+                    break;
+                case /* bytes protocol */ 3:
+                    message.protocol = reader.bytes();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: OutpointWithProtocol, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* bytes txid = 1; */
+        if (message.txid.length)
+            writer.tag(1, WireType.LengthDelimited).bytes(message.txid);
+        /* uint32 vout = 2; */
+        if (message.vout !== 0)
+            writer.tag(2, WireType.Varint).uint32(message.vout);
+        /* bytes protocol = 3; */
+        if (message.protocol.length)
+            writer.tag(3, WireType.LengthDelimited).bytes(message.protocol);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protorune.OutpointWithProtocol
+ */
+export const OutpointWithProtocol = new OutpointWithProtocol$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class Output$Type extends MessageType<Output> {
     constructor() {
         super("protorune.Output", [
@@ -810,6 +903,61 @@ class WalletResponse$Type extends MessageType<WalletResponse> {
  * @generated MessageType for protobuf message protorune.WalletResponse
  */
 export const WalletResponse = new WalletResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ProtorunesWalletRequest$Type extends MessageType<ProtorunesWalletRequest> {
+    constructor() {
+        super("protorune.ProtorunesWalletRequest", [
+            { no: 1, name: "wallet", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 2, name: "protocol_tag", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+        ]);
+    }
+    create(value?: PartialMessage<ProtorunesWalletRequest>): ProtorunesWalletRequest {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.wallet = new Uint8Array(0);
+        message.protocolTag = new Uint8Array(0);
+        if (value !== undefined)
+            reflectionMergePartial<ProtorunesWalletRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ProtorunesWalletRequest): ProtorunesWalletRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bytes wallet */ 1:
+                    message.wallet = reader.bytes();
+                    break;
+                case /* bytes protocol_tag */ 2:
+                    message.protocolTag = reader.bytes();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: ProtorunesWalletRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* bytes wallet = 1; */
+        if (message.wallet.length)
+            writer.tag(1, WireType.LengthDelimited).bytes(message.wallet);
+        /* bytes protocol_tag = 2; */
+        if (message.protocolTag.length)
+            writer.tag(2, WireType.LengthDelimited).bytes(message.protocolTag);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protorune.ProtorunesWalletRequest
+ */
+export const ProtorunesWalletRequest = new ProtorunesWalletRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class RunesResponse$Type extends MessageType<RunesResponse> {
     constructor() {
