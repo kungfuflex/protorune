@@ -1,7 +1,26 @@
 import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
 import { u128 } from "as-bignum/assembly";
+import { console } from "metashrew-as/assembly/utils";
 
-export const PROTOCOLS_TO_INDEX = new Set<u128>();
+class PROTOCOL_INDEXER {
+  set: Set<string> = new Set<string>();
+  add(val: u128): void {
+    this.set.add(val.toString());
+  }
+  has(val: u128): bool {
+    return this.set.has(val.toString());
+  }
+  toString(): string {
+    let str = "";
+    const set = this.set.values();
+    for (let i = 0; i < set.length; i++) {
+      str += set[i] + ", ";
+    }
+    return str;
+  }
+}
+
+export const PROTOCOLS_TO_INDEX = new PROTOCOL_INDEXER();
 
 export class PROTORUNE_TABLE {
   ptr: IndexPointer;

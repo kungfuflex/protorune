@@ -24,8 +24,8 @@ import { DEBUG_WASM } from "./utils/general";
 import { uint128 } from "../src.ts/proto/protorune";
 
 // const TEST_PROTOCOL_TAG = parseInt("0x112233445566778899aabbccddeeff10", 16);
-const TEST_PROTOCOL_TAG = parseInt("0x400000000000000000", 16);
-console.log(TEST_PROTOCOL_TAG.toString(16))
+const TEST_PROTOCOL_TAG = BigInt("0x400000000000000000");
+console.log(TEST_PROTOCOL_TAG.toString(10));
 
 describe("protoburns", () => {
   it("should index full protoburn", async () => {

@@ -29,7 +29,7 @@ export const constructProtoburnTransaction = (
     address: string;
     btcAmount: number;
   }[],
-  protocolTag: number,
+  protocolTag: bigint,
   block?: bitcoinjs.Block,
 ): bitcoinjs.Block => {
   if (block == undefined) {

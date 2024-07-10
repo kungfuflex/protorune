@@ -316,7 +316,6 @@ export class RunestoneMessage {
         const protoburnOut = tx.tags.protoburn[i];
         const out = tx.outs[protoburnOut];
         const payload = Index.getMessagePayload(out);
-        console.log(changetype<usize>(payload).toString());
         if (changetype<usize>(payload) == 0) continue;
 
         const protostone = ProtoStone.parse(payload);
@@ -329,12 +328,8 @@ export class RunestoneMessage {
           protostone.fields.get(ProtoruneField.BURN)[0],
           protostone.fields.get(ProtoruneField.POINTER)[0],
         ]);
-        console.log(protoburn.protocol_tag.toString());
-        const v = PROTOCOLS_TO_INDEX.values();
-        for (let i = 0; i < v.length; i++) {
-          console.log(v[i].toString());
-        }
         if (PROTOCOLS_TO_INDEX.has(protoburn.protocol_tag)) {
+          console.log("protoburn detected");
           let ary = new Array<ProtoBurn>();
           if (this.protoBurns.has(protoburnOut))
             ary = this.protoBurns.get(protoburnOut);

@@ -11,7 +11,7 @@ export class ProtoBurn {
   protocolTag: Option<u128>;
   pointer: Option<u32>;
 
-  constructor(obj: { protocolTag: number; pointer: number }) {
+  constructor(obj: { protocolTag: bigint; pointer: number }) {
     this.protocolTag = Some<u128>(u128(obj.protocolTag));
     this.pointer = Some<u32>(u32(obj.pointer));
   }
