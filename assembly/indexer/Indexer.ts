@@ -121,7 +121,7 @@ export class Index {
     const isChunk = tx.tags.chunks.has(startOutpoint);
     let payload = new ArrayBuffer(0);
     if (isChunk) {
-      payload = Box.concat(scriptParse(tx.outs[startOutpoint].script).slice(2));
+      payload = Index.getMessagePayload(tx.outs[startOutpoint], 2);
       if (payload.byteLength == 0) return message;
       return Box.concat([Box.from(message), Box.from(payload)]);
     }
