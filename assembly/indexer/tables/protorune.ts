@@ -50,7 +50,7 @@ export class PROTORUNE_TABLE {
   }
   static for_str(protocol: string): PROTORUNE_TABLE {
     return new PROTORUNE_TABLE(
-      IndexPointer.for("/runes/proto").keyword(protocol),
+      IndexPointer.for("/runes/proto/").keyword(protocol),
     );
   }
   unwrap(): IndexPointer {

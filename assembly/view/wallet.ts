@@ -65,10 +65,11 @@ export function protorunesbyaddress(): ArrayBuffer {
     input().slice(4),
   );
   const address = changetype<Uint8Array>(request.wallet).buffer;
-  const protocol_tag = changetype<Uint8Array>(request.protocol_tag).buffer;
-  const protorune_pointer = PROTORUNE_TABLE.for_str(
-    String.UTF8.decode(protocol_tag),
+  const protocol_tag = String.UTF8.decode(
+    changetype<Uint8Array>(request.protocol_tag).buffer,
   );
+  console.log(protocol_tag);
+  const protorune_pointer = PROTORUNE_TABLE.for_str(protocol_tag);
 
   const _outpoints = SpendablesIndex.findOutpointsForAddress(address);
   const outpoints = new Array<protobuf.OutpointResponse>();
