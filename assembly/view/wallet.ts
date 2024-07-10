@@ -85,7 +85,6 @@ export function protorunesbyaddress(): ArrayBuffer {
     inp.vout = parsePrimitive<u32>(Box.from(_outpoints[i].slice(32)));
     inp.protocol = request.protocol_tag;
     const op = outpointBaseForProtocol(inp);
-    console.log(op.balances.entries.length.toString());
     if (op.balances.entries.length == 0) {
       continue;
     }

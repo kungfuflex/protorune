@@ -297,7 +297,7 @@ export class RunestoneMessage {
           const protoBurn = ary[i];
           protoBurn.process(
             outputBalanceSheet,
-            OutPoint.from(txid, edictOutput).toArrayBuffer(),
+            OutPoint.from(txid, protoBurn.pointer).toArrayBuffer(),
           );
         }
       }

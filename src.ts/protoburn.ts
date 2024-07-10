@@ -19,7 +19,6 @@ export class ProtoBurn {
   encipher() {
     const stack: (Buffer | number)[] = [];
     let payloads: Buffer[] = [];
-    console.log(this.protocolTag.unwrap());
     payloads.push(Tag.encodeOptionInt(Tag.POINTER, this.pointer.map(u128)));
     payloads.push(Tag.encodeOptionInt(Tag.BURN, this.protocolTag.map(u128)));
     stack.push(OP_RETURN);

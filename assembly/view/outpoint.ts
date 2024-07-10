@@ -152,12 +152,10 @@ export function outpointBaseForProtocol(
     String.UTF8.decode(changetype<Uint8Array>(inp.protocol).buffer),
   );
   const op = table.OUTPOINT_TO_RUNES.select(outpoint);
-  console.log(encodeHexFromBuffer(outpoint));
   const output = new Output(
     Box.from(OUTPOINT_TO_OUTPUT.select(outpoint).get()),
   );
   const balanceSheet = balanceSheetToProtobuf(BalanceSheet.load(op));
-  console.log(BalanceSheet.load(op).inspect());
 
   const message = new protobuf.OutpointResponse();
   message.outpoint = new protobuf.Outpoint();
