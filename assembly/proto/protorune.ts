@@ -1140,6 +1140,98 @@ export namespace protorune {
     } // encode Outpoint
   } // Outpoint
 
+  export class OutpointWithProtocol {
+    public txid: Array<u8> = new Array<u8>();
+    public vout: u32;
+    public protocol: Array<u8> = new Array<u8>();
+
+    // Decodes OutpointWithProtocol from an ArrayBuffer
+    static decode(buf: ArrayBuffer): OutpointWithProtocol {
+      return OutpointWithProtocol.decodeDataView(new DataView(buf));
+    }
+
+    // Decodes OutpointWithProtocol from a DataView
+    static decodeDataView(view: DataView): OutpointWithProtocol {
+      const decoder = new __proto.SafeDecoder(view);
+      const obj = new OutpointWithProtocol();
+
+      while (!decoder.eof()) {
+        const tag = decoder.tag();
+        const number = tag >>> 3;
+
+        switch (number) {
+          case 1: {
+            obj.txid = decoder.bytes();
+            break;
+          }
+          case 2: {
+            obj.vout = decoder.uint32();
+            break;
+          }
+          case 3: {
+            obj.protocol = decoder.bytes();
+            break;
+          }
+
+          default:
+            decoder.skipType(tag & 7);
+            break;
+        }
+      }
+      if (decoder.invalid()) return changetype<OutpointWithProtocol>(0);
+      return obj;
+    } // decode OutpointWithProtocol
+
+    public size(): u32 {
+      let size: u32 = 0;
+
+      size +=
+        this.txid.length > 0
+          ? 1 + __proto.Sizer.varint64(this.txid.length) + this.txid.length
+          : 0;
+      size += this.vout == 0 ? 0 : 1 + __proto.Sizer.uint32(this.vout);
+      size +=
+        this.protocol.length > 0
+          ? 1 +
+            __proto.Sizer.varint64(this.protocol.length) +
+            this.protocol.length
+          : 0;
+
+      return size;
+    }
+
+    // Encodes OutpointWithProtocol to the ArrayBuffer
+    encode(): ArrayBuffer {
+      return changetype<ArrayBuffer>(
+        StaticArray.fromArray<u8>(this.encodeU8Array())
+      );
+    }
+
+    // Encodes OutpointWithProtocol to the Array<u8>
+    encodeU8Array(
+      encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
+    ): Array<u8> {
+      const buf = encoder.buf;
+
+      if (this.txid.length > 0) {
+        encoder.uint32(0xa);
+        encoder.uint32(this.txid.length);
+        encoder.bytes(this.txid);
+      }
+      if (this.vout != 0) {
+        encoder.uint32(0x10);
+        encoder.uint32(this.vout);
+      }
+      if (this.protocol.length > 0) {
+        encoder.uint32(0x1a);
+        encoder.uint32(this.protocol.length);
+        encoder.bytes(this.protocol);
+      }
+
+      return buf;
+    } // encode OutpointWithProtocol
+  } // OutpointWithProtocol
+
   export class Output {
     public script: Array<u8> = new Array<u8>();
     public value: u64;

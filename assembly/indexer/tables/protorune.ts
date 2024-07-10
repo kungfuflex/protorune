@@ -34,12 +34,12 @@ export class PROTORUNE_TABLE {
   ETCHING_TO_RUNE_ID: IndexPointer;
   constructor(ptr: IndexPointer) {
     this.ptr = ptr;
-    this.OUTPOINT_TO_RUNES = ptr.keyword("/runes/byoutpoint/");
+    this.OUTPOINT_TO_RUNES = ptr.keyword("/byoutpoint/");
     this.HEIGHT_TO_TRANSACTION_IDS = ptr.keyword("/txids/byheight");
-    this.SYMBOL = ptr.keyword("/runes/symbol/");
-    this.SPACERS = ptr.keyword("/runes/spaces/");
-    this.DIVISIBILITY = ptr.keyword("/runes/divisibility/");
-    this.ETCHINGS = ptr.keyword("/runes/names");
+    this.SYMBOL = ptr.keyword("/symbol/");
+    this.SPACERS = ptr.keyword("/spaces/");
+    this.DIVISIBILITY = ptr.keyword("/divisibility/");
+    this.ETCHINGS = ptr.keyword("/names");
     this.RUNE_ID_TO_ETCHING = ptr.keyword("/etching/byruneid/");
     this.ETCHING_TO_RUNE_ID = ptr.keyword("/runeid/byetching/");
   }
