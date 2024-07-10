@@ -261,9 +261,12 @@ export class Index {
       const tx = block.getTransaction(i);
       const txid = tx.txid();
       tx.processRunestones();
+      console.log(tx.tags.inspect());
       Index.indexOutpoints(tx, txid, height);
       for (let r = 0; r < tx.tags.runestoneOrder.length; r++) {
-        console.log("printing runestone order " + tx.tags.runestoneOrder[r].toString())
+        console.log(
+          "printing runestone order " + tx.tags.runestoneOrder[r].toString(),
+        );
         if (tx.tags.runestoneOrder[r] == u128.Zero) {
           Index.processRunes(_block, tx, txid, height, i);
         } else if (

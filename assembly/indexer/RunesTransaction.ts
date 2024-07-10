@@ -23,8 +23,9 @@ class TagOutput {
   payloadSkip: Map<u32, u32> = new Map<u32, u32>();
 
   inspect(): string {
-    let log: string = "";
-    log += "runestones: ";
+    let log: string = "\nINSPECTING TX TAGS\n";
+
+    log += "  runestones: ";
     const runestones = this.runestone.keys();
     for (let i = 0; i < runestones.length; i++) {
       log +=
@@ -33,27 +34,27 @@ class TagOutput {
         this.runestone.get(runestones[i]).toString() +
         ", ";
     }
-    log += "\nprotoburns: ";
+    log += "\n  protoburns: ";
     for (let i = 0; i < this.protoburn.length; i++) {
       log += this.protoburn[i].toString() + ", ";
     }
-    log += "\nchunks: ";
+    log += "\n  chunks: ";
     const chunks = this.chunks.values();
     for (let i = 0; i < chunks.length; i++) {
       log += chunks[i].toString() + ", ";
     }
-    log += "\nprotostones: ";
+    log += "\n  protostones: ";
     const protostones = this.protostone.keys();
     for (let i = 0; i < protostones.length; i++) {
-      log += "  " + protostones[i] + ": ";
+      log += "    " + protostones[i] + ": ";
       const ary = this.protostone.get(protostones[i]);
       for (let j = 0; j < ary.length; j++) {
         log += ary[j].toString() + ", ";
       }
     }
-    log += "\nrunestone in order: ";
+    log += "\n  runestone in order: ";
     for (let i = 0; i < this.runestoneOrder.length; i++) {
-      log += this.runestoneOrder[i].toString() + ", "';'
+      log += this.runestoneOrder[i].toString() + ", ";
     }
     return log;
   }
