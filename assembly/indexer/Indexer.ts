@@ -118,7 +118,14 @@ export class Index {
     startOutpoint: u32,
     message: ArrayBuffer,
   ): ArrayBuffer {
-    const payload = Index.getMessagePayload(
+    const isChunk = tx.tags.chunks.has(startOutpoint);
+    let payload = new ArrayBuffer(0);
+    if (isChunk) {
+      payload = Box.concat(scriptParse(tx.outs[startOutpoint].script).slice(2));
+      if (payload.byteLength == 0) return message;
+      return Box.concat([Box.from(message), Box.from(payload)]);
+    }
+    payload = Index.getMessagePayload(
       tx.outs[startOutpoint],
       tx.tags.payloadSkip.get(startOutpoint),
     );
@@ -131,9 +138,6 @@ export class Index {
         return Index.parseProtosplit(tx, splits[i], message);
       }
     }
-    const chunk = protostone.chunk();
-    if (chunk.byteLength > 0)
-      return Box.concat([Box.from(chunk), Box.from(payload)]);
     return message;
   }
   static processRunesTransaction<
@@ -163,40 +167,41 @@ export class Index {
           ProtoMessage
         >();
 
-        // parse protomessages
-        const protomessageKeys = tx.tags.protomessage.keys();
-        for (let m = 0; m < protomessageKeys.length; m++) {
-          if (protomessageKeys[m] != p) continue;
-          const index = tx.tags.protomessage[protomessageKeys[m]];
-          const out = tx.outs[index];
-          const payload = Index.getMessagePayload(
-            out,
-            tx.tags.payloadSkip.get(index),
-          );
-          if (changetype<usize>(payload) == 0) continue;
-          const protostone = ProtoStone.parse(payload);
-          protoMessages.set(
-            protomessageKeys[m],
-            ProtoMessage.from(protostone, index, sheets),
-          );
-        }
-        //parse protosplit
-        const protosplitKeys = tx.tags.protosplits.keys();
-        const protoSplitData = new Map<string, ArrayBuffer>();
-        for (let k = 0; k < protosplitKeys.length; k++) {
-          const outs = tx.tags.protosplits.get(protosplitKeys[k]);
-          let message = new ArrayBuffer(0);
+        // parse protostones
+        const protostoneKeys = tx.tags.protostone.keys();
+        for (let m = 0; m < protostoneKeys.length; m++) {
+          if (protostoneKeys[m] != p) continue;
+          if (!tx.tags.protostone.has(p)) continue;
+          const outs = tx.tags.protostone.get(p);
           for (let o = 0; o < outs.length; o++) {
-            message = Box.concat([
-              Box.from(message),
-              Box.from(Index.parseProtosplit(tx, outs[o], message)),
-            ]);
+            const index = outs[o];
+            const out = tx.outs[index];
+            const payload = Index.getMessagePayload(
+              out,
+              tx.tags.payloadSkip.get(index),
+            );
+            if (changetype<usize>(payload) == 0) continue;
+            const protostone = ProtoStone.parse(payload);
+            if (protostone.isMessage()) {
+              protoMessages.set(
+                protostoneKeys[m],
+                ProtoMessage.from(protostone, index, sheets),
+              );
+            } else if (protostone.isSplit()) {
+              let message = Index.parseProtosplit(
+                tx,
+                outs[o],
+                new ArrayBuffer(0),
+              );
+
+              const protostone = ProtoStone.parse(message);
+              if (!protostone.isMessage()) continue;
+              protoMessages.set(
+                p,
+                ProtoMessage.from(protostone, outs[o], sheets),
+              );
+            }
           }
-          const protostone = ProtoStone.parse(message);
-          protoMessages.set(
-            protosplitKeys[k],
-            ProtoMessage.from(protostone, outs[0], sheets),
-          );
         }
 
         // process protomessage
