@@ -28,9 +28,6 @@ const TEST_PROTOCOL_TAG = parseInt("0x400000000000000000", 16);
 console.log(TEST_PROTOCOL_TAG.toString(16))
 
 describe("protoburns", () => {
-  it("should not index before QUORUM•GENESIS•PROTORUNE", async () => {
-    // TODO
-  });
   it("should index full protoburn", async () => {
     const program = buildProgram(DEBUG_WASM);
     program.setBlockHeight(840000);
@@ -112,9 +109,9 @@ describe("protoburns", () => {
     );
     console.log(protorunesAddress2);
     console.log(formatKv(program.kv));
-    expect(resultAddress2.balanceSheet.length).equals(
-      0,
-      "address 2 should not have received any runes",
+    expect(protorunesAddress2.balanceSheet[0]).equals(
+      premineAmount,
+      "address 2 should now have all the protorunes",
     );
   });
 });
