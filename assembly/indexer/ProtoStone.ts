@@ -39,7 +39,12 @@ export class ProtoStone {
     const flags = fieldToU128(this.fields.get(Field.FLAGS));
     return !u128.and(flags, u128.from(1) << (<i32>position)).isZero();
   }
-
+  isMessage(): bool {
+    return this.fields.has(Field.MESSAGE);
+  }
+  isSplit(): bool {
+    return this.fields.has(Field.SPLIT);
+  }
   chunk(): ArrayBuffer {
     const chunks = this.fields.get(Field.CHUNK);
     if (chunks.length == 0) return new ArrayBuffer(0);
