@@ -2,7 +2,7 @@ import {
   MAX_SCRIPT_ELEMENT_SIZE,
   OP_RETURN,
 } from "@magiceden-oss/runestone-lib/dist/src/constants";
-import { script } from "@magiceden-oss/runestone-lib/dist/src/script";
+import { script, opcodes } from "@magiceden-oss/runestone-lib/dist/src/script";
 import { u128, u32 } from "@magiceden-oss/runestone-lib/dist/src/integer";
 import { Tag } from "./tag";
 import { Some, Option } from "@magiceden-oss/runestone-lib/dist/src/monads";
@@ -48,7 +48,7 @@ export class ProtoStone {
       payloads.push(
         Tag.encodeOptionInt(Tag.BURN, this.burn.protocolTag.map(u128)),
       );
-      stack.push(OP_RETURN);
+      stack.push(opcodes.OP_14);
     }
     const payload = Buffer.concat(payloads);
     for (let i = 0; i < payload.length; i += MAX_SCRIPT_ELEMENT_SIZE) {
