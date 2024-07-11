@@ -291,16 +291,6 @@ export class RunestoneMessage {
       const canDecrease = balanceSheet.decrease(runeId, amount);
       if (!canDecrease) isCenotaph = true;
       outputBalanceSheet.increase(runeId, amount);
-      if (this.protoBurns.has(edictOutput)) {
-        const ary = this.protoBurns.get(edictOutput);
-        for (let i = 0; i < ary.length; i++) {
-          const protoBurn = ary[i];
-          protoBurn.process(
-            outputBalanceSheet,
-            OutPoint.from(txid, protoBurn.pointer).toArrayBuffer(),
-          );
-        }
-      }
     }
     return isCenotaph;
   }
@@ -361,16 +351,29 @@ export class RunestoneMessage {
 
     const isCenotaph = this.processEdicts(balancesByOutput, balanceSheet, txid);
 
-    const runesToOutputs = balancesByOutput.keys();
+    const allOutputs = balancesByOutput.keys();
 
-    for (let x = 0; x < runesToOutputs.length; x++) {
-      const sheet = balancesByOutput.get(runesToOutputs[x]);
+    for (let x = 0; x < allOutputs.length; x++) {
+      const output = allOutputs[x];
+      const sheet = balancesByOutput.get(output);
       sheet.save(
         OUTPOINT_TO_RUNES.select(
-          OutPoint.from(txid, runesToOutputs[x]).toArrayBuffer(),
+          OutPoint.from(txid, output).toArrayBuffer(),
         ),
         isCenotaph,
       );
+
+      // save protoburns to index
+      if (this.protoBurns.has(output)) {
+        const ary = this.protoBurns.get(output);
+        for (let i = 0; i < ary.length; i++) {
+          const protoBurn = ary[i];
+          protoBurn.process(
+            sheet,
+            OutPoint.from(txid, protoBurn.pointer).toArrayBuffer(),
+          );
+        }
+      }
     }
     return balancesByOutput;
   }

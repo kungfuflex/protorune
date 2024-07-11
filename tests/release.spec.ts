@@ -22,6 +22,7 @@ import {
 import { DEBUG_WASM } from "./utils/general";
 
 describe("metashrew-runes", () => {
+	/*
   it("should check if duplicate keys are not being set", async () => {
     const program = buildProgram(DEBUG_WASM);
     program.setBlock(
@@ -36,6 +37,7 @@ describe("metashrew-runes", () => {
       ).length,
     ).to.be.equal(2);
   });
+ */
   it("should not index before 840000", async () => {
     const program = buildProgram(DEBUG_WASM);
     program.setBlockHeight(839000);

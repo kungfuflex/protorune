@@ -78,6 +78,23 @@ export interface Outpoint {
     vout: number;
 }
 /**
+ * @generated from protobuf message protorune.OutpointWithProtocol
+ */
+export interface OutpointWithProtocol {
+    /**
+     * @generated from protobuf field: bytes txid = 1;
+     */
+    txid: Uint8Array;
+    /**
+     * @generated from protobuf field: uint32 vout = 2;
+     */
+    vout: number;
+    /**
+     * @generated from protobuf field: bytes protocol = 3;
+     */
+    protocol: Uint8Array;
+}
+/**
  * @generated from protobuf message protorune.Output
  */
 export interface Output {
@@ -291,6 +308,16 @@ declare class Outpoint$Type extends MessageType<Outpoint> {
  * @generated MessageType for protobuf message protorune.Outpoint
  */
 export declare const Outpoint: Outpoint$Type;
+declare class OutpointWithProtocol$Type extends MessageType<OutpointWithProtocol> {
+    constructor();
+    create(value?: PartialMessage<OutpointWithProtocol>): OutpointWithProtocol;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: OutpointWithProtocol): OutpointWithProtocol;
+    internalBinaryWrite(message: OutpointWithProtocol, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protorune.OutpointWithProtocol
+ */
+export declare const OutpointWithProtocol: OutpointWithProtocol$Type;
 declare class Output$Type extends MessageType<Output> {
     constructor();
     create(value?: PartialMessage<Output>): Output;
