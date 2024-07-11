@@ -8,7 +8,6 @@ import { Tag } from "./tag";
 import { Some, Option } from "@magiceden-oss/runestone-lib/dist/src/monads";
 
 export type ProtoBurn = {
-  protocolTag: Option<u128>;
   pointer: Option<u32>;
 };
 
@@ -16,33 +15,44 @@ export type ProtoMessage = {
   calldata: u128[];
   pointer: Option<u32>;
   refundPointer: Option<u32>;
-  protocolTag: u128;
 };
 
-export type ProtoSplit = {};
+export type ProtoSplit = {
+  order: u32[];
+};
 
-export type Chunk = {};
+export type Chunk = Buffer;
 
 export class ProtoStone {
   burn?: ProtoBurn;
   message?: ProtoMessage;
   split?: ProtoSplit;
+  chunk?: Chunk;
+  protocolTag: u128;
 
   constructor({
     burn,
     message,
+    protocolTag,
+    split,
+    chunk,
   }: {
-    burn?: { protocolTag: bigint; pointer: number };
+    protocolTag: bigint;
+    burn?: { pointer: number };
     message?: {
       calldata: Buffer;
-      protocolTag: bigint;
+
       pointer: number;
       refundPointer: number;
     };
+    split?: {
+      order: number[];
+    };
+    chunk?: Buffer;
   }) {
+    this.protocolTag = u128(protocolTag);
     if (burn) {
       this.burn = {
-        protocolTag: Some<u128>(u128(burn.protocolTag)),
         pointer: Some<u32>(u32(burn.pointer)),
       };
     }
@@ -62,10 +72,17 @@ export class ProtoStone {
       }
       this.message = {
         calldata: res,
-        protocolTag: u128(message.protocolTag),
         pointer: Some<u32>(u32(message.pointer)),
         refundPointer: Some<u32>(u32(message.refundPointer)),
       };
+    }
+    if (split) {
+      this.split = {
+        order: split.order.map(u32),
+      };
+    }
+    if (chunk) {
+      this.chunk = chunk;
     }
   }
 
@@ -78,11 +95,11 @@ export class ProtoStone {
         Tag.encodeOptionInt(Tag.POINTER, this.burn.pointer.map(u128)),
       );
       payloads.push(
-        Tag.encodeOptionInt(Tag.BURN, this.burn.protocolTag.map(u128)),
+        Tag.encodeOptionInt(Tag.BURN, Some<u128>(this.protocolTag)),
       );
       stack.push(opcodes.OP_14);
     } else if (this.message) {
-      payloads.push(u128.encodeVarInt(this.message.protocolTag));
+      payloads.push(u128.encodeVarInt(this.protocolTag));
       payloads.push(
         Tag.encodeOptionInt(Tag.POINTER, this.message.pointer.map(u128)),
       );
@@ -91,6 +108,12 @@ export class ProtoStone {
       );
       payloads.push(Tag.encode(Tag.MESSAGE, this.message.calldata));
       stack.push(opcodes.OP_16);
+    } else if (this.split) {
+      payloads.push(Tag.encode(Tag.SPLIT, this.split.order.map(u128)));
+      stack.push(opcodes.OP_16);
+    } else if (this.chunk) {
+      payloads.push(this.chunk);
+      stack.push(opcodes.OP_15);
     }
     const payload = Buffer.concat(payloads);
     for (let i = 0; i < payload.length; i += MAX_SCRIPT_ELEMENT_SIZE) {
@@ -100,16 +123,39 @@ export class ProtoStone {
     return script.compile(stack);
   }
 
-  static burn(burn: { protocolTag: bigint; pointer: number }): ProtoStone {
-    return new ProtoStone({ burn });
+  static burn({
+    protocolTag,
+    ...burn
+  }: {
+    protocolTag: bigint;
+    pointer: number;
+  }): ProtoStone {
+    return new ProtoStone({ burn, protocolTag });
   }
 
-  static message(message: {
+  static split({
+    protocolTag,
+    ...split
+  }: {
+    protocolTag: bigint;
+    order: number[];
+  }): ProtoStone {
+    return new ProtoStone({ split, protocolTag });
+  }
+
+  static chunk(chunk: Buffer): ProtoStone {
+    return new ProtoStone({ protocolTag: BigInt(0), chunk });
+  }
+
+  static message({
+    protocolTag,
+    ...message
+  }: {
     calldata: Buffer;
     protocolTag: bigint;
     pointer: number;
     refundPointer: number;
   }): ProtoStone {
-    return new ProtoStone({ message });
+    return new ProtoStone({ message, protocolTag });
   }
 }
