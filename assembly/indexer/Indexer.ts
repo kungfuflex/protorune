@@ -13,7 +13,7 @@ import {
   GENESIS,
 } from "./constants";
 import { OutPoint, Output } from "metashrew-as/assembly/blockdata/transaction";
-import { stripNullRight } from "../utils";
+import { checkForNonDataPush, stripNullRight } from "../utils";
 import { ProtoMessage, MessageContext } from "./protomessage";
 import { BalanceSheet } from "./BalanceSheet";
 import { ProtoStone } from "./ProtoStone";
@@ -84,13 +84,7 @@ export class Index {
 
   static getMessagePayload(output: Output, skip: u32 = 2): ArrayBuffer {
     const parsed = scriptParse(output.script).slice(skip);
-    if (
-      parsed.findIndex((v: Box, i: i32, ary: Array<Box>) => {
-        return v.start === usize.MAX_VALUE;
-      }) !== -1
-    )
-      return new ArrayBuffer(0);
-    return Box.concat(parsed);
+    return checkForNonDataPush(parsed);
   }
 
   static processMessage<T extends RunestoneMessage>(
@@ -103,7 +97,9 @@ export class Index {
   ): Map<u32, BalanceSheet> {
     if (outputIndex > -1) {
       const runestoneOutput = tx.outs[outputIndex];
-      const payload = Index.getMessagePayload(runestoneOutput);
+      const payload = tx.tags.parsedScripts.has(outputIndex)
+        ? tx.tags.parsedScripts.get(outputIndex)
+        : Index.getMessagePayload(runestoneOutput);
       if (changetype<usize>(payload) == 0) return new Map<u32, BalanceSheet>();
       const message = ProtoruneMessage.parseProtocol(payload, protocol);
       if (changetype<usize>(message) === 0) return new Map<u32, BalanceSheet>();
@@ -125,10 +121,9 @@ export class Index {
       if (payload.byteLength == 0) return message;
       return Box.concat([Box.from(message), Box.from(payload)]);
     }
-    payload = Index.getMessagePayload(
-      tx.outs[startOutpoint],
-      tx.tags.payloadSkip.get(startOutpoint),
-    );
+    payload = tx.tags.parsedScripts.has(startOutpoint)
+      ? tx.tags.parsedScripts.get(startOutpoint)
+      : changetype<ArrayBuffer>(0);
     if (changetype<usize>(payload) == 0) return message;
     const protostone = ProtoStone.parse(payload);
     if (changetype<usize>(protostone) == 0) return message;
@@ -175,11 +170,7 @@ export class Index {
           const outs = tx.tags.protostone.get(p);
           for (let o = 0; o < outs.length; o++) {
             const index = outs[o];
-            const out = tx.outs[index];
-            const payload = Index.getMessagePayload(
-              out,
-              tx.tags.payloadSkip.get(index),
-            );
+            const payload = tx.tags.parsedScripts.get(index);
             if (changetype<usize>(payload) == 0) continue;
             const protostone = ProtoStone.parse(payload);
             if (protostone.isMessage()) {

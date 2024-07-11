@@ -1,4 +1,4 @@
-import { ProtoBurn } from "../../src.ts/protoburn";
+import { ProtoStone } from "../../src.ts/protostone";
 import {
   buildCoinbaseToAddress,
   buildDefaultBlock,
@@ -67,7 +67,7 @@ export const constructProtoburnTransaction = (
     edicts: edicts,
     pointer: 1, // default output for leftover runes, default goes to the protoburn
   }).encodedRunestone;
-  const protoburn = new ProtoBurn({
+  const protoburn = ProtoStone.burn({
     protocolTag: protocolTag,
     pointer: outputIndexToReceiveProtorunes,
   });
