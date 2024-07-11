@@ -12,10 +12,23 @@ export type ProtoBurn = {
   pointer: Option<u32>;
 };
 
+export type ProtoMesage = {};
+
+export type ProtoSplit = {};
+
+export type Chunk = {};
+
 export class ProtoStone {
   burn?: ProtoBurn;
 
-  constructor({ burn }: { burn?: { protocolTag: bigint; pointer: number } }) {
+  constructor({
+    burn,
+  }: {
+    burn?: { protocolTag: bigint; pointer: number };
+    chunk?: {};
+    message?: {};
+    split?: {};
+  }) {
     if (burn) {
       this.burn = {
         protocolTag: Some<u128>(u128(burn.protocolTag)),

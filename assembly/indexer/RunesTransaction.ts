@@ -13,6 +13,8 @@ import {
 import { PROTOCOLS_TO_INDEX } from "./tables/protorune";
 import { readULEB128ToU128 } from "../leb128";
 import { u128 } from "as-bignum/assembly";
+import { Box, scriptParse } from "metashrew-as/assembly/utils";
+import { checkForNonDataPush } from "../utils";
 
 class TagOutput {
   runestone: Map<string, i32> = new Map<string, i32>();
@@ -20,7 +22,7 @@ class TagOutput {
   chunks: Set<i32> = new Set<i32>();
   protostone: Map<string, Array<i32>> = new Map<string, Array<i32>>();
   runestoneOrder: Array<u128> = new Array<u128>();
-  payloadSkip: Map<u32, u32> = new Map<u32, u32>();
+  parsedScripts: Map<u32, ArrayBuffer> = new Map<u32, ArrayBuffer>();
 
   inspect(): string {
     let log: string = "\nINSPECTING TX TAGS\n";
@@ -71,27 +73,32 @@ export class RunesTransaction extends Transaction {
   the protocol_id is serialized to a hexstring as im not sure if a u128/ArrayBuffer can be used to index a Map in assemblyscript
 
   */
+
   processRunestones(): void {
     const output = new TagOutput();
     for (let i = 0; i < this.outs.length; i++) {
       const op = load<u16>(this.outs[i].script.start);
-      let tag = u128.from(0);
-      let len = 0;
-      len = <u32>readULEB128ToU128(this.outs[i].script, tag);
+      let script: Box = changetype<Box>(0);
+      let skip: usize = 0;
+      let tag: u128 = changetype<u128>(0);
       switch (op) {
         case RUNESTONE_TAG:
           if (!output.runestone.has(u128.Zero.toString())) {
             output.runestone.set(u128.Zero.toString(), i);
             output.runestoneOrder.push(u128.Zero);
-            output.payloadSkip.set(i, 2);
           }
           break;
         case PROTOBURN_TAG:
           output.protoburn.push(i);
-          output.payloadSkip.set(i, 2);
           break;
         case PROTOSTONE_TAG:
-          len = <u32>readULEB128ToU128(this.outs[i].script.shrinkFront(2), tag);
+          script = Box.from(
+            checkForNonDataPush(scriptParse(this.outs[i].script).slice(2)),
+          );
+          if (changetype<usize>(script) == 0) continue;
+          tag = changetype<u128>(0);
+          skip = readULEB128ToU128(script, tag);
+          if (changetype<usize>(tag) == 0) continue;
           if (PROTOCOLS_TO_INDEX.has(tag)) {
             if (output.protostone.has(tag.toString())) {
               const ary = output.protostone.get(tag.toString());
@@ -102,19 +109,31 @@ export class RunesTransaction extends Transaction {
               ary.push(i);
               output.protostone.set(tag.toString(), ary);
             }
-            output.payloadSkip.set(i, len + 2);
+            output.parsedScripts.set(
+              i,
+              script.shrinkFront(skip).toArrayBuffer(),
+            );
           }
           break;
         case CHUNK_TAG:
           output.chunks.add(i);
-          output.payloadSkip.set(i, 2);
           break;
         default:
+          script = Box.from(
+            checkForNonDataPush(scriptParse(this.outs[i].script)),
+          );
+          if (changetype<usize>(script) == 0) continue;
+          tag = changetype<u128>(0);
+          skip = readULEB128ToU128(script, tag);
+          if (changetype<usize>(tag) == 0) continue;
           const tagStr = tag.toString();
           if (output.runestone.has(tagStr) && PROTOCOLS_TO_INDEX.has(tag)) {
             output.runestone.set(tagStr, i);
             output.runestoneOrder.push(tag);
-            output.payloadSkip.set(i, len);
+            output.parsedScripts.set(
+              i,
+              script.shrinkFront(skip).toArrayBuffer(),
+            );
           }
           break;
       }

@@ -119,3 +119,13 @@ export function getReservedNameFor(block: u64, txindex: u32): u128 {
   const add = (u128.from(block) << 32) | u128.from(txindex);
   return RESERVED_NAME + add;
 }
+
+export function checkForNonDataPush(parsed: Array<Box>): ArrayBuffer {
+  if (
+    parsed.findIndex((v: Box, i: i32, ary: Array<Box>) => {
+      return v.start === usize.MAX_VALUE;
+    }) !== -1
+  )
+    return new ArrayBuffer(0);
+  return Box.concat(parsed);
+}
