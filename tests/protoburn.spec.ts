@@ -25,7 +25,6 @@ import { uint128 } from "../src.ts/proto/protorune";
 
 // const TEST_PROTOCOL_TAG = parseInt("0x112233445566778899aabbccddeeff10", 16);
 const TEST_PROTOCOL_TAG = BigInt("0x400000000000000000");
-console.log(TEST_PROTOCOL_TAG.toString(10));
 
 describe("protoburns", () => {
   it("should index full protoburn, where edict target and pointer point to the protoburn", async () => {
@@ -108,7 +107,6 @@ describe("protoburns", () => {
       TEST_PROTOCOL_TAG,
     );
     console.log(protorunesAddress2);
-    console.log(formatKv(program.kv));
     expect(protorunesAddress2.balanceSheet[0].balance).equals(
       premineAmount,
       "address 2 should now have all the protorunes",
@@ -197,7 +195,6 @@ describe("protoburns", () => {
       TEST_PROTOCOL_TAG,
     );
     console.log(protorunesAddress2);
-    console.log(formatKv(program.kv));
     expect(protorunesAddress2.balanceSheet[0].balance).equals(
       amount,
       "address 2 should now have the protorunes sent to protoburn through edict",
@@ -246,7 +243,6 @@ describe("protoburns", () => {
       address: TEST_BTC_ADDRESS2,
       btcAmount: 1, //this can be implied to be 1 since runes usually are just inscribed on a satoshi
     };
-    // technically this is not a valid transaction since btc in and less than btc out but this is just to test the runes
     const refundOutput = {
       address: TEST_BTC_ADDRESS1,
       btcAmount: 0, // this gives address 1 his remaining bitcoin
@@ -286,7 +282,6 @@ describe("protoburns", () => {
       TEST_PROTOCOL_TAG,
     );
     console.log(protorunesAddress2);
-    console.log(formatKv(program.kv));
     expect(protorunesAddress2.balanceSheet[0].balance).equals(
       amountLeftover,
       "address 2 should now have the protorunes left over from the transfer",
