@@ -1,6 +1,7 @@
 import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
 import { u128 } from "as-bignum/assembly";
 import { console } from "metashrew-as/assembly/utils";
+import { fromArrayBuffer, toArrayBuffer } from "../../utils";
 
 class PROTOCOL_INDEXER {
   set: Set<string> = new Set<string>();
@@ -45,12 +46,7 @@ export class PROTORUNE_TABLE {
   }
   static for(protocol: u128): PROTORUNE_TABLE {
     return new PROTORUNE_TABLE(
-      IndexPointer.for("/runes/proto/").keyword(protocol.toString()),
-    );
-  }
-  static for_str(protocol: string): PROTORUNE_TABLE {
-    return new PROTORUNE_TABLE(
-      IndexPointer.for("/runes/proto/").keyword(protocol),
+      IndexPointer.for("/runes/proto/").select(toArrayBuffer(protocol)).keyword("/")
     );
   }
   unwrap(): IndexPointer {

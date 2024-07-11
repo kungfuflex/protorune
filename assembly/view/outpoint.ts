@@ -148,9 +148,7 @@ export function outpointBaseForProtocol(
   const txid = changetype<Uint8Array>(inp.txid).buffer;
   const pos = inp.vout;
   const outpoint = OutPoint.from(txid, pos).toArrayBuffer();
-  const table = PROTORUNE_TABLE.for_str(
-    String.UTF8.decode(changetype<Uint8Array>(inp.protocol).buffer),
-  );
+  const table = PROTORUNE_TABLE.for(fromArrayBuffer(changetype<Uint8Array>(inp.protocol).buffer));
   const op = table.OUTPOINT_TO_RUNES.select(outpoint);
   const output = new Output(
     Box.from(OUTPOINT_TO_OUTPUT.select(outpoint).get()),

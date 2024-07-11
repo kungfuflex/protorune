@@ -14,6 +14,7 @@ import { console } from "metashrew-as/assembly/utils/logging";
 import { input } from "metashrew-as/assembly/indexer";
 import { OUTPOINT_TO_RUNES } from "../indexer/constants";
 import { PROTORUNE_TABLE } from "../indexer/tables/protorune";
+import { u128ToHex, fromArrayBuffer } from "../utils";
 
 export function wallet_test(): ArrayBuffer {
   const address = String.UTF8.encode(
@@ -70,10 +71,9 @@ export function protorunesbyaddress(): ArrayBuffer {
   );
   const address = changetype<Uint8Array>(request.wallet).buffer;
   const protocol_tag = changetype<Uint8Array>(request.protocol_tag).buffer;
-  const protorune_pointer = PROTORUNE_TABLE.for_str(
-    String.UTF8.decode(protocol_tag),
-  );
-
+  console.log(Box.from(protocol_tag).toHexString());
+  console.log(u128ToHex(fromArrayBuffer(protocol_tag)));
+  const protorune_pointer = PROTORUNE_TABLE.for(fromArrayBuffer(protocol_tag));
   const _outpoints = SpendablesIndex.findOutpointsForAddress(address);
   const outpoints = new Array<protobuf.OutpointResponse>();
   const balanceSheets = new Array<BalanceSheet>();
