@@ -1,7 +1,7 @@
 import { OutPoint, RuneOutput } from "metashrew-runes/lib/src.ts/outpoint";
 import { MetashrewRunes } from "metashrew-runes/lib/src.ts/rpc";
 export declare class ProtorunesRpc extends MetashrewRunes {
-    protorunesbyaddress({ address, protocol_tag }: any): Promise<{
+    protorunesbyaddress({ address, protocolTag }: any): Promise<{
         outpoints: OutPoint[];
         balanceSheet: RuneOutput[];
     }>;

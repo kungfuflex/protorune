@@ -31,6 +31,8 @@ export const constructProtoburnTransaction = (
   }[],
   protocolTag: bigint,
   block?: bitcoinjs.Block,
+  runeTransferEdictTarget: number = 1,
+  runeTransferPointer: number = 1,
 ): bitcoinjs.Block => {
   if (block == undefined) {
     block = buildDefaultBlock();
@@ -59,13 +61,13 @@ export const constructProtoburnTransaction = (
     {
       id: runeId,
       amount: runeTransferAmount,
-      output: 1, // target the protoburn output
+      output: runeTransferEdictTarget, // default targets the protoburn output
     },
   ];
 
   const runesTransfer = encodeRunestone({
     edicts: edicts,
-    pointer: 1, // default output for leftover runes, default goes to the protoburn
+    pointer: runeTransferPointer, // default output for leftover runes, default goes to the protoburn
   }).encodedRunestone;
   const protoburn = new ProtoBurn({
     protocolTag: protocolTag,
