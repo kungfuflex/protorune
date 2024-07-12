@@ -3,7 +3,7 @@ import { encodeRunestone } from "@magiceden-oss/runestone-lib";
 import * as bitcoin from "bitcoinjs-lib";
 
 //@TODO: should fetch a list of spendable outpoints for the specified address
-async function getInputsFor(address: string) {
+async function getInputsFor(address: string, amount: bigint) {
   return [];
 }
 
