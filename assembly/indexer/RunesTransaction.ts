@@ -13,7 +13,7 @@ import {
 import { PROTOCOLS_TO_INDEX } from "./tables/protorune";
 import { readULEB128ToU128 } from "../leb128";
 import { u128 } from "as-bignum/assembly";
-import { Box, scriptParse } from "metashrew-as/assembly/utils";
+import { Box, console, scriptParse } from "metashrew-as/assembly/utils";
 import { checkForNonDataPush } from "../utils";
 
 class TagOutput {
@@ -48,11 +48,12 @@ class TagOutput {
     log += "\n  protostones: ";
     const protostones = this.protostone.keys();
     for (let i = 0; i < protostones.length; i++) {
-      log += "    " + protostones[i] + ": ";
+      log += "\n    " + protostones[i] + ":\n      [";
       const ary = this.protostone.get(protostones[i]);
       for (let j = 0; j < ary.length; j++) {
         log += ary[j].toString() + ", ";
       }
+      log += "]";
     }
     log += "\n  runestone in order: ";
     for (let i = 0; i < this.runestoneOrder.length; i++) {
@@ -92,13 +93,14 @@ export class RunesTransaction extends Transaction {
           output.protoburn.push(i);
           break;
         case PROTOSTONE_TAG:
+          console.log("protostone detected");
           script = Box.from(
             checkForNonDataPush(scriptParse(this.outs[i].script).slice(2)),
           );
           if (changetype<usize>(script) == 0) continue;
-          tag = changetype<u128>(0);
+          tag = u128.from(0);
           skip = readULEB128ToU128(script, tag);
-          if (changetype<usize>(tag) == 0) continue;
+          if (tag == u128.Zero) continue;
           if (PROTOCOLS_TO_INDEX.has(tag)) {
             if (output.protostone.has(tag.toString())) {
               const ary = output.protostone.get(tag.toString());
@@ -123,9 +125,9 @@ export class RunesTransaction extends Transaction {
             checkForNonDataPush(scriptParse(this.outs[i].script)),
           );
           if (changetype<usize>(script) == 0) continue;
-          tag = changetype<u128>(0);
+          tag = u128.from(0);
           skip = readULEB128ToU128(script, tag);
-          if (changetype<usize>(tag) == 0) continue;
+          if (tag == u128.Zero) continue;
           const tagStr = tag.toString();
           if (output.runestone.has(tagStr) && PROTOCOLS_TO_INDEX.has(tag)) {
             output.runestone.set(tagStr, i);
@@ -139,6 +141,7 @@ export class RunesTransaction extends Transaction {
       }
     }
     this.tags = output;
+    console.log(output.inspect());
   }
 
   defaultOutput(): i32 {

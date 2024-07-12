@@ -366,7 +366,6 @@ export class RunestoneMessage {
         const ary = this.protoBurns.get(output);
         for (let i = 0; i < ary.length; i++) {
           const protoBurn = ary[i];
-          console.log(sheet.inspect());
           protoBurn.process(
             sheet,
             OutPoint.from(txid, protoBurn.pointer).toArrayBuffer(),

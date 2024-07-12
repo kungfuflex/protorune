@@ -171,7 +171,7 @@ describe("protoburns", () => {
       TEST_PROTOCOL_TAG,
       block,
       1,
-      2
+      2,
     );
 
     program.setBlock(block.toHex());
@@ -258,7 +258,7 @@ describe("protoburns", () => {
       TEST_PROTOCOL_TAG,
       block,
       2,
-      1
+      1,
     );
 
     program.setBlock(block.toHex());
