@@ -362,10 +362,11 @@ export class RunestoneMessage {
       );
 
       // save protoburns to index
-      if (this.protoBurns.has(output)) {
+      if (this.protoBurns.has(output) && !isCenotaph) {
         const ary = this.protoBurns.get(output);
         for (let i = 0; i < ary.length; i++) {
           const protoBurn = ary[i];
+          console.log(sheet.inspect());
           protoBurn.process(
             sheet,
             OutPoint.from(txid, protoBurn.pointer).toArrayBuffer(),
