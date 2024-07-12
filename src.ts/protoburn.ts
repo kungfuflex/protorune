@@ -1,5 +1,6 @@
 import { ProtoStone } from "./protostone";
 import { encodeRunestone } from "@magiceden-oss/runestone-lib";
+import { buildRunesTransaction } from "./utils/transaction";
 
 export async function encodeProtoburn(
   runes: {
@@ -30,4 +31,6 @@ export async function encodeProtoburn(
       value: 1,
     },
   ];
+
+  return buildRunesTransaction(outs, address);
 }
