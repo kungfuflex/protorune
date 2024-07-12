@@ -357,14 +357,12 @@ export class RunestoneMessage {
       const output = allOutputs[x];
       const sheet = balancesByOutput.get(output);
       sheet.save(
-        OUTPOINT_TO_RUNES.select(
-          OutPoint.from(txid, output).toArrayBuffer(),
-        ),
+        OUTPOINT_TO_RUNES.select(OutPoint.from(txid, output).toArrayBuffer()),
         isCenotaph,
       );
 
       // save protoburns to index
-      if (this.protoBurns.has(output)) {
+      if (this.protoBurns.has(output) && !isCenotaph) {
         const ary = this.protoBurns.get(output);
         for (let i = 0; i < ary.length; i++) {
           const protoBurn = ary[i];

@@ -22,7 +22,7 @@ import {
 import { DEBUG_WASM } from "./utils/general";
 
 describe("metashrew-runes", () => {
-	/*
+  /*
   it("should check if duplicate keys are not being set", async () => {
     const program = buildProgram(DEBUG_WASM);
     program.setBlock(

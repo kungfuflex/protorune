@@ -22,7 +22,9 @@
     "postinstall": "yarn build"
   },
   "dependencies": {
-    "@protobuf-ts/runtime": "^2.9.4"
+    "@protobuf-ts/runtime": "^2.9.4",
+    "ecpair": "^2.1.0",
+    "tiny-secp256k1": "^2.2.3"
   },
   "devDependencies": {
     "@bitauth/libauth": "^3.0.0",
@@ -39,9 +41,9 @@
     "fs-extra": "^11.2.0",
     "js-sha3": "^0.9.3",
     "metashrew-as": "https://github.com/sandshrewmetaprotocols/metashrew-as",
+    "metashrew-runes": "https://github.com/sandshrewmetaprotocols/metashrew-runes",
     "metashrew-spendables": "https://github.com/sandshrewmetaprotocols/metashrew-spendables",
     "metashrew-test": "https://github.com/sandshrewmetaprotocols/metashrew-test",
-    "metashrew-runes": "https://github.com/sandshrewmetaprotocols/metashrew-runes",
     "mocha": "^10.5.2",
     "nice-repl": "^0.1.2",
     "npm-run-all": "^4.1.5",
