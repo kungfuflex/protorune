@@ -72,8 +72,9 @@ export async function buildRunesTransaction(outputs: any[], address: string) {
     if (currentIndex > utxos.length)
       throw new Error("wallet does not have enough spendable btc");
     const v = utxos[currentIndex];
-    currentIndex++;
     tx.addInput({ hash: Buffer.from(v.txid, "hex"), index: v.vout });
+    tx.signInput(currentIndex, pair);
+    currentIndex++;
     currentTotal += v.value;
     vsize = await getVSize(tx.extractTransaction().toHex());
     fee = vsize * feeRate;
