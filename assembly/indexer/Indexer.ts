@@ -229,6 +229,7 @@ export class Index {
     height: u32,
     i: u32,
   ): void {
+    console.log("Protocol not activated, processing RunestoneMessage");
     Index.processRunesTransaction<RunestoneMessage, MessageContext>(
       block,
       tx,

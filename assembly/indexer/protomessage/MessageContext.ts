@@ -5,6 +5,7 @@ import { RuneId } from "../RuneId";
 import { BalanceSheet } from "../BalanceSheet";
 import { PROTORUNE_TABLE, PROTOCOLS_TO_INDEX } from "../tables/protorune";
 import { u128 } from "as-bignum/assembly";
+import { console } from "metashrew-as/assembly/utils/logging";
 
 export class MessageContext {
   runtime: AtomicTransaction = new AtomicTransaction();
@@ -94,6 +95,7 @@ export class MessageContext {
   }
 
   run(): void {
+    console.log("MessageContext.run " + this.baseSheet.inspect())
     if (this.sheets.has(this.pointer.index)) {
       const sheet = this.sheets.get(this.pointer.index);
       for (let i = 0; i < sheet.runes.length; i++) {
@@ -106,6 +108,7 @@ export class MessageContext {
         this.runtime,
       );
       this.baseSheet.pipe(sheet);
+      console.log("after pointer save " + this.baseSheet.inspect())
     }
     if (this.sheets.has(this.refund_pointer.index)) {
       const sheet = this.sheets.get(this.refund_pointer.index);
@@ -128,6 +131,7 @@ export class MessageContext {
         this.runtime,
       );
       this.baseSheet.pipe(sheet);
+      console.log("after refund save " + this.baseSheet.inspect())
     }
     this.runtime.checkpoint();
     const result = this.handle();

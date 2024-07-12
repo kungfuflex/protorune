@@ -106,7 +106,7 @@ describe("protoburns", () => {
       TEST_BTC_ADDRESS2,
       TEST_PROTOCOL_TAG,
     );
-    console.log(protorunesAddress2);
+    console.log(protorunesAddress2.balanceSheet[0].rune);
     expect(protorunesAddress2.balanceSheet[0].balance).equals(
       premineAmount,
       "address 2 should now have all the protorunes",
@@ -171,7 +171,7 @@ describe("protoburns", () => {
       TEST_PROTOCOL_TAG,
       block,
       1,
-      2
+      2,
     );
 
     program.setBlock(block.toHex());
@@ -258,7 +258,7 @@ describe("protoburns", () => {
       TEST_PROTOCOL_TAG,
       block,
       2,
-      1
+      1,
     );
 
     program.setBlock(block.toHex());

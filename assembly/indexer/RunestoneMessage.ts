@@ -357,9 +357,7 @@ export class RunestoneMessage {
       const output = allOutputs[x];
       const sheet = balancesByOutput.get(output);
       sheet.save(
-        OUTPOINT_TO_RUNES.select(
-          OutPoint.from(txid, output).toArrayBuffer(),
-        ),
+        OUTPOINT_TO_RUNES.select(OutPoint.from(txid, output).toArrayBuffer()),
         isCenotaph,
       );
 
