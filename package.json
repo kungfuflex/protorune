@@ -24,7 +24,8 @@
   "dependencies": {
     "@protobuf-ts/runtime": "^2.9.4",
     "ecpair": "^2.1.0",
-    "tiny-secp256k1": "^2.2.3"
+    "tiny-secp256k1": "^2.2.3",
+    "yargs": "^17.7.2"
   },
   "devDependencies": {
     "@bitauth/libauth": "^3.0.0",
@@ -33,6 +34,7 @@
     "@types/chai": "4",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.10.6",
+    "@types/yargs": "^17.0.32",
     "as-bignum": "^0.3.0",
     "assemblyscript": "^0.27.22",
     "assemblyscript-prettier": "^3.0.1",
