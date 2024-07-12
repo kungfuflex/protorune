@@ -1,11 +1,5 @@
 import { ProtoStone } from "./protostone";
 import { encodeRunestone } from "@magiceden-oss/runestone-lib";
-import * as bitcoin from "bitcoinjs-lib";
-
-//@TODO: should fetch a list of spendable outpoints for the specified address
-async function getInputsFor(address: string, amount: bigint) {
-  return [];
-}
 
 export async function encodeProtoburn(
   runes: {
@@ -21,8 +15,6 @@ export async function encodeProtoburn(
   }).encodedRunestone;
   const protoburn = ProtoStone.burn(burn).encipher();
 
-  const inputs = [];
-  const psbt = new bitcoin.Psbt();
   const outs = [
     {
       script: runestone,
@@ -33,14 +25,9 @@ export async function encodeProtoburn(
       value: 0,
     },
     {
-      script:
-        bitcoin.payments.p2pkh({
-          address,
-          network: bitcoin.networks.bitcoin,
-        }).output || Buffer.from(""),
+      address,
       //@TODO: change so that it correctly gets the value to be sent
       value: 1,
     },
   ];
-  outs.map((o) => psbt.addOutput(o));
 }
