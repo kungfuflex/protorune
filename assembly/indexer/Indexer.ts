@@ -257,6 +257,7 @@ export class Index {
       const txid = tx.txid();
       tx.processRunestones();
       Index.indexOutpoints(tx, txid, height);
+      console.log("runestone order length" +  tx.tags.runestoneOrder.length.toString());
       for (let r = 0; r < tx.tags.runestoneOrder.length; r++) {
         if (tx.tags.runestoneOrder[r] == u128.Zero) {
           Index.processRunes(_block, tx, txid, height, i);
@@ -269,6 +270,8 @@ export class Index {
             i,
             tx.tags.runestoneOrder[r],
           );
+        } else {
+          console.log("GOT INCORRECT PROTOCOL " + tx.tags.runestoneOrder[r].toString() + ", EXPECTING " + MessageContext.protocol_tag().toString());
         }
       }
     }

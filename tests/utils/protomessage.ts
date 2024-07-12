@@ -14,7 +14,7 @@ import {
 } from "metashrew-runes/lib/tests/utils/general";
 import { encodeRunestone } from "@magiceden-oss/runestone-lib";
 
-export const constructProtomessageBlock = (
+export const constructProtomessageBlockWithProtoburn = (
   inputs: {
     inputTxHash: Buffer | undefined;
     inputTxOutputIndex: number;
@@ -93,6 +93,66 @@ export const constructProtomessageBlock = (
         script: protoburn.encipher(),
         value: 0,
       },
+      {
+        script: protomessage.encipher(),
+        value: 0,
+      },
+      ...blockOutputs,
+    ],
+  );
+  block.transactions?.push(transaction);
+  return block;
+};
+
+export const constructProtomessageBlock = (
+  inputs: {
+    inputTxHash: Buffer | undefined;
+    inputTxOutputIndex: number;
+  }[],
+  outputs: {
+    address: string;
+    btcAmount: number;
+  }[],
+  protocolTag: bigint,
+  message: {
+    calldata: Buffer;
+    pointer: number;
+    refundPointer: number;
+  },
+  block?: bitcoinjs.Block,
+): bitcoinjs.Block => {
+  if (block == undefined) {
+    block = buildDefaultBlock();
+    const coinbase = buildCoinbaseToAddress(TEST_BTC_ADDRESS1);
+    block.transactions?.push(coinbase);
+  }
+
+  const blockInputs = inputs.map((input) => {
+    return {
+      hash: input.inputTxHash,
+      index: input.inputTxOutputIndex,
+      witness: EMPTY_WITNESS,
+      script: EMPTY_BUFFER,
+    };
+  });
+  const blockOutputs = outputs.map((output) => {
+    return {
+      script: bitcoinjs.payments.p2pkh({
+        address: output.address,
+        network: bitcoinjs.networks.bitcoin,
+      }).output,
+      value: output.btcAmount,
+    };
+  });
+
+  const protomessage = ProtoStone.message({
+    protocolTag: protocolTag,
+    ...message,
+  });
+
+  const transaction = buildTransaction(
+    [...blockInputs],
+    [
       {
         script: protomessage.encipher(),
         value: 0,
