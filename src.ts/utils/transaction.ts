@@ -1,17 +1,10 @@
 import * as bitcoin from "bitcoinjs-lib";
-import * as ecc from "tiny-secp256k1";
-import ECPairFactory from "ecpair";
+import { DEFAULT as DEFAULT_KEYPAIR, tweakPubkey } from "./wallet";
 import { rpcCall } from "./sandshrew";
-
-const ECPair = ECPairFactory(ecc);
+import { inspect } from "util";
 const DEFAULT_AMOUNT = 2_000;
 
-const getPrivKey = () => {
-  const key = process.env.PRIVATE_KEY || "";
-  return ECPair.fromPrivateKey(Buffer.from(key, "hex"));
-};
-
-export async function getFeeEstimates(): Promise<number> {
+export async function getFeeEstimates(): Promise<any> {
   return await rpcCall("esplora_fee-estimates", []);
 }
 
@@ -22,14 +15,12 @@ export async function getVSize(tx: string): Promise<number> {
 type UTXO = { txid: string; vout: number; value: number };
 //@TODO: should fetch a list of spendable outpoints for the specified address
 export async function getInputsFor(address: string, amount: number) {
-  const utxos: UTXO[] = await rpcCall("esplora_address::txs:mempool", [
-    address,
-  ]);
+  const utxos: UTXO[] = await rpcCall("esplora_address::utxo", [address]);
   const inputs = utxos.reduce(
     (a, d) => {
       if (a.total < amount) {
         return {
-          result: { ...a.result, d },
+          result: [...a.result, d],
           total: (a.total += d.value),
         };
       }
@@ -40,54 +31,76 @@ export async function getInputsFor(address: string, amount: number) {
   return { inputs, utxos };
 }
 
-export async function buildRunesTransaction(outputs: any[], address: string) {
+export async function buildRunesTransaction(
+  outputs: any[],
+  address: string,
+  output: any,
+) {
   const { inputs, utxos } = await getInputsFor(address, DEFAULT_AMOUNT);
-  const tx = new bitcoin.Psbt();
-  outputs.map((o) =>
-    tx.addOutput({
-      script: o.script,
-      value: o.value,
-    }),
-  );
-
+  let tx = new bitcoin.Psbt();
+  outputs.map((o) => (o.script ? (tx = tx.addOutput(o)) : null));
   let currentIndex = inputs.length;
-  let currentTotal = inputs.reduce((a, d) => {
-    tx.addInput({
+  const nodeXOnlyPubkey = tweakPubkey(DEFAULT_KEYPAIR.publicKey);
+  const pair = DEFAULT_KEYPAIR.tweak(
+    bitcoin.crypto.taggedHash("TapTweak", nodeXOnlyPubkey),
+  );
+  tx.locktime = 6;
+  let currentTotal = inputs.reduce((a, d, i) => {
+    tx = tx.addInput({
       hash: Buffer.from(d.txid, "hex"),
       index: d.vout,
+      witnessUtxo: {
+        value: d.value,
+        script: output,
+      },
+      tapInternalKey: nodeXOnlyPubkey,
     });
     return a + d.value;
   }, 0);
-  //locktime - 6 blocks
-  tx.locktime = 6;
-
-  const pair = getPrivKey();
+  let baseTx = tx.clone();
   tx.signAllInputs(pair);
+  tx.finalizeAllInputs();
+  //locktime - 6 blocks
 
   let vsize = await getVSize(tx.extractTransaction().toHex());
-  const feeRate = await getFeeEstimates();
+  const feeRate = (await getFeeEstimates())["1"];
 
   let fee = vsize * feeRate;
   while (fee > currentTotal) {
     if (currentIndex > utxos.length)
       throw new Error("wallet does not have enough spendable btc");
     const v = utxos[currentIndex];
-    tx.addInput({ hash: Buffer.from(v.txid, "hex"), index: v.vout });
-    tx.signInput(currentIndex, pair);
+    tx = baseTx.clone();
+    tx = tx.addInput({
+      hash: Buffer.from(v.txid, "hex"),
+      index: v.vout,
+
+      witnessUtxo: {
+        value: v.value,
+        script: output,
+      },
+      tapInternalKey: nodeXOnlyPubkey,
+    });
+    baseTx = tx.clone();
+    tx = tx.signAllInputs(pair);
+    tx.finalizeAllInputs();
     currentIndex++;
     currentTotal += v.value;
     vsize = await getVSize(tx.extractTransaction().toHex());
     fee = vsize * feeRate;
   }
-
-  tx.addOutput({
+  tx = baseTx.clone();
+  tx = tx.addOutput({
     script:
-      bitcoin.payments.p2pkh({
+      bitcoin.payments.p2tr({
         address,
         network: bitcoin.networks.bitcoin,
       }).output || Buffer.from(""),
-    value: currentTotal - fee,
+    value: currentTotal - Math.ceil(fee),
   });
+  console.log("total inputs: ", currentTotal, ", fee: ", fee);
+  tx.signAllInputs(pair);
+  tx.finalizeAllInputs();
 
   return tx;
 }
