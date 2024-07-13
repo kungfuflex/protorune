@@ -19,7 +19,8 @@
     "test:release": "ts-mocha --timeout 0 ./tests/release.spec.ts",
     "test:protorunes": "ts-mocha --timeout 0 ./tests/proto*.spec.ts",
     "clean": "rm -rf build lib assembly/proto/protorune.ts src.ts/proto/protorune.ts",
-    "postinstall": "yarn build"
+    "postinstall": "yarn build",
+    "cli": "node lib/cli.js"
   },
   "dependencies": {
     "@protobuf-ts/runtime": "^2.9.4",

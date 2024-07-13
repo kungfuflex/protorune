@@ -1,10 +1,18 @@
 import yargs from "yargs";
 import { encodeProtoburn } from "./protoburn";
-import { DEFAULT as DEFAULT_KEYPAIR } from "./utils/wallet";
+import { DEFAULT as DEFAULT_KEYPAIR, node, tweakPubkey } from "./utils/wallet";
 import * as bitcoin from "bitcoinjs-lib";
+import * as ecc from "tiny-secp256k1";
 
-function getAddress(node: any, network?: any): string {
-  return bitcoin.payments.p2pkh({ pubkey: node.publicKey, network }).address!;
+bitcoin.initEccLib(ecc);
+
+function getAddress(
+  node: any,
+  network?: any,
+): { address?: string; output?: any } {
+  return bitcoin.payments.p2tr({
+    internalPubkey: tweakPubkey(node.publicKey),
+  });
 }
 
 yargs
@@ -27,13 +35,16 @@ yargs
         describe: "amount of protorunes to be burned",
       });
     },
-    function (argv) {
+    async function (argv) {
       const protocol_id = argv.protocol_id as string;
       const runeid = argv.runeid as string;
       const amount = argv.amount as string;
 
-      const address = getAddress(DEFAULT_KEYPAIR, bitcoin.networks.bitcoin);
-      const protoburn = encodeProtoburn(
+      const { address, output } = getAddress(
+        DEFAULT_KEYPAIR,
+        bitcoin.networks.bitcoin,
+      );
+      const protoburn = await encodeProtoburn(
         [
           {
             amount: BigInt(amount),
@@ -47,7 +58,10 @@ yargs
           },
         ],
         BigInt(protocol_id),
-        address,
+        address!,
+        output!,
       );
+      console.log(protoburn.extractTransaction().toHex());
     },
-  );
+  )
+  .help().argv;

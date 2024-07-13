@@ -9,6 +9,7 @@ export async function encodeProtoburn(
   }[],
   protocolTag: bigint,
   address: string,
+  output: any,
 ) {
   const runestone = encodeRunestone({
     edicts: runes.map((r) => ({ ...r, output: 1 })),
@@ -32,5 +33,5 @@ export async function encodeProtoburn(
     },
   ];
 
-  return buildRunesTransaction(outs, address);
+  return buildRunesTransaction(outs, address, output);
 }
