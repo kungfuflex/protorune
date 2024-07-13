@@ -11,6 +11,7 @@ import { u128 } from "as-bignum/assembly";
 import { console } from "metashrew-as/assembly/utils/logging";
 import { RunesBlock } from "./indexer/RunesBlock";
 import { RuneId } from "./indexer/RuneId";
+import { RunestoneMessage } from "./indexer/RunestoneMessage";
 
 export function testCommitment(): void {
   const data = input();
@@ -32,7 +33,14 @@ export function testOverwrite(): void {
   const block = changetype<RunesBlock>(new Block(box));
   const tx1 = block.getTransaction(142);
   const tx2 = block.getTransaction(158);
-  Index.processRunes(block, tx1, tx1.txid(), height, 142);
+  Index.processRunestone<RunestoneMessage>(
+    height,
+    tx1,
+    tx1.txid(),
+    142,
+    0,
+    u128.Zero,
+  );
   const testBytes = new RuneId(840000, 158).toBytes();
   RUNE_ID_TO_ETCHING.select(testBytes).setValue<u32>(10);
   // Index.processRunesTransaction(tx2, tx2.txid(), height, 158);

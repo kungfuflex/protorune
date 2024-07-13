@@ -87,7 +87,7 @@ export class Index {
     return checkForNonDataPush(parsed);
   }
 
-  static processMessage<T extends RunestoneMessage>(
+  static processRunestone<T extends RunestoneMessage>(
     height: u64,
     tx: RunesTransaction,
     txid: ArrayBuffer,
@@ -135,105 +135,53 @@ export class Index {
     }
     return message;
   }
-  static processRunesTransaction<
-    T extends RunestoneMessage,
-    C extends MessageContext,
-  >(
-    block: Block,
+  static processMessages<T extends MessageContext>(
+    block: RunesBlock,
+    height: u64,
     tx: RunesTransaction,
     txid: ArrayBuffer,
-    height: u32,
     i: u32,
-    protocol: u128,
+    p: string,
   ): void {
-    const p = protocol.toString();
-    if (height >= GENESIS && tx.tags.runestone.has(p)) {
-      const sheets = Index.processMessage<T>(
-        height,
-        tx,
-        txid,
-        i,
-        tx.tags.runestone.get(p),
-        protocol,
-      );
-      if (protocol > u128.Zero) {
-        const protoMessages: Map<string, ProtoMessage> = new Map<
-          string,
-          ProtoMessage
-        >();
+    const protoMessages: Map<string, ProtoMessage> = new Map<
+      string,
+      ProtoMessage
+    >();
 
-        // parse protostones
-        const protostoneKeys = tx.tags.protostone.keys();
-        for (let m = 0; m < protostoneKeys.length; m++) {
-          if (protostoneKeys[m] != p) continue;
-          const outs = tx.tags.protostone.get(p);
-          for (let o = 0; o < outs.length; o++) {
-            const index = outs[o];
-            const payload = tx.tags.parsedScripts.get(index);
-            if (changetype<usize>(payload) == 0) continue;
-            const protostone = ProtoStone.parse(payload);
-            if (protostone.isMessage()) {
-              protoMessages.set(
-                protostoneKeys[m],
-                ProtoMessage.from(protostone, index),
-              );
-            } else if (protostone.isSplit()) {
-              let message = Index.parseProtosplit(
-                tx,
-                outs[o],
-                new ArrayBuffer(0),
-              );
+    // parse protostones
+    const protostoneKeys = tx.tags.protostone.keys();
+    for (let m = 0; m < protostoneKeys.length; m++) {
+      if (protostoneKeys[m] != p) continue;
+      const outs = tx.tags.protostone.get(p);
+      console.log(outs.toString());
+      for (let o = 0; o < outs.length; o++) {
+        const index = outs[o];
+        const payload = tx.tags.parsedScripts.get(index);
+        if (changetype<usize>(payload) == 0) continue;
+        const protostone = ProtoStone.parse(payload);
+        console.log(protostone.inspect());
+        if (protostone.isMessage()) {
+          protoMessages.set(
+            protostoneKeys[m],
+            ProtoMessage.from(protostone, index),
+          );
+        } else if (protostone.isSplit()) {
+          let message = Index.parseProtosplit(tx, outs[o], new ArrayBuffer(0));
 
-              const protostone = ProtoStone.parse(message);
-              if (!protostone.isMessage()) continue;
-              protoMessages.set(p, ProtoMessage.from(protostone, outs[o]));
-            }
-          }
-        }
-
-        // process protomessage
-        const protoMessageTypes = protoMessages.keys();
-        for (let m = 0; m < protoMessageTypes.length; m++) {
-          const message = protoMessages.get(protoMessageTypes[m]);
-          message.handle<C>(tx, block, height, i);
+          const protostone = ProtoStone.parse(message);
+          if (!protostone.isMessage()) continue;
+          protoMessages.set(p, ProtoMessage.from(protostone, outs[o]));
         }
       }
     }
-  }
-  static processProtocol<C extends MessageContext>(
-    block: Block,
-    tx: RunesTransaction,
-    txid: ArrayBuffer,
-    height: u32,
-    i: u32,
-    protocol: u128,
-  ): void {
-    console.log("Protocol activated, processing ProtoruneMessage");
-    Index.processRunesTransaction<ProtoruneMessage, C>(
-      block,
-      tx,
-      txid,
-      height,
-      i,
-      protocol,
-    );
-  }
-  static processRunes(
-    block: Block,
-    tx: RunesTransaction,
-    txid: ArrayBuffer,
-    height: u32,
-    i: u32,
-  ): void {
-    console.log("Protocol not activated, processing RunestoneMessage");
-    Index.processRunesTransaction<RunestoneMessage, MessageContext>(
-      block,
-      tx,
-      txid,
-      height,
-      i,
-      u128.Zero,
-    );
+
+    // process protomessage
+    const protoMessageTypes = protoMessages.keys();
+    for (let m = 0; m < protoMessageTypes.length; m++) {
+      console.log(m.toString());
+      const message = protoMessages.get(protoMessageTypes[m]);
+      message.handle<T>(tx, block, height, i);
+    }
   }
   static initializeSubprotocols(): void {
     MessageContext.initialiseProtocol();
@@ -253,19 +201,26 @@ export class Index {
       const txid = tx.txid();
       tx.processRunestones();
       Index.indexOutpoints(tx, txid, height);
-      console.log(
-        "runestone order length" + tx.tags.runestoneOrder.length.toString(),
-      );
       for (let r = 0; r < tx.tags.runestoneOrder.length; r++) {
+        const outputIndex = tx.tags.runestone.get(
+          tx.tags.runestoneOrder[r].toString(),
+        );
         if (tx.tags.runestoneOrder[r] == u128.Zero) {
-          Index.processRunes(_block, tx, txid, height, i);
-        } else if (tx.tags.runestoneOrder[r] == MessageContext.protocol_tag()) {
-          Index.processProtocol<MessageContext>(
-            block,
+          Index.processRunestone<RunestoneMessage>(
+            height,
             tx,
             txid,
-            height,
             i,
+            outputIndex,
+            u128.Zero,
+          );
+        } else if (tx.tags.runestoneOrder[r] == MessageContext.protocol_tag()) {
+          Index.processRunestone<ProtoruneMessage>(
+            height,
+            tx,
+            txid,
+            i,
+            outputIndex,
             tx.tags.runestoneOrder[r],
           );
         } else {
@@ -277,6 +232,14 @@ export class Index {
           );
         }
       }
+      Index.processMessages<MessageContext>(
+        block,
+        height,
+        tx,
+        txid,
+        i,
+        MessageContext.protocol_tag().toString(),
+      );
     }
   }
 }
