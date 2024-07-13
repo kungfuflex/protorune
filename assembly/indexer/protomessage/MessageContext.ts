@@ -17,48 +17,66 @@ export class MessageContext {
   pointer: OutPoint = changetype<OutPoint>(0);
   refund_pointer: OutPoint = changetype<OutPoint>(0);
   calldata: ArrayBuffer = new ArrayBuffer(0);
-  sheets: Map<u32, BalanceSheet>;
   txid: ArrayBuffer;
   baseSheet: BalanceSheet;
   runeIdToIndex: Map<ArrayBuffer, i32> = new Map<ArrayBuffer, i32>();
   table: PROTORUNE_TABLE;
+  sheets: Map<u32, BalanceSheet>;
 
   constructor(
     transaction: Transaction,
     block: Block,
     height: u64,
     index: u32,
-    sheets: Map<u32, BalanceSheet>,
     pointer: u32,
     refund_pointer: u32,
     calldata: ArrayBuffer,
   ) {
-    this.sheets = sheets;
     this.baseSheet = new BalanceSheet();
     this.transaction = transaction;
     this.block = block;
     this.height = height;
     const txid = transaction.txid();
-    this.outpoint = OutPoint.from(txid, index);
-    this.pointer = OutPoint.from(txid, pointer);
-    this.refund_pointer = OutPoint.from(txid, refund_pointer);
+    const outpoint = OutPoint.from(txid, index);
+    this.outpoint = outpoint;
+    const pointerOutpoint = OutPoint.from(txid, pointer);
+    this.pointer = pointerOutpoint;
+    const refundPointerOutpoint = OutPoint.from(txid, refund_pointer);
+    this.refund_pointer = refundPointerOutpoint;
     this.calldata = calldata;
-    this.table = PROTORUNE_TABLE.for(MessageContext.protocol_tag());
+    const table = PROTORUNE_TABLE.for(MessageContext.protocol_tag());
     this.txid = txid;
-    if (sheets.has(index)) {
-      const sheet = sheets.get(index);
-      for (let i = 0; i < sheet.runes.length; i++) {
-        const runeId = RuneId.fromBytesU128(sheet.runes[i]);
-        this.runeIdToIndex.set(sheet.runes[i], i);
-        const rune = new IncomingRune(
-          this,
-          runeId,
-          sheet.balances[i],
-          this.table,
-        );
-        this.runes.push(rune);
-        this.baseSheet.pipe(sheet);
-      }
+    this.table = table;
+    this.sheets = new Map<u32, BalanceSheet>();
+    const sheet = BalanceSheet.load(
+      table.OUTPOINT_TO_RUNES.select(outpoint.toArrayBuffer()),
+    );
+
+    this.sheets.set(index, sheet);
+    this.sheets.set(
+      pointer,
+      BalanceSheet.load(
+        table.OUTPOINT_TO_RUNES.select(pointerOutpoint.toArrayBuffer()),
+      ),
+    );
+    this.sheets.set(
+      refund_pointer,
+      BalanceSheet.load(
+        table.OUTPOINT_TO_RUNES.select(refundPointerOutpoint.toArrayBuffer()),
+      ),
+    );
+
+    for (let i = 0; i < sheet.runes.length; i++) {
+      const runeId = RuneId.fromBytesU128(sheet.runes[i]);
+      this.runeIdToIndex.set(sheet.runes[i], i);
+      const rune = new IncomingRune(
+        this,
+        runeId,
+        sheet.balances[i],
+        this.table,
+      );
+      this.runes.push(rune);
+      this.baseSheet.pipe(sheet);
     }
   }
   static initialiseProtocol(): u128 {
@@ -95,7 +113,7 @@ export class MessageContext {
   }
 
   run(): void {
-    console.log("MessageContext.run " + this.baseSheet.inspect())
+    console.log("MessageContext.run " + this.baseSheet.inspect());
     if (this.sheets.has(this.pointer.index)) {
       const sheet = this.sheets.get(this.pointer.index);
       for (let i = 0; i < sheet.runes.length; i++) {
@@ -108,7 +126,7 @@ export class MessageContext {
         this.runtime,
       );
       this.baseSheet.pipe(sheet);
-      console.log("after pointer save " + this.baseSheet.inspect())
+      console.log("after pointer save " + this.baseSheet.inspect());
     }
     if (this.sheets.has(this.refund_pointer.index)) {
       const sheet = this.sheets.get(this.refund_pointer.index);
@@ -131,7 +149,7 @@ export class MessageContext {
         this.runtime,
       );
       this.baseSheet.pipe(sheet);
-      console.log("after refund save " + this.baseSheet.inspect())
+      console.log("after refund save " + this.baseSheet.inspect());
     }
     this.runtime.checkpoint();
     const result = this.handle();

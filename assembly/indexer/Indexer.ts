@@ -166,7 +166,6 @@ export class Index {
         const protostoneKeys = tx.tags.protostone.keys();
         for (let m = 0; m < protostoneKeys.length; m++) {
           if (protostoneKeys[m] != p) continue;
-          if (!tx.tags.protostone.has(p)) continue;
           const outs = tx.tags.protostone.get(p);
           for (let o = 0; o < outs.length; o++) {
             const index = outs[o];
@@ -176,7 +175,7 @@ export class Index {
             if (protostone.isMessage()) {
               protoMessages.set(
                 protostoneKeys[m],
-                ProtoMessage.from(protostone, index, sheets),
+                ProtoMessage.from(protostone, index),
               );
             } else if (protostone.isSplit()) {
               let message = Index.parseProtosplit(
@@ -187,10 +186,7 @@ export class Index {
 
               const protostone = ProtoStone.parse(message);
               if (!protostone.isMessage()) continue;
-              protoMessages.set(
-                p,
-                ProtoMessage.from(protostone, outs[o], sheets),
-              );
+              protoMessages.set(p, ProtoMessage.from(protostone, outs[o]));
             }
           }
         }
@@ -257,7 +253,9 @@ export class Index {
       const txid = tx.txid();
       tx.processRunestones();
       Index.indexOutpoints(tx, txid, height);
-      console.log("runestone order length" +  tx.tags.runestoneOrder.length.toString());
+      console.log(
+        "runestone order length" + tx.tags.runestoneOrder.length.toString(),
+      );
       for (let r = 0; r < tx.tags.runestoneOrder.length; r++) {
         if (tx.tags.runestoneOrder[r] == u128.Zero) {
           Index.processRunes(_block, tx, txid, height, i);
@@ -271,7 +269,12 @@ export class Index {
             tx.tags.runestoneOrder[r],
           );
         } else {
-          console.log("GOT INCORRECT PROTOCOL " + tx.tags.runestoneOrder[r].toString() + ", EXPECTING " + MessageContext.protocol_tag().toString());
+          console.log(
+            "GOT INCORRECT PROTOCOL " +
+              tx.tags.runestoneOrder[r].toString() +
+              ", EXPECTING " +
+              MessageContext.protocol_tag().toString(),
+          );
         }
       }
     }
