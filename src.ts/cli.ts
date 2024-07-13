@@ -26,11 +26,20 @@ yargs
       const runeid = argv.runeid as string;
       const amount = argv.amount as string;
 
-      //TODO: write this out
-      //@ts-ignore
       const protoburn = encodeProtoburn(
-        [{ amount: BigInt(amount), id: runeid }],
-        burn,
+        [
+          {
+            amount: BigInt(amount),
+            id: runeid.split(":").reduce(
+              ({ block }, d) => ({
+                block: block == BigInt(0) ? BigInt(d) : block,
+                tx: block > BigInt(0) ? parseInt(d) : 0,
+              }),
+              { block: BigInt(0), tx: 0 } as { block: bigint; tx: number },
+            ),
+          },
+        ],
+        BigInt(protocol_id),
         address,
       );
     },

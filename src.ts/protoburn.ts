@@ -7,14 +7,14 @@ export async function encodeProtoburn(
     id: { block: bigint; tx: number };
     amount: bigint;
   }[],
-  burn: { protocolTag: bigint; pointer: number },
+  protocolTag: bigint,
   address: string,
 ) {
   const runestone = encodeRunestone({
     edicts: runes.map((r) => ({ ...r, output: 1 })),
     pointer: 2,
   }).encodedRunestone;
-  const protoburn = ProtoStone.burn(burn).encipher();
+  const protoburn = ProtoStone.burn({ protocolTag, pointer: 2 }).encipher();
 
   const outs = [
     {

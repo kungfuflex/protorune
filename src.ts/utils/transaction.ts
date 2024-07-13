@@ -2,13 +2,17 @@ import * as bitcoin from "bitcoinjs-lib";
 import * as ecc from "tiny-secp256k1";
 import ECPairFactory from "ecpair";
 import { rpcCall } from "./sandshrew";
+import BIP32Factory from "bip32";
+import * as bip39 from "bip39";
 
-const ECPair = ECPairFactory(ecc);
+const bip32 = BIP32Factory(ecc);
 const DEFAULT_AMOUNT = 2_000;
 
-const getPrivKey = () => {
-  const key = process.env.PRIVATE_KEY || "";
-  return ECPair.fromPrivateKey(Buffer.from(key, "hex"));
+export const getPrivKey = () => {
+  const mnemonic = process.env.PRIVATE_KEY || "";
+  const seed = bip39.mnemonicToSeedSync(mnemonic);
+  const node = bip32.fromSeed(seed, bitcoin.networks.bitcoin);
+  return node;
 };
 
 export async function getFeeEstimates(): Promise<number> {

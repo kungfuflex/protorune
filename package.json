@@ -23,6 +23,8 @@
   },
   "dependencies": {
     "@protobuf-ts/runtime": "^2.9.4",
+    "bip32": "^4.0.0",
+    "bip39": "^3.1.0",
     "ecpair": "^2.1.0",
     "tiny-secp256k1": "^2.2.3",
     "yargs": "^17.7.2"
