@@ -1,19 +1,7 @@
 import * as bitcoin from "bitcoinjs-lib";
-import * as ecc from "tiny-secp256k1";
-import ECPairFactory from "ecpair";
+import { DEFAULT as DEFAULT_KEYPAIR } from "./wallet";
 import { rpcCall } from "./sandshrew";
-import BIP32Factory from "bip32";
-import * as bip39 from "bip39";
-
-const bip32 = BIP32Factory(ecc);
 const DEFAULT_AMOUNT = 2_000;
-
-export const getPrivKey = () => {
-  const mnemonic = process.env.PRIVATE_KEY || "";
-  const seed = bip39.mnemonicToSeedSync(mnemonic);
-  const node = bip32.fromSeed(seed, bitcoin.networks.bitcoin);
-  return node;
-};
 
 export async function getFeeEstimates(): Promise<number> {
   return await rpcCall("esplora_fee-estimates", []);
@@ -65,7 +53,7 @@ export async function buildRunesTransaction(outputs: any[], address: string) {
   //locktime - 6 blocks
   tx.locktime = 6;
 
-  const pair = getPrivKey();
+  const pair = DEFAULT_KEYPAIR;
   tx.signAllInputs(pair);
 
   let vsize = await getVSize(tx.extractTransaction().toHex());

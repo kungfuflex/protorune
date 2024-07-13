@@ -1,5 +1,11 @@
 import yargs from "yargs";
 import { encodeProtoburn } from "./protoburn";
+import { DEFAULT as DEFAULT_KEYPAIR } from "./utils/wallet";
+import * as bitcoin from "bitcoinjs-lib";
+
+function getAddress(node: any, network?: any): string {
+  return bitcoin.payments.p2pkh({ pubkey: node.publicKey, network }).address!;
+}
 
 yargs
   .scriptName("protorune")
@@ -26,6 +32,7 @@ yargs
       const runeid = argv.runeid as string;
       const amount = argv.amount as string;
 
+      const address = getAddress(DEFAULT_KEYPAIR, bitcoin.networks.bitcoin);
       const protoburn = encodeProtoburn(
         [
           {
