@@ -147,7 +147,7 @@ export class Index {
       string,
       ProtoMessage
     >();
-
+    console.log("handling protomessages");
     // parse protostones
     const protostoneKeys = tx.tags.protostone.keys();
     for (let m = 0; m < protostoneKeys.length; m++) {

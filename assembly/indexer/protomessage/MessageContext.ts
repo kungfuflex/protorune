@@ -32,7 +32,6 @@ export class MessageContext {
     refund_pointer: u32,
     calldata: ArrayBuffer,
   ) {
-    this.baseSheet = new BalanceSheet();
     this.transaction = transaction;
     this.block = block;
     this.height = height;
@@ -51,7 +50,7 @@ export class MessageContext {
     const sheet = BalanceSheet.load(
       table.OUTPOINT_TO_RUNES.select(outpoint.toArrayBuffer()),
     );
-
+    this.baseSheet = new BalanceSheet();
     this.sheets.set(index, sheet);
     this.sheets.set(
       pointer,
@@ -65,7 +64,6 @@ export class MessageContext {
         table.OUTPOINT_TO_RUNES.select(refundPointerOutpoint.toArrayBuffer()),
       ),
     );
-
     for (let i = 0; i < sheet.runes.length; i++) {
       const runeId = RuneId.fromBytesU128(sheet.runes[i]);
       this.runeIdToIndex.set(sheet.runes[i], i);
@@ -76,7 +74,6 @@ export class MessageContext {
         this.table,
       );
       this.runes.push(rune);
-      this.baseSheet.pipe(sheet);
     }
   }
   static initialiseProtocol(): u128 {
@@ -89,18 +86,14 @@ export class MessageContext {
       this.table.OUTPOINT_TO_RUNES.select(this.refund_pointer.toArrayBuffer()),
       this.runtime,
     );
-    checkingSheet.pipe(
-      BalanceSheet.loadFromAtomicTx(
-        this.table.OUTPOINT_TO_RUNES.select(this.pointer.toArrayBuffer()),
-        this.runtime,
-      ),
-    );
-    checkingSheet.pipe(
-      BalanceSheet.loadFromAtomicTx(
-        this.table.OUTPOINT_TO_RUNES.select(this.outpoint.toArrayBuffer()),
-        this.runtime,
-      ),
-    );
+    BalanceSheet.loadFromAtomicTx(
+      this.table.OUTPOINT_TO_RUNES.select(this.pointer.toArrayBuffer()),
+      this.runtime,
+    ).pipe(checkingSheet);
+    BalanceSheet.loadFromAtomicTx(
+      this.table.OUTPOINT_TO_RUNES.select(this.outpoint.toArrayBuffer()),
+      this.runtime,
+    ).pipe(checkingSheet);
     if (this.baseSheet.runes.length != checkingSheet.runes.length) return false;
     for (let i = 0; i < this.baseSheet.runes.length; i++) {
       if (
@@ -113,9 +106,10 @@ export class MessageContext {
   }
 
   run(): void {
-    console.log("MessageContext.run " + this.baseSheet.inspect());
     if (this.sheets.has(this.pointer.index)) {
       const sheet = this.sheets.get(this.pointer.index);
+      console.log("pointer sheet");
+      console.log(sheet.inspect());
       for (let i = 0; i < sheet.runes.length; i++) {
         if (this.runeIdToIndex.has(sheet.runes[i])) {
           this.runes[this.runeIdToIndex.get(sheet.runes[i])].pointer_index = i;
@@ -125,32 +119,30 @@ export class MessageContext {
         this.table.OUTPOINT_TO_RUNES.select(this.pointer.toArrayBuffer()),
         this.runtime,
       );
-      this.baseSheet.pipe(sheet);
-      console.log("after pointer save " + this.baseSheet.inspect());
+      sheet.pipe(this.baseSheet);
     }
-    if (this.sheets.has(this.refund_pointer.index)) {
-      const sheet = this.sheets.get(this.refund_pointer.index);
-      sheet.pipe(
-        this.sheets.has(this.outpoint.index)
-          ? this.sheets.get(this.outpoint.index)
-          : new BalanceSheet(),
-      );
-      for (let i = 0; i < sheet.runes.length; i++) {
-        if (this.runeIdToIndex.has(sheet.runes[i])) {
-          this.runes[
-            this.runeIdToIndex.get(sheet.runes[i])
-          ].refund_pointer_index = i;
-        }
+
+    const sheet = this.sheets.has(this.refund_pointer.index)
+      ? this.sheets.get(this.refund_pointer.index)
+      : new BalanceSheet();
+    console.log("refund pointer sheet");
+    if (this.sheets.has(this.outpoint.index)) {
+      this.sheets.get(this.outpoint.index).pipe(sheet);
+    }
+    console.log(sheet.inspect());
+    for (let i = 0; i < sheet.runes.length; i++) {
+      if (this.runeIdToIndex.has(sheet.runes[i])) {
+        this.runes[
+          this.runeIdToIndex.get(sheet.runes[i])
+        ].refund_pointer_index = i;
       }
-      sheet.saveToAtomicTx(
-        this.table.OUTPOINT_TO_RUNES.select(
-          this.refund_pointer.toArrayBuffer(),
-        ),
-        this.runtime,
-      );
-      this.baseSheet.pipe(sheet);
-      console.log("after refund save " + this.baseSheet.inspect());
     }
+    sheet.saveToAtomicTx(
+      this.table.OUTPOINT_TO_RUNES.select(this.refund_pointer.toArrayBuffer()),
+      this.runtime,
+    );
+    sheet.pipe(this.baseSheet);
+
     this.runtime.checkpoint();
     const result = this.handle();
     if (!result) {
