@@ -6,6 +6,8 @@ import { script, opcodes } from "@magiceden-oss/runestone-lib/dist/src/script";
 import { u128, u32 } from "@magiceden-oss/runestone-lib/dist/src/integer";
 import { Tag } from "./tag";
 import { Some, Option } from "@magiceden-oss/runestone-lib/dist/src/monads";
+import { chunk } from "lodash";
+import clone from "clone";
 
 export type ProtoBurn = {
   pointer: Option<u32>;
@@ -22,6 +24,24 @@ export type ProtoSplit = {
 };
 
 export type Chunk = Buffer;
+
+export type SplitResult = {
+  protostone: ProtoStone;
+  chunks: ProtoStone[];
+};
+
+export function protosplit(input: ProtoStone, voutStart: number): SplitResult {
+  const chunks = chunk(Array.from(Buffer.concat(input.message.calldata.map((v) => u128.encodeVarInt(v)))), 79).map((v) => ProtoStone.chunk(Buffer.from(v)));
+  const protostone = clone(input);
+  protostone.split = {
+    order: Array(chunks.length).fill(0).map((_, i) => u32(i + voutStart))
+  };
+  protostone.message.calldata = [];
+  return {
+    protostone,
+    chunks
+  };
+}
 
 export class ProtoStone {
   burn?: ProtoBurn;
@@ -132,6 +152,11 @@ export class ProtoStone {
   }): ProtoStone {
     return new ProtoStone({ burn, protocolTag });
   }
+
+  protosplit(voutStart: number): ReturnType<typeof protosplit> {
+    return protosplit(this, voutStart);
+  }
+
 
   static split({
     protocolTag,

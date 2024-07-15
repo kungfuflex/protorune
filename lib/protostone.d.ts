@@ -12,6 +12,11 @@ export type ProtoSplit = {
     order: u32[];
 };
 export type Chunk = Buffer;
+export type SplitResult = {
+    protostone: ProtoStone;
+    chunks: ProtoStone[];
+};
+export declare function protosplit(input: ProtoStone, voutStart: number): SplitResult;
 export declare class ProtoStone {
     burn?: ProtoBurn;
     message?: ProtoMessage;
@@ -38,6 +43,7 @@ export declare class ProtoStone {
         protocolTag: bigint;
         pointer: number;
     }): ProtoStone;
+    protosplit(voutStart: number): ReturnType<typeof protosplit>;
     static split({ protocolTag, ...split }: {
         protocolTag: bigint;
         order: number[];
