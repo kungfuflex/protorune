@@ -33,6 +33,7 @@ export class ProtoMessage {
       block,
       height,
       i,
+      this.outpoint,
       this.pointer,
       this.refund_pointer,
       this.calldata,

@@ -82,13 +82,9 @@ export class ProtoruneMessage extends RunestoneMessage {
 
     //@TODO: save sheet properly
     const runesToOutputs = balancesByOutput.keys();
-    console.log("length: " + runesToOutputs.length.toString());
 
     for (let x = 0; x < runesToOutputs.length; x++) {
       const sheet = balancesByOutput.get(runesToOutputs[x]);
-      console.log(runesToOutputs[x].toString());
-      console.log(sheet.inspect());
-      console.log(encodeHexFromBuffer(txid));
       sheet.save(
         this.table.OUTPOINT_TO_RUNES.select(
           OutPoint.from(txid, runesToOutputs[x]).toArrayBuffer(),

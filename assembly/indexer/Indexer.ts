@@ -152,7 +152,6 @@ export class Index {
     for (let m = 0; m < protostoneKeys.length; m++) {
       if (protostoneKeys[m] != p) continue;
       const outs = tx.tags.protostone.get(p);
-      console.log(outs.toString());
       for (let o = 0; o < outs.length; o++) {
         const index = outs[o];
         const payload = tx.tags.parsedScripts.get(index);

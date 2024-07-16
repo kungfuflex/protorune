@@ -6,6 +6,7 @@ import { BalanceSheet } from "../BalanceSheet";
 import { PROTORUNE_TABLE, PROTOCOLS_TO_INDEX } from "../tables/protorune";
 import { u128 } from "as-bignum/assembly";
 import { console } from "metashrew-as/assembly/utils/logging";
+import { encodeHexFromBuffer } from "metashrew-as/assembly/utils";
 
 export class MessageContext {
   runtime: AtomicTransaction = new AtomicTransaction();
@@ -22,16 +23,19 @@ export class MessageContext {
   runeIdToIndex: Map<ArrayBuffer, i32> = new Map<ArrayBuffer, i32>();
   table: PROTORUNE_TABLE;
   sheets: Map<u32, BalanceSheet>;
+  txindex: u32;
 
   constructor(
     transaction: Transaction,
     block: Block,
     height: u64,
+    txindex: u32,
     index: u32,
     pointer: u32,
     refund_pointer: u32,
     calldata: ArrayBuffer,
   ) {
+    this.txindex = txindex;
     this.transaction = transaction;
     this.block = block;
     this.height = height;
