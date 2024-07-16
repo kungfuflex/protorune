@@ -23,6 +23,7 @@ export class ProtoStone {
       }
       result += "  ]\n";
     }
+    result += "}\n";
     // result += "  edicts: [";
     // for (let i = 0; i < this.edicts.length; i++) {
     //   result += "    ";

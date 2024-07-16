@@ -343,14 +343,13 @@ export class RunestoneMessage {
     const unallocatedTo = this.fields.has(Field.POINTER)
       ? fieldTo<u32>(this.fields.get(Field.POINTER))
       : <u32>tx.defaultOutput();
+
+    const isCenotaph = this.processEdicts(balancesByOutput, balanceSheet, txid);
     if (balancesByOutput.has(unallocatedTo)) {
       balanceSheet.pipe(balancesByOutput.get(unallocatedTo));
     } else {
       balancesByOutput.set(unallocatedTo, balanceSheet);
     }
-
-    const isCenotaph = this.processEdicts(balancesByOutput, balanceSheet, txid);
-
     const allOutputs = balancesByOutput.keys();
 
     for (let x = 0; x < allOutputs.length; x++) {

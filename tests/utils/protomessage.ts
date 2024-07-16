@@ -139,7 +139,7 @@ export const constructProtomessageBlock = (
     const coinbase = buildCoinbaseToAddress(TEST_BTC_ADDRESS1);
     block.transactions?.push(coinbase);
   }
-
+  console.log(message);
   const blockInputs = inputs.map((input) => {
     return {
       hash: input.inputTxHash,
@@ -168,14 +168,8 @@ export const constructProtomessageBlock = (
     [
       {
         script: new ProtoRunestone({
-          edicts: [
-            {
-              id: runeId,
-              amount,
-              output: 1,
-            },
-          ],
           pointer: Some(u128(1)),
+          edicts: [],
           protocolTag: u128(protocolTag),
         }).encipher(),
         value: 0,

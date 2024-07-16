@@ -177,7 +177,6 @@ export class Index {
     // process protomessage
     const protoMessageTypes = protoMessages.keys();
     for (let m = 0; m < protoMessageTypes.length; m++) {
-      console.log(m.toString());
       const message = protoMessages.get(protoMessageTypes[m]);
       message.handle<T>(tx, block, height, i);
     }

@@ -226,11 +226,14 @@ describe("protomesage", () => {
         pointer: pointer,
         refundPointer: refundPointer,
       },
+      block,
     );
 
+    console.log("txs: ", block.transactions?.length);
     program.setBlock(block.toHex());
 
     await program.run("_start");
+    console.log(formatKv(program.kv));
 
     const resultAddress1 = await runesbyaddress(program, TEST_BTC_ADDRESS1);
     expect(resultAddress1.balanceSheet.length).equals(
