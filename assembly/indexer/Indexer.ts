@@ -105,7 +105,7 @@ export class Index {
       if (changetype<usize>(message) === 0) return new Map<u32, BalanceSheet>();
 
       //process message here
-      changetype<T>(message).process(tx, txid, <u32>height, txindex);
+      message.process(tx, txid, <u32>height, txindex);
     }
     return new Map<u32, BalanceSheet>();
   }
@@ -147,7 +147,6 @@ export class Index {
       string,
       ProtoMessage
     >();
-    console.log("handling protomessages");
     // parse protostones
     const protostoneKeys = tx.tags.protostone.keys();
     for (let m = 0; m < protostoneKeys.length; m++) {
@@ -215,6 +214,7 @@ export class Index {
             u128.Zero,
           );
         } else if (tx.tags.runestoneOrder[r] == MessageContext.protocol_tag()) {
+          console.log("handling protorunestone");
           Index.processRunestone<ProtoruneMessage>(
             height,
             tx,

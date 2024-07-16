@@ -207,12 +207,10 @@ describe("protomesage", () => {
       [output, refundOutput],
       TEST_PROTOCOL_TAG,
       block,
-      /*transferTarget=*/ 1,
-      /*leftoverRunesTarget=*/ protorunesOutputIdx,
     );
 
-    const pointer = 1;
-    const refundPointer = 2;
+    const pointer = 2;
+    const refundPointer = 3;
     block = constructProtomessageBlock(
       [
         {
@@ -221,9 +219,10 @@ describe("protomesage", () => {
         },
       ],
       [output, refundOutput],
+      { runeId, amount },
       TEST_PROTOCOL_TAG,
       {
-        calldata: new Buffer(0),
+        calldata: Buffer.from("1111"),
         pointer: pointer,
         refundPointer: refundPointer,
       },

@@ -3,9 +3,10 @@ import { Edict } from "./Edict";
 import { PROTORUNE_TABLE } from "./tables/protorune";
 import { BalanceSheet } from "./BalanceSheet";
 import { RunesTransaction } from "./RunesTransaction";
-import { Input } from "metashrew-as/assembly/blockdata/transaction";
+import { OutPoint } from "metashrew-as/assembly/blockdata/transaction";
 import { RunestoneMessage } from "./RunestoneMessage";
 import { u128 } from "as-bignum/assembly";
+import { console } from "metashrew-as/assembly/utils/logging";
 
 export class ProtoruneMessage extends RunestoneMessage {
   static parseProtocol(data: ArrayBuffer, protocol: u128): RunestoneMessage {
@@ -42,7 +43,9 @@ export class ProtoruneMessage extends RunestoneMessage {
       } else outputBalanceSheet = balancesByOutput.get(edictOutput);
       const amount = min(edict.amount, balanceSheet.get(runeId));
 
-      isCenotaph = balanceSheet.decrease(runeId, amount);
+      balanceSheet.decrease(runeId, amount);
+      console.log("edict processing");
+      console.log(edict.toString());
       outputBalanceSheet.increase(runeId, amount);
     }
     return isCenotaph;
@@ -65,20 +68,22 @@ export class ProtoruneMessage extends RunestoneMessage {
     }
     let balanceSheet = BalanceSheet.concat(sheets);
     const balancesByOutput = new Map<u32, BalanceSheet>();
-
+    console.log("processing");
+    console.log(this.edicts.length.toString());
+    console.log(balanceSheet.inspect());
     this.processEdicts(balancesByOutput, balanceSheet, txid);
 
     //@TODO: save sheet properly
-    // const runesToOutputs = balancesByOutput.keys();
+    const runesToOutputs = balancesByOutput.keys();
 
-    // for (let x = 0; x < runesToOutputs.length; x++) {
-    //   const sheet = balancesByOutput.get(runesToOutputs[x]);
-    //   sheet.save(
-    //     OUTPOINT_TO_RUNES.select(
-    //       OutPoint.from(txid, runesToOutputs[x]).toArrayBuffer(),
-    //     ),
-    //   );
-    // }
+    for (let x = 0; x < runesToOutputs.length; x++) {
+      const sheet = balancesByOutput.get(runesToOutputs[x]);
+      sheet.save(
+        this.table.OUTPOINT_TO_RUNES.select(
+          OutPoint.from(txid, runesToOutputs[x]).toArrayBuffer(),
+        ),
+      );
+    }
     return balancesByOutput;
   }
 }

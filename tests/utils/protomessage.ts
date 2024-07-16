@@ -116,6 +116,16 @@ export const constructProtomessageBlock = (
     address: string;
     btcAmount: number;
   }[],
+  {
+    runeId,
+    amount,
+  }: {
+    runeId: {
+      block: bigint;
+      tx: number;
+    };
+    amount: bigint;
+  },
   protocolTag: bigint,
   message: {
     calldata: Buffer;
@@ -158,11 +168,17 @@ export const constructProtomessageBlock = (
     [
       {
         script: new ProtoRunestone({
-          edicts: [],
+          edicts: [
+            {
+              id: runeId,
+              amount,
+              output: 1,
+            },
+          ],
           pointer: Some(u128(1)),
-	  protocolTag: u128(protocolTag)
-	}).encipher(),
-	value: 0
+          protocolTag: u128(protocolTag),
+        }).encipher(),
+        value: 0,
       },
       {
         script: protomessage.encipher(),
