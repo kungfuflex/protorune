@@ -5,15 +5,23 @@ import {
 import { Edict } from "@magiceden-oss/runestone-lib/dist/src/edict";
 import { Tag } from "@magiceden-oss/runestone-lib/dist/src/tag";
 import { u128, u32, u64 } from "@magiceden-oss/runestone-lib/dist/src/integer";
-import { Option } from "@magiceden-oss/runestone-lib/dist/src/monads";
+import { Option, Some } from "@magiceden-oss/runestone-lib/dist/src/monads";
 import { RuneId } from "@magiceden-oss/runestone-lib/dist/src/runeid";
 import { script, opcodes } from "@magiceden-oss/runestone-lib/dist/src/script";
 
 export class ProtoRunestone {
-  constructor(
-    readonly pointer: Option<u32>,
-    readonly edicts: Edict[],
-  ) {}
+  public pointer: Option<u32>;
+  public protocolTag: u128;
+  public edicts: Edict[];
+  constructor({
+    pointer,
+    edicts,
+    protocolTag
+  }: any) {
+    this.pointer = pointer;
+    this.edicts = edicts;
+    this.protocolTag = protocolTag;
+  }
 
   encipher(): Buffer {
     const payloads: Buffer[] = [];
@@ -41,7 +49,7 @@ export class ProtoRunestone {
 
     const stack: (Buffer | number)[] = [];
     stack.push(OP_RETURN);
-    stack.push(opcodes.OP_2DROP);
+    stack.push(u128.encodeVarInt(this.protocolTag));
 
     const payload = Buffer.concat(payloads);
     for (let i = 0; i < payload.length; i += MAX_SCRIPT_ELEMENT_SIZE) {
