@@ -1412,7 +1412,7 @@ memorystream@^0.3.1:
 
 "metashrew-as@https://github.com/sandshrewmetaprotocols/metashrew-as":
   version "0.1.0"
-  resolved "https://github.com/sandshrewmetaprotocols/metashrew-as#c0bf50047aadd1eb8e654b5f8594da77fca43b15"
+  resolved "https://github.com/sandshrewmetaprotocols/metashrew-as#4af80934e42679ec12dfa7466056fbabedd3669d"
   dependencies:
     as-bignum "^0.3.1"
     fast-sha256-as "https://github.com/sandshrewmetaprotocols/fast-sha256-as"
