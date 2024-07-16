@@ -20,9 +20,9 @@
   integrity sha512-bRISgCIjP20/tbWSPWMEi54QVPRZExkuD9lJL+UIxUKtwVJA8wW1Trb1jMs1RFXo1CBTNZ/5hpC9QvmKWdopKw==
 
 "@jridgewell/sourcemap-codec@^1.4.10":
-  version "1.4.15"
-  resolved "https://registry.yarnpkg.com/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.4.15.tgz#d7c6e6755c78567a951e04ab52ef0fd26de59f32"
-  integrity sha512-eF2rxCRulEKXHTRiDrDy6erMYWqNw4LPdQ8UQA4huuxaQsVeRPFl2oM8oDGxMFhJUWZf9McpLtJasDDZb/Bpeg==
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.5.0.tgz#3188bcb273a414b0d215fd22a58540b989b9409a"
+  integrity sha512-gv3ZRaISU3fjPAgNsriBRqGWQL6quFx04YMPW/zD8XMLsU32mhCCbfbO6KZFLjvYpCZ8zyDEgqsgf+PwPaM7GQ==
 
 "@jridgewell/trace-mapping@0.3.9":
   version "0.3.9"
@@ -1412,7 +1412,7 @@ memorystream@^0.3.1:
 
 "metashrew-as@https://github.com/sandshrewmetaprotocols/metashrew-as":
   version "0.1.0"
-  resolved "https://github.com/sandshrewmetaprotocols/metashrew-as#365643c2e795904569e96ea69f02f40801441ee6"
+  resolved "https://github.com/sandshrewmetaprotocols/metashrew-as#4af80934e42679ec12dfa7466056fbabedd3669d"
   dependencies:
     as-bignum "^0.3.1"
     fast-sha256-as "https://github.com/sandshrewmetaprotocols/fast-sha256-as"
@@ -1420,13 +1420,13 @@ memorystream@^0.3.1:
 
 "metashrew-runes@https://github.com/sandshrewmetaprotocols/metashrew-runes":
   version "0.1.0"
-  resolved "https://github.com/sandshrewmetaprotocols/metashrew-runes#886f667e5acc932e23fd98e5c91e621f8b695313"
+  resolved "https://github.com/sandshrewmetaprotocols/metashrew-runes#807ad6b8c9ecabb061e9f5ee027584f5e1f16bb7"
   dependencies:
     "@protobuf-ts/runtime" "^2.9.4"
 
 "metashrew-spendables@https://github.com/sandshrewmetaprotocols/metashrew-spendables":
   version "0.1.0"
-  resolved "https://github.com/sandshrewmetaprotocols/metashrew-spendables#6a31930598f8a4943cfe5ed3ff285a5b163676c6"
+  resolved "https://github.com/sandshrewmetaprotocols/metashrew-spendables#b8cad71d609920e22321a9781f0a8a1cbea01c75"
   dependencies:
     as-bignum "^0.3.1"
 
@@ -1691,9 +1691,9 @@ prettier@^2.6.2:
   integrity sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==
 
 prettier@^3.1.1:
-  version "3.3.2"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.3.2.tgz#03ff86dc7c835f2d2559ee76876a3914cec4a90a"
-  integrity sha512-rAVeHYMcv8ATV5d508CFdn+8/pHPpXeIid1DdrPwXnaAdH7cqjVbpJaT5eq4yRAFU/lsbwYwSF/n5iNrdJHPQA==
+  version "3.3.3"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.3.3.tgz#30c54fe0be0d8d12e6ae61dbb10109ea00d53105"
+  integrity sha512-i2tDNA0O5IrMO757lfrdQZCc2jPNDVntV0m/+4whiDfWaTKfMNgR7Qz0NAeGz/nRqF4m5/6CLzbP4/liHt12Ew==
 
 "protobuf-as@https://github.com/sandshrewmetaprotocols/protobuf-as":
   version "1.0.1"

@@ -13,6 +13,9 @@ import {
   TEST_BTC_ADDRESS1,
 } from "metashrew-runes/lib/tests/utils/general";
 import { encodeRunestone } from "@magiceden-oss/runestone-lib";
+import { ProtoRunestone } from "../../lib/protorunestone";
+import { Some } from "@magiceden-oss/runestone-lib/dist/src/monads";
+import { u128 } from "@magiceden-oss/runestone-lib/dist/src/integer";
 
 export const constructProtomessageBlockWithProtoburn = (
   inputs: {
@@ -113,6 +116,16 @@ export const constructProtomessageBlock = (
     address: string;
     btcAmount: number;
   }[],
+  {
+    runeId,
+    amount,
+  }: {
+    runeId: {
+      block: bigint;
+      tx: number;
+    };
+    amount: bigint;
+  },
   protocolTag: bigint,
   message: {
     calldata: Buffer;
@@ -126,7 +139,7 @@ export const constructProtomessageBlock = (
     const coinbase = buildCoinbaseToAddress(TEST_BTC_ADDRESS1);
     block.transactions?.push(coinbase);
   }
-
+  console.log(message);
   const blockInputs = inputs.map((input) => {
     return {
       hash: input.inputTxHash,
@@ -153,6 +166,14 @@ export const constructProtomessageBlock = (
   const transaction = buildTransaction(
     [...blockInputs],
     [
+      {
+        script: new ProtoRunestone({
+          pointer: Some(u128(1)),
+          edicts: [],
+          protocolTag: u128(protocolTag),
+        }).encipher(),
+        value: 0,
+      },
       {
         script: protomessage.encipher(),
         value: 0,

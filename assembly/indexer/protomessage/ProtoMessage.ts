@@ -8,19 +8,16 @@ import { fieldTo, fieldToArrayBuffer } from "../../utils";
 
 export class ProtoMessage {
   outpoint: u32;
-  sheets: Map<u32, BalanceSheet>;
   calldata: ArrayBuffer;
   pointer: u32;
   refund_pointer: u32;
   constructor(
     outpoint: u32,
-    sheets: Map<u32, BalanceSheet>,
     pointer: u32,
     refund_pointer: u32,
     calldata: ArrayBuffer,
   ) {
     this.outpoint = outpoint;
-    this.sheets = sheets;
     this.pointer = pointer;
     this.refund_pointer = refund_pointer;
     this.calldata = calldata;
@@ -36,7 +33,7 @@ export class ProtoMessage {
       block,
       height,
       i,
-      this.sheets,
+      this.outpoint,
       this.pointer,
       this.refund_pointer,
       this.calldata,
@@ -44,11 +41,7 @@ export class ProtoMessage {
 
     changetype<T>(context).run();
   }
-  static from(
-    protostone: ProtoStone,
-    outpoint: u32,
-    sheets: Map<u32, BalanceSheet>,
-  ): ProtoMessage {
+  static from(protostone: ProtoStone, outpoint: u32): ProtoMessage {
     if (
       !protostone.fields.has(Field.MESSAGE) ||
       !protostone.fields.has(Field.POINTER) ||
@@ -61,7 +54,6 @@ export class ProtoMessage {
     );
     return new ProtoMessage(
       outpoint,
-      sheets,
       fieldTo<u32>(protostone.fields.get(Field.POINTER)),
       fieldTo<u32>(protostone.fields.get(Field.REFUND)),
       calldata,

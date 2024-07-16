@@ -93,7 +93,6 @@ export class RunesTransaction extends Transaction {
           output.protoburn.push(i);
           break;
         case PROTOSTONE_TAG:
-          console.log("protostone detected");
           script = Box.from(
             checkForNonDataPush(scriptParse(this.outs[i].script).slice(2)),
           );
@@ -122,14 +121,14 @@ export class RunesTransaction extends Transaction {
           break;
         default:
           script = Box.from(
-            checkForNonDataPush(scriptParse(this.outs[i].script)),
+            checkForNonDataPush(scriptParse(this.outs[i].script).slice(1)),
           );
           if (changetype<usize>(script) == 0) continue;
           tag = u128.from(0);
           skip = readULEB128ToU128(script, tag);
           if (tag == u128.Zero) continue;
           const tagStr = tag.toString();
-          if (output.runestone.has(tagStr) && PROTOCOLS_TO_INDEX.has(tag)) {
+          if (!output.runestone.has(tagStr) && PROTOCOLS_TO_INDEX.has(tag)) {
             output.runestone.set(tagStr, i);
             output.runestoneOrder.push(tag);
             output.parsedScripts.set(

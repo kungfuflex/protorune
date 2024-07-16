@@ -22,7 +22,10 @@ import { constructProtoburnTransaction } from "./utils/protoburn";
 import { protorunesbyaddress } from "./utils/view-helpers";
 import { DEBUG_WASM } from "./utils/general";
 import { uint128 } from "../src.ts/proto/protorune";
-import { constructProtomessageBlock, constructProtomessageBlockWithProtoburn } from "./utils/protomessage";
+import {
+  constructProtomessageBlock,
+  constructProtomessageBlockWithProtoburn,
+} from "./utils/protomessage";
 
 // const TEST_PROTOCOL_TAG = parseInt("0x112233445566778899aabbccddeeff10", 16);
 const TEST_PROTOCOL_TAG = BigInt("0x400000000000000000");
@@ -94,7 +97,7 @@ describe("protomesage", () => {
       [output, refundOutput],
       TEST_PROTOCOL_TAG,
       {
-        calldata: new Buffer(0),
+        calldata: Buffer.from("1111"),
         pointer: pointer,
         refundPointer: refundPointer,
       },
@@ -195,35 +198,38 @@ describe("protomesage", () => {
 
     // output 0 is runestone, output 1 is protoburn, output 2 is protomessage
     // this method transfers all remaining runes to the protoburn
-    const protorunesOutputIdx = 2
+    const protorunesOutputIdx = 2;
     block = constructProtoburnTransaction(
-        [input],
-        runeId,
-        amount,
-        outputIndexToReceiveProtorunes,
-        [output, refundOutput],
-        TEST_PROTOCOL_TAG,
-        block,
-        /*transferTarget=*/1,
-        /*leftoverRunesTarget=*/protorunesOutputIdx
+      [input],
+      runeId,
+      amount,
+      outputIndexToReceiveProtorunes,
+      [output, refundOutput],
+      TEST_PROTOCOL_TAG,
+      block,
     );
 
-    const pointer = 1;
-    const refundPointer = 2;
+    const pointer = 2;
+    const refundPointer = 3;
     block = constructProtomessageBlock(
-        [{
-            inputTxHash: block.transactions?.at(2)?.getHash(),
-            inputTxOutputIndex: protorunesOutputIdx
-        }],
-        [output, refundOutput],
-        TEST_PROTOCOL_TAG,
+      [
         {
-            calldata: new Buffer(0),
-            pointer: pointer,
-            refundPointer: refundPointer,
-          },
-    )
+          inputTxHash: block.transactions?.at(2)?.getHash(),
+          inputTxOutputIndex: protorunesOutputIdx,
+        },
+      ],
+      [output, refundOutput],
+      { runeId, amount },
+      TEST_PROTOCOL_TAG,
+      {
+        calldata: Buffer.from("1111"),
+        pointer: pointer,
+        refundPointer: refundPointer,
+      },
+      block,
+    );
 
+    console.log("txs: ", block.transactions?.length);
     program.setBlock(block.toHex());
 
     await program.run("_start");
