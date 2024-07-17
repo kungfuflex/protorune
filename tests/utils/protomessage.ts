@@ -32,11 +32,11 @@ export const constructProtomessageBlockWithProtoburn = (
     btcAmount: number;
   }[],
   protocolTag: bigint,
-  message: {
+  messages: {
     calldata: Buffer;
     pointer: number;
     refundPointer: number;
-  },
+  }[],
   block?: bitcoinjs.Block,
 ): bitcoinjs.Block => {
   if (block == undefined) {
@@ -80,9 +80,16 @@ export const constructProtomessageBlockWithProtoburn = (
     pointer: 2, // target the protomessage
   });
 
-  const protomessage = ProtoStone.message({
-    protocolTag: protocolTag,
-    ...message,
+  const protomessages = messages.map((message) => {
+    const protomessage = ProtoStone.message({
+      protocolTag: protocolTag,
+      ...message,
+    });
+
+    return {
+      script: protomessage.encipher(),
+      value: 0,
+    };
   });
 
   const transaction = buildTransaction(
@@ -96,10 +103,7 @@ export const constructProtomessageBlockWithProtoburn = (
         script: protoburn.encipher(),
         value: 0,
       },
-      {
-        script: protomessage.encipher(),
-        value: 0,
-      },
+      ...protomessages,
       ...blockOutputs,
     ],
   );
@@ -107,7 +111,7 @@ export const constructProtomessageBlockWithProtoburn = (
   return block;
 };
 
-export const constructProtomessageBlock = (
+export const constructProtomessageTransaction = (
   inputs: {
     inputTxHash: Buffer | undefined;
     inputTxOutputIndex: number;
@@ -116,22 +120,12 @@ export const constructProtomessageBlock = (
     address: string;
     btcAmount: number;
   }[],
-  {
-    runeId,
-    amount,
-  }: {
-    runeId: {
-      block: bigint;
-      tx: number;
-    };
-    amount: bigint;
-  },
   protocolTag: bigint,
-  message: {
+  messages: {
     calldata: Buffer;
     pointer: number;
     refundPointer: number;
-  },
+  }[],
   block?: bitcoinjs.Block,
 ): bitcoinjs.Block => {
   if (block == undefined) {
@@ -139,7 +133,6 @@ export const constructProtomessageBlock = (
     const coinbase = buildCoinbaseToAddress(TEST_BTC_ADDRESS1);
     block.transactions?.push(coinbase);
   }
-  console.log(message);
   const blockInputs = inputs.map((input) => {
     return {
       hash: input.inputTxHash,
@@ -158,9 +151,16 @@ export const constructProtomessageBlock = (
     };
   });
 
-  const protomessage = ProtoStone.message({
-    protocolTag: protocolTag,
-    ...message,
+  const protomessages = messages.map((message) => {
+    const protomessage = ProtoStone.message({
+      protocolTag: protocolTag,
+      ...message,
+    });
+
+    return {
+      script: protomessage.encipher(),
+      value: 0,
+    };
   });
 
   const transaction = buildTransaction(
@@ -174,10 +174,7 @@ export const constructProtomessageBlock = (
         }).encipher(),
         value: 0,
       },
-      {
-        script: protomessage.encipher(),
-        value: 0,
-      },
+      ...protomessages,
       ...blockOutputs,
     ],
   );
