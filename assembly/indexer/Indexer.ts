@@ -143,9 +143,9 @@ export class Index {
     i: u32,
     p: string,
   ): void {
-    const protoMessages: Map<string, ProtoMessage> = new Map<
+    const protoMessages: Map<string, Array<ProtoMessage>> = new Map<
       string,
-      ProtoMessage
+      Array<ProtoMessage>
     >();
     // parse protostones
     const protostoneKeys = tx.tags.protostone.keys();
@@ -158,26 +158,31 @@ export class Index {
         if (changetype<usize>(payload) == 0) continue;
         const protostone = ProtoStone.parse(payload);
         console.log(protostone.inspect());
+        const ary = protoMessages.has(p)
+          ? protoMessages.get(p)
+          : new Array<ProtoMessage>();
         if (protostone.isMessage()) {
-          protoMessages.set(
-            protostoneKeys[m],
-            ProtoMessage.from(protostone, index),
-          );
+          ary.push(ProtoMessage.from(protostone, index)),
+            protoMessages.set(p, ary);
         } else if (protostone.isSplit()) {
           let message = Index.parseProtosplit(tx, outs[o], new ArrayBuffer(0));
 
           const protostone = ProtoStone.parse(message);
           if (!protostone.isMessage()) continue;
-          protoMessages.set(p, ProtoMessage.from(protostone, outs[o]));
+          ary.push(ProtoMessage.from(protostone, outs[o]));
+          protoMessages.set(p, ary);
         }
       }
     }
 
     // process protomessage
     const protoMessageTypes = protoMessages.keys();
-    for (let m = 0; m < protoMessageTypes.length; m++) {
-      const message = protoMessages.get(protoMessageTypes[m]);
-      message.handle<T>(tx, block, height, i);
+    for (let p = 0; p < protoMessageTypes.length; p++) {
+      const messages = protoMessages.get(protoMessageTypes[p]);
+      for (let m = 0; m < messages.length; m++) {
+        let message = messages[m];
+        message.handle<T>(tx, block, height, i);
+      }
     }
   }
   static initializeSubprotocols(): void {
