@@ -19,11 +19,14 @@ export const constructProtoburnTransaction = (
     inputTxHash: Buffer | undefined;
     inputTxOutputIndex: number;
   }[],
-  runeId: {
-    block: bigint;
-    tx: number;
-  },
-  runeTransferAmount: bigint,
+  edicts: {
+    id: {
+      block: bigint;
+      tx: number;
+    },
+    amount: bigint,
+    output: number,
+  }[],
   outputIndexToReceiveProtorunes: number,
   outputs: {
     address: string;
@@ -31,7 +34,6 @@ export const constructProtoburnTransaction = (
   }[],
   protocolTag: bigint,
   block?: bitcoinjs.Block,
-  runeTransferEdictTarget: number = 1,
   runeTransferPointer: number = 1,
 ): bitcoinjs.Block => {
   if (block == undefined) {
@@ -57,13 +59,6 @@ export const constructProtoburnTransaction = (
       value: output.btcAmount,
     };
   });
-  const edicts = [
-    {
-      id: runeId,
-      amount: runeTransferAmount,
-      output: runeTransferEdictTarget, // default targets the protoburn output
-    },
-  ];
 
   const runesTransfer = encodeRunestone({
     edicts: edicts,
