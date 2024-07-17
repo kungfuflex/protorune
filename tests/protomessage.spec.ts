@@ -192,6 +192,13 @@ describe("protomesage", () => {
       btcAmount: 0, // this gives address 1 his remaining bitcoin
     };
 
+    const edicts = [{
+      id: runeId,
+      amount: amount,
+      output: 1
+    }]
+
+
     // ================================
     // TODO: to here
     // ================================
@@ -201,8 +208,7 @@ describe("protomesage", () => {
     const protorunesOutputIdx = 2;
     block = constructProtoburnTransaction(
       [input],
-      runeId,
-      amount,
+      edicts,
       outputIndexToReceiveProtorunes,
       [output, refundOutput],
       TEST_PROTOCOL_TAG,
