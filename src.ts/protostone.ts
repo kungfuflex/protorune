@@ -31,6 +31,10 @@ export type SplitResult = {
 };
 
 export function protosplit(input: ProtoStone, voutStart: number): SplitResult {
+  // input is always a protomessage?
+
+  // i think this is missing some logic for handling the pointer and refundPointer
+  // also the protostone is going to be enciphered as a protomessage, not sure if this is intended
   const chunks = chunk(
     Array.from(
       Buffer.concat(input.message.calldata.map((v) => u128.encodeVarInt(v))),
