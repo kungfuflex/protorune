@@ -159,38 +159,15 @@ export class Index {
       const txid = tx.txid();
       tx.processRunestones();
       Index.indexOutpoints(tx, txid, height);
-      for (let r = 0; r < tx.tags.runestoneOrder.length; r++) {
-        const outputIndex = tx.tags.runestone.get(
-          tx.tags.runestoneOrder[r].toString(),
-        );
-        if (tx.tags.runestoneOrder[r] == u128.Zero) {
-          Index.processRunestone<RunestoneMessage>(
-            height,
-            tx,
-            txid,
-            i,
-            outputIndex,
-            u128.Zero,
-          );
-        } else if (tx.tags.runestoneOrder[r] == MessageContext.protocol_tag()) {
-          console.log("handling protorunestone");
-          Index.processRunestone<ProtoruneMessage>(
-            height,
-            tx,
-            txid,
-            i,
-            outputIndex,
-            tx.tags.runestoneOrder[r],
-          );
-        } else {
-          console.log(
-            "GOT INCORRECT PROTOCOL " +
-              tx.tags.runestoneOrder[r].toString() +
-              ", EXPECTING " +
-              MessageContext.protocol_tag().toString(),
-          );
-        }
-      }
+      const outputIndex = tx.runestoneIndex
+      Index.processRunestone<RunestoneMessage>(
+        height,
+        tx,
+        txid,
+        i,
+        outputIndex,
+        u128.Zero,
+      );
       Index.processMessages<MessageContext>(
         block,
         height,
@@ -201,4 +178,3 @@ export class Index {
       );
     }
   }
-}
