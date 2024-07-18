@@ -113,10 +113,47 @@ export class ProtoStone {
     }
   }
 
-  encipher() {
-    const stack: (Buffer | number)[] = [];
+  // Enciphering a protostone doesn't make sense, removed this functionality
+
+  // encipher() {
+  //   const stack: (Buffer | number)[] = [];
+  //   let payloads: Buffer[] = [];
+  //   stack.push(OP_RETURN);
+  //   if (this.burn) {
+  //     payloads.push(
+  //       Tag.encodeOptionInt(Tag.POINTER, this.burn.pointer.map(u128)),
+  //     );
+  //     payloads.push(
+  //       Tag.encodeOptionInt(Tag.BURN, Some<u128>(this.protocolTag)),
+  //     );
+  //     stack.push(opcodes.OP_14);
+  //   } else if (this.message) {
+  //     payloads.push(u128.encodeVarInt(this.protocolTag));
+  //     payloads.push(
+  //       Tag.encodeOptionInt(Tag.POINTER, this.message.pointer.map(u128)),
+  //     );
+  //     payloads.push(
+  //       Tag.encodeOptionInt(Tag.REFUND, this.message.refundPointer.map(u128)),
+  //     );
+  //     payloads.push(Tag.encode(Tag.MESSAGE, this.message.calldata));
+  //     stack.push(opcodes.OP_16);
+  //   } else if (this.split) {
+  //     payloads.push(Tag.encode(Tag.SPLIT, this.split.order.map(u128)));
+  //     stack.push(opcodes.OP_16);
+  //   } else if (this.chunk) {
+  //     payloads.push(this.chunk);
+  //     stack.push(opcodes.OP_15);
+  //   }
+  //   const payload = Buffer.concat(payloads);
+  //   for (let i = 0; i < payload.length; i += MAX_SCRIPT_ELEMENT_SIZE) {
+  //     stack.push(payload.subarray(i, i + MAX_SCRIPT_ELEMENT_SIZE));
+  //   }
+
+  //   return script.compile(stack);
+  // }
+
+  encipher_payloads(): Buffer[] {
     let payloads: Buffer[] = [];
-    stack.push(OP_RETURN);
     if (this.burn) {
       payloads.push(
         Tag.encodeOptionInt(Tag.POINTER, this.burn.pointer.map(u128)),
@@ -124,7 +161,6 @@ export class ProtoStone {
       payloads.push(
         Tag.encodeOptionInt(Tag.BURN, Some<u128>(this.protocolTag)),
       );
-      stack.push(opcodes.OP_14);
     } else if (this.message) {
       payloads.push(u128.encodeVarInt(this.protocolTag));
       payloads.push(
@@ -134,20 +170,12 @@ export class ProtoStone {
         Tag.encodeOptionInt(Tag.REFUND, this.message.refundPointer.map(u128)),
       );
       payloads.push(Tag.encode(Tag.MESSAGE, this.message.calldata));
-      stack.push(opcodes.OP_16);
     } else if (this.split) {
       payloads.push(Tag.encode(Tag.SPLIT, this.split.order.map(u128)));
-      stack.push(opcodes.OP_16);
     } else if (this.chunk) {
       payloads.push(this.chunk);
-      stack.push(opcodes.OP_15);
     }
-    const payload = Buffer.concat(payloads);
-    for (let i = 0; i < payload.length; i += MAX_SCRIPT_ELEMENT_SIZE) {
-      stack.push(payload.subarray(i, i + MAX_SCRIPT_ELEMENT_SIZE));
-    }
-
-    return script.compile(stack);
+    return payloads;
   }
 
   static burn({
