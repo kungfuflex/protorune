@@ -50,6 +50,7 @@ import { SUBSIDY_HALVING_INTERVAL } from "metashrew-as/assembly/utils";
 import { ProtoBurn } from "./ProtoBurn";
 import { ProtoStone } from "./ProtoStone";
 import { Index } from "./Indexer";
+import { ProtoruneMessage } from "./ProtoruneMessage";
 
 export class RunestoneMessage {
   public fields: Map<u64, Array<u128>>;
@@ -301,33 +302,6 @@ export class RunestoneMessage {
     txindex: u32,
   ): Map<u32, BalanceSheet> {
     // collect all protoburns
-    if (tx.tags.protoburn.length > 0) {
-      for (let i = 0; i < tx.tags.protoburn.length; i++) {
-        const protoburnOut = tx.tags.protoburn[i];
-        const out = tx.outs[protoburnOut];
-        const payload = Index.getMessagePayload(out);
-        if (changetype<usize>(payload) == 0) continue;
-
-        const protostone = ProtoStone.parse(payload);
-        if (
-          !protostone.fields.has(ProtoruneField.BURN) ||
-          !protostone.fields.has(ProtoruneField.POINTER)
-        )
-          continue;
-        const protoburn = new ProtoBurn([
-          protostone.fields.get(ProtoruneField.BURN)[0],
-          protostone.fields.get(ProtoruneField.POINTER)[0],
-        ]);
-        if (PROTOCOLS_TO_INDEX.has(protoburn.protocol_tag)) {
-          console.log("protoburn detected");
-          let ary = new Array<ProtoBurn>();
-          if (this.protoBurns.has(protoburnOut))
-            ary = this.protoBurns.get(protoburnOut);
-          ary.push(protoburn);
-          this.protoBurns.set(protoburnOut, ary);
-        }
-      }
-    }
     let balanceSheet = BalanceSheet.concat(
       tx.ins.map<BalanceSheet>((v: Input, i: i32, ary: Array<Input>) =>
         BalanceSheet.load(
@@ -340,6 +314,43 @@ export class RunestoneMessage {
     this.mint(height, balanceSheet);
     this.etch(<u64>height, <u32>txindex, balanceSheet, tx);
 
+    const messages = new Array<ProtoruneMessage>();
+    // process all protostones here
+    if (this.fields.has(Field.PROTORUNE)) {
+      let startIndex = 0;
+      const ary = this.fields.get(Field.PROTORUNE);
+      while (startIndex < ary.length) {
+        const protostone = ProtoStone.parseFromField(ary);
+        if (PROTOCOLS_TO_INDEX.has(protostone.protocol_id)) {
+          if (protostone.isBurn()) {
+            const protoburn = new ProtoBurn([
+              protostone.fields.get(ProtoruneField.BURN)[0],
+              protostone.fields.get(ProtoruneField.POINTER)[0],
+            ]);
+            let ary: Array<ProtoBurn> = new Array<ProtoBurn>();
+            if (this.protoBurns.has(tx.runestoneIndex)) {
+              ary = this.protoBurns.get(tx.runestoneIndex);
+            }
+            ary.push(protoburn);
+            this.protoBurns.set(tx.runestoneIndex, ary);
+          }
+          if (protostone.isMessage()) {
+            const str = protostone.protocol_id.toString();
+            let ary: Array<ProtoStone> = new Array<ProtoStone>();
+            if (tx.protostones.has(str)) {
+              ary = tx.protostones.get(str);
+            }
+            ary.push(protostone);
+            tx.protostones.set(str, ary);
+          }
+          if (protostone.edicts.length > 0) {
+            messages.push(ProtoruneMessage.fromProtoStone(protostone));
+          }
+        }
+        startIndex = protostone.nextIndex;
+      }
+    }
+
     const unallocatedTo = this.fields.has(Field.POINTER)
       ? fieldTo<u32>(this.fields.get(Field.POINTER))
       : <u32>tx.defaultOutput();
@@ -351,6 +362,10 @@ export class RunestoneMessage {
       balancesByOutput.set(unallocatedTo, balanceSheet);
     }
     const allOutputs = balancesByOutput.keys();
+
+    for (let m = 0; m < messages.length; m++) {
+      messages[m].process(tx, txid, height, i);
+    }
 
     for (let x = 0; x < allOutputs.length; x++) {
       const output = allOutputs[x];

@@ -9,8 +9,16 @@ import { u128 } from "as-bignum/assembly";
 import { console } from "metashrew-as/assembly/utils/logging";
 import { Field } from "./fields";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils";
+import { ProtoStone } from "./ProtoStone";
 
 export class ProtoruneMessage extends RunestoneMessage {
+  static fromProtoStone(protostone: ProtoStone): ProtoruneMessage {
+    return new ProtoruneMessage(
+      changetype<Map<u64, Array<u128>>>(0),
+      protostone.edicts,
+      PROTORUNE_TABLE.for(protostone.protocol_id),
+    );
+  }
   static parseProtocol(data: ArrayBuffer, protocol: u128): RunestoneMessage {
     const message = this.parse(data);
     if (protocol == u128.Zero) {

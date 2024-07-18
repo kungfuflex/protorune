@@ -62,8 +62,8 @@ export class Index {
     tx.processRunestones();
 
     const zero = u128.Zero.toString();
-    if (!tx.tags.runestone.has(zero)) return;
-    const runestoneOutputIndex = tx.tags.runestone.get(zero);
+    if (tx.runestoneIndex == -1) return;
+    const runestoneOutputIndex = tx.runestoneIndex;
     const runestoneOutput = tx.outs[runestoneOutputIndex];
     const parsed = scriptParse(runestoneOutput.script).slice(2);
     if (
@@ -97,9 +97,7 @@ export class Index {
   ): Map<u32, BalanceSheet> {
     if (outputIndex > -1) {
       const runestoneOutput = tx.outs[outputIndex];
-      const payload = tx.tags.parsedScripts.has(outputIndex)
-        ? tx.tags.parsedScripts.get(outputIndex)
-        : Index.getMessagePayload(runestoneOutput);
+      const payload = Index.getMessagePayload(runestoneOutput);
       if (changetype<usize>(payload) == 0) return new Map<u32, BalanceSheet>();
       const message = ProtoruneMessage.parseProtocol(payload, protocol);
       if (changetype<usize>(message) === 0) return new Map<u32, BalanceSheet>();
@@ -109,32 +107,7 @@ export class Index {
     }
     return new Map<u32, BalanceSheet>();
   }
-  static parseProtosplit(
-    tx: RunesTransaction,
-    startOutpoint: u32,
-    message: ArrayBuffer,
-  ): ArrayBuffer {
-    const isChunk = tx.tags.chunks.has(startOutpoint);
-    let payload = new ArrayBuffer(0);
-    if (isChunk) {
-      payload = Index.getMessagePayload(tx.outs[startOutpoint], 2);
-      if (payload.byteLength == 0) return message;
-      return Box.concat([Box.from(message), Box.from(payload)]);
-    }
-    payload = tx.tags.parsedScripts.has(startOutpoint)
-      ? tx.tags.parsedScripts.get(startOutpoint)
-      : changetype<ArrayBuffer>(0);
-    if (changetype<usize>(payload) == 0) return message;
-    const protostone = ProtoStone.parse(payload);
-    if (changetype<usize>(protostone) == 0) return message;
-    const splits = protostone.splits();
-    if (splits.length > 0) {
-      for (let i = 0; i < splits.length; i++) {
-        return Index.parseProtosplit(tx, splits[i], message);
-      }
-    }
-    return message;
-  }
+
   static processMessages<T extends MessageContext>(
     block: RunesBlock,
     height: u64,
@@ -148,28 +121,16 @@ export class Index {
       ProtoMessage
     >();
     // parse protostones
-    const protostoneKeys = tx.tags.protostone.keys();
+    const protostoneKeys = tx.protostones.keys();
     for (let m = 0; m < protostoneKeys.length; m++) {
       if (protostoneKeys[m] != p) continue;
-      const outs = tx.tags.protostone.get(p);
-      for (let o = 0; o < outs.length; o++) {
-        const index = outs[o];
-        const payload = tx.tags.parsedScripts.get(index);
-        if (changetype<usize>(payload) == 0) continue;
-        const protostone = ProtoStone.parse(payload);
-        console.log(protostone.inspect());
-        if (protostone.isMessage()) {
-          protoMessages.set(
-            protostoneKeys[m],
-            ProtoMessage.from(protostone, index),
-          );
-        } else if (protostone.isSplit()) {
-          let message = Index.parseProtosplit(tx, outs[o], new ArrayBuffer(0));
-
-          const protostone = ProtoStone.parse(message);
-          if (!protostone.isMessage()) continue;
-          protoMessages.set(p, ProtoMessage.from(protostone, outs[o]));
-        }
+      const protostones = tx.protostones.get(p);
+      for (let s = 0; s < protostones.length; s++) {
+        const protostone = protostones[s];
+        protoMessages.set(
+          protostoneKeys[m],
+          ProtoMessage.from(protostone, tx.runestoneIndex),
+        );
       }
     }
 
