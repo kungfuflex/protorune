@@ -8,6 +8,9 @@ import {
 
 export enum Tag {
   BODY = 0,
+  PROTOSTONE = 13,
+
+  // PROTOTAGS
   MESSAGE = 81,
   BURN = 83,
   SPLIT = 85,
