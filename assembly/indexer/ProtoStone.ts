@@ -45,6 +45,9 @@ export class ProtoStone {
   isMessage(): bool {
     return this.fields.has(Field.MESSAGE);
   }
+  isBurn(): bool {
+    return this.fields.has(Field.BURN);
+  }
   isSplit(): bool {
     return this.fields.has(Field.SPLIT);
   }

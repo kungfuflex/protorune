@@ -17,6 +17,7 @@ export class Field {
   static DIVISIBILITY: u64 = 1;
   static SPACERS: u64 = 3;
   static SYMBOL: u64 = 5;
+  static PROTORUNE: u64 = 2 ** 14 - 1;
   static NOP: u64 = 127;
   constructor() {}
 }
