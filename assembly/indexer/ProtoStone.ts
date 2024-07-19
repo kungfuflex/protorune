@@ -66,42 +66,6 @@ export class ProtoStone {
     return changetype<Array<u32>>(0);
   }
 
-  static parseFromField(raw: Array<u128>, startIndex: i32 = 0): ProtoStone {
-    let fields: Map<u64, Array<u128>> = new Map<u64, Array<u128>>();
-    let edicts: Array<StaticArray<u128>> = new Array<StaticArray<u128>>();
-
-    let length = <i32>raw[0].lo;
-    let protocolId = raw[1];
-
-    let i = startIndex + 2;
-    while (i < length) {
-      if (<i32>raw[i].lo == 0) {
-        let totalLen = i + 2 + <i32>raw[i + 1].lo;
-        let e = i + 2;
-        while (e < totalLen) {
-          const len = <i32>raw[e].lo;
-          const array = new StaticArray<u128>(len);
-          for (let a = 1; a <= len; a++) {
-            array[a] = raw[a + e];
-          }
-          e += len + 1;
-        }
-        i = totalLen;
-      } else {
-        let len = <i32>raw[i + 1].lo;
-        fields.set(raw[i].lo, raw.slice(i + 2, len + i + 2));
-        i += len + i + 2;
-      }
-    }
-
-    const protostone = new ProtoStone(fields, edicts);
-    protostone.nextIndex = startIndex + length;
-    protostone.protocol_id = protocolId;
-
-    return protostone;
-  }
-
-  //deprecated
   static parse(data: ArrayBuffer): ProtoStone {
     const input = Box.from(data);
     let fields = new Map<u64, Array<u128>>();

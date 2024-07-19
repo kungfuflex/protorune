@@ -52,6 +52,25 @@ import { ProtoStone } from "./ProtoStone";
 import { Index } from "./Indexer";
 import { ProtoruneMessage } from "./ProtoruneMessage";
 
+function u128ArrayToArrayBuffer(arr: Array<u128>): ArrayBuffer {
+  // Each u128 is 16 bytes
+  let buffer = new ArrayBuffer(arr.length * 16);
+  let view = new DataView(buffer);
+
+  for (let i = 0; i < arr.length; i++) {
+    let value = arr[i];
+    // Split u128 into two 64-bit parts
+    let low = <u64>value.lo;
+    let high = <u64>value.hi;
+
+    // Set the 64-bit parts in the DataView
+    view.setUint64(i * 16, low, true); // true for little-endian
+    view.setUint64(i * 16 + 8, high, true); // true for little-endian
+  }
+
+  return buffer;
+}
+
 export class RunestoneMessage {
   public fields: Map<u64, Array<u128>>;
   public edicts: Array<StaticArray<u128>>;
@@ -318,36 +337,33 @@ export class RunestoneMessage {
     // process all protostones here
     if (this.fields.has(Field.PROTORUNE)) {
       let startIndex = 0;
-      const ary = this.fields.get(Field.PROTORUNE);
-      while (startIndex < ary.length) {
-        const protostone = ProtoStone.parseFromField(ary);
-        if (PROTOCOLS_TO_INDEX.has(protostone.protocol_id)) {
-          if (protostone.isBurn()) {
-            const protoburn = new ProtoBurn([
-              protostone.fields.get(ProtoruneField.BURN)[0],
-              protostone.fields.get(ProtoruneField.POINTER)[0],
-            ]);
-            let ary: Array<ProtoBurn> = new Array<ProtoBurn>();
-            if (this.protoBurns.has(tx.runestoneIndex)) {
-              ary = this.protoBurns.get(tx.runestoneIndex);
-            }
-            ary.push(protoburn);
-            this.protoBurns.set(tx.runestoneIndex, ary);
+      const leb128ProtostoneData = u128ArrayToArrayBuffer(this.fields.get(Field.PROTORUNE));
+      const protostone = ProtoStone.parse(leb128ProtostoneData);
+      if (PROTOCOLS_TO_INDEX.has(protostone.protocol_id)) {
+        if (protostone.isBurn()) {
+          const protoburn = new ProtoBurn([
+            protostone.fields.get(ProtoruneField.BURN)[0],
+            protostone.fields.get(ProtoruneField.POINTER)[0],
+          ]);
+          let ary: Array<ProtoBurn> = new Array<ProtoBurn>();
+          if (this.protoBurns.has(tx.runestoneIndex)) {
+            ary = this.protoBurns.get(tx.runestoneIndex);
           }
-          if (protostone.isMessage()) {
-            const str = protostone.protocol_id.toString();
-            let ary: Array<ProtoStone> = new Array<ProtoStone>();
-            if (tx.protostones.has(str)) {
-              ary = tx.protostones.get(str);
-            }
-            ary.push(protostone);
-            tx.protostones.set(str, ary);
-          }
-          if (protostone.edicts.length > 0) {
-            messages.push(ProtoruneMessage.fromProtoStone(protostone));
-          }
+          ary.push(protoburn);
+          this.protoBurns.set(tx.runestoneIndex, ary);
         }
-        startIndex = protostone.nextIndex;
+        if (protostone.isMessage()) {
+          const str = protostone.protocol_id.toString();
+          let ary: Array<ProtoStone> = new Array<ProtoStone>();
+          if (tx.protostones.has(str)) {
+            ary = tx.protostones.get(str);
+          }
+          ary.push(protostone);
+          tx.protostones.set(str, ary);
+        }
+        if (protostone.edicts.length > 0) {
+          messages.push(ProtoruneMessage.fromProtoStone(protostone));
+        }
       }
     }
 
