@@ -79,18 +79,18 @@ export class ProtoStone {
         let totalLen = i + 2 + <i32>raw[i + 1].lo;
         let e = i + 2;
         while (e < totalLen) {
-          const len = <i32>raw[e].lo;
-          const array = new StaticArray<u128>(len);
-          for (let a = 1; a <= len; a++) {
+          const array = new StaticArray<u128>(4);
+          for (let a = 1; a <= 4; a++) {
             array[a] = raw[a + e];
           }
-          e += len + 1;
+          edicts.push(array);
+          e += 4;
         }
         i = totalLen;
       } else {
         let len = <i32>raw[i + 1].lo;
         fields.set(raw[i].lo, raw.slice(i + 2, len + i + 2));
-        i += len + i + 2;
+        i += len + 2;
       }
     }
 
