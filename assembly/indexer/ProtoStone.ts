@@ -66,42 +66,31 @@ export class ProtoStone {
     return changetype<Array<u32>>(0);
   }
 
-  static parseFromField(raw: Array<u128>, startIndex: i32 = 0): ProtoStone {
-    let fields: Map<u64, Array<u128>> = new Map<u64, Array<u128>>();
-    let edicts: Array<StaticArray<u128>> = new Array<StaticArray<u128>>();
+  static parseFromFieldData(fieldData: Array<u128>): Array<ProtoStone> {
+    const box = Box.from(fieldToArrayBuffer(fieldData));
+    let ptr: usize = 0;
+    const arr = new Array<u128>();
+    const result: Array<ProtoStone> = new Array<ProtoStone>();
+    while (box.len > 0) {
+      box.shrinkFront(ptr);
+      let u = u128.from(0);
+      ptr = readULEB128ToU128(box, u);
+      arr.push(u);
+    }
+    let start = 0;
+    while (start < arr.length - 3) {
+      const protocol_id = arr[start];
+      const len = <u32>arr[start + 1].lo;
 
-    let length = <i32>raw[0].lo;
-    let protocolId = raw[1];
-
-    let i = startIndex + 2;
-    while (i < length) {
-      if (<i32>raw[i].lo == 0) {
-        let totalLen = i + 2 + <i32>raw[i + 1].lo;
-        let e = i + 2;
-        while (e < totalLen) {
-          const array = new StaticArray<u128>(4);
-          for (let a = 1; a <= 4; a++) {
-            array[a] = raw[a + e];
-          }
-          edicts.push(array);
-          e += 4;
-        }
-        i = totalLen;
-      } else {
-        let len = <i32>raw[i + 1].lo;
-        fields.set(raw[i].lo, raw.slice(i + 2, len + i + 2));
-        i += len + 2;
-      }
+      const bytes = fieldToArrayBuffer(arr.slice(start + 2, start + 2 + len));
+      const protostone = ProtoStone.parse(bytes);
+      protostone.protocol_id = protocol_id;
+      result.push(protostone);
     }
 
-    const protostone = new ProtoStone(fields, edicts);
-    protostone.nextIndex = startIndex + length;
-    protostone.protocol_id = protocolId;
-
-    return protostone;
+    return result;
   }
 
-  //deprecated
   static parse(data: ArrayBuffer): ProtoStone {
     const input = Box.from(data);
     let fields = new Map<u64, Array<u128>>();
