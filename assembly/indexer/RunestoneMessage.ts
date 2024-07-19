@@ -317,10 +317,11 @@ export class RunestoneMessage {
     const messages = new Array<ProtoruneMessage>();
     // process all protostones here
     if (this.fields.has(Field.PROTORUNE)) {
-      let startIndex = 0;
-      const ary = this.fields.get(Field.PROTORUNE);
-      while (startIndex < ary.length) {
-        const protostone = ProtoStone.parseFromField(ary);
+      const protostones = ProtoStone.parseFromFieldData(
+        this.fields.get(Field.PROTORUNE),
+      );
+      for (let s = 0; s < protostones.length; s++) {
+        const protostone = protostones[s];
         if (PROTOCOLS_TO_INDEX.has(protostone.protocol_id)) {
           if (protostone.isBurn()) {
             const protoburn = new ProtoBurn([
@@ -347,7 +348,6 @@ export class RunestoneMessage {
             messages.push(ProtoruneMessage.fromProtoStone(protostone));
           }
         }
-        startIndex = protostone.nextIndex;
       }
     }
 
