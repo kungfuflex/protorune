@@ -45,6 +45,21 @@ export function isValidPayload(payload: Payload): payload is Buffer {
   return Buffer.isBuffer(payload);
 }
 
+const MAX_LEB128_BYTES_IN_U128 = 18;
+
+// this is the max number for a 2 byte LEB encoded number
+const PROTOSTONE_TAG = 2 ** 14 - 1;
+
+export function encodeProtostone(values: u128[]): Buffer {
+  return Buffer.concat(
+    values
+      .map((value) => [
+        u128.encodeVarInt(u128(PROTOSTONE_TAG)),
+        u128.encodeVarInt(value),
+      ])
+      .flat(),
+  );
+}
 export type RunestoneProtostoneSpec = {
   mint?: {
     block: bigint;
@@ -157,7 +172,23 @@ export class RunestoneProtostoneUpgrade {
       // TODO: ORDERING?
       // TODO: encode 13 in front of everything
       this.protostones.forEach((protostone: ProtoStone) => {
-        payloads.push(...protostone.encipher_payloads());
+        const protostone_payload = protostone.encipher_payloads();
+        const u128s = [];
+        for (
+          let i = 0;
+          i < protostone_payload.length;
+          i += MAX_LEB128_BYTES_IN_U128
+        ) {
+          const end = Math.min(
+            protostone_payload.length,
+            i + MAX_LEB128_BYTES_IN_U128,
+          );
+          const seekbuffer = new SeekBuffer(
+            protostone_payload.subarray(i, end),
+          );
+          u128s.push(u128.tryDecodeVarInt(seekbuffer));
+        }
+        payloads.push(encodeProtostone(u128s));
       });
     }
     /* CODE CHANGE END */
