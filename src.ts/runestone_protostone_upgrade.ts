@@ -5,25 +5,34 @@ import {
   MAX_DIVISIBILITY,
   MAX_SCRIPT_ELEMENT_SIZE,
   OP_RETURN,
-} from "@magiceden-oss/runestone-lib/src/constants";
-import { Edict } from "@magiceden-oss/runestone-lib/src/edict";
-import { Etching } from "@magiceden-oss/runestone-lib/src/etching";
-import { SeekBuffer } from "@magiceden-oss/runestone-lib/src/seekbuffer";
-import { Tag } from "@magiceden-oss/runestone-lib/src/tag";
-import { u128, u32, u64, u8 } from "@magiceden-oss/runestone-lib/src/integer";
-import { Option, Some, None } from "@magiceden-oss/runestone-lib/src/monads";
-import { Rune } from "@magiceden-oss/runestone-lib/src/rune";
-import { Flag } from "@magiceden-oss/runestone-lib/src/flag";
-import { Instruction } from "@magiceden-oss/runestone-lib/src/utils";
-import { RuneId } from "@magiceden-oss/runestone-lib/src/runeid";
-import { script } from "@magiceden-oss/runestone-lib/src/script";
-import { Message } from "@magiceden-oss/runestone-lib/src/message";
-import { Artifact } from "@magiceden-oss/runestone-lib/src/artifact";
-import { Flaw } from "@magiceden-oss/runestone-lib/src/flaw";
-import { Cenotaph } from "@magiceden-oss/runestone-lib/src/cenotaph";
-import { RuneEtchingSpec } from "@magiceden-oss/runestone-lib/src/indexer";
-import { SpacedRune } from "@magiceden-oss/runestone-lib/src/spacedrune";
-import { Terms } from "@magiceden-oss/runestone-lib/src/terms";
+} from "@magiceden-oss/runestone-lib/dist/src/constants";
+import { Edict } from "@magiceden-oss/runestone-lib/dist/src/edict";
+import { Etching } from "@magiceden-oss/runestone-lib/dist/src/etching";
+import { SeekBuffer } from "@magiceden-oss/runestone-lib/dist/src/seekbuffer";
+import { Tag } from "@magiceden-oss/runestone-lib/dist/src/tag";
+import {
+  u128,
+  u32,
+  u64,
+  u8,
+} from "@magiceden-oss/runestone-lib/dist/src/integer";
+import {
+  Option,
+  Some,
+  None,
+} from "@magiceden-oss/runestone-lib/dist/src/monads";
+import { Rune } from "@magiceden-oss/runestone-lib/dist/src/rune";
+import { Flag } from "@magiceden-oss/runestone-lib/dist/src/flag";
+import { Instruction } from "@magiceden-oss/runestone-lib/dist/src/utils";
+import { RuneId } from "@magiceden-oss/runestone-lib/dist/src/runeid";
+import { script } from "@magiceden-oss/runestone-lib/dist/src/script";
+import { Message } from "@magiceden-oss/runestone-lib/dist/src/message";
+import { Artifact } from "@magiceden-oss/runestone-lib/dist/src/artifact";
+import { Flaw } from "@magiceden-oss/runestone-lib/dist/src/flaw";
+import { Cenotaph } from "@magiceden-oss/runestone-lib/dist/src/cenotaph";
+import { RuneEtchingSpec } from "@magiceden-oss/runestone-lib/dist/src/indexer";
+import { SpacedRune } from "@magiceden-oss/runestone-lib/dist/src/spacedrune";
+import { Terms } from "@magiceden-oss/runestone-lib/dist/src/terms";
 import { ProtoStone } from "./protostone";
 
 export const MAX_SPACERS = 0b00000111_11111111_11111111_11111111;
