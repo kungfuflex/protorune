@@ -38,7 +38,7 @@ export declare class ProtoStone {
         };
         chunk?: Buffer;
     });
-    encipher(): Buffer;
+    encipher_payloads(): Buffer[];
     static burn({ protocolTag, ...burn }: {
         protocolTag: bigint;
         pointer: number;
