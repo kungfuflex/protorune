@@ -364,7 +364,7 @@ export class RunestoneMessage {
     const allOutputs = balancesByOutput.keys();
 
     for (let m = 0; m < messages.length; m++) {
-      messages[m].process(tx, txid, height, i);
+      messages[m].process(tx, txid, height, m);
     }
 
     for (let x = 0; x < allOutputs.length; x++) {

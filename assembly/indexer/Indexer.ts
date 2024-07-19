@@ -159,7 +159,7 @@ export class Index {
       const txid = tx.txid();
       tx.processRunestones();
       Index.indexOutpoints(tx, txid, height);
-      const outputIndex = tx.runestoneIndex
+      const outputIndex = tx.runestoneIndex;
       Index.processRunestone<RunestoneMessage>(
         height,
         tx,
@@ -178,3 +178,4 @@ export class Index {
       );
     }
   }
+}
