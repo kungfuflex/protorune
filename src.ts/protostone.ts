@@ -107,6 +107,7 @@ export class ProtoStone {
 
   encipher_payloads(): Buffer {
     let payloads: Buffer[] = [];
+
     if (this.burn) {
       payloads.push(
         Tag.encodeOptionInt(Tag.POINTER, this.burn.pointer.map(u128)),
@@ -142,6 +143,13 @@ export class ProtoStone {
         previous = edict.id;
       }
     }
+
+    // pushing the protocol_id and len first as per the spec
+    const length_payload = Buffer.concat(payloads).length;
+    payloads.unshift(
+      u128.encodeVarInt(this.protocolTag),
+      u128.encodeVarInt(u128(length_payload)),
+    );
     return Buffer.concat(payloads);
   }
 

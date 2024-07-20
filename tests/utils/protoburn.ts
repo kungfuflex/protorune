@@ -16,18 +16,18 @@ import { encodeRunestoneProtostone } from "../../src.ts/runestone_protostone_upg
 
 /**
  * Outputs
- *  - [0-n): outputs (regular p2pkh) defined by outputs
- *  - [n]: runestone with protostones inside
+ *  - [0]: runestone with protostones inside
+ *  - [1-n): outputs (regular p2pkh) defined by outputs
  *  - (n, m): these are pointers that don't actually exist, but are used to target the specific protostone by edicts
  *
  *
  * @param inputs
  * @param edicts
- * @param outputIndexToReceiveProtorunes
+ * @param outputIndexToReceiveProtorunes which output receives protorunes
  * @param outputs p2pkh outputs
  * @param protocolTag
  * @param block
- * @param runeTransferPointer
+ * @param runeTransferPointer which ouput receives leftover runes
  * @returns
  */
 export const constructProtoburnTransaction = (
@@ -49,9 +49,8 @@ export const constructProtoburnTransaction = (
     btcAmount: number;
   }[],
   protocolTag: bigint,
-  block?: bitcoinjs.Block,
-  runeTransferEdictTarget: number = 1,
-  runeTransferPointer: number = 1,
+  block: bitcoinjs.Block,
+  runeTransferPointer: number,
 ): bitcoinjs.Block => {
   if (block == undefined) {
     block = buildDefaultBlock();
@@ -89,11 +88,11 @@ export const constructProtoburnTransaction = (
   const transaction = buildTransaction(
     [...blockInputs],
     [
-      ...blockOutputs,
       {
         script: runestone,
         value: 0,
       },
+      ...blockOutputs,
     ],
   );
   block.transactions?.push(transaction);

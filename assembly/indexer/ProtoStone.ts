@@ -2,8 +2,15 @@ import { u128 } from "as-bignum/assembly";
 import { Field } from "./fields/ProtoruneField";
 import { Box } from "metashrew-as/assembly/utils/box";
 import { readULEB128ToU128 } from "../leb128";
-import { u128ToHex, fieldToU128, fieldToArrayBuffer } from "../utils";
+import {
+  u128ToHex,
+  fieldToU128,
+  fieldToArrayBuffer,
+  fieldToArrayBuffer15Bytes,
+  fieldToArrayBuffer15Bytes,
+} from "../utils";
 import { Flag } from "./flags/ProtoruneFlag";
+import { console } from "metashrew-as/assembly/utils/logging";
 
 export class ProtoStone {
   public fields: Map<u64, Array<u128>>;
@@ -67,33 +74,33 @@ export class ProtoStone {
   }
 
   static parseFromFieldData(fieldData: Array<u128>): Array<ProtoStone> {
-    const box = Box.from(fieldToArrayBuffer(fieldData));
-    let ptr: usize = 0;
-    const arr = new Array<u128>();
+    const input = Box.from(fieldToArrayBuffer15Bytes(fieldData));
     const result: Array<ProtoStone> = new Array<ProtoStone>();
-    while (box.len > 0) {
-      box.shrinkFront(ptr);
-      let u = u128.from(0);
-      ptr = readULEB128ToU128(box, u);
-      arr.push(u);
-    }
-    let start = 0;
-    while (start < arr.length - 3) {
-      const protocol_id = arr[start];
-      const len = <u32>arr[start + 1].lo;
+    while (input.len > 0) {
+      const protocol_id = u128.from(0);
+      let size = readULEB128ToU128(input, protocol_id);
+      if (protocol_id.lo == 0 && protocol_id.hi == 0) {
+        // For the very last u128, not all bytes may be used (due to LEB format)
+        console.log("Found protocol id 0, breaking...");
+        break;
+      }
+      if (size === usize.MAX_VALUE) return changetype<ProtoStone[]>(0); //can choose to continue or return
+      input.shrinkFront(size);
 
-      const bytes = fieldToArrayBuffer(arr.slice(start + 2, start + 2 + len));
-      const protostone = ProtoStone.parse(bytes);
+      const len = u128.from(0); //assuming len is encoded as the number of bytes needed to read
+      size = readULEB128ToU128(input, len);
+      if (size === usize.MAX_VALUE) return changetype<ProtoStone[]>(0); //can choose to continue or return
+      input.shrinkFront(size);
+      const temp = input.sliceTo(input.start + <u32>len.lo);
+      const protostone = ProtoStone.parse(temp);
       protostone.protocol_id = protocol_id;
       result.push(protostone);
-      start += len + 2;
+      input.shrinkFront(<u32>len.lo);
     }
-
     return result;
   }
 
-  static parse(data: ArrayBuffer): ProtoStone {
-    const input = Box.from(data);
+  static parse(input: Box): ProtoStone {
     let fields = new Map<u64, Array<u128>>();
     let edicts = new Array<StaticArray<u128>>(0);
     while (input.len > 0) {

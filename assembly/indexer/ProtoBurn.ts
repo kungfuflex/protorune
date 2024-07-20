@@ -2,6 +2,7 @@ import { BalanceSheet } from "./BalanceSheet";
 import { PROTORUNE_TABLE } from "./tables/protorune";
 import * as base from "./constants";
 import { u128 } from "as-bignum/assembly";
+import { console } from "metashrew-as/assembly/utils/logging";
 
 export class ProtoBurn {
   protocol_tag: u128;

@@ -55,7 +55,7 @@ import { ProtoruneMessage } from "./ProtoruneMessage";
 export class RunestoneMessage {
   public fields: Map<u64, Array<u128>>;
   public edicts: Array<StaticArray<u128>>;
-  protoBurns: Map<u32, Array<ProtoBurn>>;
+  protoBurns: Map<u32, ProtoBurn>;
   table: PROTORUNE_TABLE;
   constructor(
     fields: Map<u64, Array<u128>>,
@@ -64,7 +64,7 @@ export class RunestoneMessage {
   ) {
     this.fields = fields;
     this.edicts = edicts;
-    this.protoBurns = new Map<u32, Array<ProtoBurn>>();
+    this.protoBurns = new Map<u32, ProtoBurn>();
     this.table = table;
   }
   inspect(): string {
@@ -320,20 +320,20 @@ export class RunestoneMessage {
       const protostones = ProtoStone.parseFromFieldData(
         this.fields.get(Field.PROTORUNE),
       );
-      for (let s = 0; s < protostones.length; s++) {
-        const protostone = protostones[s];
+      for (
+        let protostoneIdx = 0;
+        protostoneIdx < protostones.length;
+        protostoneIdx++
+      ) {
+        const protostone = protostones[protostoneIdx];
+
         if (PROTOCOLS_TO_INDEX.has(protostone.protocol_id)) {
           if (protostone.isBurn()) {
             const protoburn = new ProtoBurn([
               protostone.fields.get(ProtoruneField.BURN)[0],
               protostone.fields.get(ProtoruneField.POINTER)[0],
             ]);
-            let ary: Array<ProtoBurn> = new Array<ProtoBurn>();
-            if (this.protoBurns.has(tx.runestoneIndex)) {
-              ary = this.protoBurns.get(tx.runestoneIndex);
-            }
-            ary.push(protoburn);
-            this.protoBurns.set(tx.runestoneIndex, ary);
+            this.protoBurns.set(tx.outs.length + protostoneIdx, protoburn);
           }
           if (protostone.isMessage()) {
             const str = protostone.protocol_id.toString();
@@ -374,17 +374,13 @@ export class RunestoneMessage {
         OUTPOINT_TO_RUNES.select(OutPoint.from(txid, output).toArrayBuffer()),
         isCenotaph,
       );
-
       // save protoburns to index
       if (this.protoBurns.has(output) && !isCenotaph) {
-        const ary = this.protoBurns.get(output);
-        for (let i = 0; i < ary.length; i++) {
-          const protoBurn = ary[i];
-          protoBurn.process(
-            sheet,
-            OutPoint.from(txid, protoBurn.pointer).toArrayBuffer(),
-          );
-        }
+        const protoBurn = this.protoBurns.get(output);
+        protoBurn.process(
+          sheet,
+          OutPoint.from(txid, protoBurn.pointer).toArrayBuffer(),
+        );
       }
     }
     return balancesByOutput;
