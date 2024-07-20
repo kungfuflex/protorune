@@ -152,7 +152,7 @@ export class ProtoStone {
   //   return script.compile(stack);
   // }
 
-  encipher_payloads(): Buffer[] {
+  encipher_payloads(): Buffer {
     let payloads: Buffer[] = [];
     if (this.burn) {
       payloads.push(
@@ -175,7 +175,7 @@ export class ProtoStone {
     } else if (this.chunk) {
       payloads.push(this.chunk);
     }
-    return payloads;
+    return Buffer.concat(payloads);
   }
 
   static burn({

@@ -1,6 +1,6 @@
 import { Edict } from "@magiceden-oss/runestone-lib/dist/src/edict";
 import { Etching } from "@magiceden-oss/runestone-lib/dist/src/etching";
-import { u32 } from "@magiceden-oss/runestone-lib/dist/src/integer";
+import { u128, u32 } from "@magiceden-oss/runestone-lib/dist/src/integer";
 import { Option } from "@magiceden-oss/runestone-lib/dist/src/monads";
 import { RuneId } from "@magiceden-oss/runestone-lib/dist/src/runeid";
 import { Flaw } from "@magiceden-oss/runestone-lib/dist/src/flaw";
@@ -16,6 +16,7 @@ export type RunestoneTx = {
 };
 type Payload = Buffer | Flaw;
 export declare function isValidPayload(payload: Payload): payload is Buffer;
+export declare function encodeProtostone(values: u128[]): Buffer;
 export type RunestoneProtostoneSpec = {
     mint?: {
         block: bigint;
