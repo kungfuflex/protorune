@@ -125,7 +125,7 @@ export class ProtoStone {
       );
       payloads.push(Tag.encode(Tag.MESSAGE, this.message.calldata));
     }
-    if (this.edicts.length) {
+    if (this.edicts) {
       payloads.push(u128.encodeVarInt(u128(Tag.BODY)));
 
       const edicts = [...this.edicts].sort((x, y) =>

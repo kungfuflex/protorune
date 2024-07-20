@@ -1,5 +1,6 @@
 import { u128, u32 } from "@magiceden-oss/runestone-lib/dist/src/integer";
 import { Option } from "@magiceden-oss/runestone-lib/dist/src/monads";
+import { Edict } from "@magiceden-oss/runestone-lib/dist/src/edict";
 export type ProtoBurn = {
     pointer: Option<u32>;
 };
@@ -8,22 +9,12 @@ export type ProtoMessage = {
     pointer: Option<u32>;
     refundPointer: Option<u32>;
 };
-export type ProtoSplit = {
-    order: u32[];
-};
-export type Chunk = Buffer;
-export type SplitResult = {
-    protostone: ProtoStone;
-    chunks: ProtoStone[];
-};
-export declare function protosplit(input: ProtoStone, voutStart: number): SplitResult;
 export declare class ProtoStone {
     burn?: ProtoBurn;
     message?: ProtoMessage;
-    split?: ProtoSplit;
-    chunk?: Chunk;
     protocolTag: u128;
-    constructor({ burn, message, protocolTag, split, chunk, }: {
+    edicts?: Edict[];
+    constructor({ burn, message, protocolTag, edicts, }: {
         protocolTag: bigint;
         burn?: {
             pointer: number;
@@ -33,22 +24,13 @@ export declare class ProtoStone {
             pointer: number;
             refundPointer: number;
         };
-        split?: {
-            order: number[];
-        };
-        chunk?: Buffer;
+        edicts?: Edict[];
     });
     encipher_payloads(): Buffer;
     static burn({ protocolTag, ...burn }: {
         protocolTag: bigint;
         pointer: number;
     }): ProtoStone;
-    protosplit(voutStart: number): ReturnType<typeof protosplit>;
-    static split({ protocolTag, ...split }: {
-        protocolTag: bigint;
-        order: number[];
-    }): ProtoStone;
-    static chunk(chunk: Buffer): ProtoStone;
     static message({ protocolTag, ...message }: {
         calldata: Buffer;
         protocolTag: bigint;
