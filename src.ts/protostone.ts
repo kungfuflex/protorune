@@ -1,13 +1,8 @@
-import {
-  MAX_SCRIPT_ELEMENT_SIZE,
-  OP_RETURN,
-} from "@magiceden-oss/runestone-lib/dist/src/constants";
-import { script, opcodes } from "@magiceden-oss/runestone-lib/dist/src/script";
-import { u128, u32 } from "@magiceden-oss/runestone-lib/dist/src/integer";
+import { u128, u32, u64 } from "@magiceden-oss/runestone-lib/dist/src/integer";
 import { Tag } from "./tag";
 import { Some, Option } from "@magiceden-oss/runestone-lib/dist/src/monads";
-import { chunk } from "lodash";
-import clone from "clone";
+import { RuneId } from "@magiceden-oss/runestone-lib/dist/src/runeid";
+import { Edict } from "@magiceden-oss/runestone-lib/dist/src/edict";
 
 export type ProtoBurn = {
   pointer: Option<u32>;
@@ -19,50 +14,18 @@ export type ProtoMessage = {
   refundPointer: Option<u32>;
 };
 
-export type ProtoSplit = {
-  order: u32[];
-};
-
-export type Chunk = Buffer;
-
-export type SplitResult = {
-  protostone: ProtoStone;
-  chunks: ProtoStone[];
-};
-
-export function protosplit(input: ProtoStone, voutStart: number): SplitResult {
-  const chunks = chunk(
-    Array.from(
-      Buffer.concat(input.message.calldata.map((v) => u128.encodeVarInt(v))),
-    ),
-    79,
-  ).map((v) => ProtoStone.chunk(Buffer.from(v)));
-  const protostone = clone(input);
-  protostone.split = {
-    order: Array(chunks.length)
-      .fill(0)
-      .map((_, i) => u32(i + voutStart)),
-  };
-  protostone.message.calldata = [];
-  return {
-    protostone,
-    chunks,
-  };
-}
-
 export class ProtoStone {
   burn?: ProtoBurn;
   message?: ProtoMessage;
-  split?: ProtoSplit;
-  chunk?: Chunk;
   protocolTag: u128;
+
+  edicts?: Edict[];
 
   constructor({
     burn,
     message,
     protocolTag,
-    split,
-    chunk,
+    edicts,
   }: {
     protocolTag: bigint;
     burn?: { pointer: number };
@@ -72,12 +35,10 @@ export class ProtoStone {
       pointer: number;
       refundPointer: number;
     };
-    split?: {
-      order: number[];
-    };
-    chunk?: Buffer;
+    edicts?: Edict[];
   }) {
     this.protocolTag = u128(protocolTag);
+    this.edicts = edicts;
     if (burn) {
       this.burn = {
         pointer: Some<u32>(u32(burn.pointer)),
@@ -102,14 +63,6 @@ export class ProtoStone {
         pointer: Some<u32>(u32(message.pointer)),
         refundPointer: Some<u32>(u32(message.refundPointer)),
       };
-    }
-    if (split) {
-      this.split = {
-        order: split.order.map(u32),
-      };
-    }
-    if (chunk) {
-      this.chunk = chunk;
     }
   }
 
@@ -170,10 +123,24 @@ export class ProtoStone {
         Tag.encodeOptionInt(Tag.REFUND, this.message.refundPointer.map(u128)),
       );
       payloads.push(Tag.encode(Tag.MESSAGE, this.message.calldata));
-    } else if (this.split) {
-      payloads.push(Tag.encode(Tag.SPLIT, this.split.order.map(u128)));
-    } else if (this.chunk) {
-      payloads.push(this.chunk);
+    }
+    if (this.edicts.length) {
+      payloads.push(u128.encodeVarInt(u128(Tag.BODY)));
+
+      const edicts = [...this.edicts].sort((x, y) =>
+        Number(x.id.block - y.id.block || x.id.tx - y.id.tx),
+      );
+
+      let previous = new RuneId(u64(0), u32(0));
+      for (const edict of edicts) {
+        const [block, tx] = previous.delta(edict.id).unwrap();
+
+        payloads.push(u128.encodeVarInt(block));
+        payloads.push(u128.encodeVarInt(tx));
+        payloads.push(u128.encodeVarInt(edict.amount));
+        payloads.push(u128.encodeVarInt(u128(edict.output)));
+        previous = edict.id;
+      }
     }
     return Buffer.concat(payloads);
   }
@@ -186,24 +153,6 @@ export class ProtoStone {
     pointer: number;
   }): ProtoStone {
     return new ProtoStone({ burn, protocolTag });
-  }
-
-  protosplit(voutStart: number): ReturnType<typeof protosplit> {
-    return protosplit(this, voutStart);
-  }
-
-  static split({
-    protocolTag,
-    ...split
-  }: {
-    protocolTag: bigint;
-    order: number[];
-  }): ProtoStone {
-    return new ProtoStone({ split, protocolTag });
-  }
-
-  static chunk(chunk: Buffer): ProtoStone {
-    return new ProtoStone({ protocolTag: BigInt(0), chunk });
   }
 
   static message({
