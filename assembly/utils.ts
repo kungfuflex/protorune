@@ -4,6 +4,8 @@ import { RESERVED_NAME, TWENTY_SIX } from "./indexer/constants";
 import { Edict } from "./indexer/Edict";
 import { console } from "metashrew-as/assembly/utils/logging";
 
+export const MAX_U128_BYTES_COMPAT_W_RUNES = 15;
+
 export function min<T>(a: T, b: T): T {
   if (a > b) return b;
   return a;
@@ -100,6 +102,14 @@ export function toArrayBuffer(data: u128): ArrayBuffer {
 export function fieldToArrayBuffer(data: Array<u128>): ArrayBuffer {
   return Box.concat(
     data.map((v: u128, i: i32, ary: Array<u128>) => Box.from(toArrayBuffer(v))),
+  );
+}
+
+export function fieldToArrayBuffer15Bytes(data: Array<u128>): ArrayBuffer {
+  return Box.concat(
+    data.map((v: u128, i: i32, ary: Array<u128>) =>
+      Box.from(toArrayBuffer(v).slice(0, MAX_U128_BYTES_COMPAT_W_RUNES)),
+    ),
   );
 }
 

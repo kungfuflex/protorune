@@ -3,7 +3,6 @@ import { u128 } from "@magiceden-oss/runestone-lib/dist/src/integer";
 import { Option } from "@magiceden-oss/runestone-lib/dist/src/monads";
 export declare enum Tag {
     BODY = 0,
-    PROTOSTONE = 13,
     MESSAGE = 81,
     BURN = 83,
     SPLIT = 85,

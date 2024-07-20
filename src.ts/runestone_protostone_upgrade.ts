@@ -10,6 +10,7 @@ import { Edict } from "@magiceden-oss/runestone-lib/dist/src/edict";
 import { Etching } from "@magiceden-oss/runestone-lib/dist/src/etching";
 import { SeekBuffer } from "@magiceden-oss/runestone-lib/dist/src/seekbuffer";
 import { Tag } from "@magiceden-oss/runestone-lib/dist/src/tag";
+import { Tag as ProtoTag } from "./tag";
 import {
   u128,
   u32,
@@ -45,16 +46,36 @@ export function isValidPayload(payload: Payload): payload is Buffer {
   return Buffer.isBuffer(payload);
 }
 
-const MAX_LEB128_BYTES_IN_U128 = 18;
+export const MAX_LEB128_BYTES_IN_U128 = 18;
 
-// this is the max number for a 2 byte LEB encoded number
-const PROTOSTONE_TAG = 2 ** 14 - 1;
+// uint128s -> leb128 max needs 19 bytes, since 128/7 = 18.3, so an extra byte is needed to store the last two bits in the uint128.
+// Runes will produce cenotaph if it needs to process more than 18 bytes for any leb128, so we cannot use the upper two bits in a uint128
+// Simplest solution is to not use the upper 8 bits (upper byte) of the uint128 so the upper 2 bits can never be set.
+// Downside is we miss out on 6 bits of storage before we have to push another tag
+export const MAX_U128_BYTES_COMPAT_W_RUNES = 15;
+
+// Note: little endian seekBuffer
+function rawBytesToU128(seekBuffer: SeekBuffer): u128 {
+  let result = u128(0);
+  for (let i = 0; i <= 16; i++) {
+    const byte = seekBuffer.readUInt8();
+    if (byte === undefined) {
+      // done reading
+      return result;
+    }
+
+    const value = u128(byte);
+    result = u128(result | (value << u128(8 * i)));
+  }
+
+  return result;
+}
 
 export function encodeProtostone(values: u128[]): Buffer {
   return Buffer.concat(
     values
       .map((value) => [
-        u128.encodeVarInt(u128(PROTOSTONE_TAG)),
+        u128.encodeVarInt(u128(ProtoTag.PROTOSTONE)),
         u128.encodeVarInt(value),
       ])
       .flat(),
@@ -148,6 +169,31 @@ export class RunestoneProtostoneUpgrade {
 
     payloads.push(Tag.encodeOptionInt(Tag.POINTER, this.pointer.map(u128)));
 
+    /* BEGIN CODE CHANGE */
+    if (this.protostones.length) {
+      // TODO: ORDERING?
+      this.protostones.forEach((protostone: ProtoStone) => {
+        const protostone_payload = protostone.encipher_payloads();
+        const u128s: u128[] = [];
+        for (
+          let i = 0;
+          i < protostone_payload.length;
+          i += MAX_U128_BYTES_COMPAT_W_RUNES
+        ) {
+          const end = Math.min(
+            protostone_payload.length,
+            i + MAX_U128_BYTES_COMPAT_W_RUNES,
+          );
+          const seekbuffer = new SeekBuffer(
+            protostone_payload.subarray(i, end),
+          );
+          u128s.push(rawBytesToU128(seekbuffer));
+        }
+        payloads.push(encodeProtostone(u128s));
+      });
+    }
+    /* CODE CHANGE END */
+
     if (this.edicts.length) {
       payloads.push(u128.encodeVarInt(u128(Tag.BODY)));
 
@@ -166,32 +212,6 @@ export class RunestoneProtostoneUpgrade {
         previous = edict.id;
       }
     }
-
-    /* BEGIN CODE CHANGE */
-    if (this.protostones.length) {
-      // TODO: ORDERING?
-      // TODO: encode 13 in front of everything
-      this.protostones.forEach((protostone: ProtoStone) => {
-        const protostone_payload = protostone.encipher_payloads();
-        const u128s = [];
-        for (
-          let i = 0;
-          i < protostone_payload.length;
-          i += MAX_LEB128_BYTES_IN_U128
-        ) {
-          const end = Math.min(
-            protostone_payload.length,
-            i + MAX_LEB128_BYTES_IN_U128,
-          );
-          const seekbuffer = new SeekBuffer(
-            protostone_payload.subarray(i, end),
-          );
-          u128s.push(u128.tryDecodeVarInt(seekbuffer));
-        }
-        payloads.push(encodeProtostone(u128s));
-      });
-    }
-    /* CODE CHANGE END */
 
     const stack: (Buffer | number)[] = [];
     stack.push(OP_RETURN);

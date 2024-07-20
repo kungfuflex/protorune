@@ -16,6 +16,8 @@ export type RunestoneTx = {
 };
 type Payload = Buffer | Flaw;
 export declare function isValidPayload(payload: Payload): payload is Buffer;
+export declare const MAX_LEB128_BYTES_IN_U128 = 18;
+export declare const MAX_U128_BYTES_COMPAT_W_RUNES = 15;
 export declare function encodeProtostone(values: u128[]): Buffer;
 export type RunestoneProtostoneSpec = {
     mint?: {
