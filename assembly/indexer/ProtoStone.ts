@@ -86,6 +86,7 @@ export class ProtoStone {
       const protostone = ProtoStone.parse(bytes);
       protostone.protocol_id = protocol_id;
       result.push(protostone);
+      start += len + 2;
     }
 
     return result;
