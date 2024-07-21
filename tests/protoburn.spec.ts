@@ -88,7 +88,7 @@ describe("protoburns", () => {
         },
       ],
       /*outputIndexToReceiveProtorunes=*/ 2, //this goes to the refundOutput
-      [output, refundOutput],
+      [output, refundOutput], // 0 is script, 1 is address 2 output, 2 is address 1 output, 3 is virtual output for first protoburn
       TEST_PROTOCOL_TAG,
       block,
       /*runeTransferPointer=*/ 3,
@@ -129,179 +129,187 @@ describe("protoburns", () => {
       "address 1 should now have all the protorunes",
     );
   });
-  // it("should index full protoburn where edict points to protoburn but pointer points to another address", async () => {
-  //   const program = buildProgram(DEBUG_WASM);
-  //   program.setBlockHeight(840000);
-  //   const premineAmount = 2100000005000000n;
-  //   const outputs = [
-  //     {
-  //       script: bitcoinjs.payments.p2pkh({
-  //         address: TEST_BTC_ADDRESS1,
-  //         network: bitcoinjs.networks.bitcoin,
-  //       }).output,
-  //       value: 1,
-  //     },
-  //     {
-  //       script: bitcoinjs.payments.p2pkh({
-  //         network: bitcoinjs.networks.bitcoin,
-  //         address: TEST_BTC_ADDRESS2,
-  //       }).output,
-  //       value: 624999999,
-  //     },
-  //   ];
-  //   const pointer1 = 1;
-  //   let block = initCompleteBlockWithRuneEtching(
-  //     outputs,
-  //     pointer1,
-  //     undefined,
-  //     premineAmount,
-  //   );
+  it("should index full protoburn where edict points to protoburn but pointer points to another address", async () => {
+    const program = buildProgram(DEBUG_WASM);
+    program.setBlockHeight(840000);
+    const premineAmount = 2100000005000000n;
+    const outputs = [
+      {
+        script: bitcoinjs.payments.p2pkh({
+          address: TEST_BTC_ADDRESS1,
+          network: bitcoinjs.networks.bitcoin,
+        }).output,
+        value: 1,
+      },
+      {
+        script: bitcoinjs.payments.p2pkh({
+          network: bitcoinjs.networks.bitcoin,
+          address: TEST_BTC_ADDRESS2,
+        }).output,
+        value: 624999999,
+      },
+    ];
+    const pointer1 = 1;
+    let block = initCompleteBlockWithRuneEtching(
+      outputs,
+      pointer1,
+      undefined,
+      premineAmount,
+    );
 
-  //   const input = {
-  //     inputTxHash: block.transactions?.at(1)?.getHash(), // 0 is coinbase, 1 is the mint
-  //     inputTxOutputIndex: pointer1, // index of output in the input tx that has the runes. In this case it is the default pointer of the mint
-  //   };
-  //   const runeId = {
-  //     block: 840000n,
-  //     tx: 1,
-  //   };
-  //   const amount = premineAmount / 3n;
-  //   const amountLeftover = premineAmount - amount;
-  //   const outputIndexToReceiveProtorunes = 2; // 0 is the runestone, 1 is protoburn, 2 is ADDRESS2
-  //   const output = {
-  //     address: TEST_BTC_ADDRESS2,
-  //     btcAmount: 1, //this can be implied to be 1 since runes usually are just inscribed on a satoshi
-  //   };
-  //   // technically this is not a valid transaction since btc in and less than btc out but this is just to test the runes
-  //   const refundOutput = {
-  //     address: TEST_BTC_ADDRESS1,
-  //     btcAmount: 0, // this gives address 1 his remaining bitcoin
-  //   };
+    const input = {
+      inputTxHash: block.transactions?.at(1)?.getHash(), // 0 is coinbase, 1 is the mint
+      inputTxOutputIndex: pointer1, // index of output in the input tx that has the runes. In this case it is the default pointer of the mint
+    };
+    const runeId = {
+      block: 840000n,
+      tx: 1,
+    };
+    const amount = premineAmount / 3n;
+    const amountLeftover = premineAmount - amount;
+    const outputIndexToReceiveProtorunes = 1; // 0 is the runestone, 1 is ADDRESS2, 2 is ADDRESS1
+    const output = {
+      address: TEST_BTC_ADDRESS2,
+      btcAmount: 1, //this can be implied to be 1 since runes usually are just inscribed on a satoshi
+    };
+    // technically this is not a valid transaction since btc in and less than btc out but this is just to test the runes
+    const refundOutput = {
+      address: TEST_BTC_ADDRESS1,
+      btcAmount: 0, // this gives address 1 his remaining bitcoin
+    };
 
-  //   // is partial allowed?
-  //   block = constructProtoburnTransaction(
-  //     [input],
-  //     runeId,
-  //     amount,
-  //     outputIndexToReceiveProtorunes,
-  //     [output, refundOutput],
-  //     TEST_PROTOCOL_TAG,
-  //     block,
-  //     1,
-  //     2,
-  //   );
+    // is partial allowed?
+    block = constructProtoburnTransaction(
+      [input],
+      [
+        {
+          id: runeId,
+          amount: amount,
+          output: 3, // output 3 is the "virtual" output corresponding to the first protoburn
+        },
+      ],
+      outputIndexToReceiveProtorunes,
+      [output, refundOutput], // 0 is script, 1 is output 2, 2 is output 1, 3 is virtual protoburn
+      TEST_PROTOCOL_TAG,
+      block,
+      /*runeTransferPointer=*/ 1,
+    );
 
-  //   program.setBlock(block.toHex());
+    program.setBlock(block.toHex());
 
-  //   await program.run("_start");
+    await program.run("_start");
 
-  //   const resultAddress1 = await runesbyaddress(program, TEST_BTC_ADDRESS1);
-  //   expect(resultAddress1.balanceSheet.length).equals(
-  //     0,
-  //     "address 1 should not have any runes left",
-  //   );
-  //   const resultAddress2 = await runesbyaddress(program, TEST_BTC_ADDRESS2);
-  //   expect(resultAddress2.balanceSheet[0].balance).equals(
-  //     amountLeftover,
-  //     "address 2 should have received leftover runes",
-  //   );
+    const resultAddress1 = await runesbyaddress(program, TEST_BTC_ADDRESS1);
+    expect(resultAddress1.balanceSheet.length).equals(
+      0,
+      "address 1 should not have any runes left",
+    );
+    const resultAddress2 = await runesbyaddress(program, TEST_BTC_ADDRESS2);
+    expect(resultAddress2.balanceSheet[0].balance).equals(
+      amountLeftover,
+      "address 2 should have received leftover runes",
+    );
 
-  //   const protorunesAddress2 = await protorunesbyaddress(
-  //     program,
-  //     TEST_BTC_ADDRESS2,
-  //     TEST_PROTOCOL_TAG,
-  //   );
-  //   console.log(protorunesAddress2);
-  //   expect(protorunesAddress2.balanceSheet[0].balance).equals(
-  //     amount,
-  //     "address 2 should now have the protorunes sent to protoburn through edict",
-  //   );
-  // });
-  // it("should index full protoburn where edict points to another address but pointer points to protoburn", async () => {
-  //   const program = buildProgram(DEBUG_WASM);
-  //   program.setBlockHeight(840000);
-  //   const premineAmount = 2100000005000000n;
-  //   const outputs = [
-  //     {
-  //       script: bitcoinjs.payments.p2pkh({
-  //         address: TEST_BTC_ADDRESS1,
-  //         network: bitcoinjs.networks.bitcoin,
-  //       }).output,
-  //       value: 1,
-  //     },
-  //     {
-  //       script: bitcoinjs.payments.p2pkh({
-  //         network: bitcoinjs.networks.bitcoin,
-  //         address: TEST_BTC_ADDRESS2,
-  //       }).output,
-  //       value: 624999999,
-  //     },
-  //   ];
-  //   const pointer1 = 1;
-  //   let block = initCompleteBlockWithRuneEtching(
-  //     outputs,
-  //     pointer1,
-  //     undefined,
-  //     premineAmount,
-  //   );
+    const protorunesAddress2 = await protorunesbyaddress(
+      program,
+      TEST_BTC_ADDRESS2,
+      TEST_PROTOCOL_TAG,
+    );
+    console.log(protorunesAddress2);
+    expect(protorunesAddress2.balanceSheet[0].balance).equals(
+      amount,
+      "address 2 should now have the protorunes sent to protoburn through edict",
+    );
+  });
+  it("should index full protoburn where edict points to another address but pointer points to protoburn", async () => {
+    const program = buildProgram(DEBUG_WASM);
+    program.setBlockHeight(840000);
+    const premineAmount = 2100000005000000n;
+    const outputs = [
+      {
+        script: bitcoinjs.payments.p2pkh({
+          address: TEST_BTC_ADDRESS1,
+          network: bitcoinjs.networks.bitcoin,
+        }).output,
+        value: 1,
+      },
+      {
+        script: bitcoinjs.payments.p2pkh({
+          network: bitcoinjs.networks.bitcoin,
+          address: TEST_BTC_ADDRESS2,
+        }).output,
+        value: 624999999,
+      },
+    ];
+    const pointer1 = 1;
+    let block = initCompleteBlockWithRuneEtching(
+      outputs,
+      pointer1,
+      undefined,
+      premineAmount,
+    );
 
-  //   const input = {
-  //     inputTxHash: block.transactions?.at(1)?.getHash(), // 0 is coinbase, 1 is the mint
-  //     inputTxOutputIndex: pointer1, // index of output in the input tx that has the runes. In this case it is the default pointer of the mint
-  //   };
-  //   const runeId = {
-  //     block: 840000n,
-  //     tx: 1,
-  //   };
-  //   const amount = premineAmount / 3n;
-  //   const amountLeftover = premineAmount - amount;
-  //   const outputIndexToReceiveProtorunes = 2; // 0 is the runestone, 1 is protoburn, 2 is ADDRESS2
-  //   const output = {
-  //     address: TEST_BTC_ADDRESS2,
-  //     btcAmount: 1, //this can be implied to be 1 since runes usually are just inscribed on a satoshi
-  //   };
-  //   const refundOutput = {
-  //     address: TEST_BTC_ADDRESS1,
-  //     btcAmount: 0, // this gives address 1 his remaining bitcoin
-  //   };
+    const input = {
+      inputTxHash: block.transactions?.at(1)?.getHash(), // 0 is coinbase, 1 is the mint
+      inputTxOutputIndex: pointer1, // index of output in the input tx that has the runes. In this case it is the default pointer of the mint
+    };
+    const runeId = {
+      block: 840000n,
+      tx: 1,
+    };
+    const amount = premineAmount / 3n;
+    const amountLeftover = premineAmount - amount;
+    const outputIndexToReceiveProtorunes = 1; // 0 is the runestone, 1 is ADDRESS2, 2 is ADDRESS1
+    const output = {
+      address: TEST_BTC_ADDRESS2,
+      btcAmount: 1, //this can be implied to be 1 since runes usually are just inscribed on a satoshi
+    };
+    const refundOutput = {
+      address: TEST_BTC_ADDRESS1,
+      btcAmount: 0, // this gives address 1 his remaining bitcoin
+    };
 
-  //   // is partial allowed?
-  //   block = constructProtoburnTransaction(
-  //     [input],
-  //     runeId,
-  //     amount,
-  //     outputIndexToReceiveProtorunes,
-  //     [output, refundOutput],
-  //     TEST_PROTOCOL_TAG,
-  //     block,
-  //     2,
-  //     1,
-  //   );
+    // is partial allowed?
+    block = constructProtoburnTransaction(
+      [input],
+      [
+        {
+          id: runeId,
+          amount: amount,
+          output: 1, // output 1 is ADDRESS2 
+        },
+      ],
+      outputIndexToReceiveProtorunes,
+      [output, refundOutput],
+      TEST_PROTOCOL_TAG,
+      block,
+      /*runeTransferPointer=*/ 3,
+    );
 
-  //   program.setBlock(block.toHex());
+    program.setBlock(block.toHex());
 
-  //   await program.run("_start");
+    await program.run("_start");
 
-  //   const resultAddress1 = await runesbyaddress(program, TEST_BTC_ADDRESS1);
-  //   expect(resultAddress1.balanceSheet.length).equals(
-  //     0,
-  //     "address 1 should not have any runes left",
-  //   );
-  //   const resultAddress2 = await runesbyaddress(program, TEST_BTC_ADDRESS2);
-  //   expect(resultAddress2.balanceSheet[0].balance).equals(
-  //     amount,
-  //     "address 2 should have received transferred runes",
-  //   );
+    const resultAddress1 = await runesbyaddress(program, TEST_BTC_ADDRESS1);
+    expect(resultAddress1.balanceSheet.length).equals(
+      0,
+      "address 1 should not have any runes left",
+    );
+    const resultAddress2 = await runesbyaddress(program, TEST_BTC_ADDRESS2);
+    expect(resultAddress2.balanceSheet[0].balance).equals(
+      amount,
+      "address 2 should have received transferred runes",
+    );
 
-  //   const protorunesAddress2 = await protorunesbyaddress(
-  //     program,
-  //     TEST_BTC_ADDRESS2,
-  //     TEST_PROTOCOL_TAG,
-  //   );
-  //   console.log(protorunesAddress2);
-  //   expect(protorunesAddress2.balanceSheet[0].balance).equals(
-  //     amountLeftover,
-  //     "address 2 should now have the protorunes left over from the transfer",
-  //   );
-  // });
+    const protorunesAddress2 = await protorunesbyaddress(
+      program,
+      TEST_BTC_ADDRESS2,
+      TEST_PROTOCOL_TAG,
+    );
+    console.log(protorunesAddress2);
+    expect(protorunesAddress2.balanceSheet[0].balance).equals(
+      amountLeftover,
+      "address 2 should now have the protorunes left over from the transfer",
+    );
+  });
 });
