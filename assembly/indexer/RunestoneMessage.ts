@@ -41,6 +41,7 @@ import {
   MINIMUM_NAME,
   TWENTY_SIX,
   RESERVED_NAME,
+  MAX_BYTES_LEB128_INT,
 } from "./constants";
 import { PROTOCOLS_TO_INDEX, PROTORUNE_TABLE } from "./tables/protorune";
 import { BalanceSheet } from "./BalanceSheet";
@@ -111,16 +112,17 @@ export class RunestoneMessage {
     while (input.len > 0) {
       const fieldKeyHeap = u128.from(0);
       const size = readULEB128ToU128(input, fieldKeyHeap);
-      if (size === usize.MAX_VALUE) return changetype<RunestoneMessage>(0);
+      if (size > MAX_BYTES_LEB128_INT) return changetype<RunestoneMessage>(0);
       input.shrinkFront(size);
       const fieldKey = fieldKeyHeap.lo;
+      if (fieldKey > 22 && fieldKey % 2 == 0) return changetype<RunestoneMessage>(0); // cenotaph
       if (fieldKey === 0) {
         while (input.len > 0) {
           const edict = new StaticArray<u128>(4);
           for (let i = 0; i < 4; i++) {
             const edictInt = u128.from(0);
             const size = readULEB128ToU128(input, edictInt);
-            if (usize.MAX_VALUE === size)
+            if (size > MAX_BYTES_LEB128_INT)
               return changetype<RunestoneMessage>(0);
             input.shrinkFront(size);
             edict[i] = edictInt;
@@ -130,7 +132,7 @@ export class RunestoneMessage {
       } else {
         const value = u128.from(0);
         const size = readULEB128ToU128(input, value);
-        if (usize.MAX_VALUE === size) return changetype<RunestoneMessage>(0);
+        if (size > MAX_BYTES_LEB128_INT) return changetype<RunestoneMessage>(0);
         input.shrinkFront(size);
         let field: Array<u128> = changetype<Array<u128>>(0);
         if (!fields.has(fieldKey)) {
