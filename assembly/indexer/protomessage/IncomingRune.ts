@@ -8,9 +8,11 @@ import { fromArrayBuffer, toArrayBuffer } from "../../utils";
 export class IncomingRune {
   runeId: RuneId;
   amount: u128;
+  depositAmount: u128;
   initialAmount: u128;
   pointer_index: i32 = -1;
   refund_pointer_index: i32 = -1;
+  outpoint_index: i32 = -1;
   runtime: AtomicTransaction = new AtomicTransaction();
   context: MessageContext = changetype<MessageContext>(0);
   table: PROTORUNE_TABLE;
@@ -24,11 +26,15 @@ export class IncomingRune {
     this.runeId = runeId;
     this.initialAmount = amount;
     this.amount = new u128(amount.lo, amount.hi);
+    this.depositAmount = new u128(0, 0);
     this.table = table;
   }
 
   refundAll(): bool {
-    return this.refund(this.initialAmount - this.amount);
+    return (
+      this.refund(this.initialAmount - this.amount) &&
+      this.refundDeposit(this.depositAmount)
+    );
   }
   refund(value: u128): bool {
     const refundPtr = this.table.OUTPOINT_TO_RUNES.select(
@@ -51,6 +57,29 @@ export class IncomingRune {
     let toSet: ArrayBuffer;
     toSet = refundPtr.selectIndex(this.refund_pointer_index).unwrap();
     this.amount += value;
+    this.context.runtime.set(toSet, toArrayBuffer(value));
+    return true;
+  }
+  refundDeposit(value: u128): bool {
+    const refundPtr = this.table.OUTPOINT_TO_RUNES.select(
+      this.context.refund_pointer.toArrayBuffer(),
+    ).keyword("/balances");
+    const ptr = this.table.RUNTIME_BALANCE;
+    const currentValue = this.context.runtime.has(ptr.unwrap())
+      ? fromArrayBuffer(this.context.runtime.get(ptr.unwrap()))
+      : u128.Zero;
+    if (value > currentValue || currentValue + value > this.initialAmount)
+      return false;
+    const newValue: u128 = currentValue - value;
+    if (newValue > u128.Zero) {
+      this.context.runtime.set(ptr.unwrap(), toArrayBuffer(newValue));
+    } else {
+      this.context.runtime.set(ptr.unwrap(), new ArrayBuffer(0));
+    }
+    let toSet: ArrayBuffer;
+    toSet = refundPtr.selectIndex(this.refund_pointer_index).unwrap();
+    this.amount += value;
+    this.depositAmount -= value;
     this.context.runtime.set(toSet, toArrayBuffer(value));
     return true;
   }
@@ -85,6 +114,32 @@ export class IncomingRune {
   forwardAll(): void {
     this.forward(this.amount);
   }
-  deposit(value: u128): void {}
-  depositAll(): void {}
+  deposit(value: u128): void {
+    const refundPtr = this.table.OUTPOINT_TO_RUNES.select(
+      this.context.refund_pointer.toArrayBuffer(),
+    ).keyword("/balances");
+    const ptr = this.table.OUTPOINT_TO_RUNES.select(
+      this.context.outpoint.toArrayBuffer(),
+    ).keyword("/balances");
+    if (this.refund_pointer_index == -1) return false;
+    const index = refundPtr.selectIndex(this.refund_pointer_index).unwrap();
+    const currentValue = fromArrayBuffer(this.context.runtime.get(index));
+    if (value > this.amount || value > currentValue) return false;
+    const newValue: u128 = currentValue - value;
+    if (newValue > u128.Zero) {
+      this.context.runtime.set(index, toArrayBuffer(newValue));
+    } else {
+      this.context.runtime.set(index, new ArrayBuffer(0));
+    }
+    let toSet = this.context.table.RUNTIME_BALANCE;
+    const balance = this.context.runtime.has(toSet.unwrap())
+      ? fromArrayBuffer(this.context.runtime.get(toSet.unwrap()))
+      : fromArrayBuffer(toSet.get());
+    this.context.runtime.set(toSet.unwrap(), toArrayBuffer(balance + value));
+    this.amount = this.amount - value;
+    this.depositAmount += value;
+  }
+  depositAll(): void {
+    this.deposit(this.amount);
+  }
 }

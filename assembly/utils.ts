@@ -11,6 +11,11 @@ export function min<T>(a: T, b: T): T {
   return a;
 }
 
+export function max<T>(a: T, b: T): T {
+  if (a > b) return a;
+  return b;
+}
+
 export function padLeft(v: string, n: i32): string {
   let result = "";
   for (let i: i32 = 0; i < n - v.length; i++) {
