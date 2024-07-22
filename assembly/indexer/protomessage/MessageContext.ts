@@ -54,6 +54,8 @@ export class MessageContext {
     const sheet = BalanceSheet.load(
       table.OUTPOINT_TO_RUNES.select(outpoint.toArrayBuffer()),
     );
+    console.log(outpoint.index.toString());
+    console.log(sheet.inspect());
     this.baseSheet = new BalanceSheet();
     this.sheets.set(index, sheet);
     this.sheets.set(

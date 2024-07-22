@@ -155,23 +155,27 @@ export class ProtoStone {
 
   static burn({
     protocolTag,
+    edicts,
     ...burn
   }: {
     protocolTag: bigint;
     pointer: number;
+    edicts?: Edict[];
   }): ProtoStone {
-    return new ProtoStone({ burn, protocolTag });
+    return new ProtoStone({ burn, protocolTag, edicts });
   }
 
   static message({
     protocolTag,
+    edicts,
     ...message
   }: {
     calldata: Buffer;
     protocolTag: bigint;
     pointer: number;
     refundPointer: number;
+    edicts?: Edict[];
   }): ProtoStone {
-    return new ProtoStone({ message, protocolTag });
+    return new ProtoStone({ message, protocolTag, edicts });
   }
 }

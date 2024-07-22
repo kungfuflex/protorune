@@ -384,6 +384,9 @@ export class RunestoneMessage {
     for (let x = 0; x < allOutputs.length; x++) {
       const output = allOutputs[x];
       const sheet = balancesByOutput.get(output);
+      console.log("logging burn");
+      console.log(output.toString());
+      console.log(sheet.inspect());
       sheet.save(
         OUTPOINT_TO_RUNES.select(OutPoint.from(txid, output).toArrayBuffer()),
         isCenotaph,
