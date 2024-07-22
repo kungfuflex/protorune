@@ -389,15 +389,15 @@ export class RunestoneMessage {
     for (let x = 0; x < allOutputs.length; x++) {
       const output = allOutputs[x];
       const sheet = balancesByOutput.get(output);
-      console.log("logging burn");
-      console.log(txindex.toString());
-      console.log(sheet.inspect());
       sheet.save(
         OUTPOINT_TO_RUNES.select(OutPoint.from(txid, output).toArrayBuffer()),
         isCenotaph,
       );
       // save protoburns to index
       if (this.protoBurns.has(output) && !isCenotaph) {
+        console.log("logging burn at output " + output.toString());
+        console.log(txindex.toString());
+        console.log(sheet.inspect());
         const ary = this.protoBurns.get(output);
         for (let i = 0; i < ary.length; i++) {
           // TODO: handle multiple edicts to output 0

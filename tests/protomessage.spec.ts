@@ -70,7 +70,8 @@ describe("protomessage", () => {
       block: 840000n,
       tx: 1,
     };
-    const amount = premineAmount / 2n;
+    const amount = premineAmount / 3n;
+    const refundAmount = premineAmount - amount;
     const outputIndexToReceiveProtorunes = 2; // 0 is the runestone, 1 is protoburn, 2 is ADDRESS2
     const output = {
       address: TEST_BTC_ADDRESS2,
@@ -113,21 +114,24 @@ describe("protomessage", () => {
         }),
       ],
       block,
-      /*runeTransferPointer=*/ 3, //remaining runes go to the protoburn
+      /*runeTransferPointer=*/ 1, //remaining runes go to address 2
     );
     program.setBlock(block.toHex());
     await program.run("_start");
+
+    // CHECK RUNE BALANCES
     const resultAddress1 = await runesbyaddress(program, TEST_BTC_ADDRESS1);
     expect(resultAddress1.balanceSheet.length).equals(
       0,
       "address 1 should not have any runes left",
     );
     const resultAddress2 = await runesbyaddress(program, TEST_BTC_ADDRESS2);
-    expect(resultAddress2.balanceSheet.length).equals(
-      0,
-      "address 2 should not have received any runes",
+    expect(resultAddress2.balanceSheet[0].balance).equals(
+      refundAmount,
+      "address 2 was not refunded runes",
     );
-    // since no calldata was specified, the protomessage should send all protorunes to refundpointer
+
+    // CHECK PROTORUNE BALANCES
     const protorunesAddress2 = await protorunesbyaddress(
       program,
       TEST_BTC_ADDRESS2,
@@ -200,37 +204,36 @@ describe("protomessage", () => {
     // ================================
     // TODO: to here
     // ================================
-    // output 0 is runestone, output 1 is protoburn, output 2 is protomessage
-    // this method transfers all remaining runes to the protoburn
-    const protorunesOutputIdx = 2;
-    // block = constructProtostoneTx(
-    //   [input],
-    //   [output, refundOutput],
-    //   /*edicts=*/ [
-    //     {
-    //       id: runeId,
-    //       amount: amount,
-    //       output: 0,
-    //     },
-    //   ],
-    //   /*protostones=*/ [
-    //     ProtoStone.burn({
-    //       protocolTag: TEST_PROTOCOL_TAG,
-    //       pointer: 1,
-    //     }),
-    //   ],
-    //   block,
-    //   2, //remaining runes go to the protoburn
-    // );
-    const pointer = 1;
-    const refundPointer = 2;
-    // const input2 = {
-    //   inputTxHash: block.transactions?.at(2)?.getHash(), // 0 is coinbase, 1 is the mint
-    //   inputTxOutputIndex: 1, // index of output in the input tx that has the runes. In this case it is the default pointer of the mint
-    // };
-    console.log(block.transactions);
-    block = constructProtostoneTx(
+
+    // Constructing tx 2
+    // output 0: runestone with protoburns
+    // output 1-2: output, and refundOutput
+    // This transaction does a protoburn and transfers all protorunes to output 2
+    const outputWithProtorunesBeforeProtomessage = 1;
+    block = constructProtoburnTransaction(
       [input],
+      [
+        {
+          id: runeId,
+          amount: amount,
+          output: 0, // output 0 is the runestone. first edict corresponds to first protoburn
+        },
+      ],
+      /*outputIndexToReceiveProtorunes=*/ outputWithProtorunesBeforeProtomessage, //this goes to the output
+      [output, refundOutput], // 0 is script, 1 is address 2 output, 2 is address 1 output
+      TEST_PROTOCOL_TAG,
+      block,
+      /*runeTransferPointer=*/ 0,
+    );
+
+    // constructing tx 3: protomessage
+    block = constructProtostoneTx(
+      [
+        {
+          inputTxHash: block.transactions?.at(2)?.getHash(),
+          inputTxOutputIndex: outputWithProtorunesBeforeProtomessage,
+        },
+      ],
       [output, refundOutput],
       [],
       [
@@ -251,7 +254,7 @@ describe("protomessage", () => {
       block,
       2,
     );
-    console.log("txs: ", block.transactions?.length);
+
     program.setBlock(block.toHex());
     await program.run("_start");
     const resultAddress1 = await runesbyaddress(program, TEST_BTC_ADDRESS1);
