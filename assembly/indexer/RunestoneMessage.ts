@@ -52,6 +52,7 @@ import { ProtoBurn } from "./ProtoBurn";
 import { ProtoStone } from "./ProtoStone";
 import { Index } from "./Indexer";
 import { ProtoruneMessage } from "./ProtoruneMessage";
+import { ProtoMessage } from "./protomessage";
 
 export class RunestoneMessage {
   public fields: Map<u64, Array<u128>>;
@@ -318,6 +319,10 @@ export class RunestoneMessage {
     this.etch(<u64>height, <u32>txindex, balanceSheet, tx);
 
     const messages = new Array<ProtoruneMessage>();
+    const protomessages: Map<string, Array<ProtoMessage>> = new Map<
+      string,
+      Array<ProtoMessage>
+    >();
     // process all protostones here
     if (this.fields.has(Field.PROTORUNE)) {
       const protostones = ProtoStone.parseFromFieldData(
@@ -342,26 +347,21 @@ export class RunestoneMessage {
           if (protostone.isMessage()) {
             console.log("FOUND message");
             const str = protostone.protocol_id.toString();
-            let ary: Array<ProtoStone> = new Array<ProtoStone>();
-            console.log("about to check");
-            if (tx.protostones.has(str)) {
-              ary = tx.protostones.get(str);
+            let ary: Array<ProtoMessage> = new Array<ProtoMessage>();
+            if (protomessages.has(str)) {
+              ary = protomessages.get(str);
             }
-            console.log("after to check");
-            ary.push(protostone);
-            console.log("ary push");
-            tx.protostones.set(str, ary);
-            console.log("after ");
+            ary.push(ProtoMessage.from(protostone, tx.runestoneIndex));
+            protomessages.set(str, ary);
           }
-          console.log(
-            "got protostone with length " + protostone.edicts.length.toString(),
-          );
           if (protostone.edicts.length > 0) {
             messages.push(ProtoruneMessage.fromProtoStone(protostone));
           }
         }
       }
     }
+
+    tx.protomessages = protomessages;
 
     const unallocatedTo = this.fields.has(Field.POINTER)
       ? fieldTo<u32>(this.fields.get(Field.POINTER))
@@ -375,10 +375,12 @@ export class RunestoneMessage {
     }
     const allOutputs = balancesByOutput.keys();
 
+    // process protostone edicts
     for (let m = 0; m < messages.length; m++) {
       messages[m].process(tx, txid, height, m);
     }
 
+    // process protoburns
     for (let x = 0; x < allOutputs.length; x++) {
       const output = allOutputs[x];
       const sheet = balancesByOutput.get(output);

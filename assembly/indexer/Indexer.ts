@@ -113,33 +113,22 @@ export class Index {
     height: u64,
     tx: RunesTransaction,
     txid: ArrayBuffer,
-    i: u32,
+    txIdx: u32,
     p: string,
   ): void {
-    const protoMessages: Map<string, ProtoMessage> = new Map<
-      string,
-      ProtoMessage
-    >();
-    // parse protostones
-    const protostoneKeys = tx.protostones.keys();
-    console.log("GOT num protostone keys " + protostoneKeys.length.toString());
-    for (let m = 0; m < protostoneKeys.length; m++) {
-      if (protostoneKeys[m] != p) continue;
-      const protostones = tx.protostones.get(p);
-      for (let s = 0; s < protostones.length; s++) {
-        const protostone = protostones[s];
-        protoMessages.set(
-          protostoneKeys[m],
-          ProtoMessage.from(protostone, tx.runestoneIndex),
-        );
-      }
-    }
+    const protoMessages: Map<string, ProtoMessage[]> = tx.protomessages;
+    console.log(
+      "GOT num protomessages keys " + protoMessages.keys().length.toString(),
+    );
 
     // process protomessage
     const protoMessageTypes = protoMessages.keys();
     for (let m = 0; m < protoMessageTypes.length; m++) {
-      const message = protoMessages.get(protoMessageTypes[m]);
-      message.handle<T>(tx, block, height, i);
+      const messages = protoMessages.get(protoMessageTypes[m]);
+      for (let msgIdx = 0; msgIdx < messages.length; msgIdx++) {
+        const message = messages[msgIdx];
+        message.handle<T>(tx, block, height, txIdx);
+      }
     }
   }
   static initializeSubprotocols(): void {
@@ -155,8 +144,8 @@ export class Index {
     HEIGHT_TO_BLOCKHASH.selectValue<u32>(height).set(block.blockhash());
     BLOCKHASH_TO_HEIGHT.select(block.blockhash()).setValue<u32>(height);
     block.saveTransactions(height);
-    for (let i: i32 = 0; i < block.transactions.length; i++) {
-      const tx = block.getTransaction(i);
+    for (let txIdx: i32 = 0; txIdx < block.transactions.length; txIdx++) {
+      const tx = block.getTransaction(txIdx);
       const txid = tx.txid();
       tx.processRunestones();
       Index.indexOutpoints(tx, txid, height);
@@ -165,7 +154,7 @@ export class Index {
         height,
         tx,
         txid,
-        i,
+        txIdx,
         outputIndex,
         u128.Zero,
       );
@@ -174,7 +163,7 @@ export class Index {
         height,
         tx,
         txid,
-        i,
+        txIdx,
         MessageContext.protocol_tag().toString(),
       );
     }
