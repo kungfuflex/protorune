@@ -5,6 +5,8 @@ import { BalanceSheet } from "../BalanceSheet";
 import { ProtoStone } from "../ProtoStone";
 import { Field } from "../fields/ProtoruneField";
 import { fieldTo, fieldToArrayBuffer } from "../../utils";
+import { encodeHexFromBuffer } from "metashrew-as/assembly/utils/hex";
+import { console } from "metashrew-as/assembly/utils/logging";
 
 export class ProtoMessage {
   outpoint: u32;
@@ -21,6 +23,12 @@ export class ProtoMessage {
     this.pointer = pointer;
     this.refund_pointer = refund_pointer;
     this.calldata = calldata;
+    Uint8Array.wrap(calldata).map((d, i) => {
+      const ar = new Uint8Array(1);
+      ar[0] = d;
+      console.log(encodeHexFromBuffer(ar.buffer));
+      return d;
+    });
   }
   handle<T extends MessageContext>(
     tx: RunesTransaction,

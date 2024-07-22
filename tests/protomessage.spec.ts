@@ -226,6 +226,8 @@ describe("protomessage", () => {
       /*runeTransferPointer=*/ 0,
     );
 
+    const calldata = Buffer.from("111111111111111");
+
     // constructing tx 3: protomessage
     block = constructProtostoneTx(
       [
@@ -241,10 +243,10 @@ describe("protomessage", () => {
           protocolTag: TEST_PROTOCOL_TAG,
           pointer: 1,
           refundPointer: 2,
-          calldata: Buffer.from("1111"),
+          calldata,
           edicts: [
             {
-              amount: u128(amount),
+              amount: u128(premineAmount),
               id: new RuneId(u64(runeId.block), u32(runeId.tx)),
               output: u32(0),
             },
@@ -254,7 +256,7 @@ describe("protomessage", () => {
       block,
       2,
     );
-
+    console.log(calldata, ": calldata");
     program.setBlock(block.toHex());
     await program.run("_start");
     const resultAddress1 = await runesbyaddress(program, TEST_BTC_ADDRESS1);
