@@ -52,6 +52,51 @@ export const constructProtoburnTransaction = (
   block: bitcoinjs.Block,
   runeTransferPointer: number,
 ): bitcoinjs.Block => {
+  const protoburn = ProtoStone.burn({
+    protocolTag: protocolTag,
+    pointer: outputIndexToReceiveProtorunes,
+  });
+  return constructProtostoneTx(inputs, outputs, edicts, [protoburn], block, runeTransferPointer)
+};
+
+
+/**
+ * Outputs
+ *  - [0]: runestone with protostones inside
+ *  - [1-n): outputs (regular p2pkh) defined by outputs
+ *  - (n, m): these are pointers that don't actually exist, but are used to target the specific protostone by edicts
+ *
+ *
+ * @param inputs
+ * @param edicts
+ * @param outputIndexToReceiveProtorunes which output receives protorunes
+ * @param outputs p2pkh outputs
+ * @param protocolTag
+ * @param block
+ * @param runeTransferPointer which ouput receives leftover runes
+ * @returns
+ */
+export const constructProtostoneTx = (
+  inputs: {
+    inputTxHash: Buffer | undefined;
+    inputTxOutputIndex: number;
+  }[],
+  outputs: {
+    address: string;
+    btcAmount: number;
+  }[],
+  edicts?: {
+    id: {
+      block: bigint;
+      tx: number;
+    };
+    amount: bigint;
+    output: number;
+  }[],
+  protostones?: ProtoStone[],
+  block?: bitcoinjs.Block,
+  runeTransferPointer?: number,
+): bitcoinjs.Block => {
   if (block == undefined) {
     block = buildDefaultBlock();
     const coinbase = buildCoinbaseToAddress(TEST_BTC_ADDRESS1);
@@ -75,14 +120,10 @@ export const constructProtoburnTransaction = (
       value: output.btcAmount,
     };
   });
-  const protoburn = ProtoStone.burn({
-    protocolTag: protocolTag,
-    pointer: outputIndexToReceiveProtorunes,
-  });
   const runestone = encodeRunestoneProtostone({
     edicts: edicts,
     pointer: runeTransferPointer, // default output for leftover runes, default goes to the protoburn
-    protostones: [protoburn],
+    protostones: protostones,
   }).encodedRunestone;
 
   const transaction = buildTransaction(
