@@ -56,9 +56,15 @@ export const constructProtoburnTransaction = (
     protocolTag: protocolTag,
     pointer: outputIndexToReceiveProtorunes,
   });
-  return constructProtostoneTx(inputs, outputs, edicts, [protoburn], block, runeTransferPointer)
+  return constructProtostoneTx(
+    inputs,
+    outputs,
+    edicts,
+    [protoburn],
+    block,
+    runeTransferPointer,
+  );
 };
-
 
 /**
  * Outputs
@@ -103,6 +109,7 @@ export const constructProtostoneTx = (
     block.transactions?.push(coinbase);
   }
 
+  console.log(protostones);
   const blockInputs = inputs.map((input) => {
     return {
       hash: input.inputTxHash,

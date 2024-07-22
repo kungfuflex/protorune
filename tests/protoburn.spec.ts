@@ -18,7 +18,10 @@ import {
   buildCoinbaseToAddress,
   buildDefaultBlock,
 } from "metashrew-runes/lib/tests/utils/block-helpers";
-import { constructProtoburnTransaction, constructProtostoneTx } from "./utils/protoburn";
+import {
+  constructProtoburnTransaction,
+  constructProtostoneTx,
+} from "./utils/protoburn";
 import { protorunesbyaddress } from "./utils/view-helpers";
 import { DEBUG_WASM } from "./utils/general";
 import { uint128 } from "../src.ts/proto/protorune";
@@ -79,7 +82,6 @@ describe("protoburns", () => {
 
     // output 0: runestone with protoburns
     // output 1-2: output, and refundOutput
-    // output 3: virtual output -- output of the protoburn
     // This transaction does a protoburn and transfers all protorunes to output 2
     block = constructProtoburnTransaction(
       [input],
@@ -87,14 +89,14 @@ describe("protoburns", () => {
         {
           id: runeId,
           amount: amount,
-          output: 3, // output 3 is the "virtual" output corresponding to the first protoburn
+          output: 0, // output 0 is the runestone. first edict corresponds to first protoburn
         },
       ],
       /*outputIndexToReceiveProtorunes=*/ 2, //this goes to the refundOutput
-      [output, refundOutput], // 0 is script, 1 is address 2 output, 2 is address 1 output, 3 is virtual output for first protoburn
+      [output, refundOutput], // 0 is script, 1 is address 2 output, 2 is address 1 output
       TEST_PROTOCOL_TAG,
       block,
-      /*runeTransferPointer=*/ 3,
+      /*runeTransferPointer=*/ 0,
     );
 
     program.setBlock(block.toHex());
@@ -188,11 +190,11 @@ describe("protoburns", () => {
         {
           id: runeId,
           amount: amount,
-          output: 3, // output 3 is the "virtual" output corresponding to the first protoburn
+          output: 0,
         },
       ],
       outputIndexToReceiveProtorunes,
-      [output, refundOutput], // 0 is script, 1 is output 2, 2 is output 1, 3 is virtual protoburn
+      [output, refundOutput], // 0 is script, 1 is output 2, 2 is output 1
       TEST_PROTOCOL_TAG,
       block,
       /*runeTransferPointer=*/ 1,
@@ -279,14 +281,14 @@ describe("protoburns", () => {
         {
           id: runeId,
           amount: amount,
-          output: 1, // output 1 is ADDRESS2 
+          output: 1, // output 1 is ADDRESS2
         },
       ],
       outputIndexToReceiveProtorunes,
       [output, refundOutput],
       TEST_PROTOCOL_TAG,
       block,
-      /*runeTransferPointer=*/ 3,
+      /*runeTransferPointer=*/ 0,
     );
 
     program.setBlock(block.toHex());
@@ -358,7 +360,7 @@ describe("protoburns", () => {
       1,
       premineAmount2,
       "TEST•RUNE•GENESIS",
-      "T"
+      "T",
     );
     program.setBlock(block2.toHex());
 
@@ -393,7 +395,6 @@ describe("protoburns", () => {
 
     // output 0: runestone with protoburns
     // output 1-2: output, and refundOutput
-    // output 3: virtual output -- output of the protoburn
     // This transaction does a protoburn and transfers all protorunes to output 2
     block2 = constructProtoburnTransaction(
       [input1, input2],
@@ -401,19 +402,19 @@ describe("protoburns", () => {
         {
           id: runeId1,
           amount: amount,
-          output: 3, // output 3 is the "virtual" output corresponding to the first protoburn
+          output: 0,
         },
         {
           id: runeId2,
           amount: amount,
-          output: 3, // output 3 is the "virtual" output corresponding to the first protoburn
+          output: 0,
         },
       ],
       /*outputIndexToReceiveProtorunes=*/ 2, //this goes to the refundOutput
-      [output, refundOutput], // 0 is script, 1 is address 2 output, 2 is address 1 output, 3 is virtual output for first protoburn
+      [output, refundOutput], // 0 is script, 1 is address 2 output, 2 is address 1 output
       TEST_PROTOCOL_TAG,
       block2,
-      /*runeTransferPointer=*/ 3,
+      /*runeTransferPointer=*/ 0,
     );
 
     program.setBlock(block2.toHex());
@@ -504,7 +505,6 @@ describe("protoburns", () => {
 
     // output 0: runestone with protoburns
     // output 1-2: output, and refundOutput
-    // output 3: virtual output -- output of the protoburn
     // This transaction does a protoburn and transfers all protorunes to output 2
     block = constructProtoburnTransaction(
       [input],
@@ -512,14 +512,14 @@ describe("protoburns", () => {
         {
           id: runeId,
           amount: amount,
-          output: 3, // output 3 is the "virtual" output corresponding to the first protoburn
+          output: 0,
         },
       ],
       /*outputIndexToReceiveProtorunes=*/ 2, //this goes to the refundOutput
-      [output, refundOutput], // 0 is script, 1 is address 2 output, 2 is address 1 output, 3 is virtual output for first protoburn
+      [output, refundOutput], // 0 is script, 1 is address 2 output, 2 is address 1 output
       TEST_PROTOCOL_TAG,
       block,
-      /*runeTransferPointer=*/ 3,
+      /*runeTransferPointer=*/ 0,
     );
 
     const protostoneEdictTransfer = new ProtoStone({
@@ -528,10 +528,10 @@ describe("protoburns", () => {
         {
           id: new RuneId(<u64>840000n, <u32>1n),
           amount: <u128>amount,
-          output: <u32><unknown>1, // output 1, who will be address 2 now.
+          output: <u32>(<unknown>1), // output 1, who will be address 2 now.
         },
       ],
-    })
+    });
     const input2 = {
       inputTxHash: block.transactions?.at(2)?.getHash(), // 0 is coinbase, 1 is the mint, 2 is protoburn
       inputTxOutputIndex: 2, // index of output in the input tx that has the protorunes. In this case it is the default pointer of the protoburn
@@ -539,7 +539,7 @@ describe("protoburns", () => {
 
     block = constructProtostoneTx(
       [input2],
-      [output, refundOutput], // 0 is script, 1 is address 2 output, 2 is address 1 output, 3 is virtual output for first protoburn
+      [output, refundOutput], // 0 is script, 1 is address 2 output, 2 is address 1 output
       undefined, //no rune edicts
       [protostoneEdictTransfer],
       block,

@@ -48,8 +48,8 @@ export class ProtoStone {
       const ary = Uint8Array.from(message.calldata);
       const res: u128[] = [];
 
-      for (let i = 0; i < ary.byteLength; i += 8) {
-        const last = i + 8;
+      for (let i = 0; i < ary.byteLength; i += 16) {
+        const last = i + 16;
         res.push(
           u128(
             BigInt(
@@ -107,7 +107,6 @@ export class ProtoStone {
 
   encipher_payloads(): Buffer {
     let payloads: Buffer[] = [];
-
     if (this.burn) {
       payloads.push(
         Tag.encodeOptionInt(Tag.POINTER, this.burn.pointer.map(u128)),
@@ -116,7 +115,7 @@ export class ProtoStone {
         Tag.encodeOptionInt(Tag.BURN, Some<u128>(this.protocolTag)),
       );
     } else if (this.message) {
-      payloads.push(u128.encodeVarInt(this.protocolTag));
+      // payloads.push(u128.encodeVarInt(this.protocolTag));
       payloads.push(
         Tag.encodeOptionInt(Tag.POINTER, this.message.pointer.map(u128)),
       );
@@ -155,23 +154,27 @@ export class ProtoStone {
 
   static burn({
     protocolTag,
+    edicts,
     ...burn
   }: {
     protocolTag: bigint;
     pointer: number;
+    edicts?: Edict[];
   }): ProtoStone {
-    return new ProtoStone({ burn, protocolTag });
+    return new ProtoStone({ burn, protocolTag, edicts });
   }
 
   static message({
     protocolTag,
+    edicts,
     ...message
   }: {
     calldata: Buffer;
     protocolTag: bigint;
     pointer: number;
     refundPointer: number;
+    edicts?: Edict[];
   }): ProtoStone {
-    return new ProtoStone({ message, protocolTag });
+    return new ProtoStone({ message, protocolTag, edicts });
   }
 }

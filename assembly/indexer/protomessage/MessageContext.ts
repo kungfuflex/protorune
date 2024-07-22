@@ -6,7 +6,6 @@ import { BalanceSheet } from "../BalanceSheet";
 import { PROTORUNE_TABLE, PROTOCOLS_TO_INDEX } from "../tables/protorune";
 import { u128 } from "as-bignum/assembly";
 import { console } from "metashrew-as/assembly/utils/logging";
-import { encodeHexFromBuffer } from "metashrew-as/assembly/utils";
 
 export class MessageContext {
   runtime: AtomicTransaction = new AtomicTransaction();

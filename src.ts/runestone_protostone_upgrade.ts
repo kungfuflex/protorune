@@ -172,25 +172,26 @@ export class RunestoneProtostoneUpgrade {
     /* BEGIN CODE CHANGE */
     if (this.protostones.length) {
       // TODO: ORDERING?
+      let all_protostone_payloads: Buffer[] = [];
       this.protostones.forEach((protostone: ProtoStone) => {
         const protostone_payload = protostone.encipher_payloads();
-        const u128s: u128[] = [];
-        for (
-          let i = 0;
-          i < protostone_payload.length;
-          i += MAX_U128_BYTES_COMPAT_W_RUNES
-        ) {
-          const end = Math.min(
-            protostone_payload.length,
-            i + MAX_U128_BYTES_COMPAT_W_RUNES,
-          );
-          const seekbuffer = new SeekBuffer(
-            protostone_payload.subarray(i, end),
-          );
-          u128s.push(rawBytesToU128(seekbuffer));
-        }
-        payloads.push(encodeProtostone(u128s));
+        all_protostone_payloads.push(protostone_payload);
       });
+      const u128s: u128[] = [];
+      const packed_payloads = Buffer.concat(all_protostone_payloads);
+      for (
+        let i = 0;
+        i < packed_payloads.length;
+        i += MAX_U128_BYTES_COMPAT_W_RUNES
+      ) {
+        const end = Math.min(
+          packed_payloads.length,
+          i + MAX_U128_BYTES_COMPAT_W_RUNES,
+        );
+        const seekbuffer = new SeekBuffer(packed_payloads.subarray(i, end));
+        u128s.push(rawBytesToU128(seekbuffer));
+      }
+      payloads.push(encodeProtostone(u128s));
     }
     /* CODE CHANGE END */
 

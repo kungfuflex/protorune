@@ -135,6 +135,17 @@ export class BalanceSheet {
       }
     }
   }
+  saveIndex(i: u32, ptr: IndexPointer, isCenotaph: bool = false): void {
+    const runesPtr = ptr.keyword("/runes");
+    const balancesPtr = ptr.keyword("/balances");
+
+    if (this.balances[i] != u128.Zero && !isCenotaph) {
+      runesPtr.append(this.runes[i]);
+
+      const buf = changetype<Uint8Array>(this.balances[i].toBytes()).buffer;
+      balancesPtr.append(buf);
+    }
+  }
   static load(ptr: IndexPointer): BalanceSheet {
     const runesPtr = ptr.keyword("/runes");
     const balancesPtr = ptr.keyword("/balances");
