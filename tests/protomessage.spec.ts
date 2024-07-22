@@ -226,7 +226,7 @@ describe("protomessage", () => {
       /*runeTransferPointer=*/ 0,
     );
 
-    const calldata = Buffer.from("111111111111111");
+    const calldata = Buffer.from("testing 12345");
 
     // constructing tx 3: protomessage
     block = constructProtostoneTx(

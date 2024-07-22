@@ -48,8 +48,8 @@ export class ProtoStone {
       const ary = Uint8Array.from(message.calldata);
       const res: u128[] = [];
 
-      for (let i = 0; i < ary.byteLength; i += 8) {
-        const last = i + 8;
+      for (let i = 0; i < ary.byteLength; i += 16) {
+        const last = i + 16;
         res.push(
           u128(
             BigInt(
