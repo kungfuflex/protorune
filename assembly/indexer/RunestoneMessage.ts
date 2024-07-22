@@ -385,7 +385,7 @@ export class RunestoneMessage {
       const output = allOutputs[x];
       const sheet = balancesByOutput.get(output);
       console.log("logging burn");
-      console.log(output.toString());
+      console.log(txindex.toString());
       console.log(sheet.inspect());
       sheet.save(
         OUTPOINT_TO_RUNES.select(OutPoint.from(txid, output).toArrayBuffer()),

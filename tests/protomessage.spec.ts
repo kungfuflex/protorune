@@ -147,7 +147,7 @@ describe("protomessage", () => {
       "address 1 should now have all the protorunes",
     );
   });
-  it("should index protomessage", async () => {
+  it("should index protomessage only", async () => {
     // ================================
     // TODO: Create a fixture from here
     // ================================

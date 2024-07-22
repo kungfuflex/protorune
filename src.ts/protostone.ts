@@ -107,7 +107,6 @@ export class ProtoStone {
 
   encipher_payloads(): Buffer {
     let payloads: Buffer[] = [];
-
     if (this.burn) {
       payloads.push(
         Tag.encodeOptionInt(Tag.POINTER, this.burn.pointer.map(u128)),
