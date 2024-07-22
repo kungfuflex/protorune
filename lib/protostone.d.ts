@@ -27,14 +27,16 @@ export declare class ProtoStone {
         edicts?: Edict[];
     });
     encipher_payloads(): Buffer;
-    static burn({ protocolTag, ...burn }: {
+    static burn({ protocolTag, edicts, ...burn }: {
         protocolTag: bigint;
         pointer: number;
+        edicts?: Edict[];
     }): ProtoStone;
-    static message({ protocolTag, ...message }: {
+    static message({ protocolTag, edicts, ...message }: {
         calldata: Buffer;
         protocolTag: bigint;
         pointer: number;
         refundPointer: number;
+        edicts?: Edict[];
     }): ProtoStone;
 }
