@@ -104,7 +104,7 @@ describe("protomessage", () => {
       /*protostones=*/ [
         ProtoStone.burn({
           protocolTag: TEST_PROTOCOL_TAG,
-          pointer: 0,
+          pointer: 3, // first protomessage is at the outpoint after outpoints.length
         }),
         ProtoStone.message({
           calldata: Buffer.from("1111"),
@@ -118,7 +118,6 @@ describe("protomessage", () => {
     );
     program.setBlock(block.toHex());
     await program.run("_start");
-
     // CHECK RUNE BALANCES
     const resultAddress1 = await runesbyaddress(program, TEST_BTC_ADDRESS1);
     expect(resultAddress1.balanceSheet.length).equals(
@@ -248,7 +247,7 @@ describe("protomessage", () => {
             {
               amount: u128(premineAmount),
               id: new RuneId(u64(runeId.block), u32(runeId.tx)),
-              output: u32(0),
+              output: u32(3),
             },
           ],
         }),

@@ -53,11 +53,12 @@ import { ProtoStone } from "./ProtoStone";
 import { Index } from "./Indexer";
 import { ProtoruneMessage } from "./ProtoruneMessage";
 import { ProtoMessage } from "./protomessage";
+import { encodeHexFromBuffer } from "metashrew-as/assembly/utils/hex";
 
 export class RunestoneMessage {
   public fields: Map<u64, Array<u128>>;
   public edicts: Array<StaticArray<u128>>;
-  protoBurns: Map<u32, Array<ProtoBurn>>;
+  protoBurns: Array<ProtoBurn>;
   table: PROTORUNE_TABLE;
   constructor(
     fields: Map<u64, Array<u128>>,
@@ -66,7 +67,7 @@ export class RunestoneMessage {
   ) {
     this.fields = fields;
     this.edicts = edicts;
-    this.protoBurns = new Map<u32, Array<ProtoBurn>>();
+    this.protoBurns = new Array<ProtoBurn>();
     this.table = table;
   }
   inspect(): string {
@@ -342,12 +343,7 @@ export class RunestoneMessage {
               protostone.fields.get(ProtoruneField.BURN)[0],
               protostone.fields.get(ProtoruneField.POINTER)[0],
             ]);
-            let ary: Array<ProtoBurn> = new Array<ProtoBurn>();
-            if (this.protoBurns.has(tx.runestoneIndex)) {
-              ary = this.protoBurns.get(tx.runestoneIndex);
-            }
-            ary.push(protoburn);
-            this.protoBurns.set(tx.runestoneIndex, ary);
+            this.protoBurns.push(protoburn);
           }
           if (protostone.isMessage()) {
             console.log("FOUND message");
@@ -356,7 +352,9 @@ export class RunestoneMessage {
             if (protomessages.has(str)) {
               ary = protomessages.get(str);
             }
-            ary.push(ProtoMessage.from(protostone, tx.runestoneIndex));
+            ary.push(
+              ProtoMessage.from(protostone, tx.outs.length + ary.length),
+            );
             protomessages.set(str, ary);
           }
           if (protostone.edicts.length > 0) {
@@ -394,17 +392,38 @@ export class RunestoneMessage {
         isCenotaph,
       );
       // save protoburns to index
-      if (this.protoBurns.has(output) && !isCenotaph) {
+
+      if (output == tx.runestoneIndex && !isCenotaph) {
         console.log("logging burn at output " + output.toString());
-        console.log(txindex.toString());
         console.log(sheet.inspect());
-        const ary = this.protoBurns.get(output);
-        for (let i = 0; i < ary.length; i++) {
+        const burnBalances: Map<i32, Array<i32>> = new Map<i32, Array<i32>>();
+        const burnCount: Map<string, i32> = new Map<string, i32>();
+
+        //sort edicts by order of appearance: 1st edict per rune gets sent to the first protoburn
+        for (let i = 0; i < sheet.runes.length; i++) {
+          const rune = encodeHexFromBuffer(sheet.runes[i]);
+          let count: i32 = 0;
+          if (burnCount.has(rune)) {
+            count = burnCount.get(rune) + 1;
+            burnCount.set(rune, count);
+          } else {
+            burnCount.set(rune, count);
+          }
+          let ary: Array<i32> = new Array<i32>();
+          if (burnBalances.has(count)) {
+            ary = burnBalances.get(count);
+          }
+          ary.push(i);
+          burnBalances.set(count, ary);
+        }
+        for (let i = 0; i < this.protoBurns.length; i++) {
           // TODO: handle multiple edicts to output 0
-          const protoBurn = ary[i];
+
+          const protoBurn = this.protoBurns[i];
           protoBurn.process(
             sheet,
             OutPoint.from(txid, protoBurn.pointer).toArrayBuffer(),
+            burnBalances.has(i) ? burnBalances.get(i) : new Array<i32>(),
           );
         }
       }
