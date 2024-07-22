@@ -116,7 +116,7 @@ export class ProtoStone {
         Tag.encodeOptionInt(Tag.BURN, Some<u128>(this.protocolTag)),
       );
     } else if (this.message) {
-      payloads.push(u128.encodeVarInt(this.protocolTag));
+      // payloads.push(u128.encodeVarInt(this.protocolTag));
       payloads.push(
         Tag.encodeOptionInt(Tag.POINTER, this.message.pointer.map(u128)),
       );

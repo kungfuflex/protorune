@@ -115,7 +115,8 @@ export class RunestoneMessage {
       if (size > MAX_BYTES_LEB128_INT) return changetype<RunestoneMessage>(0);
       input.shrinkFront(size);
       const fieldKey = fieldKeyHeap.lo;
-      if (fieldKey > 22 && fieldKey % 2 == 0) return changetype<RunestoneMessage>(0); // cenotaph
+      if (fieldKey > 22 && fieldKey % 2 == 0)
+        return changetype<RunestoneMessage>(0); // cenotaph
       if (fieldKey === 0) {
         while (input.len > 0) {
           const edict = new StaticArray<u128>(4);
@@ -331,6 +332,7 @@ export class RunestoneMessage {
 
         if (PROTOCOLS_TO_INDEX.has(protostone.protocol_id)) {
           if (protostone.isBurn()) {
+            console.log("FOUND BURN");
             const protoburn = new ProtoBurn([
               protostone.fields.get(ProtoruneField.BURN)[0],
               protostone.fields.get(ProtoruneField.POINTER)[0],
@@ -338,14 +340,22 @@ export class RunestoneMessage {
             this.protoBurns.set(tx.outs.length + protostoneIdx, protoburn);
           }
           if (protostone.isMessage()) {
+            console.log("FOUND message");
             const str = protostone.protocol_id.toString();
             let ary: Array<ProtoStone> = new Array<ProtoStone>();
+            console.log("about to check");
             if (tx.protostones.has(str)) {
               ary = tx.protostones.get(str);
             }
+            console.log("after to check");
             ary.push(protostone);
+            console.log("ary push");
             tx.protostones.set(str, ary);
+            console.log("after ");
           }
+          console.log(
+            "got protostone with length " + protostone.edicts.length.toString(),
+          );
           if (protostone.edicts.length > 0) {
             messages.push(ProtoruneMessage.fromProtoStone(protostone));
           }

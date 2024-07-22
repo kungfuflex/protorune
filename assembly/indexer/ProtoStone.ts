@@ -101,6 +101,7 @@ export class ProtoStone {
   }
 
   static parse(input: Box): ProtoStone {
+    // console.log("Inside protostone.parse" + input.toHexString());
     let fields = new Map<u64, Array<u128>>();
     let edicts = new Array<StaticArray<u128>>(0);
     while (input.len > 0) {
@@ -109,6 +110,7 @@ export class ProtoStone {
       if (size === usize.MAX_VALUE) return changetype<ProtoStone>(0);
       input.shrinkFront(size);
       const fieldKey = fieldKeyHeap.lo;
+      // console.log("GOT FIELDKEY " + fieldKey.toString());
       if (fieldKey === 0) {
         while (input.len > 0) {
           const edict = new StaticArray<u128>(4);

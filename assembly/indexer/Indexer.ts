@@ -122,6 +122,7 @@ export class Index {
     >();
     // parse protostones
     const protostoneKeys = tx.protostones.keys();
+    console.log("GOT num protostone keys " + protostoneKeys.length.toString());
     for (let m = 0; m < protostoneKeys.length; m++) {
       if (protostoneKeys[m] != p) continue;
       const protostones = tx.protostones.get(p);
