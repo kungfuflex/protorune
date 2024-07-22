@@ -20,8 +20,8 @@ export async function encodeProtoburn(
   // all unused runes will be refunded to pointer 1 and retained by the runes protocol
   // the protostone will burn all runes onto the pointer 1 UTXO
   const runestone = encodeRunestoneProtostone({
-    edicts: runes.map((r) => ({ ...r, output: 2 })),
-    pointer: 1,
+    edicts: runes.map((r) => ({ ...r, output: 0 })),
+    pointer: 2,
     protostones: [ProtoStone.burn({ protocolTag, pointer: 1 })],
   }).encodedRunestone;
 
@@ -29,11 +29,6 @@ export async function encodeProtoburn(
     {
       script: runestone,
       value: 0,
-    },
-    {
-      address,
-      //@TODO: change so that it correctly gets the value to be sent
-      value: 1,
     },
   ];
 
