@@ -4,6 +4,10 @@ import { rpcCall } from "./sandshrew";
 import { inspect } from "util";
 const DEFAULT_AMOUNT = 2_000;
 
+export async function decodeRawTx(tx: string): Promise<any> {
+  return await rpcCall("btc_decoderawtransaction", [tx]);
+}
+
 export async function getFeeEstimates(): Promise<any> {
   return await rpcCall("esplora_fee-estimates", []);
 }
@@ -62,7 +66,7 @@ export async function buildRunesTransaction(
   tx.finalizeAllInputs();
   //locktime - 6 blocks
 
-  let vsize = await getVSize(tx.extractTransaction().toHex());
+  let vsize = await getVSize(tx.extractTransaction(true).toHex());
   const feeRate = (await getFeeEstimates())["1"];
 
   let fee = vsize * feeRate;
@@ -86,7 +90,7 @@ export async function buildRunesTransaction(
     tx.finalizeAllInputs();
     currentIndex++;
     currentTotal += v.value;
-    vsize = await getVSize(tx.extractTransaction().toHex());
+    vsize = await getVSize(tx.extractTransaction(true).toHex());
     fee = vsize * feeRate;
   }
   tx = baseTx.clone();

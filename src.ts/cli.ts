@@ -3,6 +3,8 @@ import { encodeProtoburn } from "./protoburn";
 import { DEFAULT as DEFAULT_KEYPAIR, node, tweakPubkey } from "./utils/wallet";
 import * as bitcoin from "bitcoinjs-lib";
 import * as ecc from "tiny-secp256k1";
+import { decodeRawTx } from "./utils/transaction";
+import { inspect } from "node:util";
 
 bitcoin.initEccLib(ecc);
 
@@ -12,6 +14,7 @@ function getAddress(
 ): { address?: string; output?: any } {
   return bitcoin.payments.p2tr({
     internalPubkey: tweakPubkey(node.publicKey),
+    network,
   });
 }
 
@@ -61,7 +64,9 @@ yargs
         address!,
         output!,
       );
-      console.log(protoburn.extractTransaction().toHex());
+      const burnTx = protoburn.extractTransaction().toHex();
+      console.log(burnTx);
+      console.log(inspect(await decodeRawTx(burnTx), false, 5, true));
     },
   )
   .help().argv;
