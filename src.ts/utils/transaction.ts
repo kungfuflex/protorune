@@ -24,7 +24,13 @@ export async function getInputsFor(address: string, amount: number) {
     (a, d) => {
       if (a.total < amount) {
         return {
-          result: [...a.result, d],
+          result: [
+            ...a.result,
+            {
+              ...d,
+              txid: Buffer.from(d.txid, "hex").reverse().toString("hex"),
+            },
+          ],
           total: (a.total += d.value),
         };
       }
@@ -116,7 +122,7 @@ export async function buildRunesTransaction(
         address,
         network: bitcoin.networks.bitcoin,
       }).output || Buffer.from(""),
-    value: currentTotal - Math.ceil(fee) - (546*2),
+    value: currentTotal - Math.ceil(fee) - 546 * 2,
   });
   console.log("total inputs: ", currentTotal, ", fee: ", fee);
   tx.signAllInputs(pair);
