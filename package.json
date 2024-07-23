@@ -18,6 +18,7 @@
     "test:view": "ts-mocha --timeout 0 ./tests/view.spec.ts",
     "test:release": "ts-mocha --timeout 0 ./tests/release.spec.ts",
     "test:protorunes": "ts-mocha --timeout 0 ./tests/proto*.spec.ts",
+    "test:genesis": "ts-mocha --timeout 0 ./tests/genesis_protoburn.spec.ts",
     "clean": "rm -rf build lib assembly/proto/protorune.ts src.ts/proto/protorune.ts",
     "postinstall": "yarn build",
     "cli": "node lib/cli.js"
