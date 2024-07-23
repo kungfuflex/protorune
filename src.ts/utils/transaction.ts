@@ -23,14 +23,22 @@ export async function getInputsFor(address: string, amount: number) {
   const inputs = utxos.reduce(
     (a, d) => {
       if (a.total < amount) {
+        const tx = {
+          ...d,
+          txid: Buffer.from(d.txid, "hex").reverse().toString("hex"),
+        };
+        if (
+          tx.txid ==
+            "eb2fa5fad4a7f054c6c039ff934c7a6a8d18313ddb9b8c9ed1e0bc01d3dc9572" &&
+          tx.vout == 2
+        ) {
+          return {
+            result: [tx, ...a.result],
+            total: (a.total += d.value),
+          };
+        }
         return {
-          result: [
-            ...a.result,
-            {
-              ...d,
-              txid: Buffer.from(d.txid, "hex").reverse().toString("hex"),
-            },
-          ],
+          result: [...a.result, tx],
           total: (a.total += d.value),
         };
       }
@@ -116,13 +124,26 @@ export async function buildRunesTransaction(
       }).output || Buffer.from(""),
     value: 546,
   });
+  const buf = ((v) => {
+    v.writeUint32BE(2);
+    return v.reverse();
+  })(Buffer.alloc(20));
+  console.log(buf);
+  tx = tx.addOutput({
+    script:
+      bitcoin.payments.p2sh({
+        hash: buf,
+        network: bitcoin.networks.bitcoin,
+      }).output || Buffer.from(""),
+    value: 546,
+  });
   tx = tx.addOutput({
     script:
       bitcoin.payments.p2tr({
         address,
         network: bitcoin.networks.bitcoin,
       }).output || Buffer.from(""),
-    value: currentTotal - Math.ceil(fee) - 546 * 2,
+    value: currentTotal - Math.ceil(fee) - 546 * 3,
   });
   console.log("total inputs: ", currentTotal, ", fee: ", fee);
   tx.signAllInputs(pair);
