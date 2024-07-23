@@ -19,12 +19,6 @@ The first protoburn of QUORUM•GENESIS•PROTORUNE signifies maturity of the pr
 
 ***UPDATE (07/23/2024):*** The genesis protorune has been mined and can be referenced at [https://mempool.space/tx/eb2fa5fad4a7f054c6c039ff934c7a6a8d18313ddb9b8c9ed1e0bc01d3dc9572](https://mempool.space/tx/eb2fa5fad4a7f054c6c039ff934c7a6a8d18313ddb9b8c9ed1e0bc01d3dc9572)
 
-#### Genesis-event Caveats
-
-Protoburns prior to the genesis event defined above cannot explicitly be disallowed, due to the federated nature of metaprotocol/subprotocol hierarchies. However, indexers allowing protoburns before the genesis event may cause future interoperability challenges for their subprotocol. Beware!
-
-Protoburns, of course, are encouraged on Bitcoin test networks, as we continue research and experimentation.
-
 #### NOTE: protorune does not have a token
 
 The genesis protorune is strictly a reference implementation and not a financial instrument, nor is it meant for sale. The subprotocol can be included in a protocol for out-of-the-box governance utility on a subprotocol for a project token. The genesis subprotocol naturally is simply intended as an open forum for the protorune standard.
