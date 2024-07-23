@@ -175,7 +175,6 @@ export class RunestoneProtostoneUpgrade {
       let all_protostone_payloads: Buffer[] = [];
       this.protostones.forEach((protostone: ProtoStone) => {
         const protostone_payload = protostone.encipher_payloads();
-        console.log(protostone_payload);
         all_protostone_payloads.push(protostone_payload);
       });
       const u128s: u128[] = [];

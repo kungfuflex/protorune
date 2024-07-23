@@ -3,6 +3,7 @@ import { Tag } from "./tag";
 import { Some, Option } from "@magiceden-oss/runestone-lib/dist/src/monads";
 import { RuneId } from "@magiceden-oss/runestone-lib/dist/src/runeid";
 import { Edict } from "@magiceden-oss/runestone-lib/dist/src/edict";
+import leb128 from "leb128";
 
 export type ProtoBurn = {
   pointer: Option<u32>;
@@ -13,6 +14,26 @@ export type ProtoMessage = {
   pointer: Option<u32>;
   refundPointer: Option<u32>;
 };
+
+function readULEB128(v) {
+  const decoded = leb128.unsigned.decode(v);
+  const { length } = leb128.unsigned.encode(Buffer.from(((s) => s.length % 2 === 1 ? '0' + s : s)(BigInt(decoded).toString(16)), 'hex'));
+  return {
+    value: decoded,
+    tail: ((b) => b.length === 0 ? null : b)(v.slice(length))
+  };
+}
+
+function decodeList(v) {
+  let tail = v;
+  const result = [];
+  while (tail) {
+    const decoded = readULEB128(tail);
+    tail = decoded.tail;
+    result.push(BigInt(decoded.value));
+  }
+  return result;
+}
 
 export class ProtoStone {
   burn?: ProtoBurn;
@@ -144,11 +165,10 @@ export class ProtoStone {
     }
 
     // pushing the protocol_id and len first as per the spec
-    const length_payload = Buffer.concat(payloads).length;
-    payloads.unshift(
-      u128.encodeVarInt(this.protocolTag),
-      u128.encodeVarInt(u128(length_payload)),
-    );
+    const length_payload = payloads.reduce((r, v) => r + decodeList(v).length, 0);
+    payloads.unshift(u128.encodeVarInt(u128(length_payload))),
+    payloads.unshift(payloads.reduce((r, v) => r || decodeList(v)[0] === 83n, false) ? u128.encodeVarInt(u128(13)) : u128.encodeVarInt(this.protocolTag));
+    console.log(payloads);
     return Buffer.concat(payloads);
   }
 
