@@ -26,7 +26,7 @@ export declare class ProtoStone {
         };
         edicts?: Edict[];
     });
-    encipher_payloads(): Buffer;
+    encipher_payloads(): Buffer[];
     static burn({ protocolTag, edicts, ...burn }: {
         protocolTag: bigint;
         pointer: number;

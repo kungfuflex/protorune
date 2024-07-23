@@ -100,7 +100,7 @@ export async function buildRunesTransaction(
         address,
         network: bitcoin.networks.bitcoin,
       }).output || Buffer.from(""),
-    value: 330,
+    value: 546,
   });
   tx = tx.addOutput({
     script:
@@ -108,7 +108,15 @@ export async function buildRunesTransaction(
         address,
         network: bitcoin.networks.bitcoin,
       }).output || Buffer.from(""),
-    value: currentTotal - Math.ceil(fee) - 330,
+    value: 546,
+  });
+  tx = tx.addOutput({
+    script:
+      bitcoin.payments.p2tr({
+        address,
+        network: bitcoin.networks.bitcoin,
+      }).output || Buffer.from(""),
+    value: currentTotal - Math.ceil(fee) - (546*2),
   });
   console.log("total inputs: ", currentTotal, ", fee: ", fee);
   tx.signAllInputs(pair);

@@ -35,6 +35,8 @@ import { RuneEtchingSpec } from "@magiceden-oss/runestone-lib/dist/src/indexer";
 import { SpacedRune } from "@magiceden-oss/runestone-lib/dist/src/spacedrune";
 import { Terms } from "@magiceden-oss/runestone-lib/dist/src/terms";
 import { ProtoStone } from "./protostone";
+import leb128 from "leb128";
+import chunk from "lodash/chunk";
 
 export const MAX_SPACERS = 0b00000111_11111111_11111111_11111111;
 
@@ -174,10 +176,11 @@ export class RunestoneProtostoneUpgrade {
       // TODO: ORDERING?
       let all_protostone_payloads: Buffer[] = [];
       this.protostones.forEach((protostone: ProtoStone) => {
-        const protostone_payload = protostone.encipher_payloads();
-        all_protostone_payloads.push(protostone_payload);
+        protostone.encipher_payloads().forEach((v) => all_protostone_payloads.push(v));
       });
-      const u128s: u128[] = [];
+      const packed = all_protostone_payloads.reduce((r: Buffer, v: Buffer) => Buffer.from((Array.from(r) as any).concat(Array.from(leb128.unsigned.encode(v as any) as any) as any)), Buffer.from([]));
+      const u128s: u128[] = chunk(Array.from(packed), 15).map((v) => u128(BigInt('0x' + Buffer.from(v).toString('hex'))));
+      /*
       const packed_payloads = Buffer.concat(all_protostone_payloads);
       for (
         let i = 0;
@@ -191,6 +194,8 @@ export class RunestoneProtostoneUpgrade {
         const seekbuffer = new SeekBuffer(packed_payloads.subarray(i, end));
         u128s.push(rawBytesToU128(seekbuffer));
       }
+     */
+
       payloads.push(encodeProtostone(u128s));
     }
     /* CODE CHANGE END */
