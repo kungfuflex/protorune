@@ -4,6 +4,10 @@ import { rpcCall } from "./sandshrew";
 import { inspect } from "util";
 const DEFAULT_AMOUNT = 2_000;
 
+export async function decodeRawTx(tx: string): Promise<any> {
+  return await rpcCall("btc_decoderawtransaction", [tx]);
+}
+
 export async function getFeeEstimates(): Promise<any> {
   return await rpcCall("esplora_fee-estimates", []);
 }
