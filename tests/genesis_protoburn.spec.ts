@@ -15,6 +15,7 @@ import {
   runesbyaddress,
 } from "metashrew-runes/lib/tests/utils/rune-helpers";
 import {
+  buildTransaction,
   buildCoinbaseToAddress,
   buildDefaultBlock,
 } from "metashrew-runes/lib/tests/utils/block-helpers";
@@ -33,7 +34,8 @@ const GENESIS_PROTOBURN = Buffer.from("5d6d171601ff7f82b6e1e892a6c0a9841a00d4ea3
 describe("protoburns", () => {
   it("should index full protoburn, where edict target and pointer point to the protoburn", async () => {
     const program = buildProgram(DEBUG_WASM);
-    program.setBlockHeight(840000);
+    program.setBlockHeight(849236);
+    const block = buildDefaultBlock();
     const premineAmount = 2100000005000000n;
     const outputs = [
       {
@@ -51,43 +53,58 @@ describe("protoburns", () => {
         value: 624999999,
       },
     ];
+    block.transactions.push(buildCoinbaseToAddress(TEST_BTC_ADDRESS1));
+    Array(297).fill(0).forEach((_, i) => {
+      block.transactions.push(buildCoinbaseToAddress(TEST_BTC_ADDRESS1));
+    });
     const pointer1 = 1;
-    let block = initCompleteBlockWithRuneEtching(
+    initCompleteBlockWithRuneEtching(
       outputs,
       pointer1,
-      undefined,
+      1,
       premineAmount,
+      "QUORUM•GENESIS•PROTORUNE",
+      "Q",
+      block
     );
-
-    const input = {
-      inputTxHash: block.transactions?.at(1)?.getHash(), // 0 is coinbase, 1 is the mint
-      inputTxOutputIndex: pointer1, // index of output in the input tx that has the runes. In this case it is the default pointer of the mint
-    };
-    const amount = premineAmount / 2n;
-    const output = {
-      address: TEST_BTC_ADDRESS2,
-      btcAmount: 1, //this can be implied to be 1 since runes usually are just inscribed on a satoshi
-    };
-    // technically this is not a valid transaction since btc in and less than btc out but this is just to test the runes
-    const refundOutput = {
-      address: TEST_BTC_ADDRESS1,
-      btcAmount: 0, // this gives address 1 his remaining bitcoin
-    };
-
-    // output 0: runestone with protoburns
-    // output 1-2: output, and refundOutput
-    // output 3: virtual output -- output of the protoburn
-    // This transaction does a protoburn and transfers all protorunes to output 2
-    block = constructRunestoneTx(
-      [input],
-      [output, refundOutput], // 0 is script, 1 is address 2 output, 2 is address 1 output, 3 is virtual output for first protoburn
-      GENESIS_PROTOBURN,
-      block,
-    );
-
     program.setBlock(block.toHex());
 
     await program.run("_start");
+
+    const input = {
+      inputTxHash: block.transactions?.at(block.transactions.length - 1)?.getHash(), // 0 is coinbase, 1 is the mint
+      inputTxOutputIndex: pointer1, // index of output in the input tx that has the runes. In this case it is the default pointer of the mint
+    };
+    const block2 = buildDefaultBlock();
+    const coinbase2 = buildCoinbaseToAddress(TEST_BTC_ADDRESS1);
+    block2.transactions.push(coinbase2);
+    const transaction2 = buildTransaction([{
+      hash: block.transactions[block.transactions.length - 1].getHash(),
+      index: pointer1
+    }, {
+      hash: coinbase2.getHash(),
+      index: 0
+    }], [{
+      value: 0,
+      script: Buffer.from('5d6d171601ff7f82b6e1e892a6c0a9841a00d4ea33aa02904e00', 'hex')
+    }, {
+      value: 1,
+      script: bitcoinjs.payments.p2pkh({
+        address: TEST_BTC_ADDRESS1,
+	network: bitcoinjs.networks.bitcoin
+      })
+    }, {
+      value: 1,
+      script: bitcoinjs.payments.p2pkh({
+        address: TEST_BTC_ADDRESS1,
+	network: bitcoinjs.networks.bitcoin
+      })
+    }]);
+    block2.transactions.push(transaction2);
+    program.setBlockHeight(program.blockHeight + 1);
+    program.setBlock(block2.toHex());
+    await program.run('_start');
+    
 
     const resultAddress1 = await runesbyaddress(program, TEST_BTC_ADDRESS1);
     // expect(resultAddress1.balanceSheet.length).equals(
