@@ -4,6 +4,7 @@ import { RunestoneMessage } from "./RunestoneMessage";
 import { ProtoruneMessage } from "./ProtoruneMessage";
 import { RunesTransaction } from "./RunesTransaction";
 import { Block } from "metashrew-as/assembly/blockdata/block";
+import { Field } from "./fields/RunestoneField";
 import { scriptParse } from "metashrew-as/assembly/utils/yabsp";
 import { console } from "metashrew-as/assembly/utils/logging";
 import {
@@ -13,7 +14,7 @@ import {
   GENESIS,
 } from "./constants";
 import { OutPoint, Output } from "metashrew-as/assembly/blockdata/transaction";
-import { checkForNonDataPush, stripNullRight } from "../utils";
+import { u128ToHex, checkForNonDataPush, stripNullRight } from "../utils";
 import { ProtoMessage, MessageContext } from "./protomessage";
 import { BalanceSheet } from "./BalanceSheet";
 import { ProtoStone } from "./ProtoStone";
@@ -83,6 +84,14 @@ export class Index {
   }
 
   static getMessagePayload(output: Output, skip: u32 = 2): ArrayBuffer {
+    /*
+    scriptParse(output.script).forEach((v: Box, i: i32, ary: Array<Box>) => {
+      if (changetype<usize>(v) === 0) console.log("null");
+      else if (v.len === 0) console.log("start: " + v.start.toString(10));
+      else if (v.start === 0) console.log("len: " + v.len.toString(10));
+      else console.log(v.toHexString());
+    });
+   */
     const parsed = scriptParse(output.script).slice(skip);
     return checkForNonDataPush(parsed);
   }
@@ -98,6 +107,7 @@ export class Index {
     if (outputIndex > -1) {
       const runestoneOutput = tx.outs[outputIndex];
       const payload = Index.getMessagePayload(runestoneOutput);
+      console.log(Box.from(payload).toHexString());
       if (changetype<usize>(payload) == 0) return new Map<u32, BalanceSheet>();
       const message = ProtoruneMessage.parseProtocol(payload, protocol);
       if (changetype<usize>(message) === 0) return new Map<u32, BalanceSheet>();
@@ -148,8 +158,11 @@ export class Index {
       const tx = block.getTransaction(txIdx);
       const txid = tx.txid();
       tx.processRunestones();
+      console.log("processed runestones");
       Index.indexOutpoints(tx, txid, height);
       const outputIndex = tx.runestoneIndex;
+      console.log("runestoneIndex " + outputIndex.toString(10));
+      console.log("process single runestone message");
       Index.processRunestone<RunestoneMessage>(
         height,
         tx,
@@ -158,6 +171,7 @@ export class Index {
         outputIndex,
         u128.Zero,
       );
+      console.log("processed runestone");
       Index.processMessages<MessageContext>(
         block,
         height,

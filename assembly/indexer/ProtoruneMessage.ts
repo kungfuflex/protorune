@@ -10,6 +10,8 @@ import { console } from "metashrew-as/assembly/utils/logging";
 import { Field } from "./fields";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils";
 import { ProtoStone } from "./ProtoStone";
+import { u128ToHex } from "../utils";
+import { Box } from "metashrew-as/assembly/utils/box";
 
 export class ProtoruneMessage extends RunestoneMessage {
   static fromProtoStone(protostone: ProtoStone): ProtoruneMessage {
@@ -20,7 +22,15 @@ export class ProtoruneMessage extends RunestoneMessage {
     );
   }
   static parseProtocol(data: ArrayBuffer, protocol: u128): RunestoneMessage {
+    console.log(Box.from(data).toHexString());
     const message = this.parse(data);
+    console.log('got message');
+    console.log(message.fields.keys().length.toString(10));
+    /*
+    message.fields.get(Field.PROTOCOL).forEach((v: u128, i: i32, ary: Array<u128>) => {
+      console.log(u128ToHex(v));
+    });
+   */
     if (protocol == u128.Zero) {
       return message;
     }

@@ -15,11 +15,11 @@ export type ProtoMessage = {
   refundPointer: Option<u32>;
 };
 
-var padLeft = (s) => (s.length % 2 === 1 ? "0" + s : s);
+export const padLeft = (s) => (s.length % 2 === 1 ? "0" + s : s);
 
-const toBuffer = (n) => Buffer.from(padLeft(n.toString(16)), "hex");
+export const toBuffer = (n) => Buffer.from(padLeft(n.toString(16)), "hex");
 
-function readULEB128(v) {
+export function readULEB128(v) {
   const decoded = leb128.unsigned.decode(v);
   const { length } = leb128.unsigned.encode(
     Buffer.from(
@@ -33,7 +33,7 @@ function readULEB128(v) {
   };
 }
 
-function decodeList(v) {
+export function decodeList(v) {
   let tail = v;
   const result = [];
   while (tail) {

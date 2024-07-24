@@ -325,9 +325,9 @@ export class RunestoneMessage {
       Array<ProtoMessage>
     >();
     // process all protostones here
-    if (this.fields.has(Field.PROTORUNE)) {
+    if (this.fields.has(Field.PROTOCOL)) {
       const protostones = ProtoStone.parseFromFieldData(
-        this.fields.get(Field.PROTORUNE),
+        this.fields.get(Field.PROTOCOL),
       );
       for (
         let protostoneIdx = 0;
@@ -336,7 +336,7 @@ export class RunestoneMessage {
       ) {
         const protostone = protostones[protostoneIdx];
 
-        if (PROTOCOLS_TO_INDEX.has(protostone.protocol_id)) {
+        if (protostone.protocol_id.hi === 0 && protostone.protocol_id.lo === 13) {
           if (protostone.isBurn()) {
             console.log("FOUND BURN");
             const protoburn = new ProtoBurn([
@@ -345,6 +345,7 @@ export class RunestoneMessage {
             ]);
             this.protoBurns.push(protoburn);
           }
+	} else if (PROTOCOLS_TO_INDEX.has(protostone.protocol_id)) {
           if (protostone.isMessage()) {
             console.log("FOUND message");
             const str = protostone.protocol_id.toString();

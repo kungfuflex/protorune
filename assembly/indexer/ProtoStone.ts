@@ -1,16 +1,48 @@
 import { u128 } from "as-bignum/assembly";
 import { Field } from "./fields/ProtoruneField";
 import { Box } from "metashrew-as/assembly/utils/box";
+import { reverse } from "metashrew-as/assembly/utils/utils";
 import { readULEB128ToU128 } from "../leb128";
 import {
   u128ToHex,
   fieldToU128,
+  toArrayBuffer,
   fieldToArrayBuffer,
   fieldToArrayBuffer15Bytes,
   fieldToArrayBuffer15Bytes,
 } from "../utils";
 import { Flag } from "./flags/ProtoruneFlag";
 import { console } from "metashrew-as/assembly/utils/logging";
+
+function logField(ary: Array<u128>): void {
+  console.log(Box.from(concatByteArray(ary)).toHexString());
+}
+
+function alignArrayBuffer(v: ArrayBuffer): Box {
+  const box = Box.from(v);
+  while (box.len !== 0) {
+    if (load<u8>(box.start) === 0) box.shrinkFront(1);
+    else break;
+  }
+  return box;
+}
+
+function alignU128ToArrayBuffer(v: u128): Box {
+  return alignArrayBuffer(reverse(toArrayBuffer(v)));
+}
+
+function concatByteArray(v: Array<u128>): ArrayBuffer {
+  return Box.concat(v.map<Box>((v) => alignU128ToArrayBuffer(v)));
+}
+
+function byteLengthForNVarInts(input: Box, n: u64): usize {
+  const clone = input.sliceFrom(0);
+  const start = clone.start;
+  for (let i: i32 = 0; i < <i32>n; i++) {
+    clone.shrinkFront(readULEB128ToU128(clone, u128.from(0)));
+  }
+  return clone.start - start;
+}
 
 export class ProtoStone {
   public fields: Map<u64, Array<u128>>;
@@ -74,7 +106,7 @@ export class ProtoStone {
   }
 
   static parseFromFieldData(fieldData: Array<u128>): Array<ProtoStone> {
-    const input = Box.from(fieldToArrayBuffer15Bytes(fieldData));
+    const input = Box.from(concatByteArray(fieldData));
     const result: Array<ProtoStone> = new Array<ProtoStone>();
     while (input.len > 0) {
       const protocol_id = u128.from(0);
@@ -91,11 +123,11 @@ export class ProtoStone {
       size = readULEB128ToU128(input, len);
       if (size === usize.MAX_VALUE) return changetype<ProtoStone[]>(0); //can choose to continue or return
       input.shrinkFront(size);
-      const temp = input.sliceTo(input.start + <u32>len.lo);
-      const protostone = ProtoStone.parse(temp);
+      const byteLength = byteLengthForNVarInts(input, len.lo);
+      const protostone = ProtoStone.parse(input.sliceTo(input.start + byteLength));
       protostone.protocol_id = protocol_id;
       result.push(protostone);
-      input.shrinkFront(<u32>len.lo);
+      input.shrinkFront(<u32>byteLength);
     }
     return result;
   }
