@@ -189,24 +189,9 @@ export class RunestoneProtostoneUpgrade {
           ),
         Buffer.from([]),
       );
-      const u128s: u128[] = chunk(Array.from(packed), 15).map((v) =>
+      const u128s: u128[] = chunk(Array.from(packed), MAX_U128_BYTES_COMPAT_W_RUNES).map((v) =>
         u128(BigInt("0x" + Buffer.from(v).toString("hex"))),
       );
-      /*
-      const packed_payloads = Buffer.concat(all_protostone_payloads);
-      for (
-        let i = 0;
-        i < packed_payloads.length;
-        i += MAX_U128_BYTES_COMPAT_W_RUNES
-      ) {
-        const end = Math.min(
-          packed_payloads.length,
-          i + MAX_U128_BYTES_COMPAT_W_RUNES,
-        );
-        const seekbuffer = new SeekBuffer(packed_payloads.subarray(i, end));
-        u128s.push(rawBytesToU128(seekbuffer));
-      }
-     */
 
       payloads.push(encodeProtostone(u128s));
     }
