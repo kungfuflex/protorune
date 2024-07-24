@@ -103,6 +103,27 @@ export const constructProtostoneTx = (
   block?: bitcoinjs.Block,
   runeTransferPointer?: number,
 ): bitcoinjs.Block => {
+  const runestone = encodeRunestoneProtostone({
+    edicts: edicts,
+    pointer: runeTransferPointer, // default output for leftover runes, default goes to the protoburn
+    protostones: protostones,
+  }).encodedRunestone;
+
+  return constructRunestoneTx(inputs, outputs, runestone, block)
+};
+
+export const constructRunestoneTx = (
+  inputs: {
+    inputTxHash: Buffer | undefined;
+    inputTxOutputIndex: number;
+  }[],
+  outputs: {
+    address: string;
+    btcAmount: number;
+  }[],
+  encodedRunestone?: Buffer,
+  block?: bitcoinjs.Block,
+): bitcoinjs.Block => {
   if (block == undefined) {
     block = buildDefaultBlock();
     const coinbase = buildCoinbaseToAddress(TEST_BTC_ADDRESS1);
@@ -127,17 +148,12 @@ export const constructProtostoneTx = (
       value: output.btcAmount,
     };
   });
-  const runestone = encodeRunestoneProtostone({
-    edicts: edicts,
-    pointer: runeTransferPointer, // default output for leftover runes, default goes to the protoburn
-    protostones: protostones,
-  }).encodedRunestone;
 
   const transaction = buildTransaction(
     [...blockInputs],
     [
       {
-        script: runestone,
+        script: encodedRunestone,
         value: 0,
       },
       ...blockOutputs,
