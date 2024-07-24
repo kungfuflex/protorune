@@ -176,10 +176,22 @@ export class RunestoneProtostoneUpgrade {
       // TODO: ORDERING?
       let all_protostone_payloads: Buffer[] = [];
       this.protostones.forEach((protostone: ProtoStone) => {
-        protostone.encipher_payloads().forEach((v) => all_protostone_payloads.push(v));
+        protostone
+          .encipher_payloads()
+          .forEach((v) => all_protostone_payloads.push(v));
       });
-      const packed = all_protostone_payloads.reduce((r: Buffer, v: Buffer) => Buffer.from((Array.from(r) as any).concat(Array.from(leb128.unsigned.encode(v as any) as any) as any)), Buffer.from([]));
-      const u128s: u128[] = chunk(Array.from(packed), 15).map((v) => u128(BigInt('0x' + Buffer.from(v).toString('hex'))));
+      const packed = all_protostone_payloads.reduce(
+        (r: Buffer, v: Buffer) =>
+          Buffer.from(
+            (Array.from(r) as any).concat(
+              Array.from(leb128.unsigned.encode(v as any) as any) as any,
+            ),
+          ),
+        Buffer.from([]),
+      );
+      const u128s: u128[] = chunk(Array.from(packed), 15).map((v) =>
+        u128(BigInt("0x" + Buffer.from(v).toString("hex"))),
+      );
       /*
       const packed_payloads = Buffer.concat(all_protostone_payloads);
       for (

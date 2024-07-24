@@ -47,6 +47,7 @@
     "chai": "4",
     "fs-extra": "^11.2.0",
     "js-sha3": "^0.9.3",
+    "leb128": "^0.0.5",
     "metashrew-as": "https://github.com/sandshrewmetaprotocols/metashrew-as",
     "metashrew-runes": "https://github.com/sandshrewmetaprotocols/metashrew-runes",
     "metashrew-spendables": "https://github.com/sandshrewmetaprotocols/metashrew-spendables",

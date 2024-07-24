@@ -15,16 +15,21 @@ export type ProtoMessage = {
   refundPointer: Option<u32>;
 };
 
-var padLeft = (s) => s.length % 2 === 1 ? '0' + s : s;
+var padLeft = (s) => (s.length % 2 === 1 ? "0" + s : s);
 
-const toBuffer = (n) => Buffer.from(padLeft(n.toString(16)), 'hex');
+const toBuffer = (n) => Buffer.from(padLeft(n.toString(16)), "hex");
 
 function readULEB128(v) {
   const decoded = leb128.unsigned.decode(v);
-  const { length } = leb128.unsigned.encode(Buffer.from(((s) => s.length % 2 === 1 ? '0' + s : s)(BigInt(decoded).toString(16)), 'hex'));
+  const { length } = leb128.unsigned.encode(
+    Buffer.from(
+      ((s) => (s.length % 2 === 1 ? "0" + s : s))(BigInt(decoded).toString(16)),
+      "hex",
+    ),
+  );
   return {
     value: decoded,
-    tail: ((b) => b.length === 0 ? null : b)(v.slice(length))
+    tail: ((b) => (b.length === 0 ? null : b))(v.slice(length)),
   };
 }
 
@@ -169,9 +174,24 @@ export class ProtoStone {
     }
 
     // pushing the protocol_id and len first as per the spec
-    const length_payload = payloads.reduce((r, v) => r + decodeList(v).length, 0);
-    const prefix = [ toBuffer(payloads.reduce((r, v) => r || decodeList(v)[0] === 83n, false) ? u128(13) : u128(this.protocolTag)), toBuffer(u128(length_payload)) ];
-    const result = prefix.concat(payloads.reduce((r, v) => r.concat(decodeList(v).map((v) => toBuffer(v))), prefix.slice(2)));
+    const length_payload = payloads.reduce(
+      (r, v) => r + decodeList(v).length,
+      0,
+    );
+    const prefix = [
+      toBuffer(
+        payloads.reduce((r, v) => r || decodeList(v)[0] === 83n, false)
+          ? u128(13)
+          : u128(this.protocolTag),
+      ),
+      toBuffer(u128(length_payload)),
+    ];
+    const result = prefix.concat(
+      payloads.reduce(
+        (r, v) => r.concat(decodeList(v).map((v) => toBuffer(v))),
+        prefix.slice(2),
+      ),
+    );
     return result;
   }
 
