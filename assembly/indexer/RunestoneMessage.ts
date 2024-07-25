@@ -43,7 +43,7 @@ import {
   RESERVED_NAME,
   MAX_BYTES_LEB128_INT,
 } from "./constants";
-import { PROTOCOLS_TO_INDEX, PROTORUNE_TABLE } from "./tables/protorune";
+import { PROTOCOLS_TO_INDEX, ProtoruneTable } from "./tables/protorune";
 import { BalanceSheet } from "./BalanceSheet";
 import { RunesTransaction } from "./RunesTransaction";
 import { Input, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
@@ -59,11 +59,11 @@ export class RunestoneMessage {
   public fields: Map<u64, Array<u128>>;
   public edicts: Array<StaticArray<u128>>;
   protoBurns: Array<ProtoBurn>;
-  table: PROTORUNE_TABLE;
+  table: ProtoruneTable;
   constructor(
     fields: Map<u64, Array<u128>>,
     edicts: Array<StaticArray<u128>>,
-    table: PROTORUNE_TABLE,
+    table: ProtoruneTable,
   ) {
     this.fields = fields;
     this.edicts = edicts;
@@ -147,7 +147,7 @@ export class RunestoneMessage {
         field.push(value);
       }
     }
-    return new RunestoneMessage(fields, edicts, changetype<PROTORUNE_TABLE>(0));
+    return new RunestoneMessage(fields, edicts, changetype<ProtoruneTable>(0));
   }
 
   mint(height: u32, balanceSheet: BalanceSheet): bool {

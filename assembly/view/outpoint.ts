@@ -11,7 +11,7 @@ import {
   SPACERS,
   SYMBOL,
 } from "../indexer/constants";
-import { PROTORUNE_TABLE } from "../indexer/tables/protorune";
+import { ProtoruneTable } from "../indexer/tables/protorune";
 import { OutPoint, Output } from "metashrew-as/assembly/blockdata/transaction";
 import { arrayBufferToArray } from "metashrew-spendables/assembly/indexer";
 import { OUTPOINT_TO_OUTPUT } from "metashrew-spendables/assembly/tables";
@@ -83,7 +83,7 @@ export function balanceSheetToProtobuf(
 
 export function balanceSheetToProtobufForProtocol(
   sheet: BalanceSheet,
-  table: PROTORUNE_TABLE,
+  table: ProtoruneTable,
 ): protobuf.BalanceSheet {
   const runes = new Array<protobuf.Rune>();
   for (let i = 0; i < sheet.runes.length; i++) {
@@ -148,7 +148,7 @@ export function outpointBaseForProtocol(
   const txid = changetype<Uint8Array>(inp.txid).buffer;
   const pos = inp.vout;
   const outpoint = OutPoint.from(txid, pos).toArrayBuffer();
-  const table = PROTORUNE_TABLE.for_str(
+  const table = ProtoruneTable.for_str(
     String.UTF8.decode(changetype<Uint8Array>(inp.protocol).buffer),
   );
   const op = table.OUTPOINT_TO_RUNES.select(outpoint);

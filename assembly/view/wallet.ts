@@ -13,7 +13,7 @@ import { parsePrimitive } from "metashrew-as/assembly/utils/utils";
 import { console } from "metashrew-as/assembly/utils/logging";
 import { input } from "metashrew-as/assembly/indexer";
 import { OUTPOINT_TO_RUNES } from "../indexer/constants";
-import { PROTORUNE_TABLE } from "../indexer/tables/protorune";
+import { ProtoruneTable } from "../indexer/tables/protorune";
 
 export function wallet_test(): ArrayBuffer {
   const address = String.UTF8.encode(
@@ -70,7 +70,7 @@ export function protorunesbyaddress(): ArrayBuffer {
   );
   const address = changetype<Uint8Array>(request.wallet).buffer;
   const protocol_tag = changetype<Uint8Array>(request.protocol_tag).buffer;
-  const protorune_pointer = PROTORUNE_TABLE.for_str(
+  const protorune_pointer = ProtoruneTable.for_str(
     String.UTF8.decode(protocol_tag),
   );
 

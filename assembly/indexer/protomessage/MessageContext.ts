@@ -3,7 +3,7 @@ import { IncomingRune } from "./IncomingRune";
 import { AtomicTransaction } from "metashrew-as/assembly/indexer/atomic";
 import { RuneId } from "../RuneId";
 import { BalanceSheet } from "../BalanceSheet";
-import { PROTORUNE_TABLE, PROTOCOLS_TO_INDEX } from "../tables/protorune";
+import { ProtoruneTable, PROTOCOLS_TO_INDEX } from "../tables/protorune";
 import { u128 } from "as-bignum/assembly";
 import { console } from "metashrew-as/assembly/utils/logging";
 
@@ -20,7 +20,7 @@ export class MessageContext {
   txid: ArrayBuffer;
   baseSheet: BalanceSheet;
   runeIdToIndex: Map<ArrayBuffer, i32> = new Map<ArrayBuffer, i32>();
-  table: PROTORUNE_TABLE;
+  table: ProtoruneTable;
   sheets: Map<u32, BalanceSheet>;
   txindex: u32;
 
@@ -46,7 +46,7 @@ export class MessageContext {
     const refundPointerOutpoint = OutPoint.from(txid, refund_pointer);
     this.refund_pointer = refundPointerOutpoint;
     this.calldata = calldata;
-    const table = PROTORUNE_TABLE.for(MessageContext.protocol_tag());
+    const table = ProtoruneTable.for(MessageContext.protocol_tag());
     this.txid = txid;
     this.table = table;
     this.sheets = new Map<u32, BalanceSheet>();

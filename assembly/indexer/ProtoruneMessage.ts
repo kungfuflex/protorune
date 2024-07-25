@@ -1,6 +1,6 @@
 import { toPrimitive, min, fieldTo } from "../utils";
 import { Edict } from "./Edict";
-import { PROTORUNE_TABLE } from "./tables/protorune";
+import { ProtoruneTable } from "./tables/protorune";
 import { BalanceSheet } from "./BalanceSheet";
 import { RunesTransaction } from "./RunesTransaction";
 import { OutPoint } from "metashrew-as/assembly/blockdata/transaction";
@@ -18,7 +18,7 @@ export class ProtoruneMessage extends RunestoneMessage {
     return new ProtoruneMessage(
       changetype<Map<u64, Array<u128>>>(0),
       protostone.edicts,
-      PROTORUNE_TABLE.for(protostone.protocol_id),
+      ProtoruneTable.for(protostone.protocol_id),
     );
   }
   static parseProtocol(data: ArrayBuffer, protocol: u128): RunestoneMessage {
@@ -29,7 +29,7 @@ export class ProtoruneMessage extends RunestoneMessage {
     let protorunemessage = new ProtoruneMessage(
       message.fields,
       message.edicts,
-      PROTORUNE_TABLE.for(protocol),
+      ProtoruneTable.for(protocol),
     );
     return protorunemessage;
   }

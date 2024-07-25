@@ -2,7 +2,7 @@ import { AtomicTransaction } from "metashrew-as/assembly/indexer/atomic";
 import { RuneId } from "../RuneId";
 import { u128 } from "as-bignum/assembly";
 import { MessageContext } from "./MessageContext";
-import { PROTORUNE_TABLE } from "../tables/protorune";
+import { ProtoruneTable } from "../tables/protorune";
 import { fromArrayBuffer, toArrayBuffer } from "../../utils";
 
 export class IncomingRune {
@@ -15,12 +15,12 @@ export class IncomingRune {
   outpoint_index: i32 = -1;
   runtime: AtomicTransaction = new AtomicTransaction();
   context: MessageContext = changetype<MessageContext>(0);
-  table: PROTORUNE_TABLE;
+  table: ProtoruneTable;
   constructor(
     context: MessageContext,
     runeId: RuneId,
     amount: u128,
-    table: PROTORUNE_TABLE,
+    table: ProtoruneTable,
   ) {
     this.context = context;
     this.runeId = runeId;

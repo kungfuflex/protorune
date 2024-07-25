@@ -2,7 +2,7 @@ import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
 import { u128 } from "as-bignum/assembly";
 import { console } from "metashrew-as/assembly/utils";
 
-class PROTOCOL_INDEXER {
+class ProtocolIndexer {
   set: Set<string> = new Set<string>();
   add(val: u128): void {
     this.set.add(val.toString());
@@ -20,9 +20,9 @@ class PROTOCOL_INDEXER {
   }
 }
 
-export const PROTOCOLS_TO_INDEX = new PROTOCOL_INDEXER();
+export const PROTOCOLS_TO_INDEX = new ProtocolIndexer();
 
-export class PROTORUNE_TABLE {
+export class ProtoruneTable {
   ptr: IndexPointer;
   OUTPOINT_TO_RUNES: IndexPointer;
   HEIGHT_TO_TRANSACTION_IDS: IndexPointer;
@@ -45,13 +45,13 @@ export class PROTORUNE_TABLE {
     this.ETCHING_TO_RUNE_ID = ptr.keyword("/runeid/byetching/");
     this.RUNTIME_BALANCE = ptr.keyword("/runtime/balance");
   }
-  static for(protocol: u128): PROTORUNE_TABLE {
-    return new PROTORUNE_TABLE(
+  static for(protocol: u128): ProtoruneTable {
+    return new ProtoruneTable(
       IndexPointer.for("/runes/proto/").keyword(protocol.toString()),
     );
   }
-  static for_str(protocol: string): PROTORUNE_TABLE {
-    return new PROTORUNE_TABLE(
+  static for_str(protocol: string): ProtoruneTable {
+    return new ProtoruneTable(
       IndexPointer.for("/runes/proto/").keyword(protocol),
     );
   }
