@@ -31,8 +31,14 @@ function alignU128ToArrayBuffer(v: u128): Box {
   return alignArrayBuffer(reverse(toArrayBuffer(v)));
 }
 
+function snapTo15Bytes(v: Box): Box {
+  const box = v.sliceFrom(0);
+  box.shrinkFront(1);
+  return box;
+}
+
 function concatByteArray(v: Array<u128>): ArrayBuffer {
-  return Box.concat(v.map<Box>((v) => alignU128ToArrayBuffer(v)));
+  return Box.concat(v.map<Box>((v, i, ary) => i === ary.length - 1 ? alignU128ToArrayBuffer(v) : snapTo15Bytes(Box.from(reverse(toArrayBuffer(v))))));
 }
 
 function byteLengthForNVarInts(input: Box, n: u64): usize {
