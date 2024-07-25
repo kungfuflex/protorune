@@ -84,14 +84,6 @@ export class Index {
   }
 
   static getMessagePayload(output: Output, skip: u32 = 2): ArrayBuffer {
-    /*
-    scriptParse(output.script).forEach((v: Box, i: i32, ary: Array<Box>) => {
-      if (changetype<usize>(v) === 0) console.log("null");
-      else if (v.len === 0) console.log("start: " + v.start.toString(10));
-      else if (v.start === 0) console.log("len: " + v.len.toString(10));
-      else console.log(v.toHexString());
-    });
-   */
     const parsed = scriptParse(output.script).slice(skip);
     return checkForNonDataPush(parsed);
   }
@@ -158,11 +150,8 @@ export class Index {
       const tx = block.getTransaction(txIdx);
       const txid = tx.txid();
       tx.processRunestones();
-      console.log("processed runestones");
       Index.indexOutpoints(tx, txid, height);
       const outputIndex = tx.runestoneIndex;
-      console.log("runestoneIndex " + outputIndex.toString(10));
-      console.log("process single runestone message");
       Index.processRunestone<RunestoneMessage>(
         height,
         tx,
@@ -171,7 +160,6 @@ export class Index {
         outputIndex,
         u128.Zero,
       );
-      console.log("processed runestone");
       Index.processMessages<MessageContext>(
         block,
         height,
