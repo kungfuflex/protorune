@@ -65,7 +65,7 @@ Refer to [https://github.com/kungfuflex/protorune/tree/master/assembly/indexer/p
 
 ### Example
 
-```js
+```ts
 import { MessageContext } from "protorune/assembly/indexer/protomessage/MessageContext";
 import { Protorune } from "protorune/assembly/indexer";
 import { Index as SpendablesIndex } from "metashrew-spendables/assembly/indexer";
