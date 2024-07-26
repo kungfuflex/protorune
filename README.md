@@ -55,6 +55,52 @@ Run the indexer with metashrew:
 ./metashrew/target/release/metashrew --log-filters DEBUG --indexer yourprotorunefork/build/debug.wasm --db-dir ~/.metashrew --daemon-dir ~/.bitcoin/bitcoin --network bitcoin
 ```
 
+## Implementing the Subprotocol
+
+At the top level of `assembly/index.ts` the entrypoint to the program `_start` must call the indexer then `_flush()` the k/v pairs for the block. In production, this WASM function is called for every block.
+
+The Protorune class is generic and accepts a class argument where you can supply a subclass of `MessageContext`. In your subclass, you define the `MessageContext#handle()` function which does the work of handling `this.runes` which contains a set of `IncomingRune` objects.
+
+Refer to [https://github.com/kungfuflex/protorune/tree/master/assembly/indexer/protomessage/MessageContext.ts](https://github.com/kungfuflex/protorune/tree/master/assembly/indexer/protomessage/MessageContext.ts) to see the API to this object.
+
+### Example
+
+```js
+import { MessageContext } from "protorune/assembly/indexer/protomessage/MessageContext";
+import { Protorune } from "protorune/assembly/indexer";
+import { Index as SpendablesIndex } from "metashrew-spendables/assembly/indexer";
+class MyMessageContext extends MessageContext {
+  handle(): bool {
+    const runes: Array<IncomingRune> = this.runes;
+    runes.forEach((v: IncomingRune) => {
+      v.depositAll(); /* this indexer just swallows your runes */
+    });
+    return true;
+  }
+  protocolTag(): u128 {
+    return u128.from(0x22222222); /* this subprotocol has ID 0x22222222 */
+  }
+}
+
+class MyProtorune extends Protorune<MyMessageContext> {}
+
+const GENESIS = 850000;
+
+export function _start(): void {
+  const data = input();
+  const box = Box.from(data);
+  const block = new Block(box);
+  if (height < GENESIS) {
+    _flush();
+    return;
+  }
+  SpendablesIndex.indexBlock(height, block);
+  new MyProtorune().indexBlock(height, block);
+  _flush();
+}
+```
+
+
 ## Testing
 
 Modify test suite in tests/release.spec.ts to mock blocks.
