@@ -63,6 +63,10 @@ The Protorune class is generic and accepts a class argument where you can supply
 
 Refer to [https://github.com/kungfuflex/protorune/tree/master/assembly/indexer/protomessage/MessageContext.ts](https://github.com/kungfuflex/protorune/tree/master/assembly/indexer/protomessage/MessageContext.ts) to see the API to this object.
 
+Every protomessage evaluated in a Protostone that is called is passed a context to `MessageContext#handle()` and executed. The default behavior of the MessageContext is to refund all runes to the `refund_pointer` which are not used by the runtime.
+
+Other protomessage / protoburn semantics are handled transparently by the indexer runtime.
+
 ### Example
 
 ```ts
