@@ -99,7 +99,6 @@ export class Index {
     if (outputIndex > -1) {
       const runestoneOutput = tx.outs[outputIndex];
       const payload = Index.getMessagePayload(runestoneOutput);
-      console.log(Box.from(payload).toHexString());
       if (changetype<usize>(payload) == 0) return new Map<u32, BalanceSheet>();
       const message = ProtoruneMessage.parseProtocol(payload, protocol);
       if (changetype<usize>(message) === 0) return new Map<u32, BalanceSheet>();
@@ -119,9 +118,11 @@ export class Index {
     p: string,
   ): void {
     const protoMessages: Map<string, ProtoMessage[]> = tx.protomessages;
+    /*
     console.log(
       "GOT num protomessages keys " + protoMessages.keys().length.toString(),
     );
+   */
 
     // process protomessage
     const protoMessageTypes = protoMessages.keys();
@@ -142,7 +143,7 @@ export class Index {
       RunestoneMessage.etchGenesisRune();
     }
     const block = changetype<RunesBlock>(_block);
-    console.log("METASHREW_RUNES_LOG::indexing block: " + height.toString());
+    //console.log("METASHREW_RUNES_LOG::indexing block: " + height.toString());
     HEIGHT_TO_BLOCKHASH.selectValue<u32>(height).set(block.blockhash());
     BLOCKHASH_TO_HEIGHT.select(block.blockhash()).setValue<u32>(height);
     block.saveTransactions(height);

@@ -35,11 +35,11 @@ export class ProtoruneMessage extends RunestoneMessage {
   }
 
   processEdicts(
+    edicts: Array<Edict>,
     balancesByOutput: Map<u32, BalanceSheet>,
     balanceSheet: BalanceSheet,
     _txid: ArrayBuffer,
   ): bool {
-    const edicts = Edict.fromDeltaSeries(this.edicts);
     let isCenotaph: bool = false;
     for (let e = 0; e < edicts.length; e++) {
       const edict = edicts[e];
@@ -81,8 +81,9 @@ export class ProtoruneMessage extends RunestoneMessage {
     const unallocatedTo = this.fields.has(Field.POINTER)
       ? fieldTo<u32>(this.fields.get(Field.POINTER))
       : <u32>tx.defaultOutput();
+    const edicts = Edict.fromDeltaSeries(this.edicts);
 
-    this.processEdicts(balancesByOutput, balanceSheet, txid);
+    this.processEdicts(edicts, balancesByOutput, balanceSheet, txid);
 
     if (balancesByOutput.has(unallocatedTo)) {
       balanceSheet.pipe(balancesByOutput.get(unallocatedTo));

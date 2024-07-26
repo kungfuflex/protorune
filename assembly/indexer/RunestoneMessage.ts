@@ -55,6 +55,29 @@ import { ProtoruneMessage } from "./ProtoruneMessage";
 import { ProtoMessage } from "./protomessage";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils/hex";
 
+class BurnCycle {
+  public max: i32;
+  public cycles: Map<string, i32>;
+  constructor(max: i32) {
+    this.max = max;
+    this.cycles = new Map<string, i32>();
+  }
+  next(rune: ArrayBuffer): i32 {
+    if (!this.cycles.has(changetype<string>(rune))) {
+      this.cycles.set(changetype<string>(rune), 0);
+    }
+    const cycle = this.cycles.get(changetype<string>(rune));
+    this.cycles.set(changetype<string>(rune), (cycle + 1) % this.max);
+    return cycle;
+  }
+  peek(rune: ArrayBuffer): i32 {
+    if (!this.cycles.has(changetype<string>(rune))) {
+      this.cycles.set(changetype<string>(rune), 0);
+    }
+    return this.cycles.get(changetype<string>(rune));
+  }
+}
+
 export class RunestoneMessage {
   public fields: Map<u64, Array<u128>>;
   public edicts: Array<StaticArray<u128>>;
@@ -275,12 +298,12 @@ export class RunestoneMessage {
   }
 
   processEdicts(
+    edicts: Array<Edict>,
     balancesByOutput: Map<u32, BalanceSheet>,
     balanceSheet: BalanceSheet,
     txid: ArrayBuffer,
   ): bool {
     let isCenotaph: bool = false;
-    const edicts = Edict.fromDeltaSeries(this.edicts);
     for (let e = 0; e < edicts.length; e++) {
       const edict = edicts[e];
       const edictOutput = toPrimitive<u32>(edict.output);
@@ -338,7 +361,7 @@ export class RunestoneMessage {
 
         if (protostone.protocol_id.hi === 0 && protostone.protocol_id.lo === 13) {
           if (protostone.isBurn()) {
-            console.log("FOUND BURN");
+            //console.log("FOUND BURN");
             const protoburn = new ProtoBurn([
               protostone.fields.get(ProtoruneField.BURN)[0],
               protostone.fields.get(ProtoruneField.POINTER)[0],
@@ -347,7 +370,7 @@ export class RunestoneMessage {
           }
 	} else if (PROTOCOLS_TO_INDEX.has(protostone.protocol_id)) {
           if (protostone.isMessage()) {
-            console.log("FOUND message");
+            //console.log("FOUND message");
             const str = protostone.protocol_id.toString();
             let ary: Array<ProtoMessage> = new Array<ProtoMessage>();
             if (protomessages.has(str)) {
@@ -371,7 +394,13 @@ export class RunestoneMessage {
       ? fieldTo<u32>(this.fields.get(Field.POINTER))
       : <u32>tx.defaultOutput();
 
-    const isCenotaph = this.processEdicts(balancesByOutput, balanceSheet, txid);
+    const edicts = Edict.fromDeltaSeries(this.edicts);
+    /*
+    edicts.forEach((v: Edict) => {
+      console.log(v.toString());
+    });
+    */
+    const isCenotaph = this.processEdicts(edicts, balancesByOutput, balanceSheet, txid);
     if (balancesByOutput.has(unallocatedTo)) {
       balanceSheet.pipe(balancesByOutput.get(unallocatedTo));
     } else {
@@ -392,41 +421,47 @@ export class RunestoneMessage {
         OUTPOINT_TO_RUNES.select(OutPoint.from(txid, output).toArrayBuffer()),
         isCenotaph,
       );
-      // save protoburns to index
-
-      if (output == tx.runestoneIndex && !isCenotaph) {
-        console.log("logging burn at output " + output.toString());
-        console.log(sheet.inspect());
-        const burnBalances: Map<i32, Array<i32>> = new Map<i32, Array<i32>>();
-        const burnCount: Map<string, i32> = new Map<string, i32>();
-
-        //sort edicts by order of appearance: 1st edict per rune gets sent to the first protoburn
-        for (let i = 0; i < sheet.runes.length; i++) {
-          const rune = encodeHexFromBuffer(sheet.runes[i]);
-          let count: i32 = 0;
-          if (burnCount.has(rune)) {
-            count = burnCount.get(rune) + 1;
-            burnCount.set(rune, count);
-          } else {
-            burnCount.set(rune, count);
-          }
-          let ary: Array<i32> = new Array<i32>();
-          if (burnBalances.has(count)) {
-            ary = burnBalances.get(count);
-          }
-          ary.push(i);
-          burnBalances.set(count, ary);
+    }
+    if (this.protoBurns.length > 0) {
+      const runestoneBalanceSheet = new BalanceSheet();
+      (balancesByOutput.has(tx.runestoneIndex) ? balancesByOutput.get(tx.runestoneIndex) : new BalanceSheet()).pipe(runestoneBalanceSheet);
+      const burns: Array<Edict> = new Array<Edict>(0);
+      const burnSheets = new Array<BalanceSheet>(0);
+      const cycles = new BurnCycle(this.protoBurns.length);
+      for (let i = 0; i < this.protoBurns.length; i++) {
+        burnSheets[i] = new BalanceSheet();
+      }
+      for (let i = 0; i < edicts.length; i++) {
+        if (edicts[i].output === u128.from(tx.runestoneIndex)) {
+          const rune = edicts[i].runeId().toBytes();
+          const cycle = cycles.peek(rune);
+          const remaining = runestoneBalanceSheet.get(rune);
+          const toApply = min(remaining, edicts[i].amount);
+	  if (toApply.isZero()) continue;
+	  cycles.next(rune);
+          runestoneBalanceSheet.decrease(rune, toApply);
+	  burnSheets[cycle].increase(rune, toApply);
         }
-        for (let i = 0; i < this.protoBurns.length; i++) {
-          // TODO: handle multiple edicts to output 0
-
-          const protoBurn = this.protoBurns[i];
-          protoBurn.process(
-            sheet,
-            OutPoint.from(txid, protoBurn.pointer).toArrayBuffer(),
-            burnBalances.has(i) ? burnBalances.get(i) : new Array<i32>(),
-          );
+      }
+      if (tx.runestoneIndex === unallocatedTo) {
+        for (let i = 0; i < runestoneBalanceSheet.runes.length; i++) {
+          const rune = runestoneBalanceSheet.runes[i];
+          const cycle = cycles.peek(rune);
+          const toApply = runestoneBalanceSheet.get(rune);
+	  if (toApply.isZero()) continue;
+	  cycles.next(rune);
+	  runestoneBalanceSheet.decrease(rune, toApply);
+	  burnSheets[cycle].increase(rune, toApply);
         }
+      }
+      for (let i = 0; i < this.protoBurns.length; i++) {
+        // TODO: handle multiple edicts to output 0
+
+        const protoBurn = this.protoBurns[i];
+        protoBurn.process(
+          burnSheets[i],
+          OutPoint.from(txid, protoBurn.pointer).toArrayBuffer()
+        );
       }
     }
     return balancesByOutput;

@@ -119,7 +119,7 @@ export class ProtoStone {
       let size = readULEB128ToU128(input, protocol_id);
       if (protocol_id.lo == 0 && protocol_id.hi == 0) {
         // For the very last u128, not all bytes may be used (due to LEB format)
-        console.log("Found protocol id 0, breaking...");
+        //console.log("Found protocol id 0, breaking...");
         break;
       }
       if (size === usize.MAX_VALUE) return changetype<ProtoStone[]>(0); //can choose to continue or return

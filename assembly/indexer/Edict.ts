@@ -22,7 +22,7 @@ export class Edict {
   static diff(previous: Edict, values: StaticArray<u128>): Edict {
     return new Edict(
       previous.block + values[0],
-      values[0].isZero() ? values[1] : previous.transactionIndex + values[1],
+      !values[0].isZero() ? values[1] : previous.transactionIndex + values[1],
       values[2],
       values[3],
     );

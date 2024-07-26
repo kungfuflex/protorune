@@ -34,7 +34,6 @@ export class ProtoRunestone {
       let previous = new RuneId(u64(0), u32(0));
       for (const edict of edicts) {
         const [block, tx] = previous.delta(edict.id).unwrap();
-        console.log(edict.amount);
         payloads.push(u128.encodeVarInt(block));
         payloads.push(u128.encodeVarInt(tx));
         payloads.push(u128.encodeVarInt(edict.amount));

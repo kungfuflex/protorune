@@ -128,7 +128,7 @@ export async function buildRunesTransaction(
     v.writeUint32BE(2);
     return v.reverse();
   })(Buffer.alloc(20));
-  console.log(buf);
+  //console.log(buf);
   tx = tx.addOutput({
     script:
       bitcoin.payments.p2sh({

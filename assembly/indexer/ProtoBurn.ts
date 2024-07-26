@@ -16,11 +16,9 @@ export class ProtoBurn {
 
   process(
     balanceSheet: BalanceSheet,
-    outpoint: ArrayBuffer,
-    indices: Array<i32>,
+    outpoint: ArrayBuffer
   ): void {
-    for (let idx = 0; idx < indices.length; idx++) {
-      const i = indices[idx];
+    for (let i = 0; i < balanceSheet.runes.length; i++) {
       const runeId = balanceSheet.runes[i];
       const name = base.RUNE_ID_TO_ETCHING.select(runeId).get();
       this.table.RUNE_ID_TO_ETCHING.select(runeId).set(name);

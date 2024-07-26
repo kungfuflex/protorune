@@ -128,7 +128,7 @@ describe("protoburns", () => {
       TEST_BTC_ADDRESS1,
       TEST_PROTOCOL_TAG,
     );
-    console.log(protorunesAddress1);
+    //console.log(protorunesAddress1);
     expect(protorunesAddress1.balanceSheet[0].balance).equals(
       premineAmount,
       "address 1 should now have all the protorunes",
@@ -220,7 +220,7 @@ describe("protoburns", () => {
       TEST_BTC_ADDRESS2,
       TEST_PROTOCOL_TAG,
     );
-    console.log(protorunesAddress2);
+    //console.log(protorunesAddress2);
     expect(protorunesAddress2.balanceSheet[0].balance).equals(
       amount,
       "address 2 should now have the protorunes sent to protoburn through edict",
@@ -311,7 +311,7 @@ describe("protoburns", () => {
       TEST_BTC_ADDRESS2,
       TEST_PROTOCOL_TAG,
     );
-    console.log(protorunesAddress2);
+    //console.log(protorunesAddress2);
     expect(protorunesAddress2.balanceSheet[0].balance).equals(
       amountLeftover,
       "address 2 should now have the protorunes left over from the transfer",
@@ -446,7 +446,7 @@ describe("protoburns", () => {
       TEST_BTC_ADDRESS1,
       TEST_PROTOCOL_TAG,
     );
-    console.log(protorunesAddress1);
+    //console.log(protorunesAddress1);
     expect(protorunesAddress1.balanceSheet[0].balance).equals(
       premineAmount,
       "address 1 should now have all the protorunes 1",
@@ -566,7 +566,7 @@ describe("protoburns", () => {
       TEST_BTC_ADDRESS2,
       TEST_PROTOCOL_TAG,
     );
-    console.log(protorunesAddress2);
+    //console.log(protorunesAddress2);
     expect(protorunesAddress2.balanceSheet[0].balance).equals(
       premineAmount,
       "address 2 should now have all protorunes",
@@ -576,7 +576,7 @@ describe("protoburns", () => {
       TEST_BTC_ADDRESS1,
       TEST_PROTOCOL_TAG,
     );
-    console.log(protorunesAddress1);
+    //console.log(protorunesAddress1);
     expect(protorunesAddress1.balanceSheet.length).equals(
       0,
       "address 1 should now have no protorunes",
@@ -626,7 +626,7 @@ describe("protoburns", () => {
     // technically this is not a valid transaction since btc in and less than btc out but this is just to test the runes
     const refundOutput = {
       address: TEST_BTC_ADDRESS1,
-      btcAmount: 0, // this gives address 1 his remaining bitcoin
+      btcAmount: 1, // this gives address 1 his remaining bitcoin
     };
 
     // output 0: runestone with protoburns
@@ -682,26 +682,26 @@ describe("protoburns", () => {
       0,
       "address 2 should not have received any runes",
     );
+    const protorunesAddress1 = await protorunesbyaddress(
+      program,
+      TEST_BTC_ADDRESS1,
+      TEST_PROTOCOL_TAG,
+    );
+    //console.log(protorunesAddress1);
+    expect(protorunesAddress1.balanceSheet[0].balance).equals(
+      amount + 2n,
+      "address 1 should now have amount",
+    );
 
     const protorunesAddress2 = await protorunesbyaddress(
       program,
       TEST_BTC_ADDRESS2,
       TEST_PROTOCOL_TAG,
     );
-    console.log(protorunesAddress2);
+    //console.log(protorunesAddress2);
     expect(protorunesAddress2.balanceSheet[0].balance).equals(
       2n * amount,
       "address 2 should now have 2*amount",
-    );
-    const protorunesAddress1 = await protorunesbyaddress(
-      program,
-      TEST_BTC_ADDRESS1,
-      TEST_PROTOCOL_TAG,
-    );
-    console.log(protorunesAddress1);
-    expect(protorunesAddress1.balanceSheet[0].balance).equals(
-      amount,
-      "address 1 should now have amount",
     );
   });
 });
