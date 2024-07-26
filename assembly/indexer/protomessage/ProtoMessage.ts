@@ -32,7 +32,8 @@ export class ProtoMessage {
     height: u64,
     i: u32,
   ): void {
-    const context = new MessageContext(
+    const context = instantiate<T>(
+      changetype<T>(0).protocolTag(),
       tx,
       block,
       height,

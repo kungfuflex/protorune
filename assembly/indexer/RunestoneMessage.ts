@@ -50,7 +50,7 @@ import { Input, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
 import { SUBSIDY_HALVING_INTERVAL } from "metashrew-as/assembly/utils";
 import { ProtoBurn } from "./ProtoBurn";
 import { ProtoStone } from "./ProtoStone";
-import { Index } from "./Indexer";
+import { Protorune } from "./Indexer";
 import { ProtoruneMessage } from "./ProtoruneMessage";
 import { ProtoMessage } from "./protomessage";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils/hex";

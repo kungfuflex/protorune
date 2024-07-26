@@ -1,5 +1,6 @@
 import { _flush, input, get, set } from "metashrew-as/assembly/indexer/index";
-import { Index } from "./indexer";
+import { Protorune, DefaultProtorune } from "./indexer";
+import { MessageContext } from "./indexer/protomessage";
 import { Block } from "metashrew-as/assembly/blockdata/block";
 import { Transaction } from "metashrew-as/assembly/blockdata/transaction";
 import { Box } from "metashrew-as/assembly/utils/box";
@@ -13,12 +14,13 @@ import { RunesBlock } from "./indexer/RunesBlock";
 import { RuneId } from "./indexer/RuneId";
 import { RunestoneMessage } from "./indexer/RunestoneMessage";
 
+
 export function testCommitment(): void {
   const data = input();
   const box = Box.from(data);
   const height = parsePrimitive<u32>(box);
   const block = new Block(box);
-  Index.inspectTransaction(
+  new DefaultProtorune().inspectTransaction(
     nameToArrayBuffer("QUORUMGENESISPROTORUNE"),
     height,
     block,
@@ -33,7 +35,7 @@ export function testOverwrite(): void {
   const block = changetype<RunesBlock>(new Block(box));
   const tx1 = block.getTransaction(142);
   const tx2 = block.getTransaction(158);
-  Index.processRunestone<RunestoneMessage>(
+  new DefaultProtorune().processRunestone(
     height,
     tx1,
     tx1.txid(),
@@ -66,7 +68,7 @@ function testTransaction(hex: string): void {
   );
   block.transactions = new Array<Transaction>(1);
   block.transactions[0] = new Transaction(Box.from(decodeHex(hex)));
-  Index.indexBlock(GENESIS, block);
+  new DefaultProtorune().indexBlock(GENESIS, block);
   _flush();
 }
 

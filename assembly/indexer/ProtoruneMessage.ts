@@ -14,6 +14,13 @@ import { u128ToHex } from "../utils";
 import { Box } from "metashrew-as/assembly/utils/box";
 
 export class ProtoruneMessage extends RunestoneMessage {
+  constructor(
+    fields: Map<u64, Array<u128>>,
+    edicts: Array<StaticArray<u128>>,
+    table: ProtoruneTable,
+  ) {
+    super(fields, edicts, table);
+  }
   static fromProtoStone(protostone: ProtoStone): ProtoruneMessage {
     return new ProtoruneMessage(
       changetype<Map<u64, Array<u128>>>(0),

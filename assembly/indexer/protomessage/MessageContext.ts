@@ -25,6 +25,7 @@ export class MessageContext {
   txindex: u32;
 
   constructor(
+    protocolTag: u128,
     transaction: Transaction,
     block: Block,
     height: u64,
@@ -46,14 +47,14 @@ export class MessageContext {
     const refundPointerOutpoint = OutPoint.from(txid, refund_pointer);
     this.refund_pointer = refundPointerOutpoint;
     this.calldata = calldata;
-    const table = ProtoruneTable.for(MessageContext.protocol_tag());
     this.txid = txid;
-    this.table = table;
+    this.baseSheet = new BalanceSheet();
     this.sheets = new Map<u32, BalanceSheet>();
+    const table = ProtoruneTable.for(protocolTag);
+    this.table = table;
     const sheet = BalanceSheet.load(
       table.OUTPOINT_TO_RUNES.select(outpoint.toArrayBuffer()),
     );
-    this.baseSheet = new BalanceSheet();
     this.sheets.set(index, sheet);
     this.sheets.set(
       pointer,
@@ -79,8 +80,8 @@ export class MessageContext {
       this.runes.push(rune);
     }
   }
-  static initialiseProtocol(): u128 {
-    const tag = MessageContext.protocol_tag();
+  initializeProtocol(): u128 {
+    const tag = this.protocolTag();
     PROTOCOLS_TO_INDEX.add(tag);
     return tag;
   }
@@ -161,7 +162,7 @@ export class MessageContext {
   handle(): bool {
     return false;
   }
-  static protocol_tag(): u128 {
+  protocolTag(): u128 {
     //change value here
     return new u128(0, 64);
   }

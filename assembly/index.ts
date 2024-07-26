@@ -2,7 +2,8 @@ import { Box } from "metashrew-as/assembly/utils/box";
 import { _flush, input } from "metashrew-as/assembly/indexer/index";
 import { Block } from "metashrew-as/assembly/blockdata/block";
 import { parsePrimitive } from "metashrew-as/assembly/utils/utils";
-import { Index } from "./indexer";
+import { DefaultProtorune, Protorune } from "./indexer";
+import { MessageContext } from "./indexer/protomessage";
 import { GENESIS } from "./indexer/constants";
 import { Index as SpendablesIndex } from "metashrew-spendables/assembly/indexer";
 
@@ -22,7 +23,7 @@ export function _start(): void {
   if (height >= GENESIS) {
     SpendablesIndex.indexBlock(height, block);
   }
-  Index.indexBlock(height, block);
+  new DefaultProtorune().indexBlock(height, block);
   _flush();
 }
 

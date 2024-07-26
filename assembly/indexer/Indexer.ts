@@ -20,8 +20,8 @@ import { BalanceSheet } from "./BalanceSheet";
 import { ProtoStone } from "./ProtoStone";
 import { u128 } from "as-bignum/assembly";
 
-export class Index {
-  static indexOutpoints(
+export class Protorune<T extends MessageContext> {
+  indexOutpoints(
     tx: RunesTransaction,
     txid: ArrayBuffer,
     height: u32,
@@ -32,7 +32,7 @@ export class Index {
       ).setValue<u32>(height);
     }
   }
-  static findCommitment(
+  findCommitment(
     name: ArrayBuffer,
     tx: RunesTransaction,
     height: u32,
@@ -52,7 +52,7 @@ export class Index {
     }
     return false;
   }
-  static inspectTransaction(
+  inspectTransaction(
     name: ArrayBuffer,
     height: u32,
     _block: Block,
@@ -76,19 +76,19 @@ export class Index {
     const payload = Box.concat(parsed);
     const message = RunestoneMessage.parse(payload);
     if (changetype<usize>(message) === 0) return;
-    const commitment = Index.findCommitment(stripNullRight(name), tx, height);
+    const commitment = this.findCommitment(stripNullRight(name), tx, height);
     /*
     if (commitment) console.log("no commitment");
     else console.log("commitment found");
    */
   }
 
-  static getMessagePayload(output: Output, skip: u32 = 2): ArrayBuffer {
+  getMessagePayload(output: Output, skip: u32 = 2): ArrayBuffer {
     const parsed = scriptParse(output.script).slice(skip);
     return checkForNonDataPush(parsed);
   }
 
-  static processRunestone<T extends RunestoneMessage>(
+  processRunestone(
     height: u64,
     tx: RunesTransaction,
     txid: ArrayBuffer,
@@ -98,7 +98,7 @@ export class Index {
   ): Map<u32, BalanceSheet> {
     if (outputIndex > -1) {
       const runestoneOutput = tx.outs[outputIndex];
-      const payload = Index.getMessagePayload(runestoneOutput);
+      const payload = this.getMessagePayload(runestoneOutput);
       if (changetype<usize>(payload) == 0) return new Map<u32, BalanceSheet>();
       const message = ProtoruneMessage.parseProtocol(payload, protocol);
       if (changetype<usize>(message) === 0) return new Map<u32, BalanceSheet>();
@@ -109,7 +109,7 @@ export class Index {
     return new Map<u32, BalanceSheet>();
   }
 
-  static processMessages<T extends MessageContext>(
+  processMessages(
     block: RunesBlock,
     height: u64,
     tx: RunesTransaction,
@@ -134,11 +134,11 @@ export class Index {
       }
     }
   }
-  static initializeSubprotocols(): void {
-    MessageContext.initialiseProtocol();
+  initializeSubprotocols(): void {
+    changetype<T>(0).initializeProtocol();
   }
-  static indexBlock(height: u32, _block: Block): void {
-    Index.initializeSubprotocols();
+  indexBlock(height: u32, _block: Block): void {
+    this.initializeSubprotocols();
     if (height == GENESIS) {
       RunestoneMessage.etchGenesisRune();
     }
@@ -151,9 +151,9 @@ export class Index {
       const tx = block.getTransaction(txIdx);
       const txid = tx.txid();
       tx.processRunestones();
-      Index.indexOutpoints(tx, txid, height);
+      this.indexOutpoints(tx, txid, height);
       const outputIndex = tx.runestoneIndex;
-      Index.processRunestone<RunestoneMessage>(
+      this.processRunestone(
         height,
         tx,
         txid,
@@ -161,14 +161,16 @@ export class Index {
         outputIndex,
         u128.Zero,
       );
-      Index.processMessages<MessageContext>(
+      this.processMessages(
         block,
         height,
         tx,
         txid,
         txIdx,
-        MessageContext.protocol_tag().toString(),
+        changetype<T>(0).protocolTag().toString(),
       );
     }
   }
 }
+
+export class DefaultProtorune extends Protorune<MessageContext> {}
