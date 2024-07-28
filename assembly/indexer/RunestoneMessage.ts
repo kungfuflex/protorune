@@ -46,14 +46,18 @@ import {
 import { PROTOCOLS_TO_INDEX, ProtoruneTable } from "./tables/protorune";
 import { BalanceSheet } from "./BalanceSheet";
 import { RunesTransaction } from "./RunesTransaction";
-import { Input, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
+import { Input, OutPoint, Output } from "metashrew-as/assembly/blockdata/transaction";
 import { SUBSIDY_HALVING_INTERVAL } from "metashrew-as/assembly/utils";
 import { ProtoBurn } from "./ProtoBurn";
 import { ProtoStone } from "./ProtoStone";
 import { Protorune } from "./Indexer";
 import { ProtoruneMessage } from "./ProtoruneMessage";
 import { ProtoMessage } from "./protomessage";
-import { encodeHexFromBuffer } from "metashrew-as/assembly/utils/hex";
+import {
+  parsePrimitive,
+  encodeHexFromBuffer,
+  SUBSIDY_HALVING_INTERVAL
+} from "metashrew-as/assembly/utils/hex";
 
 class BurnCycle {
   public max: i32;
@@ -297,31 +301,100 @@ export class RunestoneMessage {
     return true;
   }
 
+  //TODO: This should really be a function in transaction.ts in metashrew-as in class Output
+  isNonOpReturnOutput(output: Output): bool {
+    return parsePrimitive<u8>(output.script) != 0x6a;
+  }
+
+  numNonOpReturnOutputs(outputs: Array<Output>): u128 {
+    let counter = 0;
+    for (let i = 0; i < outputs.length; i++) {
+      if (this.isNonOpReturnOutput(outputs[i]))
+        counter++;
+    }
+    return new u128(counter, 0)
+  }
+
+  updateBalancesForEdict(
+    balancesByOutput: Map<u32, BalanceSheet>,
+    balanceSheet: BalanceSheet,
+    edictAmount: u128,
+    edictOutput: u32,
+    runeId: ArrayBuffer
+  ): void {
+    let outputBalanceSheet = changetype<BalanceSheet>(0);
+    if (!balancesByOutput.has(edictOutput)) {
+      balancesByOutput.set(
+        edictOutput,
+        (outputBalanceSheet = new BalanceSheet()),
+      );
+    } else outputBalanceSheet = balancesByOutput.get(edictOutput);
+    const amount = edictAmount.lo == 0 && edictAmount.hi == 0 ? balanceSheet.get(runeId) : min(edictAmount, balanceSheet.get(runeId));
+    balanceSheet.decrease(runeId, amount);
+    outputBalanceSheet.increase(runeId, amount);
+  }
+
+  processEdict(
+    balancesByOutput: Map<u32, BalanceSheet>,
+    balanceSheet: BalanceSheet,
+    edict: Edict,
+    outputs: Array<Output>,
+  ): bool {
+    if (edict.block.lo == 0 && edict.block.hi == 0 && (edict.transactionIndex.lo > 0 || edict.transactionIndex.hi > 0)) {
+      return true
+    }
+    const runeId = edict.runeId().toBytes();
+
+    const edictOutput = toPrimitive<u32>(edict.output);
+    if (edictOutput > <u32>outputs.length) {
+      return true
+    }
+    else if (edictOutput == outputs.length) {
+      if (edict.amount.lo == 0 && edict.amount.hi == 0) { // need to split equally
+        const numNonOpReturnOuts: u128 = this.numNonOpReturnOutputs(outputs)
+        const amountSplit = u128.div(balanceSheet.get(runeId), numNonOpReturnOuts)
+        const amountSplitPlus1 = amountSplit.preInc()
+        const numRemainder = u128.rem(balanceSheet.get(runeId), numNonOpReturnOuts)
+        let extraCounter: u64 = 0
+        for (let i = 0; i < outputs.length; i++) {
+          if (this.isNonOpReturnOutput(outputs[i])) {
+            if (extraCounter < numRemainder.lo) {
+              this.updateBalancesForEdict(balancesByOutput, balanceSheet, amountSplitPlus1, i, runeId)
+              extraCounter++
+            } else {
+              this.updateBalancesForEdict(balancesByOutput, balanceSheet, amountSplit, i, runeId)
+            }
+          }
+        }
+      }
+      else {
+        for (let i = 0; i < outputs.length; i++) {
+          if (this.isNonOpReturnOutput(outputs[i]))
+            this.updateBalancesForEdict(balancesByOutput, balanceSheet, edict.amount, i, runeId)
+        }
+      }
+
+      return false
+    }
+    else {
+      this.updateBalancesForEdict(balancesByOutput, balanceSheet, edict.amount, edictOutput, runeId)
+      return false
+    }
+  }
+
   processEdicts(
     edicts: Array<Edict>,
     balancesByOutput: Map<u32, BalanceSheet>,
     balanceSheet: BalanceSheet,
-    txid: ArrayBuffer,
+    outputs: Array<Output>,
   ): bool {
-    let isCenotaph: bool = false;
+    const edicts = Edict.fromDeltaSeries(this.edicts);
     for (let e = 0; e < edicts.length; e++) {
-      const edict = edicts[e];
-      const edictOutput = toPrimitive<u32>(edict.output);
-      const runeId = edict.runeId().toBytes();
-      let outputBalanceSheet = changetype<BalanceSheet>(0);
-      if (!balancesByOutput.has(edictOutput)) {
-        balancesByOutput.set(
-          edictOutput,
-          (outputBalanceSheet = new BalanceSheet()),
-        );
-      } else outputBalanceSheet = balancesByOutput.get(edictOutput);
-      const amount = min(edict.amount, balanceSheet.get(runeId));
-
-      const canDecrease = balanceSheet.decrease(runeId, amount);
-      if (!canDecrease) isCenotaph = true;
-      outputBalanceSheet.increase(runeId, amount);
+      if (this.processEdict(balancesByOutput, balanceSheet, edicts[e], outputs)) {
+        return true;
+      }
     }
-    return isCenotaph;
+    return false;
   }
   process(
     tx: RunesTransaction,
@@ -400,23 +473,19 @@ export class RunestoneMessage {
       console.log(v.toString());
     });
     */
-    const isCenotaph = this.processEdicts(edicts, balancesByOutput, balanceSheet, txid);
+    const isCenotaph = this.processEdicts(edicts, balancesByOutput, balanceSheet, tx.outs);
     if (balancesByOutput.has(unallocatedTo)) {
       balanceSheet.pipe(balancesByOutput.get(unallocatedTo));
     } else {
       balancesByOutput.set(unallocatedTo, balanceSheet);
     }
-    const allOutputs = balancesByOutput.keys();
 
     // process protostone edicts
-    for (let m = 0; m < messages.length; m++) {
-      messages[m].process(tx, txid, height, m);
-    }
+    const runesToOutputs = balancesByOutput.keys();
 
-    // process protoburns
-    for (let x = 0; x < allOutputs.length; x++) {
-      const output = allOutputs[x];
-      const sheet = balancesByOutput.get(output);
+
+    for (let x = 0; x < runesToOutputs.length; x++) {
+      const sheet = balancesByOutput.get(runesToOutputs[x]);
       sheet.save(
         OUTPOINT_TO_RUNES.select(OutPoint.from(txid, output).toArrayBuffer()),
         isCenotaph,
@@ -462,6 +531,9 @@ export class RunestoneMessage {
           burnSheets[i],
           OutPoint.from(txid, protoBurn.pointer).toArrayBuffer()
         );
+      }
+      for (let m = 0; m < messages.length; m++) {
+        messages[m].process(tx, txid, height, m);
       }
     }
     return balancesByOutput;
