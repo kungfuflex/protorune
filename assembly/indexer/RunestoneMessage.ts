@@ -377,7 +377,7 @@ export class RunestoneMessage {
               ary = protomessages.get(str);
             }
             ary.push(
-              ProtoMessage.from(protostone, tx.outs.length + ary.length),
+              ProtoMessage.from(protostone, tx.outs.length + ary.length)
             );
             protomessages.set(str, ary);
           }
