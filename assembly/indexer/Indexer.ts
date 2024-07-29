@@ -10,7 +10,7 @@ import { Edict } from "metashrew-runes/assembly/indexer/Edict";
 import { ProtoMessage, MessageContext } from "./protomessage";
 import { ProtoruneBalanceSheet } from "./ProtoruneBalanceSheet";
 import { BalanceSheet } from "metashrew-runes/assembly/indexer/BalanceSheet";
-import { ProtoStone } from "./ProtoStone";
+import { Protostone } from "./Protostone";
 import { u128 } from "as-bignum/assembly";
 import { console } from "metashrew-as/assembly/utils/logging";
 import { RunesIndex } from "metashrew-runes/assembly/indexer";
@@ -32,21 +32,21 @@ class ProtoMessageReduce {
 }
 
 export class ProtostoneTable {
-  public list: Array<ProtoStone>;
+  public list: Array<Protostone>;
   public voutStart: u32;
-  constructor(v: Array<ProtoStone>, voutStart: u32) {
+  constructor(v: Array<Protostone>, voutStart: u32) {
     this.list = v;
     this.voutStart = voutStart;
   }
   static from(ary: Array<u128>, voutStart: u32): ProtostoneTable {
-    const list = ProtoStone.parseFromFieldData(ary);
+    const list = Protostone.parseFromFieldData(ary);
     return new ProtostoneTable(list, voutStart);
   }
   burns(): Array<ProtoBurn> {
     return this.list
-      .filter((v: ProtoStone) => v.protocolTag === u128.from(13) && v.isBurn())
+      .filter((v: Protostone) => v.protocolTag === u128.from(13) && v.isBurn())
       .map(
-        (v: ProtoStone) =>
+        (v: Protostone) =>
           new ProtoBurn([
             v.fields.get(ProtoruneField.BURN)[0],
             v.fields.get(ProtoruneField.POINTER)[0],
@@ -57,9 +57,9 @@ export class ProtostoneTable {
     return this.list.reduce(
       (
         r: ProtoMessageReduce,
-        v: ProtoStone,
+        v: Protostone,
         i: i32,
-        ary: Array<ProtoStone>,
+        ary: Array<Protostone>,
       ) => {
         if (v.isMessage()) {
           r.accumulated.push(ProtoMessage.from(v, r.voutStart + i));
@@ -69,7 +69,7 @@ export class ProtostoneTable {
       ProtoMessageReduce.from(this.voutStart),
     ).accumulated;
   }
-  flat(): Array<ProtoStone> {
+  flat(): Array<Protostone> {
     return this.list;
   }
 }

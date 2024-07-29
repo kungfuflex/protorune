@@ -2,7 +2,7 @@ import { Block } from "metashrew-as/assembly/blockdata";
 import { RunesTransaction } from "metashrew-runes/assembly/indexer/RunesTransaction";
 import { MessageContext } from "./MessageContext";
 import { BalanceSheet } from "metashrew-runes/assembly/indexer/BalanceSheet";
-import { ProtoStone } from "../ProtoStone";
+import { Protostone } from "../Protostone";
 import { ProtoruneField } from "../fields/ProtoruneField";
 import { fieldTo, fieldToArrayBuffer, stripNullRight } from "metashrew-runes/assembly/utils";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils/hex";
@@ -50,7 +50,7 @@ export class ProtoMessage {
 
     changetype<T>(context).run();
   }
-  static from(protostone: ProtoStone, vout: u32): ProtoMessage {
+  static from(protostone: Protostone, vout: u32): ProtoMessage {
     if (
       !protostone.fields.has(ProtoruneField.MESSAGE) ||
       !protostone.fields.has(ProtoruneField.POINTER) ||

@@ -1,19 +1,26 @@
 import { u128 } from "as-bignum/assembly";
 import { ProtoruneField } from "./fields/ProtoruneField";
+import { ProtoruneTable } from "./tables/protorune";
 import { Box } from "metashrew-as/assembly/utils/box";
 import { reverse } from "metashrew-as/assembly/utils/utils";
 import { readULEB128ToU128 } from "metashrew-runes/assembly/leb128";
+import { BalanceSheet } from "metashrew-runes/assembly/indexer/BalanceSheet";
+import { Input, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
+import { RunesTransaction } from "metashrew-runes/assembly/indexer/RunesTransaction";
+import { RunestoneMessage } from "metashrew-runes/assembly/indexer/RunestoneMessage";
 import {
   u128ToHex,
   fieldToU128,
   toArrayBuffer,
-  fieldToArrayBuffer,
+  fieldToArrayBuffer
 } from "metashrew-runes/assembly/utils";
-import { fieldToArrayBuffer15Bytes } from "../utils";
+import {
+  fieldToArrayBuffer15Bytes
+} from "../utils";
 import { Flag } from "./flags/ProtoruneFlag";
 import { console } from "metashrew-as/assembly/utils/logging";
 
-function logField(ary: Array<u128>): void {
+function logProtoruneField(ary: Array<u128>): void {
   console.log(Box.from(concatByteArray(ary)).toHexString());
 }
 
@@ -37,13 +44,7 @@ function snapTo15Bytes(v: Box): Box {
 }
 
 function concatByteArray(v: Array<u128>): ArrayBuffer {
-  return Box.concat(
-    v.map<Box>((v, i, ary) =>
-      i === ary.length - 1
-        ? alignU128ToArrayBuffer(v)
-        : snapTo15Bytes(Box.from(reverse(toArrayBuffer(v)))),
-    ),
-  );
+  return Box.concat(v.map<Box>((v, i, ary) => i === ary.length - 1 ? alignU128ToArrayBuffer(v) : snapTo15Bytes(Box.from(reverse(toArrayBuffer(v))))));
 }
 
 function byteLengthForNVarInts(input: Box, n: u64): usize {
@@ -55,17 +56,33 @@ function byteLengthForNVarInts(input: Box, n: u64): usize {
   return clone.start - start;
 }
 
-export class ProtoStone {
+class BalanceSheetReduce {
+  public table: ProtoruneTable;
+  public sheets: Array<BalanceSheet>
+  constructor(table: ProtoruneTable) {
+    this.table = table;
+    this.sheets = new Array<BalanceSheet>(0);
+  }
+  concat(): BalanceSheet {
+    return BalanceSheet.concat(this.sheets);
+  }
+}
+
+export class Protostone extends RunestoneMessage {
   public fields: Map<u64, Array<u128>>;
   public edicts: Array<StaticArray<u128>>;
   public nextIndex: i32 = -1;
   public protocolTag: u128 = u128.Zero;
-  constructor(fields: Map<u64, Array<u128>>, edicts: Array<StaticArray<u128>>) {
+  public table: ProtoruneTable;
+  constructor(fields: Map<u64, Array<u128>>, edicts: Array<StaticArray<u128>>, protocolTag: u128) {
+    super(fields, edicts);
     this.fields = fields;
     this.edicts = edicts;
+    this.protocolTag = protocolTag;
+    this.table = ProtoruneTable.for(protocolTag);
   }
   inspect(): string {
-    let result = "ProtoStone {\n";
+    let result = "Protostone {\n";
     let fieldInts = this.fields.keys();
     for (let i = 0; i < fieldInts.length; i++) {
       result += "  " + fieldInts[i].toString(10) + ": [\n";
@@ -86,6 +103,17 @@ export class ProtoStone {
     // }
     // result += "]\n}";
     return result;
+  }
+  mint(height: u32, balanceSheet: BalanceSheet): bool {
+    return false;
+  }
+  etch(
+    height: u64,
+    tx: u32,
+    initialBalanceSheet: BalanceSheet,
+    transaction: RunesTransaction,
+  ): bool {
+    return false;
   }
   getFlag(position: u64): bool {
     if (!this.fields.has(ProtoruneField.FLAGS)) return false;
@@ -116,9 +144,9 @@ export class ProtoStone {
     return changetype<Array<u32>>(0);
   }
 
-  static parseFromFieldData(fieldData: Array<u128>): Array<ProtoStone> {
+  static parseFromFieldData(fieldData: Array<u128>): Array<Protostone> {
     const input = Box.from(concatByteArray(fieldData));
-    const result: Array<ProtoStone> = new Array<ProtoStone>();
+    const result: Array<Protostone> = new Array<Protostone>();
     while (input.len > 0) {
       const protocolTag = u128.from(0);
       let size = readULEB128ToU128(input, protocolTag);
@@ -127,32 +155,49 @@ export class ProtoStone {
         //console.log("Found protocol id 0, breaking...");
         break;
       }
-      if (size === usize.MAX_VALUE) return changetype<ProtoStone[]>(0); //can choose to continue or return
+      if (size === usize.MAX_VALUE) return changetype<Protostone[]>(0); //can choose to continue or return
       input.shrinkFront(size);
 
       const len = u128.from(0); //assuming len is encoded as the number of bytes needed to read
       size = readULEB128ToU128(input, len);
-      if (size === usize.MAX_VALUE) return changetype<ProtoStone[]>(0); //can choose to continue or return
+      if (size === usize.MAX_VALUE) return changetype<Protostone[]>(0); //can choose to continue or return
       input.shrinkFront(size);
       const byteLength = byteLengthForNVarInts(input, len.lo);
-      const protostone = ProtoStone.parse(
-        input.sliceTo(input.start + byteLength),
-      );
-      protostone.protocolTag = protocolTag;
+      const protostone = Protostone.parse(input.sliceTo(input.start + byteLength), protocolTag);
       result.push(protostone);
       input.shrinkFront(<u32>byteLength);
     }
     return result;
   }
-
-  static parse(input: Box): ProtoStone {
+  saveBalanceSheet(
+    sheet: BalanceSheet,
+    txid: ArrayBuffer,
+    output: u32,
+    isCenotaph: bool
+  ): void {
+    sheet.save(
+      this.table.OUTPOINT_TO_RUNES.select(
+        OutPoint.from(txid, output).toArrayBuffer(),
+      ),
+      isCenotaph
+    );
+  }
+  loadBalanceSheet(tx: RunesTransaction): BalanceSheet {
+    return tx.ins.reduce<BalanceSheetReduce>((r: BalanceSheetReduce, v: Input, i: i32, ary: Array<Input>) => {
+      r.sheets.push(BalanceSheet.load(
+        r.table.OUTPOINT_TO_RUNES.select(v.previousOutput().toArrayBuffer())
+      ));
+      return r;
+    }, new BalanceSheetReduce(this.table)).concat();
+  }
+  static parse(input: Box, protocolTag: u128): Protostone {
     // console.log("Inside protostone.parse" + input.toHexString());
     let fields = new Map<u64, Array<u128>>();
     let edicts = new Array<StaticArray<u128>>(0);
     while (input.len > 0) {
       const fieldKeyHeap = u128.from(0);
       const size = readULEB128ToU128(input, fieldKeyHeap);
-      if (size === usize.MAX_VALUE) return changetype<ProtoStone>(0);
+      if (size === usize.MAX_VALUE) return changetype<Protostone>(0);
       input.shrinkFront(size);
       const fieldKey = fieldKeyHeap.lo;
       // console.log("GOT FIELDKEY " + fieldKey.toString());
@@ -162,7 +207,7 @@ export class ProtoStone {
           for (let i = 0; i < 4; i++) {
             const edictInt = u128.from(0);
             const size = readULEB128ToU128(input, edictInt);
-            if (usize.MAX_VALUE === size) return changetype<ProtoStone>(0);
+            if (usize.MAX_VALUE === size) return changetype<Protostone>(0);
             input.shrinkFront(size);
             edict[i] = edictInt;
           }
@@ -171,7 +216,7 @@ export class ProtoStone {
       } else {
         const value = u128.from(0);
         const size = readULEB128ToU128(input, value);
-        if (usize.MAX_VALUE === size) return changetype<ProtoStone>(0);
+        if (usize.MAX_VALUE === size) return changetype<Protostone>(0);
         input.shrinkFront(size);
         let field: Array<u128> = changetype<Array<u128>>(0);
         if (!fields.has(fieldKey)) {
@@ -183,6 +228,6 @@ export class ProtoStone {
         field.push(value);
       }
     }
-    return new ProtoStone(fields, edicts);
+    return new Protostone(fields, edicts, protocolTag);
   }
 }

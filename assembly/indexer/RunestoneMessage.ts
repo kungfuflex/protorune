@@ -49,7 +49,7 @@ import { RunesTransaction } from "./RunesTransaction";
 import { Input, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
 import { SUBSIDY_HALVING_INTERVAL } from "metashrew-as/assembly/utils";
 import { ProtoBurn } from "./ProtoBurn";
-import { ProtoStone } from "./ProtoStone";
+import { Protostone } from "./Protostone";
 import { Protorune } from "./Indexer";
 import { ProtoruneMessage } from "./ProtoruneMessage";
 import { ProtoMessage } from "./protomessage";
@@ -349,7 +349,7 @@ export class RunestoneMessage {
     >();
     // process all protostones here
     if (this.fields.has(Field.PROTOCOL)) {
-      const protostones = ProtoStone.parseFromFieldData(
+      const protostones = Protostone.parseFromFieldData(
         this.fields.get(Field.PROTOCOL),
       );
       for (
@@ -382,7 +382,7 @@ export class RunestoneMessage {
             protomessages.set(str, ary);
           }
           if (protostone.edicts.length > 0) {
-            messages.push(ProtoruneMessage.fromProtoStone(protostone));
+            messages.push(ProtoruneMessage.fromProtostone(protostone));
           }
         }
       }

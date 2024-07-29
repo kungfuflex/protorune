@@ -15,7 +15,7 @@ import { readULEB128ToU128 } from "metashrew-runes/assembly/leb128";
 import { u128 } from "as-bignum/assembly";
 import { Box, console, scriptParse } from "metashrew-as/assembly/utils";
 import { checkForNonDataPush } from "../utils";
-import { ProtoStone } from "./ProtoStone";
+import { Protostone } from "./Protostone";
 import { ProtoMessage } from "./protomessage";
 
 @final

@@ -9,7 +9,7 @@ import { u128 } from "as-bignum/assembly";
 import { console } from "metashrew-as/assembly/utils/logging";
 import { Field } from "./fields";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils";
-import { ProtoStone } from "./ProtoStone";
+import { Protostone } from "./Protostone";
 import { u128ToHex } from "metashrew-runes/assembly/utils";
 import { Box } from "metashrew-as/assembly/utils/box";
 
@@ -21,7 +21,7 @@ export class ProtoruneMessage extends RunestoneMessage {
   ) {
     super(fields, edicts, table);
   }
-  static fromProtoStone(protostone: ProtoStone): ProtoruneMessage {
+  static fromProtostone(protostone: Protostone): ProtoruneMessage {
     return new ProtoruneMessage(
       changetype<Map<u64, Array<u128>>>(0),
       protostone.edicts,
