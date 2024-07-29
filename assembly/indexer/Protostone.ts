@@ -8,6 +8,8 @@ import { BalanceSheet } from "metashrew-runes/assembly/indexer/BalanceSheet";
 import { Input, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
 import { RunesTransaction } from "metashrew-runes/assembly/indexer/RunesTransaction";
 import { RunestoneMessage } from "metashrew-runes/assembly/indexer/RunestoneMessage";
+import { ProtoMessage } from "./protomessage";
+import { Protoburn } from "./Protoburn";
 import {
   u128ToHex,
   fieldToU128,
@@ -18,6 +20,7 @@ import {
   fieldToArrayBuffer15Bytes
 } from "../utils";
 import { console } from "metashrew-as/assembly/utils/logging";
+import { PROTOCOL_FIELD } from "../constants";
 
 function logProtoruneField(ary: Array<u128>): void {
   console.log(Box.from(concatByteArray(ary)).toHexString());
@@ -55,6 +58,7 @@ function byteLengthForNVarInts(input: Box, n: u64): usize {
   return clone.start - start;
 }
 
+
 class BalanceSheetReduce {
   public table: ProtoruneTable;
   public sheets: Array<BalanceSheet>
@@ -64,6 +68,61 @@ class BalanceSheetReduce {
   }
   concat(): BalanceSheet {
     return BalanceSheet.concat(this.sheets);
+  }
+}
+
+export class ProtoMessageReduce {
+  public accumulated: Array<ProtoMessage>;
+  public voutStart: u32;
+  constructor(voutStart: u32) {
+    this.voutStart = voutStart;
+    this.accumulated = new Array<ProtoMessage>();
+  }
+  static from(voutStart: u32): ProtoMessageReduce {
+    return new ProtoMessageReduce(voutStart);
+  }
+}
+
+export class ProtostoneTable {
+  public list: Array<Protostone>;
+  public voutStart: u32;
+  constructor(v: Array<Protostone>, voutStart: u32) {
+    this.list = v;
+    this.voutStart = voutStart;
+  }
+  static from(ary: Array<u128>, voutStart: u32): ProtostoneTable {
+    const list = Protostone.parseFromFieldData(ary);
+    return new ProtostoneTable(list, voutStart);
+  }
+  burns(): Array<Protoburn> {
+    return this.list
+      .filter((v: Protostone) => v.protocolTag === u128.from(13) && v.isBurn())
+      .map(
+        (v: Protostone) =>
+          new Protoburn([
+            v.fields.get(ProtoruneField.BURN)[0],
+            v.fields.get(ProtoruneField.POINTER)[0],
+          ]),
+      );
+  }
+  messages(): Array<ProtoMessage> {
+    return this.list.reduce(
+      (
+        r: ProtoMessageReduce,
+        v: Protostone,
+        i: i32,
+        ary: Array<Protostone>,
+      ) => {
+        if (v.isMessage()) {
+          r.accumulated.push(ProtoMessage.from(v, r.voutStart + i));
+        }
+        return r;
+      },
+      ProtoMessageReduce.from(this.voutStart),
+    ).accumulated;
+  }
+  flat(): Array<Protostone> {
+    return this.list;
   }
 }
 
@@ -79,6 +138,14 @@ export class Protostone extends RunestoneMessage {
     this.edicts = edicts;
     this.protocolTag = protocolTag;
     this.table = ProtoruneTable.for(protocolTag);
+  }
+  protostones(voutStart: u32): ProtostoneTable {
+    if (!this.fields.has(PROTOCOL_FIELD))
+      return ProtostoneTable.from(new Array<u128>(), voutStart);
+    return ProtostoneTable.from(this.fields.get(PROTOCOL_FIELD), voutStart);
+  }
+  static from(v: RunestoneMessage): Protostone {
+    return changetype<Protostone>(v);
   }
   inspect(): string {
     let result = "Protostone {\n";
@@ -117,8 +184,17 @@ export class Protostone extends RunestoneMessage {
   isMessage(): bool {
     return this.fields.has(ProtoruneField.MESSAGE);
   }
+  toMessage(vout: u32): ProtoMessage {
+    return ProtoMessage.from(this, vout);
+  }
   isBurn(): bool {
     return this.fields.has(ProtoruneField.BURN);
+  }
+  toBurn(): Protoburn {
+    return new Protoburn([
+      this.fields.get(ProtoruneField.BURN)[0],
+      this.fields.get(ProtoruneField.POINTER)[0],
+    ]);
   }
   isSplit(): bool {
     return this.fields.has(ProtoruneField.SPLIT);
