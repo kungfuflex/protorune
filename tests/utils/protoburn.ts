@@ -109,7 +109,6 @@ export const constructProtostoneTx = (
     block.transactions?.push(coinbase);
   }
 
-  console.log(protostones);
   const blockInputs = inputs.map((input) => {
     return {
       hash: input.inputTxHash,
@@ -132,7 +131,6 @@ export const constructProtostoneTx = (
     pointer: runeTransferPointer, // default output for leftover runes, default goes to the protoburn
     protostones: protostones,
   }).encodedRunestone;
-  console.log(runestone);
 
   const transaction = buildTransaction(
     [...blockInputs],

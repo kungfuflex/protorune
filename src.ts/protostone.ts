@@ -74,7 +74,7 @@ export class ProtoStone {
         pointer: Some<u32>(u32(burn.pointer)),
       };
     }
-    if (message) {
+    if (message && message.calldata) {
       const ary = Uint8Array.from(message.calldata);
       const res: u128[] = [];
 

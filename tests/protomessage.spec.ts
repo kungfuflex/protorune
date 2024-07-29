@@ -28,6 +28,7 @@ import { ProtoStone } from "../src.ts/protostone";
 import { u128, u64, u32 } from "@magiceden-oss/runestone-lib/dist/src/integer";
 import { RuneId } from "@magiceden-oss/runestone-lib/dist/src/runeid";
 
+
 // const TEST_PROTOCOL_TAG = parseInt("0x112233445566778899aabbccddeeff10", 16);
 const TEST_PROTOCOL_TAG = BigInt("0x400000000000000000");
 
@@ -180,7 +181,6 @@ describe("protomessage", () => {
       undefined,
       premineAmount,
     );
-    console.log("block with rune etching init");
     const input = {
       inputTxHash: block.transactions?.at(1)?.getHash(), // 0 is coinbase, 1 is the mint
       inputTxOutputIndex: pointer1, // index of output in the input tx that has the runes. In this case it is the default pointer of the mint
@@ -241,23 +241,27 @@ describe("protomessage", () => {
         ProtoStone.message({
           protocolTag: TEST_PROTOCOL_TAG,
           pointer: 1,
-          refundPointer: 2,
-          calldata,
           edicts: [
             {
               amount: u128(premineAmount),
               id: new RuneId(u64(runeId.block), u32(runeId.tx)),
-              output: u32(3),
+              output: u32(5),
             },
           ],
+        }),
+        ProtoStone.message({
+          protocolTag: TEST_PROTOCOL_TAG,
+          pointer: 1,
+          refundPointer: 2,
+          calldata
         }),
       ],
       block,
       2,
     );
-    console.log(calldata, ": calldata");
     program.setBlock(block.toHex());
     await program.run("_start");
+    const sheet = await protorunesbyaddress(program, TEST_BTC_ADDRESS2, TEST_PROTOCOL_TAG);
     const resultAddress1 = await runesbyaddress(program, TEST_BTC_ADDRESS1);
     expect(resultAddress1.balanceSheet.length).equals(
       0,
@@ -274,7 +278,6 @@ describe("protomessage", () => {
       TEST_BTC_ADDRESS2,
       TEST_PROTOCOL_TAG,
     );
-    console.log(protorunesAddress2);
     expect(protorunesAddress2.balanceSheet.length).equals(
       0,
       "address 2 should not have any protorunes",
@@ -284,7 +287,6 @@ describe("protomessage", () => {
       TEST_BTC_ADDRESS1,
       TEST_PROTOCOL_TAG,
     );
-    console.log(protorunesAddress1);
     expect(protorunesAddress1.balanceSheet[0].balance).equals(
       premineAmount,
       "address 1 should now have all the protorunes",

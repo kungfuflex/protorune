@@ -65,7 +65,6 @@ yargs
         output!,
       );
       const burnTx = protoburn.extractTransaction().toHex();
-      console.log(burnTx);
       console.log(inspect(await decodeRawTx(burnTx), false, 5, true));
     },
   )

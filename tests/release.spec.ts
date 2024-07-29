@@ -159,13 +159,11 @@ describe("metashrew-runes", () => {
     await program.run("_start");
 
     const resultAddress1 = await runesbyaddress(program, TEST_BTC_ADDRESS1);
-    console.log(resultAddress1.balanceSheet);
     expect(resultAddress1.balanceSheet.length).equals(
       0,
       "address 1 should not have received runes from invalid rune transfer",
     );
     const resultAddress2 = await runesbyaddress(program, TEST_BTC_ADDRESS2);
-    console.log(resultAddress2.balanceSheet);
     expect(resultAddress2.balanceSheet.length).equals(
       0,
       "address 2 should not have received runes from invalid rune transfer",
@@ -237,13 +235,11 @@ describe("metashrew-runes", () => {
     const remainingAmount = premineAmount - amount;
 
     const resultAddress1 = await runesbyaddress(program, TEST_BTC_ADDRESS1);
-    console.log(resultAddress1.balanceSheet);
     expect(resultAddress1.balanceSheet[0].balance).equals(
       remainingAmount,
       "amount refund to address 1 is incorrect",
     );
     const resultAddress2 = await runesbyaddress(program, TEST_BTC_ADDRESS2);
-    console.log(resultAddress2.balanceSheet);
     expect(resultAddress2.balanceSheet[0].balance).equals(
       amount,
       "amount to address 2 is incorrect",
@@ -312,13 +308,11 @@ describe("metashrew-runes", () => {
     await program.run("_start");
 
     const resultAddress1 = await runesbyaddress(program, TEST_BTC_ADDRESS1);
-    console.log(resultAddress1.balanceSheet);
     expect(resultAddress1.balanceSheet.length).equals(
       0,
       "address 1 should not have any runes left",
     );
     const resultAddress2 = await runesbyaddress(program, TEST_BTC_ADDRESS2);
-    console.log(resultAddress2.balanceSheet);
     expect(resultAddress2.balanceSheet[0].balance).equals(
       premineAmount,
       "amount to address 2 should be entire premineAmount",
@@ -400,13 +394,11 @@ describe("metashrew-runes", () => {
     await program.run("_start");
 
     const resultAddress1 = await runesbyaddress(program, TEST_BTC_ADDRESS1);
-    console.log(resultAddress1.balanceSheet);
     expect(resultAddress1.balanceSheet.length).equals(
       0,
       "address 1 should not have any runes left",
     );
     const resultAddress2 = await runesbyaddress(program, TEST_BTC_ADDRESS2);
-    console.log(resultAddress2.balanceSheet);
     expect(resultAddress2.balanceSheet[0].balance).equals(
       premineAmount,
       "amount to address 2 should be entire premineAmount",
@@ -471,13 +463,11 @@ describe("metashrew-runes", () => {
     await program.run("_start");
 
     const resultAddress1 = await runesbyaddress(program, TEST_BTC_ADDRESS1);
-    //console.log(resultAddress1.balanceSheet);
     expect(resultAddress1.balanceSheet.length).equals(
       0,
       "address 1 should not have any runes left",
     );
     const resultAddress2 = await runesbyaddress(program, TEST_BTC_ADDRESS2);
-    //console.log(resultAddress2.balanceSheet);
     expect(resultAddress2.balanceSheet.length).equals(
       0,
       "address 2 should not have any runes left",
@@ -549,13 +539,11 @@ describe("metashrew-runes", () => {
     await program.run("_start");
 
     let resultAddress1 = await runesbyaddress(program, TEST_BTC_ADDRESS1);
-    //console.log(resultAddress1.balanceSheet);
     expect(resultAddress1.balanceSheet.length).equals(
       0,
       "address 1 should not have any runes left",
     );
     let resultAddress2 = await runesbyaddress(program, TEST_BTC_ADDRESS2);
-    //console.log(resultAddress2.balanceSheet);
     expect(resultAddress2.balanceSheet[0].balance).equals(
       premineAmount,
       "amount to address 2 should be entire premineAmount",
@@ -583,10 +571,8 @@ describe("metashrew-runes", () => {
     const leftover = premineAmount - amount;
 
     resultAddress1 = await runesbyaddress(program, TEST_BTC_ADDRESS1);
-    //console.log(resultAddress1.balanceSheet);
     expect(resultAddress1.balanceSheet[0].balance).equals(amount);
     resultAddress2 = await runesbyaddress(program, TEST_BTC_ADDRESS2);
-    //console.log(resultAddress2.balanceSheet);
     expect(resultAddress2.balanceSheet[0].balance).equals(leftover);
   });
 });

@@ -53,11 +53,9 @@ export class MessageContext {
     this.sheets = new Map<u32, ProtoruneBalanceSheet>();
     const table = ProtoruneTable.for(protocolTag);
     this.table = table;
-    console.log("outpoint: " + Box.from(outpoint.toArrayBuffer()).toHexString());
     const sheet = ProtoruneBalanceSheet.load(
       table.OUTPOINT_TO_RUNES.select(outpoint.toArrayBuffer()),
     );
-    console.log(sheet.inspect());
     this.sheets.set(index, sheet);
     this.sheets.set(
       pointer,
@@ -115,8 +113,6 @@ export class MessageContext {
   run(): void {
     if (this.sheets.has(this.pointer.index)) {
       const sheet = this.sheets.get(this.pointer.index);
-      //console.log("pointer sheet");
-      //console.log(sheet.inspect());
       for (let i = 0; i < sheet.runes.length; i++) {
         if (this.runeIdToIndex.has(sheet.runes[i])) {
           this.runes[this.runeIdToIndex.get(sheet.runes[i])].pointer_index = i;
@@ -132,11 +128,9 @@ export class MessageContext {
     const sheet = this.sheets.has(this.refund_pointer.index)
       ? this.sheets.get(this.refund_pointer.index)
       : new ProtoruneBalanceSheet();
-    //console.log("refund pointer sheet");
     if (this.sheets.has(this.outpoint.index)) {
       this.sheets.get(this.outpoint.index).pipe(sheet);
     }
-    //console.log(sheet.inspect());
     for (let i = 0; i < sheet.runes.length; i++) {
       if (this.runeIdToIndex.has(sheet.runes[i])) {
         this.runes[

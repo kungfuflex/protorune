@@ -20,9 +20,6 @@ export class Protoburn {
     balanceSheet: ProtoruneBalanceSheet,
     outpoint: ArrayBuffer
   ): void {
-    console.log("balanceSheet:");
-    console.log(balanceSheet.inspect());
-    console.log(Box.from(outpoint).toHexString());
     for (let i = 0; i < balanceSheet.runes.length; i++) {
       const runeId = balanceSheet.runes[i];
       const name = base.RUNE_ID_TO_ETCHING.select(runeId).get();

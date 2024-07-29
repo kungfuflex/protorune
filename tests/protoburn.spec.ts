@@ -128,7 +128,6 @@ describe("protoburns", () => {
       TEST_BTC_ADDRESS1,
       TEST_PROTOCOL_TAG,
     );
-    //console.log(protorunesAddress1);
     expect(protorunesAddress1.balanceSheet[0].balance).equals(
       premineAmount,
       "address 1 should now have all the protorunes",
@@ -220,7 +219,6 @@ describe("protoburns", () => {
       TEST_BTC_ADDRESS2,
       TEST_PROTOCOL_TAG,
     );
-    //console.log(protorunesAddress2);
     expect(protorunesAddress2.balanceSheet[0].balance).equals(
       amount,
       "address 2 should now have the protorunes sent to protoburn through edict",
@@ -311,7 +309,6 @@ describe("protoburns", () => {
       TEST_BTC_ADDRESS2,
       TEST_PROTOCOL_TAG,
     );
-    //console.log(protorunesAddress2);
     expect(protorunesAddress2.balanceSheet[0].balance).equals(
       amountLeftover,
       "address 2 should now have the protorunes left over from the transfer",
@@ -446,7 +443,6 @@ describe("protoburns", () => {
       TEST_BTC_ADDRESS1,
       TEST_PROTOCOL_TAG,
     );
-    //console.log(protorunesAddress1);
     expect(protorunesAddress1.balanceSheet[0].balance).equals(
       premineAmount,
       "address 1 should now have all the protorunes 1",
@@ -566,7 +562,6 @@ describe("protoburns", () => {
       TEST_BTC_ADDRESS2,
       TEST_PROTOCOL_TAG,
     );
-    //console.log(protorunesAddress2);
     expect(protorunesAddress2.balanceSheet[0].balance).equals(
       premineAmount,
       "address 2 should now have all protorunes",
@@ -576,7 +571,6 @@ describe("protoburns", () => {
       TEST_BTC_ADDRESS1,
       TEST_PROTOCOL_TAG,
     );
-    //console.log(protorunesAddress1);
     expect(protorunesAddress1.balanceSheet.length).equals(
       0,
       "address 1 should now have no protorunes",
@@ -687,7 +681,6 @@ describe("protoburns", () => {
       TEST_BTC_ADDRESS1,
       TEST_PROTOCOL_TAG,
     );
-    //console.log(protorunesAddress1);
     expect(protorunesAddress1.balanceSheet[0].balance).equals(
       amount + 2n,
       "address 1 should now have amount",
@@ -698,7 +691,6 @@ describe("protoburns", () => {
       TEST_BTC_ADDRESS2,
       TEST_PROTOCOL_TAG,
     );
-    //console.log(protorunesAddress2);
     expect(protorunesAddress2.balanceSheet[0].balance).equals(
       2n * amount,
       "address 2 should now have 2*amount",
@@ -809,7 +801,6 @@ describe("protoburns", () => {
       TEST_BTC_ADDRESS1,
       TEST_PROTOCOL_TAG,
     );
-    //console.log(protorunesAddress1);
     expect(protorunesAddress1.balanceSheet[0].balance).equals(
       2n * amount,
       "address 1 should now have amount from first edict and third edict",
@@ -820,7 +811,6 @@ describe("protoburns", () => {
       TEST_BTC_ADDRESS2,
       TEST_PROTOCOL_TAG,
     );
-    //console.log(protorunesAddress2);
     expect(protorunesAddress2.balanceSheet[0].balance).equals(
       2n * amount,
       "address 2 should now have amount from second edict and pointer",
