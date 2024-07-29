@@ -10,7 +10,7 @@ import {
   OUTPOINT_TO_HEIGHT,
   SPACERS,
   SYMBOL,
-} from "../indexer/constants";
+} from "metashrew-runes/assembly/indexer/constants";
 import { ProtoruneTable } from "../indexer/tables/protorune";
 import { OutPoint, Output } from "metashrew-as/assembly/blockdata/transaction";
 import { arrayBufferToArray } from "metashrew-spendables/assembly/indexer";

@@ -4,7 +4,7 @@ import { Block } from "metashrew-as/assembly/blockdata/block";
 import { parsePrimitive } from "metashrew-as/assembly/utils/utils";
 import { DefaultProtorune, Protorune } from "./indexer";
 import { MessageContext } from "./indexer/protomessage";
-import { GENESIS } from "./indexer/constants";
+import { GENESIS } from "metashrew-runes/assembly/indexer/constants";
 import { Index as SpendablesIndex } from "metashrew-spendables/assembly/indexer";
 
 export function trap(): void {

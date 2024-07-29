@@ -17,7 +17,6 @@ import {
 import {
   fieldToArrayBuffer15Bytes
 } from "../utils";
-import { Flag } from "./flags/ProtoruneFlag";
 import { console } from "metashrew-as/assembly/utils/logging";
 
 function logProtoruneField(ary: Array<u128>): void {
@@ -114,11 +113,6 @@ export class Protostone extends RunestoneMessage {
     transaction: RunesTransaction,
   ): bool {
     return false;
-  }
-  getFlag(position: u64): bool {
-    if (!this.fields.has(ProtoruneField.FLAGS)) return false;
-    const flags = fieldToU128(this.fields.get(ProtoruneField.FLAGS));
-    return !u128.and(flags, u128.from(1) << (<i32>position)).isZero();
   }
   isMessage(): bool {
     return this.fields.has(ProtoruneField.MESSAGE);

@@ -4,7 +4,7 @@ import {
   SPACERS,
   DIVISIBILITY,
   SYMBOL,
-} from "../indexer/constants";
+} from "metashrew-runes/assembly/indexer/constants";
 import { metashrew_runes as protobuf } from "metashrew-runes/assembly/proto/metashrew-runes";
 import { input } from "metashrew-as/assembly/indexer";
 import { RuneId } from "metashrew-runes/assembly/indexer/RuneId";

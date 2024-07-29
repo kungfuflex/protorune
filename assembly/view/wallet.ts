@@ -12,7 +12,7 @@ import { Box } from "metashrew-as/assembly/utils/box";
 import { parsePrimitive } from "metashrew-as/assembly/utils/utils";
 import { console } from "metashrew-as/assembly/utils/logging";
 import { input } from "metashrew-as/assembly/indexer";
-import { OUTPOINT_TO_RUNES } from "../indexer/constants";
+import { OUTPOINT_TO_RUNES } from "metashrew-runes/assembly/indexer/constants";
 import { ProtoruneTable } from "../indexer/tables/protorune";
 
 export function wallet_test(): ArrayBuffer {

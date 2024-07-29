@@ -1,6 +1,6 @@
 import { ProtoruneBalanceSheet } from "./ProtoruneBalanceSheet";
 import { ProtoruneTable } from "./tables/protorune";
-import * as base from "./constants";
+import * as base from "metashrew-runes/assembly/indexer/constants";
 import { u128 } from "as-bignum/assembly";
 
 export class Protoburn {
