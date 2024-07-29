@@ -104,7 +104,6 @@ export class ProtostoneTable {
   }
   static from(ary: Array<u128>, voutStart: u32): ProtostoneTable {
     const list = Protostone.parseFromFieldData(ary);
-    console.log("number of protostones:" + list.length.toString());
     return new ProtostoneTable(list, voutStart);
   }
   burns(): Array<Protoburn> {
@@ -404,56 +403,5 @@ export class Protostone extends RunestoneMessage {
       );
       return false;
     }
-  }
-
-  process(
-    tx: RunesTransaction,
-    txid: ArrayBuffer,
-    height: u32,
-    txindex: u32,
-  ): Map<u32, BalanceSheet> {
-    let balanceSheets = new Array<BalanceSheet>();
-    for (let i = 0; i < tx.ins.length; i++) {
-      balanceSheets.push(
-        BalanceSheet.load(
-          this.table.OUTPOINT_TO_RUNES.select(
-            tx.ins[i].previousOutput().toArrayBuffer(),
-          ),
-        ),
-      );
-    }
-    let balanceSheet = BalanceSheet.concat(balanceSheets);
-    const balancesByOutput = new Map<u32, BalanceSheet>();
-
-    this.mint(height, balanceSheet);
-    this.etch(<u64>height, <u32>txindex, balanceSheet, tx);
-
-    const unallocatedTo = this.fields.has(Field.POINTER)
-      ? fieldTo<u32>(this.fields.get(Field.POINTER))
-      : <u32>tx.defaultOutput();
-
-    const isCenotaph = this.processEdicts(
-      balancesByOutput,
-      balanceSheet,
-      tx.outs,
-    );
-
-    if (balancesByOutput.has(unallocatedTo)) {
-      balanceSheet.pipe(balancesByOutput.get(unallocatedTo));
-    } else {
-      balancesByOutput.set(unallocatedTo, balanceSheet);
-    }
-    const runesToOutputs = balancesByOutput.keys();
-
-    for (let x = 0; x < runesToOutputs.length; x++) {
-      const sheet = balancesByOutput.get(runesToOutputs[x]);
-      sheet.save(
-        this.table.OUTPOINT_TO_RUNES.select(
-          OutPoint.from(txid, runesToOutputs[x]).toArrayBuffer(),
-        ),
-        isCenotaph,
-      );
-    }
-    return balancesByOutput;
   }
 }

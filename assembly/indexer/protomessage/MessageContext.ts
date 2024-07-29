@@ -43,7 +43,6 @@ export class MessageContext {
     const txid = transaction.txid();
     const outpoint = OutPoint.from(txid, index);
     this.outpoint = outpoint;
-    console.log("protomessage index: " + index.toString());
     const pointerOutpoint = OutPoint.from(txid, pointer);
     this.pointer = pointerOutpoint;
     const refundPointerOutpoint = OutPoint.from(txid, refund_pointer);
