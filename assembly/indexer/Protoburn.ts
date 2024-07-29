@@ -3,7 +3,7 @@ import { ProtoruneTable } from "./tables/protorune";
 import * as base from "./constants";
 import { u128 } from "as-bignum/assembly";
 
-export class ProtoBurn {
+export class Protoburn {
   public protocol_tag: u128;
   public pointer: u32;
   public table: ProtoruneTable;

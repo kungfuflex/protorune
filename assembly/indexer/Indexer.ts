@@ -15,7 +15,7 @@ import { u128 } from "as-bignum/assembly";
 import { console } from "metashrew-as/assembly/utils/logging";
 import { RunesIndex } from "metashrew-runes/assembly/indexer";
 
-import { ProtoBurn } from "./ProtoBurn";
+import { Protoburn } from "./Protoburn";
 
 const PROTOCOL_FIELD: u64 = 16383;
 
@@ -42,12 +42,12 @@ export class ProtostoneTable {
     const list = Protostone.parseFromFieldData(ary);
     return new ProtostoneTable(list, voutStart);
   }
-  burns(): Array<ProtoBurn> {
+  burns(): Array<Protoburn> {
     return this.list
       .filter((v: Protostone) => v.protocolTag === u128.from(13) && v.isBurn())
       .map(
         (v: Protostone) =>
-          new ProtoBurn([
+          new Protoburn([
             v.fields.get(ProtoruneField.BURN)[0],
             v.fields.get(ProtoruneField.POINTER)[0],
           ]),
@@ -155,7 +155,7 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
     runestoneOutputIndex: i32,
     runestone: ProtoruneRunestoneMessage,
     edicts: Array<Edict>,
-    protoburns: Array<ProtoBurn>,
+    protoburns: Array<Protoburn>,
   ): void {
     const runestoneBalanceSheet = new ProtoruneBalanceSheet();
     (balancesByOutput.has(runestoneOutputIndex)
