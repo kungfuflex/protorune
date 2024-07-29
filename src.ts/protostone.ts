@@ -220,4 +220,14 @@ export class ProtoStone {
   }): ProtoStone {
     return new ProtoStone({ message, protocolTag, edicts });
   }
+
+  static edicts({
+    protocolTag,
+    edicts,
+  }: {
+    edicts?: Edict[];
+    protocolTag: bigint;
+  }): ProtoStone {
+    return new ProtoStone({ edicts, protocolTag });
+  }
 }

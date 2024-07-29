@@ -48,18 +48,17 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
     height: u32,
     i: u32,
   ): RunestoneMessage {
-    const runestone = Protostone.from(tx.runestone());
+    const baseRunestone = tx.runestone();
+    const runestone = Protostone.from(baseRunestone);
     const unallocatedTo = runestone.fields.has(Field.POINTER)
       ? fieldTo<u32>(runestone.fields.get(Field.POINTER))
       : <u32>tx.defaultOutput();
     if (changetype<usize>(runestone) === 0)
       return changetype<RunestoneMessage>(0);
     const balancesByOutput = changetype<Map<u32, ProtoruneBalanceSheet>>(
-      runestone.process(tx, txid, height, i),
+      baseRunestone.process(tx, txid, height, i),
     );
-    const protostones = runestone.protostones(
-      tx.outs.length + 1,
-    );
+    const protostones = runestone.protostones(tx.outs.length + 1);
     const burns = protostones.burns();
 
     const runestoneOutputIndex = tx.runestoneOutputIndex();
@@ -139,7 +138,9 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
     for (let i = 0; i < protostones.length; i++) {
       const protostone = protostones[i];
       if (protostone.isMessage()) {
-        protostone.toMessage(tx.outs.length + 1 + i).handle<T>(tx, block, height, txindex);
+        protostone
+          .toMessage(tx.outs.length + 1 + i)
+          .handle<T>(tx, block, height, txindex);
       } else if (protostone.edicts.length) {
         protostone.process(tx, txid, <u32>height, txindex);
       }

@@ -28,7 +28,6 @@ import { ProtoStone } from "../src.ts/protostone";
 import { u128, u64, u32 } from "@magiceden-oss/runestone-lib/dist/src/integer";
 import { RuneId } from "@magiceden-oss/runestone-lib/dist/src/runeid";
 
-
 // const TEST_PROTOCOL_TAG = parseInt("0x112233445566778899aabbccddeeff10", 16);
 const TEST_PROTOCOL_TAG = BigInt("0x400000000000000000");
 
@@ -238,9 +237,8 @@ describe("protomessage", () => {
       [output, refundOutput],
       [],
       [
-        ProtoStone.message({
+        ProtoStone.edicts({
           protocolTag: TEST_PROTOCOL_TAG,
-          pointer: 1,
           edicts: [
             {
               amount: u128(premineAmount),
@@ -253,15 +251,20 @@ describe("protomessage", () => {
           protocolTag: TEST_PROTOCOL_TAG,
           pointer: 1,
           refundPointer: 2,
-          calldata
+          calldata,
         }),
       ],
       block,
       2,
     );
     program.setBlock(block.toHex());
+    console.log("indexing message block");
     await program.run("_start");
-    const sheet = await protorunesbyaddress(program, TEST_BTC_ADDRESS2, TEST_PROTOCOL_TAG);
+    const sheet = await protorunesbyaddress(
+      program,
+      TEST_BTC_ADDRESS2,
+      TEST_PROTOCOL_TAG,
+    );
     const resultAddress1 = await runesbyaddress(program, TEST_BTC_ADDRESS1);
     expect(resultAddress1.balanceSheet.length).equals(
       0,

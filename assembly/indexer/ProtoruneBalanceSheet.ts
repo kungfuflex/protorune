@@ -4,6 +4,7 @@ import { u128 } from "as-bignum/assembly";
 import { fromArrayBuffer } from "metashrew-runes/assembly/utils";
 import { RuneId } from "metashrew-runes/assembly/indexer/RuneId";
 import { BalanceSheet } from "metashrew-runes/assembly/indexer/BalanceSheet";
+import { console } from "metashrew-as/assembly/utils";
 
 export class ProtoruneBalanceSheet extends BalanceSheet {
   static fromPairs(
@@ -12,11 +13,29 @@ export class ProtoruneBalanceSheet extends BalanceSheet {
   ): ProtoruneBalanceSheet {
     return ProtoruneBalanceSheet.from(BalanceSheet.fromPairs(runes, balances));
   }
-  static merge(a: ProtoruneBalanceSheet, b: ProtoruneBalanceSheet): ProtoruneBalanceSheet {
-    return ProtoruneBalanceSheet.from(BalanceSheet.merge(changetype<BalanceSheet>(a), changetype<BalanceSheet>(b)));
+  static merge(
+    a: ProtoruneBalanceSheet,
+    b: ProtoruneBalanceSheet,
+  ): ProtoruneBalanceSheet {
+    return ProtoruneBalanceSheet.from(
+      BalanceSheet.merge(
+        changetype<BalanceSheet>(a),
+        changetype<BalanceSheet>(b),
+      ),
+    );
   }
   static concat(ary: Array<ProtoruneBalanceSheet>): ProtoruneBalanceSheet {
-    return ProtoruneBalanceSheet.from(BalanceSheet.concat(ary.map<BalanceSheet>((v: ProtoruneBalanceSheet, i: i32, ary: Array<ProtoruneBalanceSheet>) => changetype<BalanceSheet>(v))));
+    return ProtoruneBalanceSheet.from(
+      BalanceSheet.concat(
+        ary.map<BalanceSheet>(
+          (
+            v: ProtoruneBalanceSheet,
+            i: i32,
+            ary: Array<ProtoruneBalanceSheet>,
+          ) => changetype<BalanceSheet>(v),
+        ),
+      ),
+    );
   }
   saveToAtomicTx(ptr: IndexPointer, tx: AtomicTransaction): void {
     const runesPtr = ptr.keyword("/runes");

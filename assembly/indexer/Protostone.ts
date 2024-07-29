@@ -5,7 +5,11 @@ import { Box } from "metashrew-as/assembly/utils/box";
 import { reverse } from "metashrew-as/assembly/utils/utils";
 import { readULEB128ToU128 } from "metashrew-runes/assembly/leb128";
 import { BalanceSheet } from "metashrew-runes/assembly/indexer/BalanceSheet";
-import { Input, OutPoint } from "metashrew-as/assembly/blockdata/transaction";
+import {
+  Input,
+  OutPoint,
+  Output,
+} from "metashrew-as/assembly/blockdata/transaction";
 import { RunesTransaction } from "metashrew-runes/assembly/indexer/RunesTransaction";
 import { RunestoneMessage } from "metashrew-runes/assembly/indexer/RunestoneMessage";
 import { ProtoMessage } from "./protomessage";
@@ -14,13 +18,16 @@ import {
   u128ToHex,
   fieldToU128,
   toArrayBuffer,
-  fieldToArrayBuffer
+  fieldToArrayBuffer,
+  toPrimitive,
+  fieldTo,
 } from "metashrew-runes/assembly/utils";
-import {
-  fieldToArrayBuffer15Bytes
-} from "../utils";
+import { fieldToArrayBuffer15Bytes } from "../utils";
 import { console } from "metashrew-as/assembly/utils/logging";
 import { PROTOCOL_FIELD } from "../constants";
+import { Edict } from "metashrew-runes/assembly/indexer/Edict";
+import { Field } from "metashrew-runes/assembly/indexer/Field";
+import { encodeHexFromBuffer } from "metashrew-as/assembly/utils";
 
 function logProtoruneField(ary: Array<u128>): void {
   console.log(Box.from(concatByteArray(ary)).toHexString());
@@ -46,7 +53,13 @@ function snapTo15Bytes(v: Box): Box {
 }
 
 function concatByteArray(v: Array<u128>): ArrayBuffer {
-  return Box.concat(v.map<Box>((v, i, ary) => i === ary.length - 1 ? alignU128ToArrayBuffer(v) : snapTo15Bytes(Box.from(reverse(toArrayBuffer(v))))));
+  return Box.concat(
+    v.map<Box>((v, i, ary) =>
+      i === ary.length - 1
+        ? alignU128ToArrayBuffer(v)
+        : snapTo15Bytes(Box.from(reverse(toArrayBuffer(v)))),
+    ),
+  );
 }
 
 function byteLengthForNVarInts(input: Box, n: u64): usize {
@@ -58,10 +71,9 @@ function byteLengthForNVarInts(input: Box, n: u64): usize {
   return clone.start - start;
 }
 
-
 class BalanceSheetReduce {
   public table: ProtoruneTable;
-  public sheets: Array<BalanceSheet>
+  public sheets: Array<BalanceSheet>;
   constructor(table: ProtoruneTable) {
     this.table = table;
     this.sheets = new Array<BalanceSheet>(0);
@@ -92,6 +104,7 @@ export class ProtostoneTable {
   }
   static from(ary: Array<u128>, voutStart: u32): ProtostoneTable {
     const list = Protostone.parseFromFieldData(ary);
+    console.log("number of protostones:" + list.length.toString());
     return new ProtostoneTable(list, voutStart);
   }
   burns(): Array<Protoburn> {
@@ -132,7 +145,11 @@ export class Protostone extends RunestoneMessage {
   public nextIndex: i32 = -1;
   public protocolTag: u128 = u128.Zero;
   public table: ProtoruneTable;
-  constructor(fields: Map<u64, Array<u128>>, edicts: Array<StaticArray<u128>>, protocolTag: u128) {
+  constructor(
+    fields: Map<u64, Array<u128>>,
+    edicts: Array<StaticArray<u128>>,
+    protocolTag: u128,
+  ) {
     super(fields, edicts);
     this.fields = fields;
     this.edicts = edicts;
@@ -233,7 +250,10 @@ export class Protostone extends RunestoneMessage {
       if (size === usize.MAX_VALUE) return changetype<Protostone[]>(0); //can choose to continue or return
       input.shrinkFront(size);
       const byteLength = byteLengthForNVarInts(input, len.lo);
-      const protostone = Protostone.parse(input.sliceTo(input.start + byteLength), protocolTag);
+      const protostone = Protostone.parseIntoProtostone(
+        input.sliceTo(input.start + byteLength),
+        protocolTag,
+      );
       result.push(protostone);
       input.shrinkFront(<u32>byteLength);
     }
@@ -243,24 +263,33 @@ export class Protostone extends RunestoneMessage {
     sheet: BalanceSheet,
     txid: ArrayBuffer,
     output: u32,
-    isCenotaph: bool
+    isCenotaph: bool,
   ): void {
     sheet.save(
       this.table.OUTPOINT_TO_RUNES.select(
         OutPoint.from(txid, output).toArrayBuffer(),
       ),
-      isCenotaph
+      isCenotaph,
     );
   }
   loadBalanceSheet(tx: RunesTransaction): BalanceSheet {
-    return tx.ins.reduce<BalanceSheetReduce>((r: BalanceSheetReduce, v: Input, i: i32, ary: Array<Input>) => {
-      r.sheets.push(BalanceSheet.load(
-        r.table.OUTPOINT_TO_RUNES.select(v.previousOutput().toArrayBuffer())
-      ));
-      return r;
-    }, new BalanceSheetReduce(this.table)).concat();
+    return tx.ins
+      .reduce<BalanceSheetReduce>(
+        (r: BalanceSheetReduce, v: Input, i: i32, ary: Array<Input>) => {
+          r.sheets.push(
+            BalanceSheet.load(
+              r.table.OUTPOINT_TO_RUNES.select(
+                v.previousOutput().toArrayBuffer(),
+              ),
+            ),
+          );
+          return r;
+        },
+        new BalanceSheetReduce(this.table),
+      )
+      .concat();
   }
-  static parse(input: Box, protocolTag: u128): Protostone {
+  static parseIntoProtostone(input: Box, protocolTag: u128): Protostone {
     // console.log("Inside protostone.parse" + input.toHexString());
     let fields = new Map<u64, Array<u128>>();
     let edicts = new Array<StaticArray<u128>>(0);
@@ -299,5 +328,132 @@ export class Protostone extends RunestoneMessage {
       }
     }
     return new Protostone(fields, edicts, protocolTag);
+  }
+
+  processEdict(
+    balancesByOutput: Map<u32, BalanceSheet>,
+    balanceSheet: BalanceSheet,
+    edict: Edict,
+    outputs: Array<Output>,
+  ): bool {
+    if (edict.block.isZero() && !edict.transactionIndex.isZero()) {
+      return true;
+    }
+    const runeId = edict.runeId().toBytes();
+
+    const edictOutput = toPrimitive<u32>(edict.output);
+    if (edictOutput == outputs.length) {
+      if (edict.amount.isZero()) {
+        const numNonOpReturnOuts: u128 = this.numNonOpReturnOutputs(outputs);
+        if (!numNonOpReturnOuts.isZero()) {
+          const amountSplit = u128.div(
+            balanceSheet.get(runeId),
+            numNonOpReturnOuts,
+          );
+          const amountSplitPlus1 = amountSplit.preInc();
+          const numRemainder = u128.rem(
+            balanceSheet.get(runeId),
+            numNonOpReturnOuts,
+          );
+          let extraCounter: u64 = 0;
+          for (let i = 0; i < outputs.length; i++) {
+            if (this.isNonOpReturnOutput(outputs[i])) {
+              if (extraCounter < numRemainder.lo) {
+                this.updateBalancesForEdict(
+                  balancesByOutput,
+                  balanceSheet,
+                  amountSplitPlus1,
+                  i,
+                  runeId,
+                );
+                extraCounter++;
+              } else {
+                this.updateBalancesForEdict(
+                  balancesByOutput,
+                  balanceSheet,
+                  amountSplit,
+                  i,
+                  runeId,
+                );
+              }
+            }
+          }
+        }
+      } else {
+        for (let i = 0; i < outputs.length; i++) {
+          if (this.isNonOpReturnOutput(outputs[i])) {
+            this.updateBalancesForEdict(
+              balancesByOutput,
+              balanceSheet,
+              edict.amount,
+              i,
+              runeId,
+            );
+          }
+        }
+      }
+
+      return false;
+    } else {
+      this.updateBalancesForEdict(
+        balancesByOutput,
+        balanceSheet,
+        edict.amount,
+        edictOutput,
+        runeId,
+      );
+      return false;
+    }
+  }
+
+  process(
+    tx: RunesTransaction,
+    txid: ArrayBuffer,
+    height: u32,
+    txindex: u32,
+  ): Map<u32, BalanceSheet> {
+    let balanceSheets = new Array<BalanceSheet>();
+    for (let i = 0; i < tx.ins.length; i++) {
+      balanceSheets.push(
+        BalanceSheet.load(
+          this.table.OUTPOINT_TO_RUNES.select(
+            tx.ins[i].previousOutput().toArrayBuffer(),
+          ),
+        ),
+      );
+    }
+    let balanceSheet = BalanceSheet.concat(balanceSheets);
+    const balancesByOutput = new Map<u32, BalanceSheet>();
+
+    this.mint(height, balanceSheet);
+    this.etch(<u64>height, <u32>txindex, balanceSheet, tx);
+
+    const unallocatedTo = this.fields.has(Field.POINTER)
+      ? fieldTo<u32>(this.fields.get(Field.POINTER))
+      : <u32>tx.defaultOutput();
+
+    const isCenotaph = this.processEdicts(
+      balancesByOutput,
+      balanceSheet,
+      tx.outs,
+    );
+
+    if (balancesByOutput.has(unallocatedTo)) {
+      balanceSheet.pipe(balancesByOutput.get(unallocatedTo));
+    } else {
+      balancesByOutput.set(unallocatedTo, balanceSheet);
+    }
+    const runesToOutputs = balancesByOutput.keys();
+
+    for (let x = 0; x < runesToOutputs.length; x++) {
+      const sheet = balancesByOutput.get(runesToOutputs[x]);
+      sheet.save(
+        this.table.OUTPOINT_TO_RUNES.select(
+          OutPoint.from(txid, runesToOutputs[x]).toArrayBuffer(),
+        ),
+        isCenotaph,
+      );
+    }
+    return balancesByOutput;
   }
 }

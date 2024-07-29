@@ -46,4 +46,8 @@ export declare class ProtoStone {
         refundPointer: number;
         edicts?: Edict[];
     }): ProtoStone;
+    static edicts({ protocolTag, edicts, }: {
+        edicts?: Edict[];
+        protocolTag: bigint;
+    }): ProtoStone;
 }
