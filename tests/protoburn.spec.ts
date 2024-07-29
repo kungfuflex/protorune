@@ -33,7 +33,7 @@ import { RuneId } from "@magiceden-oss/runestone-lib/dist/src/runeid";
 const TEST_PROTOCOL_TAG = BigInt("0x400000000000000000");
 
 describe("protoburns", () => {
-  it("should index full protoburn, where edict target and pointer point to the protoburn", async () => {
+  it("initialProtoBurn: should index full protoburn, where edict target and pointer point to the protoburn", async () => {
     const program = buildProgram(DEBUG_WASM);
     program.setBlockHeight(840000);
     const premineAmount = 2100000005000000n;

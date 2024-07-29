@@ -7,11 +7,9 @@ import {
   u128ToHex,
   fieldToU128,
   toArrayBuffer,
-  fieldToArrayBuffer
+  fieldToArrayBuffer,
 } from "metashrew-runes/assembly/utils";
-import {
-  fieldToArrayBuffer15Bytes
-} from "../utils";
+import { fieldToArrayBuffer15Bytes } from "../utils";
 import { Flag } from "./flags/ProtoruneFlag";
 import { console } from "metashrew-as/assembly/utils/logging";
 
@@ -39,7 +37,13 @@ function snapTo15Bytes(v: Box): Box {
 }
 
 function concatByteArray(v: Array<u128>): ArrayBuffer {
-  return Box.concat(v.map<Box>((v, i, ary) => i === ary.length - 1 ? alignU128ToArrayBuffer(v) : snapTo15Bytes(Box.from(reverse(toArrayBuffer(v))))));
+  return Box.concat(
+    v.map<Box>((v, i, ary) =>
+      i === ary.length - 1
+        ? alignU128ToArrayBuffer(v)
+        : snapTo15Bytes(Box.from(reverse(toArrayBuffer(v)))),
+    ),
+  );
 }
 
 function byteLengthForNVarInts(input: Box, n: u64): usize {
@@ -118,7 +122,7 @@ export class ProtoStone {
     while (input.len > 0) {
       const protocolTag = u128.from(0);
       let size = readULEB128ToU128(input, protocolTag);
-      if (protocolTag.isZero() === 0) {
+      if (protocolTag.isZero()) {
         // For the very last u128, not all bytes may be used (due to LEB format)
         //console.log("Found protocol id 0, breaking...");
         break;
@@ -131,7 +135,9 @@ export class ProtoStone {
       if (size === usize.MAX_VALUE) return changetype<ProtoStone[]>(0); //can choose to continue or return
       input.shrinkFront(size);
       const byteLength = byteLengthForNVarInts(input, len.lo);
-      const protostone = ProtoStone.parse(input.sliceTo(input.start + byteLength));
+      const protostone = ProtoStone.parse(
+        input.sliceTo(input.start + byteLength),
+      );
       protostone.protocolTag = protocolTag;
       result.push(protostone);
       input.shrinkFront(<u32>byteLength);
