@@ -162,10 +162,10 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
       ? balancesByOutput.get(runestoneOutputIndex)
       : new ProtoruneBalanceSheet()
     ).pipe(changetype<BalanceSheet>(runestoneBalanceSheet));
-    const burns: Array<Edict> = new Array<Edict>(edicts.length);
-    const burnSheets = new Array<ProtoruneBalanceSheet>(edicts.length);
+    const burns: Array<Edict> = new Array<Edict>(protoburns.length);
+    const burnSheets = new Array<ProtoruneBalanceSheet>(protoburns.length);
     console.log("burn edict length: " + edicts.length.toString());
-    const cycles = new BurnCycle(edicts.length);
+    const cycles = new BurnCycle(protoburns.length);
     for (let i = 0; i < burns.length; i++) {
       burnSheets[i] = new ProtoruneBalanceSheet();
     }
