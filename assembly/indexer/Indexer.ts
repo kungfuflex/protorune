@@ -61,6 +61,7 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
       tx.outs.length + 1,
     );
     const burns = protostones.burns();
+
     console.log("burns: " + burns.length.toString());
     const runestoneOutputIndex = tx.runestoneOutputIndex();
     const edicts = Edict.fromDeltaSeries(runestone.edicts);
@@ -96,7 +97,7 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
     const burnSheets = new Array<ProtoruneBalanceSheet>(protoburns.length);
     console.log("burn edict length: " + edicts.length.toString());
     const cycles = new BurnCycle(protoburns.length);
-    for (let i = 0; i < burns.length; i++) {
+    for (let i = 0; i < protoburns.length; i++) {
       burnSheets[i] = new ProtoruneBalanceSheet();
     }
     for (let i = 0; i < edicts.length; i++) {
@@ -123,6 +124,8 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
       }
     }
     for (let i = 0; i < protoburns.length; i++) {
+      console.log("burnSheet(" + i.toString(10) + ")");
+      console.log(burnSheets[i].inspect());
       protoburns[i].process(
         burnSheets[i],
         OutPoint.from(txid, protoburns[i].pointer).toArrayBuffer(),

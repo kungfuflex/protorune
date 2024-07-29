@@ -1,23 +1,28 @@
 import { ProtoruneBalanceSheet } from "./ProtoruneBalanceSheet";
+import { Box } from "metashrew-as/assembly/utils/box";
 import { ProtoruneTable } from "./tables/protorune";
 import * as base from "metashrew-runes/assembly/indexer/constants";
 import { u128 } from "as-bignum/assembly";
+import { console } from "metashrew-as/assembly/utils/logging";
 
 export class Protoburn {
-  public protocol_tag: u128;
+  public protocolTag: u128;
   public pointer: u32;
   public table: ProtoruneTable;
   constructor(data: Array<u128>) {
-    const protocol_tag = data[0];
+    const protocolTag = data[0];
     this.pointer = data[1].toU32();
-    this.protocol_tag = protocol_tag;
-    this.table = ProtoruneTable.for(protocol_tag);
+    this.protocolTag = protocolTag;
+    this.table = ProtoruneTable.for(protocolTag);
   }
 
   process(
     balanceSheet: ProtoruneBalanceSheet,
     outpoint: ArrayBuffer
   ): void {
+    console.log("balanceSheet:");
+    console.log(balanceSheet.inspect());
+    console.log(Box.from(outpoint).toHexString());
     for (let i = 0; i < balanceSheet.runes.length; i++) {
       const runeId = balanceSheet.runes[i];
       const name = base.RUNE_ID_TO_ETCHING.select(runeId).get();

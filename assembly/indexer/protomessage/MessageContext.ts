@@ -6,6 +6,7 @@ import { ProtoruneBalanceSheet } from "../ProtoruneBalanceSheet";
 import { ProtoruneTable, PROTOCOLS_TO_INDEX } from "../tables/protorune";
 import { u128 } from "as-bignum/assembly";
 import { console } from "metashrew-as/assembly/utils/logging";
+import { Box } from "metashrew-as/assembly/utils/box";
 
 export class MessageContext {
   runtime: AtomicTransaction = new AtomicTransaction();
@@ -52,9 +53,11 @@ export class MessageContext {
     this.sheets = new Map<u32, ProtoruneBalanceSheet>();
     const table = ProtoruneTable.for(protocolTag);
     this.table = table;
+    console.log("outpoint: " + Box.from(outpoint.toArrayBuffer()).toHexString());
     const sheet = ProtoruneBalanceSheet.load(
       table.OUTPOINT_TO_RUNES.select(outpoint.toArrayBuffer()),
     );
+    console.log(sheet.inspect());
     this.sheets.set(index, sheet);
     this.sheets.set(
       pointer,

@@ -104,7 +104,7 @@ describe("protomessage", () => {
       /*protostones=*/ [
         ProtoStone.burn({
           protocolTag: TEST_PROTOCOL_TAG,
-          pointer: 3, // first protomessage is at the outpoint after outpoints.length
+          pointer: 5, // first protomessage is at the outpoint after outpoints.length
         }),
         ProtoStone.message({
           calldata: Buffer.from("1111"),
