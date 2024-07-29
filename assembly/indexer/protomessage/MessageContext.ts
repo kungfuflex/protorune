@@ -1,8 +1,8 @@
 import { Block, OutPoint, Transaction } from "metashrew-as/assembly/blockdata";
 import { IncomingRune } from "./IncomingRune";
 import { AtomicTransaction } from "metashrew-as/assembly/indexer/atomic";
-import { RuneId } from "../RuneId";
-import { BalanceSheet } from "../BalanceSheet";
+import { RuneId } from "metashrew-runes/assembly/indexer/RuneId";
+import { BalanceSheet } from "metashrew-runes/assembly/indexer/BalanceSheet";
 import { ProtoruneTable, PROTOCOLS_TO_INDEX } from "../tables/protorune";
 import { u128 } from "as-bignum/assembly";
 import { console } from "metashrew-as/assembly/utils/logging";

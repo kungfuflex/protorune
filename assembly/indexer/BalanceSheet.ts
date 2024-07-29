@@ -1,7 +1,7 @@
 import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
 import { AtomicTransaction } from "metashrew-as/assembly/indexer/atomic";
 import { u128 } from "as-bignum/assembly";
-import { fromArrayBuffer } from "../utils";
+import { fromArrayBuffer } from "metashrew-runes/assembly/utils";
 import { RuneId } from "./RuneId";
 
 export class BalanceSheet {

@@ -1,16 +1,16 @@
-import { toPrimitive, min, fieldTo } from "../utils";
-import { Edict } from "./Edict";
+import { toPrimitive, min, fieldTo } from "metashrew-runes/assembly/utils";
+import { Edict } from "metashrew-runes/assembly/indexer/Edict";
 import { ProtoruneTable } from "./tables/protorune";
-import { BalanceSheet } from "./BalanceSheet";
-import { RunesTransaction } from "./RunesTransaction";
+import { BalanceSheet } from "metashrew-runes/assembly/indexer/BalanceSheet";
+import { RunesTransaction } from "metashrew-runes/assembly/indexer/RunesTransaction";
 import { OutPoint } from "metashrew-as/assembly/blockdata/transaction";
-import { RunestoneMessage } from "./RunestoneMessage";
+import { RunestoneMessage } from "metashrew-runes/assembly/indexer/RunestoneMessage";
 import { u128 } from "as-bignum/assembly";
 import { console } from "metashrew-as/assembly/utils/logging";
 import { Field } from "./fields";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils";
 import { ProtoStone } from "./ProtoStone";
-import { u128ToHex } from "../utils";
+import { u128ToHex } from "metashrew-runes/assembly/utils";
 import { Box } from "metashrew-as/assembly/utils/box";
 
 export class ProtoruneMessage extends RunestoneMessage {

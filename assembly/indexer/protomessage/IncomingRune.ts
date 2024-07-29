@@ -1,9 +1,9 @@
 import { AtomicTransaction } from "metashrew-as/assembly/indexer/atomic";
-import { RuneId } from "../RuneId";
+import { RuneId } from "metashrew-runes/assembly/indexer/RuneId";
 import { u128 } from "as-bignum/assembly";
 import { MessageContext } from "./MessageContext";
 import { ProtoruneTable } from "../tables/protorune";
-import { fromArrayBuffer, toArrayBuffer } from "../../utils";
+import { fromArrayBuffer, toArrayBuffer } from "metashrew-runes/assembly/utils";
 
 export class IncomingRune {
   runeId: RuneId;

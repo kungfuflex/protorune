@@ -7,9 +7,9 @@ import {
 } from "../indexer/constants";
 import { metashrew_runes as protobuf } from "../proto/metashrew-runes";
 import { input } from "metashrew-as/assembly/indexer";
-import { RuneId } from "../indexer/RuneId";
+import { RuneId } from "metashrew-runes/assembly/indexer/RuneId";
 import { u128 } from "as-bignum/assembly";
-import { fromArrayBuffer, fieldToName } from "../utils";
+import { fromArrayBuffer, fieldToName } from "metashrew-runes/assembly/utils";
 
 export function runes(): ArrayBuffer {
   const inp = protobuf.PaginationInput.decode(input().slice(4));

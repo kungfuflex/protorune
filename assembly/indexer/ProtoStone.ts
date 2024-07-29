@@ -2,7 +2,7 @@ import { u128 } from "as-bignum/assembly";
 import { Field } from "./fields/ProtoruneField";
 import { Box } from "metashrew-as/assembly/utils/box";
 import { reverse } from "metashrew-as/assembly/utils/utils";
-import { readULEB128ToU128 } from "../leb128";
+import { readULEB128ToU128 } from "metashrew-runes/assembly/leb128";
 import {
   u128ToHex,
   fieldToU128,
@@ -10,7 +10,7 @@ import {
   fieldToArrayBuffer,
   fieldToArrayBuffer15Bytes,
   fieldToArrayBuffer15Bytes,
-} from "../utils";
+} from "metashrew-runes/assembly/utils";
 import { Flag } from "./flags/ProtoruneFlag";
 import { console } from "metashrew-as/assembly/utils/logging";
 
@@ -117,7 +117,7 @@ export class ProtoStone {
     while (input.len > 0) {
       const protocol_id = u128.from(0);
       let size = readULEB128ToU128(input, protocol_id);
-      if (protocol_id.lo == 0 && protocol_id.hi == 0) {
+      if (protocol_id.isZero() === 0) {
         // For the very last u128, not all bytes may be used (due to LEB format)
         //console.log("Found protocol id 0, breaking...");
         break;

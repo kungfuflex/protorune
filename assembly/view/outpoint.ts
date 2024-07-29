@@ -1,7 +1,7 @@
 import { Box } from "metashrew-as/assembly/utils/box";
 import { input } from "metashrew-as/assembly/indexer/index";
-import { BalanceSheet } from "../indexer/BalanceSheet";
-import { RuneId } from "../indexer/RuneId";
+import { BalanceSheet } from "metashrew-runes/assembly/indexer/BalanceSheet";
+import { RuneId } from "metashrew-runes/assembly/indexer/RuneId";
 import {
   OUTPOINT_TO_RUNES,
   HEIGHT_TO_TRANSACTION_IDS,
@@ -15,10 +15,10 @@ import { ProtoruneTable } from "../indexer/tables/protorune";
 import { OutPoint, Output } from "metashrew-as/assembly/blockdata/transaction";
 import { arrayBufferToArray } from "metashrew-spendables/assembly/indexer";
 import { OUTPOINT_TO_OUTPUT } from "metashrew-spendables/assembly/tables";
-import { metashrew_runes as protobuf } from "../proto/metashrew-runes";
+import { metashrew_runes as protobuf } from "metashrew-runes/assembly/proto/metashrew-runes";
 import { protorune as protobuf_protorune } from "../proto/protorune";
 import { u128 } from "as-bignum/assembly";
-import { fromArrayBuffer, fieldToName } from "../utils";
+import { fromArrayBuffer, fieldToName } from "metashrew-runes/assembly/utils";
 import { console } from "metashrew-as/assembly/utils/logging";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils";
 

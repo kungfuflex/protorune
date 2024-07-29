@@ -11,7 +11,7 @@ import {
   CHUNK_TAG,
 } from "./constants";
 import { PROTOCOLS_TO_INDEX } from "./tables/protorune";
-import { readULEB128ToU128 } from "../leb128";
+import { readULEB128ToU128 } from "metashrew-runes/assembly/leb128";
 import { u128 } from "as-bignum/assembly";
 import { Box, console, scriptParse } from "metashrew-as/assembly/utils";
 import { checkForNonDataPush } from "../utils";

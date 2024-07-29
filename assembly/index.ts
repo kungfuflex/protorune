@@ -27,5 +27,4 @@ export function _start(): void {
   _flush();
 }
 
-export * from "./tests";
 export * from "./view";

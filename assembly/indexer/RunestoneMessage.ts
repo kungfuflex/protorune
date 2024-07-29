@@ -2,7 +2,7 @@ import { u128 } from "as-bignum/assembly";
 import { Field } from "./fields";
 import { Field as ProtoruneField } from "./fields/ProtoruneField";
 import { Box } from "metashrew-as/assembly/utils/box";
-import { readULEB128ToU128 } from "../leb128";
+import { readULEB128ToU128 } from "metashrew-runes/assembly/leb128";
 import {
   u128ToHex,
   fieldToArrayBuffer,
