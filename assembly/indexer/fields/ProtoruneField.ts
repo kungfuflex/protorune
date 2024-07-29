@@ -1,6 +1,6 @@
 @final
 @unmanaged
-export class Field {
+export class ProtoruneField {
   static BODY: u64 = 0;
   static FLAGS: u64 = 2;
   static MESSAGE: u64 = 81;

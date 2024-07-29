@@ -5,7 +5,7 @@ import {
   DIVISIBILITY,
   SYMBOL,
 } from "../indexer/constants";
-import { metashrew_runes as protobuf } from "../proto/metashrew-runes";
+import { metashrew_runes as protobuf } from "metashrew-runes/assembly/proto/metashrew-runes";
 import { input } from "metashrew-as/assembly/indexer";
 import { RuneId } from "metashrew-runes/assembly/indexer/RuneId";
 import { u128 } from "as-bignum/assembly";

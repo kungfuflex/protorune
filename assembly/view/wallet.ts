@@ -4,8 +4,8 @@ import {
   outpointBase,
   outpointBaseForProtocol,
 } from "./outpoint";
-import { BalanceSheet } from "../indexer/BalanceSheet";
-import { metashrew_runes as protobuf } from "../proto/metashrew-runes";
+import { ProtoruneBalanceSheet } from "../indexer/ProtoruneBalanceSheet";
+import { metashrew_runes as protobuf } from "metashrew-runes/assembly/proto/metashrew-runes";
 import { protorune, protorune as protoruneProtobuf } from "../proto/protorune";
 import { Output } from "metashrew-as/assembly/blockdata/transaction";
 import { Box } from "metashrew-as/assembly/utils/box";
@@ -33,7 +33,7 @@ export function runesbyaddress(): ArrayBuffer {
 
   const _outpoints = SpendablesIndex.findOutpointsForAddress(address);
   const outpoints = new Array<protobuf.OutpointResponse>();
-  const balanceSheets = new Array<BalanceSheet>();
+  const balanceSheets = new Array<ProtoruneBalanceSheet>();
   for (let i = 0; i < _outpoints.length; i++) {
     const inp = new protobuf.Outpoint();
     inp.txid = changetype<Array<u8>>(
@@ -45,7 +45,7 @@ export function runesbyaddress(): ArrayBuffer {
       continue;
     }
     balanceSheets.push(
-      BalanceSheet.load(OUTPOINT_TO_RUNES.select(_outpoints[i])),
+      ProtoruneBalanceSheet.load(OUTPOINT_TO_RUNES.select(_outpoints[i])),
     );
     outpoints.push(op);
   }
@@ -53,11 +53,11 @@ export function runesbyaddress(): ArrayBuffer {
   const message = new protobuf.WalletResponse();
   message.outpoints = outpoints;
   message.balances = balanceSheetToProtobuf(
-    balanceSheets.reduce(
-      (r: BalanceSheet, v: BalanceSheet, i: i32, ary: Array<BalanceSheet>) => {
-        return BalanceSheet.merge(r, v);
+    balanceSheets.reduce<ProtoruneBalanceSheet>(
+      (r: ProtoruneBalanceSheet, v: ProtoruneBalanceSheet, i: i32, ary: Array<ProtoruneBalanceSheet>) => {
+        return ProtoruneBalanceSheet.merge(r, v);
       },
-      new BalanceSheet(),
+      new ProtoruneBalanceSheet(),
     ),
   );
 
@@ -76,7 +76,7 @@ export function protorunesbyaddress(): ArrayBuffer {
 
   const _outpoints = SpendablesIndex.findOutpointsForAddress(address);
   const outpoints = new Array<protobuf.OutpointResponse>();
-  const balanceSheets = new Array<BalanceSheet>();
+  const balanceSheets = new Array<ProtoruneBalanceSheet>();
   for (let i = 0; i < _outpoints.length; i++) {
     const inp = new protoruneProtobuf.OutpointWithProtocol();
     inp.txid = changetype<Array<u8>>(
@@ -89,7 +89,7 @@ export function protorunesbyaddress(): ArrayBuffer {
       continue;
     }
     balanceSheets.push(
-      BalanceSheet.load(
+      ProtoruneBalanceSheet.load(
         protorune_pointer.OUTPOINT_TO_RUNES.select(_outpoints[i]),
       ),
     );
@@ -100,10 +100,10 @@ export function protorunesbyaddress(): ArrayBuffer {
   message.outpoints = outpoints;
   message.balances = balanceSheetToProtobuf(
     balanceSheets.reduce(
-      (r: BalanceSheet, v: BalanceSheet, i: i32, ary: Array<BalanceSheet>) => {
-        return BalanceSheet.merge(r, v);
+      (r: ProtoruneBalanceSheet, v: ProtoruneBalanceSheet, i: i32, ary: Array<ProtoruneBalanceSheet>) => {
+        return ProtoruneBalanceSheet.merge(r, v);
       },
-      new BalanceSheet(),
+      new ProtoruneBalanceSheet(),
     ),
   );
 

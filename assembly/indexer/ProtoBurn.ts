@@ -1,4 +1,4 @@
-import { BalanceSheet } from "./BalanceSheet";
+import { ProtoruneBalanceSheet } from "./ProtoruneBalanceSheet";
 import { ProtoruneTable } from "./tables/protorune";
 import * as base from "./constants";
 import { u128 } from "as-bignum/assembly";
@@ -15,7 +15,7 @@ export class ProtoBurn {
   }
 
   process(
-    balanceSheet: BalanceSheet,
+    balanceSheet: ProtoruneBalanceSheet,
     outpoint: ArrayBuffer
   ): void {
     for (let i = 0; i < balanceSheet.runes.length; i++) {

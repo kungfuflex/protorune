@@ -2,7 +2,7 @@ import { Block, OutPoint, Transaction } from "metashrew-as/assembly/blockdata";
 import { IncomingRune } from "./IncomingRune";
 import { AtomicTransaction } from "metashrew-as/assembly/indexer/atomic";
 import { RuneId } from "metashrew-runes/assembly/indexer/RuneId";
-import { BalanceSheet } from "metashrew-runes/assembly/indexer/BalanceSheet";
+import { ProtoruneBalanceSheet } from "../ProtoruneBalanceSheet";
 import { ProtoruneTable, PROTOCOLS_TO_INDEX } from "../tables/protorune";
 import { u128 } from "as-bignum/assembly";
 import { console } from "metashrew-as/assembly/utils/logging";
@@ -18,10 +18,10 @@ export class MessageContext {
   refund_pointer: OutPoint = changetype<OutPoint>(0);
   calldata: ArrayBuffer = new ArrayBuffer(0);
   txid: ArrayBuffer;
-  baseSheet: BalanceSheet;
+  baseSheet: ProtoruneBalanceSheet;
   runeIdToIndex: Map<ArrayBuffer, i32> = new Map<ArrayBuffer, i32>();
   table: ProtoruneTable;
-  sheets: Map<u32, BalanceSheet>;
+  sheets: Map<u32, ProtoruneBalanceSheet>;
   txindex: u32;
 
   constructor(
@@ -48,23 +48,23 @@ export class MessageContext {
     this.refund_pointer = refundPointerOutpoint;
     this.calldata = calldata;
     this.txid = txid;
-    this.baseSheet = new BalanceSheet();
-    this.sheets = new Map<u32, BalanceSheet>();
+    this.baseSheet = new ProtoruneBalanceSheet();
+    this.sheets = new Map<u32, ProtoruneBalanceSheet>();
     const table = ProtoruneTable.for(protocolTag);
     this.table = table;
-    const sheet = BalanceSheet.load(
+    const sheet = ProtoruneBalanceSheet.load(
       table.OUTPOINT_TO_RUNES.select(outpoint.toArrayBuffer()),
     );
     this.sheets.set(index, sheet);
     this.sheets.set(
       pointer,
-      BalanceSheet.load(
+      ProtoruneBalanceSheet.load(
         table.OUTPOINT_TO_RUNES.select(pointerOutpoint.toArrayBuffer()),
       ),
     );
     this.sheets.set(
       refund_pointer,
-      BalanceSheet.load(
+      ProtoruneBalanceSheet.load(
         table.OUTPOINT_TO_RUNES.select(refundPointerOutpoint.toArrayBuffer()),
       ),
     );
@@ -86,15 +86,15 @@ export class MessageContext {
     return tag;
   }
   checkBalances(): bool {
-    const checkingSheet = BalanceSheet.loadFromAtomicTx(
+    const checkingSheet = ProtoruneBalanceSheet.loadFromAtomicTx(
       this.table.OUTPOINT_TO_RUNES.select(this.refund_pointer.toArrayBuffer()),
       this.runtime,
     );
-    BalanceSheet.loadFromAtomicTx(
+    ProtoruneBalanceSheet.loadFromAtomicTx(
       this.table.OUTPOINT_TO_RUNES.select(this.pointer.toArrayBuffer()),
       this.runtime,
     ).pipe(checkingSheet);
-    BalanceSheet.loadFromAtomicTx(
+    ProtoruneBalanceSheet.loadFromAtomicTx(
       this.table.OUTPOINT_TO_RUNES.select(this.outpoint.toArrayBuffer()),
       this.runtime,
     ).pipe(checkingSheet);
@@ -128,7 +128,7 @@ export class MessageContext {
 
     const sheet = this.sheets.has(this.refund_pointer.index)
       ? this.sheets.get(this.refund_pointer.index)
-      : new BalanceSheet();
+      : new ProtoruneBalanceSheet();
     //console.log("refund pointer sheet");
     if (this.sheets.has(this.outpoint.index)) {
       this.sheets.get(this.outpoint.index).pipe(sheet);

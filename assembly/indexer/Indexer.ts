@@ -4,7 +4,8 @@ import { RunestoneMessage } from "metashrew-runes/assembly/indexer/RunestoneMess
 import { ProtoruneMessage } from "./ProtoruneMessage";
 import { RunesTransaction } from "metashrew-runes/assembly/indexer/RunesTransaction";
 import { Block } from "metashrew-as/assembly/blockdata/block";
-import { Field } from "./fields/RunestoneField";
+import { Field } from "metashrew-runes/assembly/indexer/Field";
+import { ProtoruneField } from "./fields/ProtoruneField";
 import { scriptParse } from "metashrew-as/assembly/utils/yabsp";
 import { console } from "metashrew-as/assembly/utils/logging";
 import {
@@ -14,14 +15,19 @@ import {
   GENESIS,
 } from "./constants";
 import { OutPoint, Output } from "metashrew-as/assembly/blockdata/transaction";
-import { u128ToHex, checkForNonDataPush, stripNullRight } from "metashrew-runes/assembly/utils";
+import { fieldTo, u128ToHex, stripNullRight, min } from "metashrew-runes/assembly/utils";
+import { Edict } from "metashrew-runes/assembly/indexer/Edict";
+import { checkForNonDataPush } from "../utils";
 import { ProtoMessage, MessageContext } from "./protomessage";
-import { BalanceSheet } from "./BalanceSheet";
+import { ProtoruneBalanceSheet } from "./ProtoruneBalanceSheet";
+import { BalanceSheet } from "metashrew-runes/assembly/indexer/BalanceSheet";
 import { ProtoStone } from "./ProtoStone";
 import { u128 } from "as-bignum/assembly";
 import { RunesIndex } from "metashrew-runes/assembly/indexer";
 
 import { ProtoBurn } from "./ProtoBurn";
+
+const PROTOCOL_FIELD: u64 = 16383;
 
 class ProtoMessageReduce {
   public accumulated: Array<ProtoMessage>;
@@ -48,7 +54,7 @@ export class ProtostoneTable {
   }
   burns(): Array<ProtoBurn> {
     return this.list
-      .filter((v: ProtoStone) => v.protocol_tag === u128.from(13) && v.isBurn())
+      .filter((v: ProtoStone) => v.protocolTag === u128.from(13) && v.isBurn())
       .map(
         (v: ProtoStone) =>
           new ProtoBurn([
@@ -71,7 +77,7 @@ export class ProtostoneTable {
         return r;
       },
       ProtoMessageReduce.from(this.voutStart),
-    );
+    ).accumulated;
   }
   flat(): Array<ProtoStone> {
     return this.list;
@@ -80,10 +86,10 @@ export class ProtostoneTable {
 
 export class ProtoruneRunestoneMessage extends RunestoneMessage {
   protostones(voutStart: u32): ProtostoneTable {
-    if (!this.fields.has(Field.PROTOCOL))
-      ProtostoneTable.from(new Array<ProtoStone>(), voutStart);
+    if (!this.fields.has(PROTOCOL_FIELD))
+      return ProtostoneTable.from(new Array<u128>(), voutStart);
     return ProtostoneTable.from(
-      ProtoStone.parseFromFieldData(this.fields.get(Field.PROTOCOL)),
+      this.fields.get(PROTOCOL_FIELD),
       voutStart,
     );
   }
@@ -116,7 +122,6 @@ class BurnCycle {
 }
 
 export class Protorune<T extends MessageContext> extends RunesIndex {
-  public block: RunesBlock;
   processRunestone(
     block: RunesBlock,
     tx: RunesTransaction,
@@ -124,13 +129,13 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
     height: u32,
     i: u32,
   ): RunestoneMessage {
-    const unallocatedTo = this.fields.has(Field.POINTER)
-      ? fieldTo<u32>(this.fields.get(Field.POINTER))
-      : <u32>tx.defaultOutput();
     const runestone = tx.runestone();
+    const unallocatedTo = runestone.fields.has(Field.POINTER)
+      ? fieldTo<u32>(runestone.fields.get(Field.POINTER))
+      : <u32>tx.defaultOutput();
     if (changetype<usize>(runestone) === 0)
       return changetype<RunestoneMessage>(0);
-    const balancesByOutput = runestone.process(tx, txid, height, i);
+    const balancesByOutput = changetype<Map<u32, ProtoruneBalanceSheet>>(runestone.process(tx, txid, height, i));
     const protoruneRunestoneMessage = ProtoruneRunestoneMessage.from(runestone);
     const protostones = protoruneRunestoneMessage.protostones(
       tx.outs.length + 1,
@@ -140,7 +145,7 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
     const runestoneOutputIndex = tx.runestoneOutputIndex();
     const edicts = Edict.fromDeltaSeries(runestone.edicts);
     if (burns.length > 0) {
-      this.processProtoburns(unallocatedTo, balancesByOutput, txid, runestoneOutputIndex, runestone, burns);
+      this.processProtoburns(unallocatedTo, balancesByOutput, txid, runestoneOutputIndex, protoruneRunestoneMessage, edicts, burns);
     }
     this.processMessages(
       messages,
@@ -154,19 +159,20 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
   }
   processProtoburns(
     unallocatedTo: u32,
-    balanceByOutput: Map<u32, BalanceSheet>,
+    balancesByOutput: Map<u32, ProtoruneBalanceSheet>,
     txid: ArrayBuffer,
     runestoneOutputIndex: i32,
     runestone: ProtoruneRunestoneMessage,
-    burns: Array<ProtoBurn>,
+    edicts: Array<Edict>,
+    protoburns: Array<ProtoBurn>,
   ): void {
-      const runestoneBalanceSheet = new BalanceSheet();
-      (balancesByOutput.has(runestoneOutputIndex) ? balancesByOutput.get(runestoneOutputIndex) : new BalanceSheet()).pipe(runestoneBalanceSheet);
+      const runestoneBalanceSheet = new ProtoruneBalanceSheet();
+      (balancesByOutput.has(runestoneOutputIndex) ? balancesByOutput.get(runestoneOutputIndex) : new ProtoruneBalanceSheet()).pipe(changetype<BalanceSheet>(runestoneBalanceSheet));
       const burns: Array<Edict> = new Array<Edict>(0);
-      const burnSheets = new Array<BalanceSheet>(0);
+      const burnSheets = new Array<ProtoruneBalanceSheet>(0);
       const cycles = new BurnCycle(burns.length);
       for (let i = 0; i < burns.length; i++) {
-        burnSheets[i] = new BalanceSheet();
+        burnSheets[i] = new ProtoruneBalanceSheet();
       }
       for (let i = 0; i < edicts.length; i++) {
         if (edicts[i].output === u128.from(runestoneOutputIndex)) {
@@ -191,8 +197,8 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
 	  burnSheets[cycle].increase(rune, toApply);
         }
       }
-      for (let i = 0; i < burns.length; i++) {
-        burns[i].process(burnSheets[i], OutPoint.from(txid, burns[i].pointer).toArrayBuffer());
+      for (let i = 0; i < protoburns.length; i++) {
+        protoburns[i].process(burnSheets[i], OutPoint.from(txid, protoburns[i].pointer).toArrayBuffer());
       }
   }
   processMessages(
@@ -211,7 +217,7 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
   initializeSubprotocols(): void {
     changetype<T>(0).initializeProtocol();
   }
-  indexBlock(height: u32, _block: Block): void {
+  indexBlock(height: u32, block: Block): void {
     this.initializeSubprotocols();
     super.indexBlock(height, block);
   }

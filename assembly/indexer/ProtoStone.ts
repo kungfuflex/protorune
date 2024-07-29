@@ -1,5 +1,5 @@
 import { u128 } from "as-bignum/assembly";
-import { Field } from "./fields/ProtoruneField";
+import { ProtoruneField } from "./fields/ProtoruneField";
 import { Box } from "metashrew-as/assembly/utils/box";
 import { reverse } from "metashrew-as/assembly/utils/utils";
 import { readULEB128ToU128 } from "metashrew-runes/assembly/leb128";
@@ -7,10 +7,11 @@ import {
   u128ToHex,
   fieldToU128,
   toArrayBuffer,
-  fieldToArrayBuffer,
-  fieldToArrayBuffer15Bytes,
-  fieldToArrayBuffer15Bytes,
+  fieldToArrayBuffer
 } from "metashrew-runes/assembly/utils";
+import {
+  fieldToArrayBuffer15Bytes
+} from "../utils";
 import { Flag } from "./flags/ProtoruneFlag";
 import { console } from "metashrew-as/assembly/utils/logging";
 
@@ -54,7 +55,7 @@ export class ProtoStone {
   public fields: Map<u64, Array<u128>>;
   public edicts: Array<StaticArray<u128>>;
   public nextIndex: i32 = -1;
-  public protocol_id: u128 = u128.Zero;
+  public protocolTag: u128 = u128.Zero;
   constructor(fields: Map<u64, Array<u128>>, edicts: Array<StaticArray<u128>>) {
     this.fields = fields;
     this.edicts = edicts;
@@ -83,27 +84,27 @@ export class ProtoStone {
     return result;
   }
   getFlag(position: u64): bool {
-    if (!this.fields.has(Field.FLAGS)) return false;
-    const flags = fieldToU128(this.fields.get(Field.FLAGS));
+    if (!this.fields.has(ProtoruneField.FLAGS)) return false;
+    const flags = fieldToU128(this.fields.get(ProtoruneField.FLAGS));
     return !u128.and(flags, u128.from(1) << (<i32>position)).isZero();
   }
   isMessage(): bool {
-    return this.fields.has(Field.MESSAGE);
+    return this.fields.has(ProtoruneField.MESSAGE);
   }
   isBurn(): bool {
-    return this.fields.has(Field.BURN);
+    return this.fields.has(ProtoruneField.BURN);
   }
   isSplit(): bool {
-    return this.fields.has(Field.SPLIT);
+    return this.fields.has(ProtoruneField.SPLIT);
   }
   chunk(): ArrayBuffer {
-    const chunks = this.fields.get(Field.CHUNK);
+    const chunks = this.fields.get(ProtoruneField.CHUNK);
     if (chunks.length == 0) return new ArrayBuffer(0);
     return fieldToArrayBuffer(chunks);
   }
 
   splits(): Array<u32> {
-    const splits = this.fields.get(Field.SPLIT);
+    const splits = this.fields.get(ProtoruneField.SPLIT);
 
     if (splits.length > 0) {
       return splits.map<u32>((d) => d.toU32());
@@ -115,9 +116,9 @@ export class ProtoStone {
     const input = Box.from(concatByteArray(fieldData));
     const result: Array<ProtoStone> = new Array<ProtoStone>();
     while (input.len > 0) {
-      const protocol_id = u128.from(0);
-      let size = readULEB128ToU128(input, protocol_id);
-      if (protocol_id.isZero() === 0) {
+      const protocolTag = u128.from(0);
+      let size = readULEB128ToU128(input, protocolTag);
+      if (protocolTag.isZero() === 0) {
         // For the very last u128, not all bytes may be used (due to LEB format)
         //console.log("Found protocol id 0, breaking...");
         break;
@@ -131,7 +132,7 @@ export class ProtoStone {
       input.shrinkFront(size);
       const byteLength = byteLengthForNVarInts(input, len.lo);
       const protostone = ProtoStone.parse(input.sliceTo(input.start + byteLength));
-      protostone.protocol_id = protocol_id;
+      protostone.protocolTag = protocolTag;
       result.push(protostone);
       input.shrinkFront(<u32>byteLength);
     }
