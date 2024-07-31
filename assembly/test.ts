@@ -6,12 +6,21 @@ import { DefaultProtorune, Protorune } from "./indexer";
 import { MessageContext } from "./indexer/protomessage";
 import { GENESIS } from "metashrew-runes/assembly/indexer/constants";
 import { Index as SpendablesIndex } from "metashrew-spendables/assembly/indexer";
+import { IncomingRune } from "./indexer/protomessage/IncomingRune";
 
-export function trap(): void {
-  unreachable();
+class DepositAllContext extends MessageContext {
+  handle(): bool {
+    this.runes.map<IncomingRune>((rune) => {
+      rune.depositAll();
+      return rune;
+    });
+    return true;
+  }
 }
 
-export function _start(): void {
+class DepositAllProtorune extends Protorune<DepositAllContext> {}
+
+export function testProtomessage() {
   const data = input();
   const box = Box.from(data);
   const height = parsePrimitive<u32>(box);
@@ -23,9 +32,6 @@ export function _start(): void {
   if (height >= GENESIS) {
     SpendablesIndex.indexBlock(height, block);
   }
-  new DefaultProtorune().indexBlock(height, block);
+  new DepositAllProtorune().indexBlock(height, block);
   _flush();
 }
-
-export * from "./view";
-export * from "./test";
