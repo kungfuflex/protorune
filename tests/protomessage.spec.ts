@@ -253,4 +253,57 @@ describe("protomessage", () => {
       TEST_PROTOCOL_TAG,
     ).equals(premineAmount);
   });
+
+  it("should test depositAll", async () => {
+    let { block, output, refundOutput, runeId } =
+      await createProtoruneFixture();
+    const calldata = Buffer.from("testing 12345");
+
+    // constructing tx 3: protomessage
+    block = constructProtostoneTx(
+      [
+        {
+          inputTxHash: block.transactions?.at(2)?.getHash(),
+          inputTxOutputIndex: 1,
+        },
+      ],
+      [output, refundOutput],
+      [],
+      [
+        ProtoStone.edicts({
+          protocolTag: TEST_PROTOCOL_TAG,
+          edicts: [
+            {
+              amount: u128(premineAmount),
+              id: new RuneId(u64(runeId.block), u32(runeId.tx)),
+              output: u32(5),
+            },
+          ],
+        }),
+        ProtoStone.message({
+          protocolTag: TEST_PROTOCOL_TAG,
+          pointer: 1,
+          refundPointer: 2,
+          calldata,
+        }),
+      ],
+      block,
+      2,
+    );
+    program.setBlock(block.toHex());
+    console.log("indexing message block");
+    await program.run("_start");
+    await expectRunesBalances(TEST_BTC_ADDRESS1, 1).isZero();
+    await expectRunesBalances(TEST_BTC_ADDRESS2, 2).isZero();
+    await expectProtoRunesBalances(
+      TEST_BTC_ADDRESS2,
+      2,
+      TEST_PROTOCOL_TAG,
+    ).isZero();
+    await expectProtoRunesBalances(
+      TEST_BTC_ADDRESS1,
+      1,
+      TEST_PROTOCOL_TAG,
+    ).isZero();
+  });
 });
