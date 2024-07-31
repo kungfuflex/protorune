@@ -5,6 +5,7 @@ import { fromArrayBuffer } from "metashrew-runes/assembly/utils";
 import { RuneId } from "metashrew-runes/assembly/indexer/RuneId";
 import { BalanceSheet } from "metashrew-runes/assembly/indexer/BalanceSheet";
 import { console } from "metashrew-as/assembly/utils";
+import { encodeHexFromBuffer } from "metashrew-as/assembly/utils/hex";
 
 export class ProtoruneBalanceSheet extends BalanceSheet {
   static fromPairs(
@@ -42,12 +43,10 @@ export class ProtoruneBalanceSheet extends BalanceSheet {
     const balancesPtr = ptr.keyword("/balances");
 
     for (let i = 0; i < this.runes.length; i++) {
-      if (this.balances[i] != u128.from(0)) {
-        tx.appendIndexPointerList(runesPtr, this.runes[i]);
+      tx.appendIndexPointerList(runesPtr, this.runes[i]);
 
-        const buf = changetype<Uint8Array>(this.balances[i].toBytes()).buffer;
-        tx.appendIndexPointerList(balancesPtr, buf);
-      }
+      const buf = changetype<Uint8Array>(this.balances[i].toBytes()).buffer;
+      tx.appendIndexPointerList(balancesPtr, buf);
     }
   }
 

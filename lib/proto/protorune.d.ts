@@ -266,6 +266,10 @@ export interface RuntimeInput {
      * @generated from protobuf field: bytes protocol_tag = 1;
      */
     protocolTag: Uint8Array;
+    /**
+     * @generated from protobuf field: protorune.RuneId rune = 2;
+     */
+    rune?: RuneId;
 }
 /**
  * @generated from protobuf message protorune.Runtime

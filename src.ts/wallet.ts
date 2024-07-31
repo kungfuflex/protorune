@@ -24,9 +24,13 @@ export function encodeProtorunesWalletInput(
   );
 }
 
-export function encodeRuntimeInput(protocol_tag: bigint) {
+export function encodeRuntimeInput(
+  protocol_tag: bigint,
+  runeid: { height: number; txindex: number },
+) {
   const input: RuntimeInput = {
     protocolTag: numberToBytes(protocol_tag),
+    rune: runeid,
   };
   return "0x" + Buffer.from(RuntimeInput.toBinary(input)).toString("hex");
 }

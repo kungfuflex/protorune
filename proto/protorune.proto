@@ -97,6 +97,7 @@ message ProtoMessage {
 
 message RuntimeInput {
   bytes protocol_tag = 1;
+  RuneId rune = 2;
 }
 
 message Runtime {

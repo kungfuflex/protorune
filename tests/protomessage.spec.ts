@@ -305,7 +305,10 @@ describe("protomessage", () => {
     //   1,
     //   TEST_PROTOCOL_TAG,
     // ).isZero();
-    const runtimeStats = await runtime(program, TEST_PROTOCOL_TAG);
-    console.log(runtimeStats);
+    const runtimeStats = await runtime(program, TEST_PROTOCOL_TAG, {
+      height: Number(runeId.block),
+      txindex: runeId.tx,
+    });
+    expect(runtimeStats.balance).to.equal(premineAmount);
   });
 });

@@ -4,6 +4,8 @@ import { u128 } from "as-bignum/assembly";
 import { MessageContext } from "./MessageContext";
 import { ProtoruneTable } from "../tables/protorune";
 import { fromArrayBuffer, toArrayBuffer } from "metashrew-runes/assembly/utils";
+import { console } from "metashrew-as/assembly/utils";
+import { encodeHexFromBuffer } from "metashrew-as/assembly/utils/hex";
 
 export class IncomingRune {
   runeId: RuneId;
@@ -61,10 +63,20 @@ export class IncomingRune {
     return true;
   }
   refundDeposit(value: u128): bool {
+    if (this.refund_pointer_index == -1) return false;
     const refundPtr = this.table.OUTPOINT_TO_RUNES.select(
       this.context.refund_pointer.toArrayBuffer(),
-    ).keyword("/balances");
-    const ptr = this.table.RUNTIME_BALANCE;
+    )
+      .keyword("/balances")
+      .selectIndex(this.refund_pointer_index);
+    const runePtr = this.table.OUTPOINT_TO_RUNES.select(
+      this.context.refund_pointer.toArrayBuffer(),
+    )
+      .keyword("/runes")
+      .selectIndex(this.refund_pointer_index)
+      .unwrap();
+    const runeId = this.context.runtime.get(runePtr);
+    const ptr = this.table.RUNTIME_BALANCE.select(runeId);
     const currentValue = this.context.runtime.has(ptr.unwrap())
       ? fromArrayBuffer(this.context.runtime.get(ptr.unwrap()))
       : u128.Zero;
@@ -114,15 +126,18 @@ export class IncomingRune {
   forwardAll(): void {
     this.forward(this.amount);
   }
-  deposit(value: u128): void {
+  deposit(value: u128): bool {
     const refundPtr = this.table.OUTPOINT_TO_RUNES.select(
       this.context.refund_pointer.toArrayBuffer(),
     ).keyword("/balances");
-    const ptr = this.table.OUTPOINT_TO_RUNES.select(
-      this.context.outpoint.toArrayBuffer(),
-    ).keyword("/balances");
+    const runePtr = this.table.OUTPOINT_TO_RUNES.select(
+      this.context.refund_pointer.toArrayBuffer(),
+    ).keyword("/runes");
     if (this.refund_pointer_index == -1) return false;
     const index = refundPtr.selectIndex(this.refund_pointer_index).unwrap();
+    const runeId = this.context.runtime.get(
+      runePtr.selectIndex(this.refund_pointer_index).unwrap(),
+    );
     const currentValue = fromArrayBuffer(this.context.runtime.get(index));
     if (value > this.amount || value > currentValue) return false;
     const newValue: u128 = currentValue - value;
@@ -131,15 +146,16 @@ export class IncomingRune {
     } else {
       this.context.runtime.set(index, new ArrayBuffer(0));
     }
-    let toSet = this.context.table.RUNTIME_BALANCE;
+    let toSet = this.context.table.RUNTIME_BALANCE.select(runeId);
     const balance = this.context.runtime.has(toSet.unwrap())
       ? fromArrayBuffer(this.context.runtime.get(toSet.unwrap()))
       : fromArrayBuffer(toSet.get());
     this.context.runtime.set(toSet.unwrap(), toArrayBuffer(balance + value));
     this.amount = this.amount - value;
     this.depositAmount += value;
+    return true;
   }
-  depositAll(): void {
-    this.deposit(this.amount);
+  depositAll(): bool {
+    return this.deposit(this.amount);
   }
 }

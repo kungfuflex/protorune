@@ -272,6 +272,10 @@ export interface RuntimeInput {
      * @generated from protobuf field: bytes protocol_tag = 1;
      */
     protocolTag: Uint8Array;
+    /**
+     * @generated from protobuf field: protorune.RuneId rune = 2;
+     */
+    rune?: RuneId;
 }
 /**
  * @generated from protobuf message protorune.Runtime
@@ -1307,7 +1311,8 @@ export const ProtoMessage = new ProtoMessage$Type();
 class RuntimeInput$Type extends MessageType<RuntimeInput> {
     constructor() {
         super("protorune.RuntimeInput", [
-            { no: 1, name: "protocol_tag", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+            { no: 1, name: "protocol_tag", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 2, name: "rune", kind: "message", T: () => RuneId }
         ]);
     }
     create(value?: PartialMessage<RuntimeInput>): RuntimeInput {
@@ -1325,6 +1330,9 @@ class RuntimeInput$Type extends MessageType<RuntimeInput> {
                 case /* bytes protocol_tag */ 1:
                     message.protocolTag = reader.bytes();
                     break;
+                case /* protorune.RuneId rune */ 2:
+                    message.rune = RuneId.internalBinaryRead(reader, reader.uint32(), options, message.rune);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -1340,6 +1348,9 @@ class RuntimeInput$Type extends MessageType<RuntimeInput> {
         /* bytes protocol_tag = 1; */
         if (message.protocolTag.length)
             writer.tag(1, WireType.LengthDelimited).bytes(message.protocolTag);
+        /* protorune.RuneId rune = 2; */
+        if (message.rune)
+            RuneId.internalBinaryWrite(message.rune, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

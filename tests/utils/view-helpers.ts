@@ -26,6 +26,10 @@ export const protorunesbyaddress = async (
 export const runtime = async (
   program: IndexerProgram,
   protocolTag: bigint,
+  runeId: {
+    height: number;
+    txindex: number;
+  },
 ): Promise<any> => {
   const cloned = program; // just mutate it
   const result = await ProtorunesRpc.prototype.runtime.call(
@@ -36,7 +40,7 @@ export const runtime = async (
         return readArrayBufferAsHex(cloned.memory, ptr);
       },
     },
-    { protocolTag },
+    { protocolTag, runeId },
   );
   return result;
 };
