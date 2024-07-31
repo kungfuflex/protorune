@@ -5,4 +5,7 @@ export declare class ProtorunesRpc extends MetashrewRunes {
         outpoints: OutPoint[];
         balanceSheet: RuneOutput[];
     }>;
+    runtime({ protocolTag }: any): Promise<{
+        balance: bigint;
+    }>;
 }

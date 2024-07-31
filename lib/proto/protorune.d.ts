@@ -258,6 +258,24 @@ export interface ProtoMessage {
      */
     refundPointer: number;
 }
+/**
+ * @generated from protobuf message protorune.RuntimeInput
+ */
+export interface RuntimeInput {
+    /**
+     * @generated from protobuf field: bytes protocol_tag = 1;
+     */
+    protocolTag: Uint8Array;
+}
+/**
+ * @generated from protobuf message protorune.Runtime
+ */
+export interface Runtime {
+    /**
+     * @generated from protobuf field: bytes balance = 1;
+     */
+    balance: Uint8Array;
+}
 declare class RuneId$Type extends MessageType<RuneId> {
     constructor();
     create(value?: PartialMessage<RuneId>): RuneId;
@@ -438,4 +456,24 @@ declare class ProtoMessage$Type extends MessageType<ProtoMessage> {
  * @generated MessageType for protobuf message protorune.ProtoMessage
  */
 export declare const ProtoMessage: ProtoMessage$Type;
+declare class RuntimeInput$Type extends MessageType<RuntimeInput> {
+    constructor();
+    create(value?: PartialMessage<RuntimeInput>): RuntimeInput;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: RuntimeInput): RuntimeInput;
+    internalBinaryWrite(message: RuntimeInput, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protorune.RuntimeInput
+ */
+export declare const RuntimeInput: RuntimeInput$Type;
+declare class Runtime$Type extends MessageType<Runtime> {
+    constructor();
+    create(value?: PartialMessage<Runtime>): Runtime;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Runtime): Runtime;
+    internalBinaryWrite(message: Runtime, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protorune.Runtime
+ */
+export declare const Runtime: Runtime$Type;
 export {};

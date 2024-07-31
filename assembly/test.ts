@@ -20,7 +20,7 @@ class DepositAllContext extends MessageContext {
 
 class DepositAllProtorune extends Protorune<DepositAllContext> {}
 
-export function testProtomessage() {
+export function testProtomessage(): void {
   const data = input();
   const box = Box.from(data);
   const height = parsePrimitive<u32>(box);

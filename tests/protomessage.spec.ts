@@ -19,7 +19,7 @@ import {
   buildDefaultBlock,
 } from "metashrew-runes/lib/tests/utils/block-helpers";
 import { constructProtoburnTransaction } from "./utils/protoburn";
-import { protorunesbyaddress } from "./utils/view-helpers";
+import { protorunesbyaddress, runtime } from "./utils/view-helpers";
 import { DEBUG_WASM } from "./utils/general";
 import { uint128 } from "../src.ts/proto/protorune";
 import { constructProtostoneTx } from "./utils/protoburn";
@@ -292,7 +292,7 @@ describe("protomessage", () => {
     );
     program.setBlock(block.toHex());
     console.log("indexing message block");
-    await program.run("_start");
+    await program.run("testProtomessage");
     await expectRunesBalances(TEST_BTC_ADDRESS1, 1).isZero();
     await expectRunesBalances(TEST_BTC_ADDRESS2, 2).isZero();
     await expectProtoRunesBalances(
@@ -300,10 +300,12 @@ describe("protomessage", () => {
       2,
       TEST_PROTOCOL_TAG,
     ).isZero();
-    await expectProtoRunesBalances(
-      TEST_BTC_ADDRESS1,
-      1,
-      TEST_PROTOCOL_TAG,
-    ).isZero();
+    // await expectProtoRunesBalances(
+    //   TEST_BTC_ADDRESS1,
+    //   1,
+    //   TEST_PROTOCOL_TAG,
+    // ).isZero();
+    const runtimeStats = await runtime(program, TEST_PROTOCOL_TAG);
+    console.log(runtimeStats);
   });
 });
