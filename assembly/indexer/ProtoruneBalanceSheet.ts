@@ -69,6 +69,15 @@ export class ProtoruneBalanceSheet extends BalanceSheet {
     return result;
   }
 
+  clearAndSave(ptr: IndexPointer): void {
+    const runesPtr = ptr.keyword("/runes").lengthKey();
+    const balancesPtr = ptr.keyword("/balances").lengthKey();
+
+    runesPtr.setValue<u32>(0);
+    balancesPtr.setValue<u32>(0);
+    this.save(ptr);
+  }
+
   save(ptr: IndexPointer, isCenotaph: bool = false): void {
     const runesPtr = ptr.keyword("/runes");
     const balancesPtr = ptr.keyword("/balances");

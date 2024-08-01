@@ -1,3 +1,4 @@
+import { decodeRunes } from "metashrew-runes/lib/src.ts/outpoint";
 import {
   ProtorunesWalletRequest,
   RuntimeInput,
@@ -24,13 +25,9 @@ export function encodeProtorunesWalletInput(
   );
 }
 
-export function encodeRuntimeInput(
-  protocol_tag: bigint,
-  runeid: { height: number; txindex: number },
-) {
+export function encodeRuntimeInput(protocol_tag: bigint) {
   const input: RuntimeInput = {
     protocolTag: numberToBytes(protocol_tag),
-    rune: runeid,
   };
   return "0x" + Buffer.from(RuntimeInput.toBinary(input)).toString("hex");
 }
@@ -39,8 +36,8 @@ export function decodeRuntimeOutput(hex: string) {
   const runtime = Runtime.fromBinary(
     Uint8Array.from(Buffer.from(stripHexPrefix(hex), "hex")),
   );
-  const balance = BigInt("0x" + Buffer.from(runtime.balance).toString("hex"));
+  const balances = decodeRunes(runtime.balances);
   return {
-    balance,
+    balances,
   };
 }

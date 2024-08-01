@@ -272,19 +272,15 @@ export interface RuntimeInput {
      * @generated from protobuf field: bytes protocol_tag = 1;
      */
     protocolTag: Uint8Array;
-    /**
-     * @generated from protobuf field: protorune.RuneId rune = 2;
-     */
-    rune?: RuneId;
 }
 /**
  * @generated from protobuf message protorune.Runtime
  */
 export interface Runtime {
     /**
-     * @generated from protobuf field: bytes balance = 1;
+     * @generated from protobuf field: protorune.BalanceSheet balances = 1;
      */
-    balance: Uint8Array;
+    balances?: BalanceSheet;
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class RuneId$Type extends MessageType<RuneId> {
@@ -1311,8 +1307,7 @@ export const ProtoMessage = new ProtoMessage$Type();
 class RuntimeInput$Type extends MessageType<RuntimeInput> {
     constructor() {
         super("protorune.RuntimeInput", [
-            { no: 1, name: "protocol_tag", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 2, name: "rune", kind: "message", T: () => RuneId }
+            { no: 1, name: "protocol_tag", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
         ]);
     }
     create(value?: PartialMessage<RuntimeInput>): RuntimeInput {
@@ -1330,9 +1325,6 @@ class RuntimeInput$Type extends MessageType<RuntimeInput> {
                 case /* bytes protocol_tag */ 1:
                     message.protocolTag = reader.bytes();
                     break;
-                case /* protorune.RuneId rune */ 2:
-                    message.rune = RuneId.internalBinaryRead(reader, reader.uint32(), options, message.rune);
-                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -1348,9 +1340,6 @@ class RuntimeInput$Type extends MessageType<RuntimeInput> {
         /* bytes protocol_tag = 1; */
         if (message.protocolTag.length)
             writer.tag(1, WireType.LengthDelimited).bytes(message.protocolTag);
-        /* protorune.RuneId rune = 2; */
-        if (message.rune)
-            RuneId.internalBinaryWrite(message.rune, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1365,12 +1354,11 @@ export const RuntimeInput = new RuntimeInput$Type();
 class Runtime$Type extends MessageType<Runtime> {
     constructor() {
         super("protorune.Runtime", [
-            { no: 1, name: "balance", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+            { no: 1, name: "balances", kind: "message", T: () => BalanceSheet }
         ]);
     }
     create(value?: PartialMessage<Runtime>): Runtime {
         const message = globalThis.Object.create((this.messagePrototype!));
-        message.balance = new Uint8Array(0);
         if (value !== undefined)
             reflectionMergePartial<Runtime>(this, message, value);
         return message;
@@ -1380,8 +1368,8 @@ class Runtime$Type extends MessageType<Runtime> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* bytes balance */ 1:
-                    message.balance = reader.bytes();
+                case /* protorune.BalanceSheet balances */ 1:
+                    message.balances = BalanceSheet.internalBinaryRead(reader, reader.uint32(), options, message.balances);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1395,9 +1383,9 @@ class Runtime$Type extends MessageType<Runtime> {
         return message;
     }
     internalBinaryWrite(message: Runtime, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* bytes balance = 1; */
-        if (message.balance.length)
-            writer.tag(1, WireType.LengthDelimited).bytes(message.balance);
+        /* protorune.BalanceSheet balances = 1; */
+        if (message.balances)
+            BalanceSheet.internalBinaryWrite(message.balances, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

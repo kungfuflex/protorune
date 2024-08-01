@@ -266,19 +266,15 @@ export interface RuntimeInput {
      * @generated from protobuf field: bytes protocol_tag = 1;
      */
     protocolTag: Uint8Array;
-    /**
-     * @generated from protobuf field: protorune.RuneId rune = 2;
-     */
-    rune?: RuneId;
 }
 /**
  * @generated from protobuf message protorune.Runtime
  */
 export interface Runtime {
     /**
-     * @generated from protobuf field: bytes balance = 1;
+     * @generated from protobuf field: protorune.BalanceSheet balances = 1;
      */
-    balance: Uint8Array;
+    balances?: BalanceSheet;
 }
 declare class RuneId$Type extends MessageType<RuneId> {
     constructor();

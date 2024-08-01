@@ -27,6 +27,7 @@ export class MessageContext {
   table: ProtoruneTable;
   sheets: Map<u32, ProtoruneBalanceSheet>;
   txindex: u32;
+  runtimeBalance: ProtoruneBalanceSheet;
 
   constructor(
     protocolTag: u128,
@@ -56,6 +57,7 @@ export class MessageContext {
     this.sheets = new Map<u32, ProtoruneBalanceSheet>();
     const table = ProtoruneTable.for(protocolTag);
     this.table = table;
+    this.runtimeBalance = ProtoruneBalanceSheet.load(table.RUNTIME_BALANCE);
     const sheet = ProtoruneBalanceSheet.load(
       table.OUTPOINT_TO_RUNES.select(outpoint.toArrayBuffer()),
     );
@@ -102,23 +104,7 @@ export class MessageContext {
       this.table.OUTPOINT_TO_RUNES.select(this.outpoint.toArrayBuffer()),
       this.runtime,
     ).pipe(checkingSheet);
-    for (let i = 0; i < this.baseSheet.runes.length; i++) {
-      const hasRuntimeBalance = this.runtime.has(
-        this.table.RUNTIME_BALANCE.select(this.baseSheet.runes[i]).unwrap(),
-      );
-      if (hasRuntimeBalance) {
-        checkingSheet.increase(
-          this.baseSheet.runes[i],
-          fromArrayBuffer(
-            this.runtime.get(
-              this.table.RUNTIME_BALANCE.select(
-                this.baseSheet.runes[i],
-              ).unwrap(),
-            ),
-          ),
-        );
-      }
-    }
+    this.runtimeBalance.pipe(checkingSheet);
     if (this.baseSheet.runes.length != checkingSheet.runes.length) return false;
     for (let i = 0; i < this.baseSheet.runes.length; i++) {
       if (
@@ -174,6 +160,7 @@ export class MessageContext {
       this.runtime.rollback();
     }
     this.runtime.checkpoint();
+    this.runtimeBalance.clearAndSave(this.table.RUNTIME_BALANCE);
     this.runtime.commit();
   }
 

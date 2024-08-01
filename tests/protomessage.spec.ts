@@ -309,6 +309,6 @@ describe("protomessage", () => {
       height: Number(runeId.block),
       txindex: runeId.tx,
     });
-    expect(runtimeStats.balance).to.equal(premineAmount);
+    expect(runtimeStats.balances[0].balance).to.equal(premineAmount);
   });
 });

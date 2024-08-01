@@ -2392,7 +2392,6 @@ export namespace protorune {
 
   export class RuntimeInput {
     public protocol_tag: Array<u8> = new Array<u8>();
-    public rune: RuneId = new RuneId();
 
     // Decodes RuntimeInput from an ArrayBuffer
     static decode(buf: ArrayBuffer): RuntimeInput {
@@ -2411,19 +2410,6 @@ export namespace protorune {
         switch (number) {
           case 1: {
             obj.protocol_tag = decoder.bytes();
-            break;
-          }
-          case 2: {
-            const length = decoder.uint32();
-            obj.rune = RuneId.decodeDataView(
-              new DataView(
-                decoder.view.buffer,
-                decoder.pos + decoder.view.byteOffset,
-                length
-              )
-            );
-            decoder.skip(length);
-
             break;
           }
 
@@ -2445,15 +2431,6 @@ export namespace protorune {
             __proto.Sizer.varint64(this.protocol_tag.length) +
             this.protocol_tag.length
           : 0;
-
-      if (this.rune != null) {
-        const f: RuneId = this.rune as RuneId;
-        const messageSize = f.size();
-
-        if (messageSize > 0) {
-          size += 1 + __proto.Sizer.varint64(messageSize) + messageSize;
-        }
-      }
 
       return size;
     }
@@ -2477,24 +2454,12 @@ export namespace protorune {
         encoder.bytes(this.protocol_tag);
       }
 
-      if (this.rune != null) {
-        const f = this.rune as RuneId;
-
-        const messageSize = f.size();
-
-        if (messageSize > 0) {
-          encoder.uint32(0x12);
-          encoder.uint32(messageSize);
-          f.encodeU8Array(encoder);
-        }
-      }
-
       return buf;
     } // encode RuntimeInput
   } // RuntimeInput
 
   export class Runtime {
-    public balance: Array<u8> = new Array<u8>();
+    public balances: BalanceSheet = new BalanceSheet();
 
     // Decodes Runtime from an ArrayBuffer
     static decode(buf: ArrayBuffer): Runtime {
@@ -2512,7 +2477,16 @@ export namespace protorune {
 
         switch (number) {
           case 1: {
-            obj.balance = decoder.bytes();
+            const length = decoder.uint32();
+            obj.balances = BalanceSheet.decodeDataView(
+              new DataView(
+                decoder.view.buffer,
+                decoder.pos + decoder.view.byteOffset,
+                length
+              )
+            );
+            decoder.skip(length);
+
             break;
           }
 
@@ -2528,12 +2502,14 @@ export namespace protorune {
     public size(): u32 {
       let size: u32 = 0;
 
-      size +=
-        this.balance.length > 0
-          ? 1 +
-            __proto.Sizer.varint64(this.balance.length) +
-            this.balance.length
-          : 0;
+      if (this.balances != null) {
+        const f: BalanceSheet = this.balances as BalanceSheet;
+        const messageSize = f.size();
+
+        if (messageSize > 0) {
+          size += 1 + __proto.Sizer.varint64(messageSize) + messageSize;
+        }
+      }
 
       return size;
     }
@@ -2551,10 +2527,16 @@ export namespace protorune {
     ): Array<u8> {
       const buf = encoder.buf;
 
-      if (this.balance.length > 0) {
-        encoder.uint32(0xa);
-        encoder.uint32(this.balance.length);
-        encoder.bytes(this.balance);
+      if (this.balances != null) {
+        const f = this.balances as BalanceSheet;
+
+        const messageSize = f.size();
+
+        if (messageSize > 0) {
+          encoder.uint32(0xa);
+          encoder.uint32(messageSize);
+          f.encodeU8Array(encoder);
+        }
       }
 
       return buf;

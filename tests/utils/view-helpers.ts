@@ -40,7 +40,7 @@ export const runtime = async (
         return readArrayBufferAsHex(cloned.memory, ptr);
       },
     },
-    { protocolTag, runeId },
+    { protocolTag },
   );
   return result;
 };
