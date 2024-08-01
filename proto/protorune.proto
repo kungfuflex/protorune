@@ -94,3 +94,11 @@ message ProtoMessage {
   uint32 pointer = 3;
   uint32 refund_pointer = 4;
 }
+
+message RuntimeInput {
+  bytes protocol_tag = 1;
+}
+
+message Runtime {
+  BalanceSheet balances = 1;
+}

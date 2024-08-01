@@ -264,6 +264,24 @@ export interface ProtoMessage {
      */
     refundPointer: number;
 }
+/**
+ * @generated from protobuf message protorune.RuntimeInput
+ */
+export interface RuntimeInput {
+    /**
+     * @generated from protobuf field: bytes protocol_tag = 1;
+     */
+    protocolTag: Uint8Array;
+}
+/**
+ * @generated from protobuf message protorune.Runtime
+ */
+export interface Runtime {
+    /**
+     * @generated from protobuf field: protorune.BalanceSheet balances = 1;
+     */
+    balances?: BalanceSheet;
+}
 // @generated message type with reflection information, may provide speed optimized methods
 class RuneId$Type extends MessageType<RuneId> {
     constructor() {
@@ -1285,3 +1303,96 @@ class ProtoMessage$Type extends MessageType<ProtoMessage> {
  * @generated MessageType for protobuf message protorune.ProtoMessage
  */
 export const ProtoMessage = new ProtoMessage$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class RuntimeInput$Type extends MessageType<RuntimeInput> {
+    constructor() {
+        super("protorune.RuntimeInput", [
+            { no: 1, name: "protocol_tag", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+        ]);
+    }
+    create(value?: PartialMessage<RuntimeInput>): RuntimeInput {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.protocolTag = new Uint8Array(0);
+        if (value !== undefined)
+            reflectionMergePartial<RuntimeInput>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: RuntimeInput): RuntimeInput {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bytes protocol_tag */ 1:
+                    message.protocolTag = reader.bytes();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: RuntimeInput, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* bytes protocol_tag = 1; */
+        if (message.protocolTag.length)
+            writer.tag(1, WireType.LengthDelimited).bytes(message.protocolTag);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protorune.RuntimeInput
+ */
+export const RuntimeInput = new RuntimeInput$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Runtime$Type extends MessageType<Runtime> {
+    constructor() {
+        super("protorune.Runtime", [
+            { no: 1, name: "balances", kind: "message", T: () => BalanceSheet }
+        ]);
+    }
+    create(value?: PartialMessage<Runtime>): Runtime {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        if (value !== undefined)
+            reflectionMergePartial<Runtime>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Runtime): Runtime {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* protorune.BalanceSheet balances */ 1:
+                    message.balances = BalanceSheet.internalBinaryRead(reader, reader.uint32(), options, message.balances);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: Runtime, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* protorune.BalanceSheet balances = 1; */
+        if (message.balances)
+            BalanceSheet.internalBinaryWrite(message.balances, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protorune.Runtime
+ */
+export const Runtime = new Runtime$Type();

@@ -1,4 +1,4 @@
-import { Block, OutPoint, Transaction } from "metashrew-as/assembly/blockdata";
+import { Block, OutPoint } from "metashrew-as/assembly/blockdata";
 import { IncomingRune } from "./IncomingRune";
 import { AtomicTransaction } from "metashrew-as/assembly/indexer/atomic";
 import { RuneId } from "metashrew-runes/assembly/indexer/RuneId";
@@ -7,11 +7,14 @@ import { ProtoruneTable, PROTOCOLS_TO_INDEX } from "../tables/protorune";
 import { u128 } from "as-bignum/assembly";
 import { console } from "metashrew-as/assembly/utils/logging";
 import { Box } from "metashrew-as/assembly/utils/box";
+import { RunesTransaction } from "metashrew-runes/assembly/indexer/RunesTransaction";
+import { fromArrayBuffer } from "metashrew-runes/assembly/utils";
+import { encodeHexFromBuffer } from "metashrew-as/assembly/utils/hex";
 
 export class MessageContext {
   runtime: AtomicTransaction = new AtomicTransaction();
   public runes: Array<IncomingRune> = new Array<IncomingRune>();
-  transaction: Transaction = changetype<Transaction>(0);
+  transaction: RunesTransaction = changetype<RunesTransaction>(0);
   block: Block = changetype<Block>(0);
   height: u64 = 0;
   outpoint: OutPoint = changetype<OutPoint>(0);
@@ -24,10 +27,11 @@ export class MessageContext {
   table: ProtoruneTable;
   sheets: Map<u32, ProtoruneBalanceSheet>;
   txindex: u32;
+  runtimeBalance: ProtoruneBalanceSheet;
 
   constructor(
     protocolTag: u128,
-    transaction: Transaction,
+    transaction: RunesTransaction,
     block: Block,
     height: u64,
     txindex: u32,
@@ -53,6 +57,7 @@ export class MessageContext {
     this.sheets = new Map<u32, ProtoruneBalanceSheet>();
     const table = ProtoruneTable.for(protocolTag);
     this.table = table;
+    this.runtimeBalance = ProtoruneBalanceSheet.load(table.RUNTIME_BALANCE);
     const sheet = ProtoruneBalanceSheet.load(
       table.OUTPOINT_TO_RUNES.select(outpoint.toArrayBuffer()),
     );
@@ -99,6 +104,7 @@ export class MessageContext {
       this.table.OUTPOINT_TO_RUNES.select(this.outpoint.toArrayBuffer()),
       this.runtime,
     ).pipe(checkingSheet);
+    this.runtimeBalance.pipe(checkingSheet);
     if (this.baseSheet.runes.length != checkingSheet.runes.length) return false;
     for (let i = 0; i < this.baseSheet.runes.length; i++) {
       if (
@@ -149,10 +155,12 @@ export class MessageContext {
     if (!result) {
       this.runtime.rollback();
     }
-
-    if (!this.checkBalances()) {
+    const balanceCheck = this.checkBalances();
+    if (!balanceCheck) {
       this.runtime.rollback();
     }
+    this.runtime.checkpoint();
+    this.runtimeBalance.clearAndSave(this.table.RUNTIME_BALANCE);
     this.runtime.commit();
   }
 

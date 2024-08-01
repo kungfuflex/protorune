@@ -22,3 +22,25 @@ export const protorunesbyaddress = async (
   );
   return result;
 };
+
+export const runtime = async (
+  program: IndexerProgram,
+  protocolTag: bigint,
+  runeId: {
+    height: number;
+    txindex: number;
+  },
+): Promise<any> => {
+  const cloned = program; // just mutate it
+  const result = await ProtorunesRpc.prototype.runtime.call(
+    {
+      async _call({ input }) {
+        cloned.setBlock(input);
+        const ptr = await cloned.run("runtime");
+        return readArrayBufferAsHex(cloned.memory, ptr);
+      },
+    },
+    { protocolTag },
+  );
+  return result;
+};

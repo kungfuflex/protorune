@@ -2389,4 +2389,157 @@ export namespace protorune {
       return buf;
     } // encode ProtoMessage
   } // ProtoMessage
+
+  export class RuntimeInput {
+    public protocol_tag: Array<u8> = new Array<u8>();
+
+    // Decodes RuntimeInput from an ArrayBuffer
+    static decode(buf: ArrayBuffer): RuntimeInput {
+      return RuntimeInput.decodeDataView(new DataView(buf));
+    }
+
+    // Decodes RuntimeInput from a DataView
+    static decodeDataView(view: DataView): RuntimeInput {
+      const decoder = new __proto.SafeDecoder(view);
+      const obj = new RuntimeInput();
+
+      while (!decoder.eof()) {
+        const tag = decoder.tag();
+        const number = tag >>> 3;
+
+        switch (number) {
+          case 1: {
+            obj.protocol_tag = decoder.bytes();
+            break;
+          }
+
+          default:
+            decoder.skipType(tag & 7);
+            break;
+        }
+      }
+      if (decoder.invalid()) return changetype<RuntimeInput>(0);
+      return obj;
+    } // decode RuntimeInput
+
+    public size(): u32 {
+      let size: u32 = 0;
+
+      size +=
+        this.protocol_tag.length > 0
+          ? 1 +
+            __proto.Sizer.varint64(this.protocol_tag.length) +
+            this.protocol_tag.length
+          : 0;
+
+      return size;
+    }
+
+    // Encodes RuntimeInput to the ArrayBuffer
+    encode(): ArrayBuffer {
+      return changetype<ArrayBuffer>(
+        StaticArray.fromArray<u8>(this.encodeU8Array())
+      );
+    }
+
+    // Encodes RuntimeInput to the Array<u8>
+    encodeU8Array(
+      encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
+    ): Array<u8> {
+      const buf = encoder.buf;
+
+      if (this.protocol_tag.length > 0) {
+        encoder.uint32(0xa);
+        encoder.uint32(this.protocol_tag.length);
+        encoder.bytes(this.protocol_tag);
+      }
+
+      return buf;
+    } // encode RuntimeInput
+  } // RuntimeInput
+
+  export class Runtime {
+    public balances: BalanceSheet = new BalanceSheet();
+
+    // Decodes Runtime from an ArrayBuffer
+    static decode(buf: ArrayBuffer): Runtime {
+      return Runtime.decodeDataView(new DataView(buf));
+    }
+
+    // Decodes Runtime from a DataView
+    static decodeDataView(view: DataView): Runtime {
+      const decoder = new __proto.SafeDecoder(view);
+      const obj = new Runtime();
+
+      while (!decoder.eof()) {
+        const tag = decoder.tag();
+        const number = tag >>> 3;
+
+        switch (number) {
+          case 1: {
+            const length = decoder.uint32();
+            obj.balances = BalanceSheet.decodeDataView(
+              new DataView(
+                decoder.view.buffer,
+                decoder.pos + decoder.view.byteOffset,
+                length
+              )
+            );
+            decoder.skip(length);
+
+            break;
+          }
+
+          default:
+            decoder.skipType(tag & 7);
+            break;
+        }
+      }
+      if (decoder.invalid()) return changetype<Runtime>(0);
+      return obj;
+    } // decode Runtime
+
+    public size(): u32 {
+      let size: u32 = 0;
+
+      if (this.balances != null) {
+        const f: BalanceSheet = this.balances as BalanceSheet;
+        const messageSize = f.size();
+
+        if (messageSize > 0) {
+          size += 1 + __proto.Sizer.varint64(messageSize) + messageSize;
+        }
+      }
+
+      return size;
+    }
+
+    // Encodes Runtime to the ArrayBuffer
+    encode(): ArrayBuffer {
+      return changetype<ArrayBuffer>(
+        StaticArray.fromArray<u8>(this.encodeU8Array())
+      );
+    }
+
+    // Encodes Runtime to the Array<u8>
+    encodeU8Array(
+      encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
+    ): Array<u8> {
+      const buf = encoder.buf;
+
+      if (this.balances != null) {
+        const f = this.balances as BalanceSheet;
+
+        const messageSize = f.size();
+
+        if (messageSize > 0) {
+          encoder.uint32(0xa);
+          encoder.uint32(messageSize);
+          f.encodeU8Array(encoder);
+        }
+      }
+
+      return buf;
+    } // encode Runtime
+  } // Runtime
 } // protorune

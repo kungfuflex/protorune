@@ -26,4 +26,15 @@ export class ProtorunesRpc extends MetashrewRunes {
     const decoded = wallet.decodeWalletOutput(byteString);
     return decoded;
   }
+  async runtime({ protocolTag }: any): Promise<{
+    balances: RuneOutput[];
+  }> {
+    const buffer = protowallet.encodeRuntimeInput(protocolTag);
+    const byteString = await this._call({
+      method: "protorunesbyaddress",
+      input: buffer,
+    });
+    const decoded = protowallet.decodeRuntimeOutput(byteString);
+    return decoded;
+  }
 }
