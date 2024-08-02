@@ -41,6 +41,13 @@ class BurnCycle {
 }
 
 export class Protorune<T extends MessageContext> extends RunesIndex {
+  etchEnabled: bool;
+  openMint: bool;
+  constructor(etchEnabled: bool = false, openMint: bool = false) {
+    super();
+    this.etchEnabled = etchEnabled;
+    this.openMint = openMint;
+  }
   processRunestone(
     block: RunesBlock,
     tx: RunesTransaction,
@@ -50,6 +57,8 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
   ): RunestoneMessage {
     const baseRunestone = tx.runestone();
     const runestone = Protostone.from(baseRunestone);
+    runestone.etchEnabled = this.etchEnabled;
+    runestone.openMint = this.openMint;
     const unallocatedTo = runestone.fields.has(Field.POINTER)
       ? fieldTo<u32>(runestone.fields.get(Field.POINTER))
       : <u32>tx.defaultOutput();

@@ -144,6 +144,8 @@ export class Protostone extends RunestoneMessage {
   public nextIndex: i32 = -1;
   public protocolTag: u128 = u128.Zero;
   public table: ProtoruneTable;
+  public etchEnabled: bool = false;
+  public openMint: bool = false;
   constructor(
     fields: Map<u64, Array<u128>>,
     edicts: Array<StaticArray<u128>>,
@@ -187,7 +189,8 @@ export class Protostone extends RunestoneMessage {
     return result;
   }
   mint(height: u32, balanceSheet: BalanceSheet): bool {
-    return false;
+    if (!this.openMint) return this.openMint;
+    return super.mint(height, balanceSheet);
   }
   etch(
     height: u64,
@@ -195,7 +198,8 @@ export class Protostone extends RunestoneMessage {
     initialBalanceSheet: BalanceSheet,
     transaction: RunesTransaction,
   ): bool {
-    return false;
+    if (!this.etchEnabled) return this.etchEnabled;
+    return super.etch(height, tx, initialBalanceSheet, transaction);
   }
   isMessage(): bool {
     return this.fields.has(ProtoruneField.MESSAGE);
