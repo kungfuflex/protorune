@@ -28,13 +28,7 @@ import { PROTOCOL_FIELD } from "../constants";
 import { Edict } from "metashrew-runes/assembly/indexer/Edict";
 import { Field } from "metashrew-runes/assembly/indexer/Field";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils";
-import {
-  RuneIdHi
-} from "./RuneIdHi";
-import {
-  u32,
-  u64
-} from "@magiceden-oss/runestone-lib/dist/src/integer";
+import { RuneIdHi } from "./RuneIdHi";
 
 function logProtoruneField(ary: Array<u128>): void {
   console.log(Box.from(concatByteArray(ary)).toHexString());
@@ -197,11 +191,11 @@ export class Protostone extends RunestoneMessage {
   }
 
   buildRuneIdForMint(bytes: ArrayBuffer): ArrayBuffer {
-    return RuneIdHi.fromBytes(bytes).toBytes()
+    return RuneIdHi.fromBytes(bytes).toBytes();
   }
 
   buildRuneId(height: u64, tx: u32): ArrayBuffer {
-    return new RuneIdHi(height, tx).toBytes()
+    return new RuneIdHi(height, tx).toBytes();
   }
 
   getReservedNameFor(height: u64, tx: u32): ArrayBuffer {
