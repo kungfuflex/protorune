@@ -29,6 +29,7 @@ import { Edict } from "metashrew-runes/assembly/indexer/Edict";
 import { Field } from "metashrew-runes/assembly/indexer/Field";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils";
 import { RuneIdHi } from "./RuneIdHi";
+import { RuneId } from "metashrew-runes/assembly/indexer/RuneId";
 
 function logProtoruneField(ary: Array<u128>): void {
   console.log(Box.from(concatByteArray(ary)).toHexString());
@@ -214,7 +215,11 @@ export class Protostone extends RunestoneMessage {
     transaction: RunesTransaction,
   ): bool {
     if (!this.etchEnabled) return this.etchEnabled;
-    return super.etch(height, tx, initialBalanceSheet, transaction);
+    const res = super.etch(height, tx, initialBalanceSheet, transaction);
+    this.table.INTERNAL_MINT.select(
+      new RuneId(height, tx).toBytes(),
+    ).setValue<bool>(true);
+    return res;
   }
   isMessage(): bool {
     return this.fields.has(ProtoruneField.MESSAGE);
