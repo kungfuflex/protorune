@@ -8,7 +8,7 @@ export class RuneIdHi extends RuneIdBase {
     return changetype<Uint8Array>(bytes).buffer;
   }
 
-  static fromBytes(ary: ArrayBuffer): RuneIdHi {
+  static fromHiBytes(ary: ArrayBuffer): RuneIdHi {
     const parsed = changetype<Array<u8>>(Uint8Array.wrap(ary));
     const block = u128.fromBytes(parsed.slice(0, 16), true).toU64();
     const tx = u128.fromBytes(parsed.slice(16, 32), true).toU32();
