@@ -35,3 +35,20 @@ export function testProtomessage(): void {
   new DepositAllProtorune().indexBlock(height, block);
   _flush();
 }
+
+export function testEtching(): void {
+  const data = input();
+  const box = Box.from(data);
+  const height = parsePrimitive<u32>(box);
+  if (height < GENESIS - 6) {
+    _flush();
+    return;
+  }
+  const block = new Block(box);
+  if (height >= GENESIS) {
+    new SpendablesIndex().indexBlock(height, block);
+  }
+  const indexer = new DefaultProtorune(true, true);
+  indexer.indexBlock(height, block);
+  _flush();
+}
