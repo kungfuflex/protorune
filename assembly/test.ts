@@ -5,8 +5,8 @@ import { parsePrimitive } from "metashrew-as/assembly/utils/utils";
 import { DefaultProtorune, Protorune } from "./indexer";
 import { MessageContext } from "./indexer/protomessage";
 import { GENESIS } from "metashrew-runes/assembly/indexer/constants";
-import { Index as SpendablesIndex } from "metashrew-spendables/assembly/indexer";
 import { IncomingRune } from "./indexer/protomessage/IncomingRune";
+import { SpendablesIndex } from "metashrew-spendables/assembly/indexer";
 
 class DepositAllContext extends MessageContext {
   handle(): bool {
@@ -30,7 +30,7 @@ export function testProtomessage(): void {
   }
   const block = new Block(box);
   if (height >= GENESIS) {
-    SpendablesIndex.indexBlock(height, block);
+    new SpendablesIndex().indexBlock(height, block);
   }
   new DepositAllProtorune().indexBlock(height, block);
   _flush();
