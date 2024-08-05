@@ -53,8 +53,8 @@ export function balanceSheetToProtobuf(
     const divisibility = <u32>DIVISIBILITY.select(name).getValue<u8>();
     const rune = new protobuf.Rune();
     const runeId = new protobuf.RuneId();
-    runeId.height = <u32>_runeId.block;
-    runeId.txindex = _runeId.tx;
+    runeId.height = <u32>_runeId.block.toU64();
+    runeId.txindex = _runeId.tx.toU32();
     rune.runeId = runeId;
     rune.name = Uint8Array.wrap(
       String.UTF8.encode(fieldToName(fromArrayBuffer(name))),
@@ -94,8 +94,8 @@ export function balanceSheetToProtobufForProtocol(
     const divisibility = <u32>table.DIVISIBILITY.select(name).getValue<u8>();
     const rune = new protobuf.Rune();
     const runeId = new protobuf.RuneId();
-    runeId.height = <u32>_runeId.block;
-    runeId.txindex = _runeId.tx;
+    runeId.height = <u32>_runeId.block.toU64();
+    runeId.txindex = _runeId.tx.toU32();
     rune.runeId = runeId;
     rune.name = Uint8Array.wrap(
       String.UTF8.encode(fieldToName(fromArrayBuffer(name))),

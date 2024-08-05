@@ -29,8 +29,8 @@ export function runes(): ArrayBuffer {
     const runeId = new protobuf.RuneId();
     const _runeId = RuneId.fromBytesU128(ETCHING_TO_RUNE_ID.select(d).get());
 
-    runeId.height = <u32>_runeId.block;
-    runeId.txindex = _runeId.tx;
+    runeId.height = <u32>_runeId.block.toU64();
+    runeId.txindex = _runeId.tx.toU32();
 
     rune.runeId = runeId;
     rune.name = Uint8Array.wrap(String.UTF8.encode(fieldToName(name))).reduce<

@@ -33,6 +33,7 @@ export class ProtoruneTable {
   RUNE_ID_TO_ETCHING: IndexPointer;
   ETCHING_TO_RUNE_ID: IndexPointer;
   RUNTIME_BALANCE: IndexPointer;
+  INTERNAL_MINT: IndexPointer;
   constructor(ptr: IndexPointer) {
     this.ptr = ptr;
     this.OUTPOINT_TO_RUNES = ptr.keyword("/byoutpoint/");
@@ -44,6 +45,7 @@ export class ProtoruneTable {
     this.RUNE_ID_TO_ETCHING = ptr.keyword("/etching/byruneid/");
     this.ETCHING_TO_RUNE_ID = ptr.keyword("/runeid/byetching/");
     this.RUNTIME_BALANCE = ptr.keyword("/runtime/balance");
+    this.INTERNAL_MINT = ptr.keyword("/mint/isinternal");
   }
   static for(protocol: u128): ProtoruneTable {
     return new ProtoruneTable(

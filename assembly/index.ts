@@ -5,7 +5,7 @@ import { parsePrimitive } from "metashrew-as/assembly/utils/utils";
 import { DefaultProtorune, Protorune } from "./indexer";
 import { MessageContext } from "./indexer/protomessage";
 import { GENESIS } from "metashrew-runes/assembly/indexer/constants";
-import { Index as SpendablesIndex } from "metashrew-spendables/assembly/indexer";
+import { SpendablesIndex } from "metashrew-spendables/assembly/indexer";
 
 export function trap(): void {
   unreachable();
@@ -21,7 +21,7 @@ export function _start(): void {
   }
   const block = new Block(box);
   if (height >= GENESIS) {
-    SpendablesIndex.indexBlock(height, block);
+    new SpendablesIndex().indexBlock(height, block);
   }
   new DefaultProtorune().indexBlock(height, block);
   _flush();
