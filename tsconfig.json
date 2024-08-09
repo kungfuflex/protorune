@@ -14,5 +14,5 @@
     "declaration": true,
     "types": ["node"]
   },
-  "include": ["./src.ts/*"]
+  "include": ["./src.ts/*", "./tests/utils/*.ts"]
 }

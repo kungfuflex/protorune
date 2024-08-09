@@ -156,7 +156,7 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
     }
   }
   initializeSubprotocols(): void {
-    changetype<T>(0).initializeProtocol();
+    changetype<T>(0).initializeProtocol<T>();
   }
   indexBlock(height: u32, block: Block): void {
     this.initializeSubprotocols();

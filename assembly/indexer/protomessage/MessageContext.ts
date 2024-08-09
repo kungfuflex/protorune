@@ -5,11 +5,8 @@ import { RuneId } from "metashrew-runes/assembly/indexer/RuneId";
 import { ProtoruneBalanceSheet } from "../ProtoruneBalanceSheet";
 import { ProtoruneTable, PROTOCOLS_TO_INDEX } from "../tables/protorune";
 import { u128 } from "as-bignum/assembly";
-import { console } from "metashrew-as/assembly/utils/logging";
-import { Box } from "metashrew-as/assembly/utils/box";
 import { RunesTransaction } from "metashrew-runes/assembly/indexer/RunesTransaction";
-import { fromArrayBuffer } from "metashrew-runes/assembly/utils";
-import { encodeHexFromBuffer } from "metashrew-as/assembly/utils/hex";
+import { console } from "metashrew-as/assembly/utils";
 
 export class MessageContext {
   runtime: AtomicTransaction = new AtomicTransaction();
@@ -86,8 +83,8 @@ export class MessageContext {
       this.runes.push(rune);
     }
   }
-  initializeProtocol(): u128 {
-    const tag = this.protocolTag();
+  initializeProtocol<T extends MessageContext>(): u128 {
+    const tag = changetype<T>(0).protocolTag();
     PROTOCOLS_TO_INDEX.add(tag);
     return tag;
   }
