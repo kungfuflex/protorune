@@ -2,6 +2,8 @@ import { Box } from "metashrew-as/assembly/utils/box";
 import { _flush, input } from "metashrew-as/assembly/indexer/index";
 import { Block } from "metashrew-as/assembly/blockdata/block";
 import { parsePrimitive } from "metashrew-as/assembly/utils/utils";
+import { u128 } from "as-bignum/assembly";
+import { ProtoruneRuneId } from "./indexer/ProtoruneRuneId";
 import { DefaultProtorune, Protorune } from "./indexer";
 import { MessageContext } from "./indexer/protomessage";
 import { GENESIS } from "metashrew-runes/assembly/indexer/constants";
@@ -19,6 +21,12 @@ class DepositAllContext extends MessageContext {
 }
 
 class DepositAllProtorune extends Protorune<DepositAllContext> {}
+
+export function test_ProtoruneRuneId(): void {
+  const runeId = ProtoruneRuneId.encode([ u128.from(50), u128.from(100) ]);
+  console.log(runeId.block.toString());
+  console.log(runeId.tx.toString());
+}
 
 export function testProtomessage(): void {
   const data = input();

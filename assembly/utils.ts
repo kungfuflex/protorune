@@ -60,3 +60,39 @@ export function fieldToArrayBuffer15Bytes(data: Array<u128>): ArrayBuffer {
   );
 }
 
+function toSevenBitChunks(data: u128): Array<Array<u8>> {
+  const bytes = changetype<Uint8Array>(data.toBytes());
+  let result = new Array<Array<u8>>(0);
+  let bit = 0;
+  for (let i = 0; i < bytes.length; i++) {
+    for (let j = 0; j < 8; j++) {
+      if (bit % 7 === 0) result.push(new Array<u8>(0));
+      result[result.length - 1].push((bytes[i] >> <u8>(7 - j)) & 0x01);
+    }
+  }
+  return result;
+}
+
+function joinBits(data: Array<u8>): u8 {
+  return data.reduce((r: u8, v: u8, i: i32, ary: Array<u8>) => {
+    return (r << 1) | v;
+  }, <u8>0);
+}
+
+function dropTerminalBytes(ary: Array<u8>): Array<u8> {
+  let i: i32 = ary.length;
+  for (; i >= 0; i--) {
+    if (ary[i] !== 0) break;
+  }
+  return ary.slice(0, i);
+}
+
+export function toLEB128(data: u128): ArrayBuffer {
+  const values = dropTerminalBytes(toSevenBitChunks(data).map<u8>((v: Array<u8>, i: i32, ary: Array<Array<u8>>) => {
+    return joinBits(v);
+  }).reverse());
+  return values.reduce((r: ArrayBuffer, v: u8, i: i32, ary: Array<u8>) => {
+    store<u8>(changetype<usize>(r) + <usize>i, i === ary.length - 1 ? 0x80 | v : v);
+    return r;
+  }, new ArrayBuffer(values.length));
+}
