@@ -5,22 +5,22 @@ import { expect } from "chai";
 //@ts-ignore
 import bitcoinjs = require("bitcoinjs-lib");
 import {
-  buildProgram,
-  formatKv,
-  TEST_BTC_ADDRESS1,
-  TEST_BTC_ADDRESS2,
+    buildProgram,
+    formatKv,
+    TEST_BTC_ADDRESS1,
+    TEST_BTC_ADDRESS2,
 } from "metashrew-runes/lib/tests/utils/general";
 import {
-  initCompleteBlockWithRuneEtching,
-  runesbyaddress,
+    initCompleteBlockWithRuneEtching,
+    runesbyaddress,
 } from "metashrew-runes/lib/tests/utils/rune-helpers";
 import {
-  buildCoinbaseToAddress,
-  buildDefaultBlock,
+    buildCoinbaseToAddress,
+    buildDefaultBlock,
 } from "metashrew-runes/lib/tests/utils/block-helpers";
 import {
-  constructProtoburnTransaction,
-  constructProtostoneTx,
+    constructProtoburnTransaction,
+    constructProtostoneTx,
 } from "./utils/protoburn";
 import { protorunesbyaddress } from "./utils/view-helpers";
 import { DEBUG_WASM } from "./utils/general";
@@ -33,9 +33,11 @@ import { RuneId } from "@magiceden-oss/runestone-lib/dist/src/runeid";
 const TEST_PROTOCOL_TAG = BigInt("0x400000000000000000");
 
 describe("protoruneRuneId", () => {
-  it("testing encode", async () => {
-    const program = buildProgram(DEBUG_WASM);
-    await program.run("test_ProtoruneRuneId");
-    console.log(formatKv(program.kv));
-  });
+    it("testing encode", async () => {
+        const program = buildProgram(DEBUG_WASM);
+        await program.run("test_ProtoruneRuneId");
+        const kv = formatKv(program.kv);
+        expect(kv["/test/protorune/runeid/block"]).to.equal("0x00000000000000000000000000000000");
+        expect(kv["/test/protorune/runeid/tx"]).to.equal("0x64320000000000000000000000000000");
+    });
 });

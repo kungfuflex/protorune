@@ -25,12 +25,20 @@ export function snapTo15Bytes(v: Box): Box {
   return box;
 }
 
-export function concatByteArray(v: Array<u128>): ArrayBuffer {
+export function concatByteArray15BytesPerU128(v: Array<u128>): ArrayBuffer {
   return Box.concat(
     v.map<Box>((v, i, ary) =>
       i === ary.length - 1
         ? alignU128ToArrayBuffer(v)
         : snapTo15Bytes(Box.from(reverse(toArrayBuffer(v)))),
+    ),
+  );
+}
+
+export function concatByteArrayTruncateZeros(v: Array<u128>): ArrayBuffer {
+  return Box.concat(
+    v.map<Box>((v, i, ary) =>
+      alignU128ToArrayBuffer(v)
     ),
   );
 }

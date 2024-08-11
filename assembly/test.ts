@@ -28,11 +28,14 @@ class DepositAllProtorune extends Protorune<DepositAllContext> { }
 
 export function test_ProtoruneRuneId(): void {
   const runeId = ProtoruneRuneId.encode([u128.from(50), u128.from(100)]);
-  const padded = new ArrayBuffer(32);
-  memory.copy(changetype<usize>(padded), changetype<usize>(runeId), 32);
   console.log(runeId.block.toString());
   console.log(runeId.tx.toString());
-  TEST_PROTORUNE_RUNEID.set(padded);
+  TEST_PROTORUNE_RUNEID.select(String.UTF8.encode("block")).set(runeId.block.toUint8Array().buffer);
+  TEST_PROTORUNE_RUNEID.select(String.UTF8.encode("tx")).set(runeId.tx.toUint8Array().buffer);
+  const decoded = runeId.decode();
+  for (let i = 0; i < decoded.length; i++) {
+    console.log("decoded[" + i.toString() + "]: " + decoded[i].toString())
+  }
   _flush();
 }
 

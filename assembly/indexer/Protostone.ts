@@ -28,12 +28,12 @@ import { PROTOCOL_FIELD } from "../constants";
 import { Edict } from "metashrew-runes/assembly/indexer/Edict";
 import { Field } from "metashrew-runes/assembly/indexer/Field";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils";
-import { concatByteArray, byteLengthForNVarInts } from "../utils";
+import { concatByteArray15BytesPerU128, byteLengthForNVarInts } from "../utils";
 import { ProtoruneRuneId } from "./ProtoruneRuneId";
 import { RuneId } from "metashrew-runes/assembly/indexer/RuneId";
 
 function logProtoruneField(ary: Array<u128>): void {
-  console.log(Box.from(concatByteArray(ary)).toHexString());
+  console.log(Box.from(concatByteArray15BytesPerU128(ary)).toHexString());
 }
 
 class BalanceSheetReduce {
@@ -218,7 +218,7 @@ export class Protostone extends RunestoneMessage {
   }
 
   static parseFromFieldData(fieldData: Array<u128>): Array<Protostone> {
-    const input = Box.from(concatByteArray(fieldData));
+    const input = Box.from(concatByteArray15BytesPerU128(fieldData));
     const result: Array<Protostone> = new Array<Protostone>();
     while (input.len > 0) {
       const protocolTag = u128.from(0);
