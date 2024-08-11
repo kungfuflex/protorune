@@ -10,7 +10,9 @@ import { GENESIS } from "metashrew-runes/assembly/indexer/constants";
 import { IncomingRune } from "./indexer/protomessage/IncomingRune";
 import { SpendablesIndex } from "metashrew-spendables/assembly/indexer";
 import { console } from "metashrew-as/assembly/utils/logging"
+import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
 
+export const TEST_PROTORUNE_RUNEID = IndexPointer.for("/test/protorune/runeid/");
 
 class DepositAllContext extends MessageContext {
   handle(): bool {
@@ -26,8 +28,12 @@ class DepositAllProtorune extends Protorune<DepositAllContext> { }
 
 export function test_ProtoruneRuneId(): void {
   const runeId = ProtoruneRuneId.encode([u128.from(50), u128.from(100)]);
+  const padded = new ArrayBuffer(32);
+  memory.copy(changetype<usize>(padded), changetype<usize>(runeId), 32);
   console.log(runeId.block.toString());
   console.log(runeId.tx.toString());
+  TEST_PROTORUNE_RUNEID.set(padded);
+  _flush();
 }
 
 export function testProtomessage(): void {

@@ -3,6 +3,8 @@ import { readULEB128ToU128 } from "metashrew-runes/assembly/leb128";
 import { toArrayBuffer } from "metashrew-runes/assembly/utils";
 import { u128 } from "as-bignum/assembly";
 import { reverse } from "metashrew-as/assembly/utils";
+import { console } from "metashrew-as/assembly/utils/logging"
+
 
 export function alignArrayBuffer(v: ArrayBuffer): Box {
   const box = Box.from(v);
@@ -87,12 +89,50 @@ function dropTerminalBytes(ary: Array<u8>): Array<u8> {
   return ary.slice(0, i);
 }
 
+// export function toLEB128(data: u128): ArrayBuffer {
+//   const values = dropTerminalBytes(toSevenBitChunks(data).map<u8>((v: Array<u8>, i: i32, ary: Array<Array<u8>>) => {
+//     return joinBits(v);
+//   }).reverse());
+//   return values.reduce((r: ArrayBuffer, v: u8, i: i32, ary: Array<u8>) => {
+//     store<u8>(changetype<usize>(r) + <usize>i, i === ary.length - 1 ? 0x80 | v : v);
+//     return r;
+//   }, new ArrayBuffer(values.length));
+// }
+
 export function toLEB128(data: u128): ArrayBuffer {
-  const values = dropTerminalBytes(toSevenBitChunks(data).map<u8>((v: Array<u8>, i: i32, ary: Array<Array<u8>>) => {
-    return joinBits(v);
-  }).reverse());
-  return values.reduce((r: ArrayBuffer, v: u8, i: i32, ary: Array<u8>) => {
-    store<u8>(changetype<usize>(r) + <usize>i, i === ary.length - 1 ? 0x80 | v : v);
-    return r;
-  }, new ArrayBuffer(values.length));
+  let result: Array<u8> = [];
+  let tempValue = data;
+  const sevenBitMask = u128.from(0x7F);
+  const continuationBit = u128.from(0x80);
+  // Encode the u128 value using LEB128
+  while (tempValue > sevenBitMask) {
+    // Extract 7 bits and add continuation bit (0x80)
+    const extracted: u128 = ((tempValue & sevenBitMask) | continuationBit)
+    console.log("Attempting to push u8 " + extracted.toString())
+    result.push(<u8>extracted.lo);
+    // Shift the value right by 7 bits for the next byte
+    tempValue = tempValue >> <i32>7;
+  }
+
+  // Add the final byte without continuation bit
+  const lastByte = <u8>((tempValue & sevenBitMask).lo)
+  result.push(lastByte);
+
+  for (let i = 0; i < result.length; i++) {
+    console.log("result[i] " + result[i].toString())
+  }
+
+  const final = changetype<ArrayBuffer>(StaticArray.fromArray<u8>(result));
+
+  console.log("return final bytelength " + final.byteLength.toString())
+
+  return final;
+}
+
+export function logArrayBuffer(arr: ArrayBuffer): void {
+  const tempArray = Uint8Array.wrap(arr);
+  console.log("Got arraybuffer of size " + tempArray.length.toString());
+  tempArray.forEach((val, i) => {
+    console.log("byte[" + i.toString() + "] = " + val.toString());
+  })
 }
