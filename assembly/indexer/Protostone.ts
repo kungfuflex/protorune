@@ -27,13 +27,8 @@ import { console } from "metashrew-as/assembly/utils/logging";
 import { PROTOCOL_FIELD } from "../constants";
 import { Edict } from "metashrew-runes/assembly/indexer/Edict";
 import { Field } from "metashrew-runes/assembly/indexer/Field";
-import {
-  encodeHexFromBuffer,
-} from "metashrew-as/assembly/utils";
-import {
-  concatByteArray,
-  byteLengthForNVarInts,
-} from "../utils";
+import { encodeHexFromBuffer } from "metashrew-as/assembly/utils";
+import { concatByteArray, byteLengthForNVarInts } from "../utils";
 import { ProtoruneRuneId } from "./ProtoruneRuneId";
 import { RuneId } from "metashrew-runes/assembly/indexer/RuneId";
 
