@@ -26,8 +26,7 @@ class DepositAllContext extends MessageContext {
 
 class DepositAllProtorune extends Protorune<DepositAllContext> { }
 
-export function test_ProtoruneRuneId(): void {
-  const runeId = ProtoruneRuneId.encode([u128.from(50), u128.from(100)]);
+function _test_ProtoruneRuneId(runeId: ProtoruneRuneId): void {
   console.log(runeId.block.toString());
   console.log(runeId.tx.toString());
   TEST_PROTORUNE_RUNEID.select(String.UTF8.encode("block")).set(runeId.block.toUint8Array().buffer);
@@ -35,8 +34,19 @@ export function test_ProtoruneRuneId(): void {
   const decoded = runeId.decode();
   for (let i = 0; i < decoded.length; i++) {
     console.log("decoded[" + i.toString() + "]: " + decoded[i].toString())
+    TEST_PROTORUNE_RUNEID.select(String.UTF8.encode("decoded/")).select(String.UTF8.encode(i.toString())).set(decoded[i].toUint8Array().buffer);
   }
   _flush();
+}
+
+export function test_ProtoruneRuneId1(): void {
+  const runeId = ProtoruneRuneId.encode([u128.from(50), u128.from(100)]);
+  _test_ProtoruneRuneId(runeId);
+}
+
+export function test_ProtoruneRuneId2(): void {
+  const runeId = ProtoruneRuneId.encode([u128.from(50000000), u128.from(1000000000)]);
+  _test_ProtoruneRuneId(runeId);
 }
 
 export function testProtomessage(): void {

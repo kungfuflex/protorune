@@ -79,7 +79,6 @@ export function toLEB128(data: u128): ArrayBuffer {
   while (tempValue > sevenBitMask) {
     // Extract 7 bits and add continuation bit (0x80)
     const extracted: u128 = ((tempValue & sevenBitMask) | continuationBit)
-    console.log("Attempting to push u8 " + extracted.toString())
     result.push(<u8>extracted.lo);
     // Shift the value right by 7 bits for the next byte
     tempValue = tempValue >> <i32>7;
@@ -89,13 +88,7 @@ export function toLEB128(data: u128): ArrayBuffer {
   const lastByte = <u8>((tempValue & sevenBitMask).lo)
   result.push(lastByte);
 
-  for (let i = 0; i < result.length; i++) {
-    console.log("result[i] " + result[i].toString())
-  }
-
   const final = changetype<ArrayBuffer>(StaticArray.fromArray<u8>(result));
-
-  console.log("return final bytelength " + final.byteLength.toString())
 
   return final;
 }
