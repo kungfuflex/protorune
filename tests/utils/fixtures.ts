@@ -35,19 +35,23 @@ export async function createProtoruneFixture(
   {
     runeId,
     TEST_PROTOCOL_TAG,
+    skip = 0,
   }: {
     runeId: {
       block: bigint;
       tx: number;
     };
     TEST_PROTOCOL_TAG: bigint;
+    skip?: number;
   } = {
     runeId: {
       block: 840000n,
       tx: 1,
     },
     TEST_PROTOCOL_TAG: BigInt("0x400000000000000000"),
+    skip: 0,
   },
+  _block?: bitcoinjs.Block,
 ) {
   // ================================
   // TODO: Create a fixture from here
@@ -69,14 +73,22 @@ export async function createProtoruneFixture(
     },
   ];
   const pointer1 = 1;
-  let block = initCompleteBlockWithRuneEtching(
-    outputs,
-    pointer1,
-    undefined,
-    premineAmount,
-  );
+  let block =
+    _block ||
+    initCompleteBlockWithRuneEtching(
+      outputs,
+      pointer1,
+      undefined,
+      premineAmount,
+      undefined /*name */,
+      undefined /*symbol */,
+      undefined /* block */,
+      skip,
+    );
   const input = {
-    inputTxHash: block.transactions?.at(1)?.getHash(), // 0 is coinbase, 1 is the mint
+    inputTxHash: block.transactions
+      ?.at(block?.transactions?.length - 1)
+      ?.getHash(), // 0 is coinbase, 1 is the mint
     inputTxOutputIndex: pointer1, // index of output in the input tx that has the runes. In this case it is the default pointer of the mint
   };
   const amount = premineAmount / 2n;

@@ -5,7 +5,7 @@ export declare function createProtoruneFixture(omitBurn?: boolean, premineAmount
         tx: number;
     };
     TEST_PROTOCOL_TAG: bigint;
-}): Promise<{
+}, _block?: bitcoinjs.Block): Promise<{
     input: {
         inputTxHash: Buffer;
         inputTxOutputIndex: number;
