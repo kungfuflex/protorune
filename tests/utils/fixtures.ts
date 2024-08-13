@@ -32,7 +32,22 @@ import { RuneId } from "@magiceden-oss/runestone-lib/dist/src/runeid";
 export async function createProtoruneFixture(
   omitBurn: boolean = false,
   premineAmount: bigint = 2100000005000000n,
-  TEST_PROTOCOL_TAG: bigint = BigInt("0x400000000000000000"),
+  {
+    runeId,
+    TEST_PROTOCOL_TAG,
+  }: {
+    runeId: {
+      block: bigint;
+      tx: number;
+    };
+    TEST_PROTOCOL_TAG: bigint;
+  } = {
+    runeId: {
+      block: 840000n,
+      tx: 1,
+    },
+    TEST_PROTOCOL_TAG: BigInt("0x400000000000000000"),
+  },
 ) {
   // ================================
   // TODO: Create a fixture from here
@@ -63,10 +78,6 @@ export async function createProtoruneFixture(
   const input = {
     inputTxHash: block.transactions?.at(1)?.getHash(), // 0 is coinbase, 1 is the mint
     inputTxOutputIndex: pointer1, // index of output in the input tx that has the runes. In this case it is the default pointer of the mint
-  };
-  const runeId = {
-    block: 840000n,
-    tx: 1,
   };
   const amount = premineAmount / 2n;
   const outputIndexToReceiveProtorunes = 2; // 0 is the runestone, 1 is protoburn, 2 is ADDRESS2
