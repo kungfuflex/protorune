@@ -49,6 +49,21 @@ export function test_ProtoruneRuneId2(): void {
   _test_ProtoruneRuneId(runeId);
 }
 
+export function test_ProtoruneRuneId3(): void {
+  const runeId = ProtoruneRuneId.encode([u128.from(50000000), u128.from(1000000000), u128.from(1500000000)]);
+  _test_ProtoruneRuneId(runeId);
+}
+
+export function test_ProtoruneRuneId4(): void {
+  const runeId = ProtoruneRuneId.encode([u128.from(50000000), u128.from(1000000000), u128.from(1500000000), u128.from(2000000000)]);
+  _test_ProtoruneRuneId(runeId);
+}
+
+export function test_ProtoruneRuneId5(): void {
+  const runeId = ProtoruneRuneId.encode([u128.from(50000000), u128.from(1000000000), u128.from(1500000000), u128.from(2000000000), u128.from(50000000), u128.from(1000000000), u128.from(1500000000), u128.from(2000000000)]);
+  _test_ProtoruneRuneId(runeId);
+}
+
 export function testProtomessage(): void {
   const data = input();
   const box = Box.from(data);

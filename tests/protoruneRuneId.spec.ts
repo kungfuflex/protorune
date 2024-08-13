@@ -51,4 +51,35 @@ describe("protoruneRuneId", () => {
         expect(kv["/test/protorune/runeid/decoded/0"]).to.equal("0x80f0fa02000000000000000000000000");
         expect(kv["/test/protorune/runeid/decoded/1"]).to.equal("0x00ca9a3b000000000000000000000000");
     });
+    it("testing encode/decode for multiple bytes 2", async () => {
+        const program = buildProgram(DEBUG_WASM);
+        await program.run("test_ProtoruneRuneId3");
+        const kv = formatKv(program.kv);
+        console.log(kv)
+        expect(kv["/test/protorune/runeid/block"]).to.equal("0x00000000000000000000000000000000");
+        expect(kv["/test/protorune/runeid/tx"]).to.equal("0x05cba0de8003dceb948017ebe1800000");
+        expect(kv["/test/protorune/runeid/decoded/0"]).to.equal("0x80f0fa02000000000000000000000000");
+        expect(kv["/test/protorune/runeid/decoded/1"]).to.equal("0x00ca9a3b000000000000000000000000");
+        expect(kv["/test/protorune/runeid/decoded/2"]).to.equal("0x002f6859000000000000000000000000");
+    });
+    it("testing encode/decode for multiple bytes into block area", async () => {
+        const program = buildProgram(DEBUG_WASM);
+        await program.run("test_ProtoruneRuneId4");
+        const kv = formatKv(program.kv);
+        console.log(kv)
+        expect(kv["/test/protorune/runeid/block"]).to.equal("0xebe18000000000000000000000000000");
+        expect(kv["/test/protorune/runeid/tx"]).to.equal("0x07b9d6a88005cba0de8003dceb948017");
+        expect(kv["/test/protorune/runeid/decoded/0"]).to.equal("0x80f0fa02000000000000000000000000");
+        expect(kv["/test/protorune/runeid/decoded/1"]).to.equal("0x00ca9a3b000000000000000000000000");
+        expect(kv["/test/protorune/runeid/decoded/2"]).to.equal("0x002f6859000000000000000000000000");
+        expect(kv["/test/protorune/runeid/decoded/3"]).to.equal("0x00943577000000000000000000000000");
+    });
+    it("testing encode when bytes > 32", async () => {
+        const program = buildProgram(DEBUG_WASM);
+        await program.run("test_ProtoruneRuneId5");
+        const kv = formatKv(program.kv);
+        console.log(kv)
+        expect(kv["/test/protorune/runeid/block"]).to.equal("0x00000000000000000000000000000000");
+        expect(kv["/test/protorune/runeid/tx"]).to.equal("0x00000000000000000000000000000000");
+    });
 });

@@ -36,11 +36,25 @@ export function concatByteArray15BytesPerU128(v: Array<u128>): ArrayBuffer {
 }
 
 export function concatByteArrayTruncateZeros(v: Array<u128>): ArrayBuffer {
-  return Box.concat(
-    v.map<Box>((v, i, ary) =>
-      alignU128ToArrayBuffer(v)
-    ),
-  );
+  let foundFirstNonZero = false;
+  let result = new Array<Box>();
+
+  for (let i = 0; i < v.length; i++) {
+    let value = v[i];
+
+    if (!foundFirstNonZero) {
+      if (value.isZero()) {
+        continue; // Skip this element
+      } else {
+        result.push(alignU128ToArrayBuffer(value));
+        foundFirstNonZero = true; // Mark the first nonzero element
+        continue
+      }
+    }
+    result.push(Box.from(reverse(toArrayBuffer(value))));
+  }
+
+  return Box.concat(result);
 }
 
 export function byteLengthForNVarInts(input: Box, n: u64): usize {

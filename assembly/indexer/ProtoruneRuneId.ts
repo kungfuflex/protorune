@@ -31,16 +31,16 @@ export class ProtoruneRuneId extends RuneId {
         Box.from(toLEB128(v)),
       ),
     );
-    if (data.byteLength > 32) return changetype<ProtoruneRuneId>(0);
+    const result = new ProtoruneRuneId(0, 0);
+    if (data.byteLength > 32) return result;
 
     // adds left padding of 0 bytes until the data is 32 bytes
     const padded = new ArrayBuffer(32);
     memory.copy(
       changetype<usize>(padded) + <usize>(32 - data.byteLength),
       changetype<usize>(data),
-      32 - data.byteLength,
+      data.byteLength,
     );
-    const result = new ProtoruneRuneId(0, 0);
     result.block = u128.fromBytes(
       Uint8Array.wrap(Box.from(padded).shrinkBack(16).toArrayBuffer()),
       true // bigEndian is true, since we pushed the bytes to the highest memory addresses, we only want those to be processed, and the 0s should be higher significance so the encoded values are increasing in size and not so huge
