@@ -1,5 +1,5 @@
 import bitcoinjs = require("bitcoinjs-lib");
-export declare function createProtoruneFixture(omitBurn?: boolean, premineAmount?: bigint): Promise<{
+export declare function createProtoruneFixture(omitBurn?: boolean, premineAmount?: bigint, TEST_PROTOCOL_TAG?: bigint): Promise<{
     input: {
         inputTxHash: Buffer;
         inputTxOutputIndex: number;
@@ -18,4 +18,5 @@ export declare function createProtoruneFixture(omitBurn?: boolean, premineAmount
         tx: number;
     };
     premineAmount: bigint;
+    TEST_PROTOCOL_TAG: bigint;
 }>;

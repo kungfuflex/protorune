@@ -29,10 +29,10 @@ import { u128, u64, u32 } from "@magiceden-oss/runestone-lib/dist/src/integer";
 import { RuneId } from "@magiceden-oss/runestone-lib/dist/src/runeid";
 
 // const TEST_PROTOCOL_TAG = parseInt("0x112233445566778899aabbccddeeff10", 16);
-const TEST_PROTOCOL_TAG = BigInt("0x400000000000000000");
 export async function createProtoruneFixture(
   omitBurn: boolean = false,
   premineAmount: bigint = 2100000005000000n,
+  TEST_PROTOCOL_TAG: bigint = BigInt("0x400000000000000000"),
 ) {
   // ================================
   // TODO: Create a fixture from here
@@ -104,5 +104,13 @@ export async function createProtoruneFixture(
       /*runeTransferPointer=*/ 0,
     );
   }
-  return { input, block, output, refundOutput, runeId, premineAmount };
+  return {
+    input,
+    block,
+    output,
+    refundOutput,
+    runeId,
+    premineAmount,
+    TEST_PROTOCOL_TAG,
+  };
 }
