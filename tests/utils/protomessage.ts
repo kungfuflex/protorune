@@ -14,7 +14,7 @@ import {
 } from "metashrew-runes/lib/tests/utils/general";
 import { encodeRunestoneProtostone } from "../../src.ts/runestone_protostone_upgrade";
 import { encodeRunestone } from "@magiceden-oss/runestone-lib";
-import { ProtoRunestone } from "../../lib/protorunestone";
+import { ProtoRunestone } from "../../src.ts/protorunestone";
 import { Some } from "@magiceden-oss/runestone-lib/dist/src/monads";
 import { u128, u64, u32 } from "@magiceden-oss/runestone-lib/dist/src/integer";
 import { RuneId } from "@magiceden-oss/runestone-lib/dist/src/runeid";
