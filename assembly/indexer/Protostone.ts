@@ -67,8 +67,12 @@ export class ProtostoneTable {
     this.list = v;
     this.voutStart = voutStart;
   }
-  static from(ary: Array<u128>, voutStart: u32): ProtostoneTable {
-    const list = Protostone.parseFromFieldData(ary);
+  static from(
+    ary: Array<u128>,
+    voutStart: u32,
+    unallocatedTo: u32,
+  ): ProtostoneTable {
+    const list = Protostone.parseFromFieldData(ary, unallocatedTo);
     return new ProtostoneTable(list, voutStart);
   }
   burns(): Array<Protoburn> {
@@ -115,8 +119,9 @@ export class Protostone extends RunestoneMessage {
     fields: Map<u64, Array<u128>>,
     edicts: Array<StaticArray<u128>>,
     protocolTag: u128,
+    unallocatedTo: u32,
   ) {
-    super(fields, edicts);
+    super(fields, edicts, unallocatedTo);
     this.fields = fields;
     this.edicts = edicts;
     this.protocolTag = protocolTag;
@@ -124,8 +129,16 @@ export class Protostone extends RunestoneMessage {
   }
   protostones(voutStart: u32): ProtostoneTable {
     if (!this.fields.has(PROTOCOL_FIELD))
-      return ProtostoneTable.from(new Array<u128>(), voutStart);
-    return ProtostoneTable.from(this.fields.get(PROTOCOL_FIELD), voutStart);
+      return ProtostoneTable.from(
+        new Array<u128>(),
+        voutStart,
+        this.unallocatedTo,
+      );
+    return ProtostoneTable.from(
+      this.fields.get(PROTOCOL_FIELD),
+      voutStart,
+      this.unallocatedTo,
+    );
   }
   static from(v: RunestoneMessage): Protostone {
     return changetype<Protostone>(v);
@@ -217,7 +230,10 @@ export class Protostone extends RunestoneMessage {
     return changetype<Array<u32>>(0);
   }
 
-  static parseFromFieldData(fieldData: Array<u128>): Array<Protostone> {
+  static parseFromFieldData(
+    fieldData: Array<u128>,
+    unallocatedTo: u32,
+  ): Array<Protostone> {
     const input = Box.from(concatByteArray15BytesPerU128(fieldData));
     const result: Array<Protostone> = new Array<Protostone>();
     while (input.len > 0) {
@@ -239,6 +255,7 @@ export class Protostone extends RunestoneMessage {
       const protostone = Protostone.parseIntoProtostone(
         input.sliceTo(input.start + byteLength),
         protocolTag,
+        unallocatedTo,
       );
       result.push(protostone);
       input.shrinkFront(<u32>byteLength);
@@ -275,7 +292,11 @@ export class Protostone extends RunestoneMessage {
       )
       .concat();
   }
-  static parseIntoProtostone(input: Box, protocolTag: u128): Protostone {
+  static parseIntoProtostone(
+    input: Box,
+    protocolTag: u128,
+    unallocatedTo: u32,
+  ): Protostone {
     // console.log("Inside protostone.parse" + input.toHexString());
     let fields = new Map<u64, Array<u128>>();
     let edicts = new Array<StaticArray<u128>>(0);
@@ -313,7 +334,7 @@ export class Protostone extends RunestoneMessage {
         field.push(value);
       }
     }
-    return new Protostone(fields, edicts, protocolTag);
+    return new Protostone(fields, edicts, protocolTag, unallocatedTo);
   }
 
   processEdict(

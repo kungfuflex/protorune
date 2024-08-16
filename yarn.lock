@@ -1447,7 +1447,7 @@ memorystream@^0.3.1:
 
 "metashrew-runes@https://github.com/sandshrewmetaprotocols/metashrew-runes":
   version "0.1.0"
-  resolved "https://github.com/sandshrewmetaprotocols/metashrew-runes#4cb1c7b79e679597bbc59c7109ff48a3a54afe19"
+  resolved "https://github.com/sandshrewmetaprotocols/metashrew-runes#87a8c7cc2c2e8a8c71fea484e536ebd56cac1978"
   dependencies:
     "@protobuf-ts/runtime" "^2.9.4"
 
