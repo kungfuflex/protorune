@@ -1,10 +1,11 @@
 import bitcoinjs = require("bitcoinjs-lib");
-export declare function createProtoruneFixture(omitBurn?: boolean, premineAmount?: bigint, { runeId, TEST_PROTOCOL_TAG, }?: {
+export declare function createProtoruneFixture(omitBurn?: boolean, premineAmount?: bigint, { runeId, TEST_PROTOCOL_TAG, skip, }?: {
     runeId: {
         block: bigint;
         tx: number;
     };
     TEST_PROTOCOL_TAG: bigint;
+    skip?: number;
 }, _block?: bitcoinjs.Block): Promise<{
     input: {
         inputTxHash: Buffer;

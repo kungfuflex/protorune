@@ -35,7 +35,7 @@ export async function createProtoruneFixture(
   {
     runeId,
     TEST_PROTOCOL_TAG,
-    skip = 0,
+    skip,
   }: {
     runeId: {
       block: bigint;
