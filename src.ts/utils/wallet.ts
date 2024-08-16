@@ -13,6 +13,4 @@ export const node = bip32.fromSeed(seed);
 export const DEFAULT = node.derivePath(`m/86'/0'/0'/0/${INDEX}`);
 
 export const tweakPubkey = (pubKey: Buffer) =>
-pubKey.length === 32 ? pubKey : pubKey.slice(1, 33)
-
-
+  pubKey.length === 32 ? pubKey : pubKey.slice(1, 33);

@@ -16,10 +16,7 @@ export class Protoburn {
     this.table = ProtoruneTable.for(protocolTag);
   }
 
-  process(
-    balanceSheet: ProtoruneBalanceSheet,
-    outpoint: ArrayBuffer
-  ): void {
+  process(balanceSheet: ProtoruneBalanceSheet, outpoint: ArrayBuffer): void {
     for (let i = 0; i < balanceSheet.runes.length; i++) {
       const runeId = balanceSheet.runes[i];
       const name = base.RUNE_ID_TO_ETCHING.select(runeId).get();

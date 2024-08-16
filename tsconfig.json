@@ -12,12 +12,7 @@
     "sourceMap": true,
     "outDir": "./lib",
     "declaration": true,
-    "types": [
-      "node"
-    ]
+    "types": ["node"]
   },
-  "include": [
-    "./src.ts/*",
-    "./tests/utils/*"
-  ]
+  "include": ["./src.ts/*", "./tests/utils/*.ts"]
 }

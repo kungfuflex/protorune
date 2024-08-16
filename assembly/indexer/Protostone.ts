@@ -28,49 +28,12 @@ import { PROTOCOL_FIELD } from "../constants";
 import { Edict } from "metashrew-runes/assembly/indexer/Edict";
 import { Field } from "metashrew-runes/assembly/indexer/Field";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils";
-import { RuneIdHi } from "./RuneIdHi";
+import { concatByteArray15BytesPerU128, byteLengthForNVarInts } from "../utils";
+import { ProtoruneRuneId } from "./ProtoruneRuneId";
 import { RuneId } from "metashrew-runes/assembly/indexer/RuneId";
 
 function logProtoruneField(ary: Array<u128>): void {
-  console.log(Box.from(concatByteArray(ary)).toHexString());
-}
-
-function alignArrayBuffer(v: ArrayBuffer): Box {
-  const box = Box.from(v);
-  while (box.len !== 0) {
-    if (load<u8>(box.start) === 0) box.shrinkFront(1);
-    else break;
-  }
-  return box;
-}
-
-function alignU128ToArrayBuffer(v: u128): Box {
-  return alignArrayBuffer(reverse(toArrayBuffer(v)));
-}
-
-function snapTo15Bytes(v: Box): Box {
-  const box = v.sliceFrom(0);
-  box.shrinkFront(1);
-  return box;
-}
-
-function concatByteArray(v: Array<u128>): ArrayBuffer {
-  return Box.concat(
-    v.map<Box>((v, i, ary) =>
-      i === ary.length - 1
-        ? alignU128ToArrayBuffer(v)
-        : snapTo15Bytes(Box.from(reverse(toArrayBuffer(v)))),
-    ),
-  );
-}
-
-function byteLengthForNVarInts(input: Box, n: u64): usize {
-  const clone = input.sliceFrom(0);
-  const start = clone.start;
-  for (let i: i32 = 0; i < <i32>n; i++) {
-    clone.shrinkFront(readULEB128ToU128(clone, u128.from(0)));
-  }
-  return clone.start - start;
+  console.log(Box.from(concatByteArray15BytesPerU128(ary)).toHexString());
 }
 
 class BalanceSheetReduce {
@@ -192,11 +155,11 @@ export class Protostone extends RunestoneMessage {
   }
 
   buildRuneIdForMint(bytes: ArrayBuffer): ArrayBuffer {
-    return RuneIdHi.fromBytes(bytes).toBytes();
+    return ProtoruneRuneId.fromBytes(bytes).toBytes();
   }
 
   buildRuneId(height: u64, tx: u32): ArrayBuffer {
-    return new RuneIdHi(height, tx).toBytes();
+    return new ProtoruneRuneId(height, tx).toBytes();
   }
 
   getReservedNameFor(height: u64, tx: u32): ArrayBuffer {
@@ -255,7 +218,7 @@ export class Protostone extends RunestoneMessage {
   }
 
   static parseFromFieldData(fieldData: Array<u128>): Array<Protostone> {
-    const input = Box.from(concatByteArray(fieldData));
+    const input = Box.from(concatByteArray15BytesPerU128(fieldData));
     const result: Array<Protostone> = new Array<Protostone>();
     while (input.len > 0) {
       const protocolTag = u128.from(0);

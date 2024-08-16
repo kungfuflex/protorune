@@ -21,7 +21,6 @@ import {
 import { constructProtoburnTransaction } from "./protoburn";
 
 // const TEST_PROTOCOL_TAG = parseInt("0x112233445566778899aabbccddeeff10", 16);
-const TEST_PROTOCOL_TAG = BigInt("0x400000000000000000");
 
 /**
  * Fixture creates a block with 3 transactions:
@@ -62,6 +61,26 @@ const TEST_PROTOCOL_TAG = BigInt("0x400000000000000000");
 export async function createProtoruneFixture(
   omitBurn: boolean = false,
   premineAmount: bigint = 2100000005000000n,
+  {
+    runeId,
+    TEST_PROTOCOL_TAG,
+    skip,
+  }: {
+    runeId: {
+      block: bigint;
+      tx: number;
+    };
+    TEST_PROTOCOL_TAG: bigint;
+    skip?: number;
+  } = {
+    runeId: {
+      block: 840000n,
+      tx: 1,
+    },
+    TEST_PROTOCOL_TAG: BigInt("0x400000000000000000"),
+    skip: 0,
+  },
+  _block?: bitcoinjs.Block,
 ) {
   const outputs = [
     {
@@ -80,19 +99,23 @@ export async function createProtoruneFixture(
     },
   ];
   const pointer1 = 1;
-  let block = initCompleteBlockWithRuneEtching(
-    outputs,
-    pointer1,
-    undefined,
-    premineAmount,
-  );
+  let block =
+    _block ||
+    initCompleteBlockWithRuneEtching(
+      outputs,
+      pointer1,
+      undefined,
+      premineAmount,
+      undefined /*name */,
+      undefined /*symbol */,
+      undefined /* block */,
+      skip,
+    );
   const input = {
-    inputTxHash: block.transactions?.at(1)?.getHash(), // 0 is coinbase, 1 is the mint
+    inputTxHash: block.transactions
+      ?.at(block?.transactions?.length - 1)
+      ?.getHash(), // 0 is coinbase, 1 is the mint
     inputTxOutputIndex: pointer1, // index of output in the input tx that has the runes. In this case it is the default pointer of the mint
-  };
-  const runeId = {
-    block: 840000n,
-    tx: 1,
   };
   const amount = premineAmount / 2n;
   const outputIndexToReceiveProtorunes = 2; // 0 is the runestone, 1 is protoburn, 2 is ADDRESS2
@@ -127,5 +150,13 @@ export async function createProtoruneFixture(
       /*runeTransferPointer=*/ 0,
     );
   }
-  return { input, block, output, refundOutput, runeId, premineAmount, amount };
+  return {
+    input,
+    block,
+    output,
+    refundOutput,
+    runeId,
+    premineAmount,
+    TEST_PROTOCOL_TAG,
+  };
 }
