@@ -11,12 +11,14 @@ export function expectBalances(
     equals: async (amount: bigint) => {
       expect((await result).balanceSheet[0].balance).equals(
         amount,
-        `address ${index} was not refunded runes`,
+        `address ${index} did not have the expected balance`,
       );
     },
     isZero: async () => {
-      expect((await result).balanceSheet.length).equals(
-        0,
+      // its possible for a protorune to have a balancesheet, but it was decremented to 0
+      const resBalances = (await result).balanceSheet;
+      expect(resBalances.length == 0 || resBalances[0].balance == 0).equals(
+        true,
         `address ${index} should not have any runes left`,
       );
     },

@@ -19,24 +19,50 @@ import {
   buildDefaultBlock,
 } from "metashrew-runes/lib/tests/utils/block-helpers";
 import { constructProtoburnTransaction } from "./protoburn";
-import { protorunesbyaddress, runtime } from "./view-helpers";
-import { DEBUG_WASM } from "./general";
-import { uint128 } from "../../src.ts/proto/protorune";
-import { constructProtostoneTx } from "./protoburn";
-import { constructProtomessageBlock } from "./protomessage";
-import { ProtoStone } from "../../src.ts/protostone";
-import { u128, u64, u32 } from "@magiceden-oss/runestone-lib/dist/src/integer";
-import { RuneId } from "@magiceden-oss/runestone-lib/dist/src/runeid";
 
 // const TEST_PROTOCOL_TAG = parseInt("0x112233445566778899aabbccddeeff10", 16);
 const TEST_PROTOCOL_TAG = BigInt("0x400000000000000000");
+
+/**
+ * Fixture creates a block with 3 transactions:
+ *  - tx 1: coinbase that transfers all bitcoins to ADDRESS1
+ *  - tx 2: runestone that has two outputs
+ *    - output 0: runestone etch, transfer all runes to pointer = 1 which is ADDRESS1
+ *    - output 1: ADDRESS1 p2pkh
+ *    - output 2: ADDRESS2 p2pkh
+ *  - tx 3: runestone with protoburn
+ *    - output 0: runestone with edicts transferring half of the runes to output 0, which has the protoburn.
+ *                the protoburn transfers the protorunes to output 1.
+ *                The leftover runes get transferred to the pointer, which is also output 0 (the protoburn)
+ *                All runes end up getting converted to protorunes and sent to ADDRESS2
+ *    - output 1: ADDRESS2 p2pkh
+ *    - output 2: ADDRESS1 p2pkh
+ *    - note, this will protoburn all the runes that address 1 had and transfer all to ADDRESS2
+ *
+ * Ending balances if omitBurn=true:
+ *  - ADDRESS1 balances
+ *    - 1 sat
+ *    - 2100000005000000 runes
+ *    - 0 protorunes
+ *  - ADDRESS2 balances
+ *    - 624999999 sat
+ *    - 0 runes
+ *    - 0 protorunes
+ *
+ * Ending balances if omitBurn=false:
+ *  - ADDRESS1 balances
+ *    - 1 sat
+ *    - 0 runes
+ *    - 0 protorunes
+ *  - ADDRESS2 balances
+ *    - 624999999 sat
+ *    - 0 runes
+ *    - 2100000005000000 protorunes
+ */
 export async function createProtoruneFixture(
   omitBurn: boolean = false,
   premineAmount: bigint = 2100000005000000n,
 ) {
-  // ================================
-  // TODO: Create a fixture from here
-  // ================================
   const outputs = [
     {
       script: bitcoinjs.payments.p2pkh({
@@ -79,9 +105,6 @@ export async function createProtoruneFixture(
     address: TEST_BTC_ADDRESS1,
     btcAmount: 0, // this gives address 1 his remaining bitcoin
   };
-  // ================================
-  // TODO: to here
-  // ================================
 
   // Constructing tx 2
   // output 0: runestone with protoburns
@@ -104,5 +127,5 @@ export async function createProtoruneFixture(
       /*runeTransferPointer=*/ 0,
     );
   }
-  return { input, block, output, refundOutput, runeId, premineAmount };
+  return { input, block, output, refundOutput, runeId, premineAmount, amount };
 }
