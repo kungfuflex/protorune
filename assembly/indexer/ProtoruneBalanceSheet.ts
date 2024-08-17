@@ -53,6 +53,7 @@ export class ProtoruneBalanceSheet extends BalanceSheet {
   static loadFromAtomicTx(
     ptr: IndexPointer,
     tx: AtomicTransaction,
+    inspect: bool = false,
   ): ProtoruneBalanceSheet {
     const runesPtr = ptr.keyword("/runes");
     const balancesPtr = ptr.keyword("/balances");

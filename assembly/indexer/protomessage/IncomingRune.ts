@@ -91,11 +91,20 @@ export class IncomingRune {
     const refundPtr = this.table.OUTPOINT_TO_RUNES.select(
       this.context.refund_pointer.toArrayBuffer(),
     ).keyword("/balances");
+    const refundRunesPtr = this.table.OUTPOINT_TO_RUNES.select(
+      this.context.refund_pointer.toArrayBuffer(),
+    ).keyword("/runes");
     const ptr = this.table.OUTPOINT_TO_RUNES.select(
       this.context.pointer.toArrayBuffer(),
     ).keyword("/balances");
+    const runePtr = this.table.OUTPOINT_TO_RUNES.select(
+      this.context.pointer.toArrayBuffer(),
+    ).keyword("/runes");
     if (this.refund_pointer_index == -1) return false;
     const index = refundPtr.selectIndex(this.refund_pointer_index).unwrap();
+    const runeName = this.context.runtime.get(
+      refundRunesPtr.selectIndex(this.refund_pointer_index).unwrap(),
+    );
     const currentValue = fromArrayBuffer(this.context.runtime.get(index));
     if (value > this.amount || value > currentValue) return false;
     const newValue: u128 = currentValue - value;
@@ -108,6 +117,10 @@ export class IncomingRune {
     if (this.pointer_index == -1) {
       this.pointer_index = ptr.length();
       toSet = this.context.runtime.extendIndexPointerList(ptr);
+      this.context.runtime.set(
+        this.context.runtime.extendIndexPointerList(runePtr),
+        runeName,
+      );
     } else {
       toSet = ptr.selectIndex(this.pointer_index).unwrap();
     }
