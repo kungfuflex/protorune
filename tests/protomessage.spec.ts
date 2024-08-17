@@ -13,15 +13,19 @@ import { constructProtostoneTx } from "./utils/protoburn";
 import { ProtoStone } from "../src.ts/protostone";
 import { u128, u64, u32 } from "@magiceden-oss/runestone-lib/dist/src/integer";
 import { RuneId } from "@magiceden-oss/runestone-lib/dist/src/runeid";
-import { createProtoruneFixture } from "./utils/fixtures";
+import {
+  createMultipleProtomessageFixture,
+  createMultipleProtoruneFixture,
+  createProtomessageFixture,
+  createProtoruneFixture,
+  TEST_PROTOCOL_TAG,
+} from "./utils/fixtures";
 import { expectBalances } from "./utils/matchers";
 
 // const TEST_PROTOCOL_TAG = parseInt("0x112233445566778899aabbccddeeff10", 16);
-const TEST_PROTOCOL_TAG = BigInt("0x400000000000000000");
 
 describe("protomessage", () => {
   let program: ReturnType<typeof buildProgram>;
-  const premineAmount = 2100000005000000n;
   beforeEach(async () => {
     program = buildProgram(DEBUG_WASM);
     program.setBlockHeight(840000);
@@ -39,7 +43,7 @@ describe("protomessage", () => {
     let { block, premineAmount } = await createProtoruneFixture(true);
     program.setBlock(block.toHex());
     await program.run("_start");
-    await expectRunesBalances(TEST_BTC_ADDRESS1, 1).equals(premineAmount);
+    await expectRunesBalances(TEST_BTC_ADDRESS1, 1).equals([premineAmount]);
     await expectRunesBalances(TEST_BTC_ADDRESS2, 2).isZero();
     await expectProtoRunesBalances(
       TEST_BTC_ADDRESS2,
@@ -52,7 +56,7 @@ describe("protomessage", () => {
       TEST_PROTOCOL_TAG,
     ).isZero();
   });
-  it("should test fixture initial values", async () => {
+  it("should test fixture initial values protoburn", async () => {
     let { block, premineAmount } = await createProtoruneFixture();
     program.setBlock(block.toHex());
     await program.run("_start");
@@ -62,7 +66,46 @@ describe("protomessage", () => {
       TEST_BTC_ADDRESS2,
       2,
       TEST_PROTOCOL_TAG,
-    ).equals(premineAmount);
+    ).equals([premineAmount]);
+    await expectProtoRunesBalances(
+      TEST_BTC_ADDRESS1,
+      1,
+      TEST_PROTOCOL_TAG,
+    ).isZero();
+  });
+  it("should test fixture initial values before multiple protoburn", async () => {
+    let { block, premineAmount } = await createMultipleProtoruneFixture(
+      /*omitBurn=*/ true,
+    );
+    program.setBlock(block.toHex());
+    await program.run("_start");
+    await expectRunesBalances(TEST_BTC_ADDRESS1, 1).equals([
+      premineAmount,
+      premineAmount,
+    ]);
+    await expectRunesBalances(TEST_BTC_ADDRESS2, 2).isZero();
+    await expectProtoRunesBalances(
+      TEST_BTC_ADDRESS2,
+      2,
+      TEST_PROTOCOL_TAG,
+    ).isZero();
+    await expectProtoRunesBalances(
+      TEST_BTC_ADDRESS1,
+      1,
+      TEST_PROTOCOL_TAG,
+    ).isZero();
+  });
+  it("should test fixture initial values multiple protoburn", async () => {
+    let { block, premineAmount } = await createMultipleProtoruneFixture();
+    program.setBlock(block.toHex());
+    await program.run("_start");
+    await expectRunesBalances(TEST_BTC_ADDRESS1, 1).isZero();
+    await expectRunesBalances(TEST_BTC_ADDRESS2, 2).isZero();
+    await expectProtoRunesBalances(
+      TEST_BTC_ADDRESS2,
+      2,
+      TEST_PROTOCOL_TAG,
+    ).equals([premineAmount, premineAmount]);
     await expectProtoRunesBalances(
       TEST_BTC_ADDRESS1,
       1,
@@ -70,23 +113,23 @@ describe("protomessage", () => {
     ).isZero();
   });
   it("should index protomessage in the same tx as protoburn", async () => {
-    let { runeId, block, output, refundOutput, input } =
-      await createProtoruneFixture(true);
+    let { runeId1, block, output, refundOutput, inputs, premineAmount } =
+      await createMultipleProtoruneFixture(true);
     const amount = premineAmount / 3n;
     const refundAmount = premineAmount - amount;
 
-    // output 0 is runestone
-    // output 1 TEST_BTC_ADDRESS2
-    // output 2 TEST_BTC_ADDRESS1
-    // output 3 is protoburn
+    // output 0 is runestone, targetting 0 will protoburn
+    // output 1 p2pkh TEST_BTC_ADDRESS2
+    // output 2 p2pkh TEST_BTC_ADDRESS1
+    // output 3 will distribute... unused
     // output 4 is protomessage
     // this method transfers all remaining runes to the protoburn
     block = constructProtostoneTx(
-      [input],
+      inputs,
       [output, refundOutput],
       /*edicts=*/ [
         {
-          id: runeId,
+          id: runeId1, // only rune1 is protoburned
           amount: amount,
           output: 0,
         },
@@ -110,7 +153,10 @@ describe("protomessage", () => {
     await program.run("_start");
     // CHECK RUNE BALANCES
     await expectRunesBalances(TEST_BTC_ADDRESS1, 1).isZero();
-    await expectRunesBalances(TEST_BTC_ADDRESS2, 2).equals(refundAmount);
+    await expectRunesBalances(TEST_BTC_ADDRESS2, 2).equals([
+      refundAmount,
+      premineAmount,
+    ]);
 
     // CHECK PROTORUNE BALANCES
     await expectProtoRunesBalances(
@@ -122,47 +168,15 @@ describe("protomessage", () => {
       TEST_BTC_ADDRESS1,
       1,
       TEST_PROTOCOL_TAG,
-    ).equals(amount);
+    ).equals([amount]);
   });
   it("should index protomessage only", async () => {
-    let { block, output, refundOutput, runeId } =
-      await createProtoruneFixture();
-    const calldata = Buffer.from("testing 12345");
-
-    // constructing tx 3: protomessage
-    block = constructProtostoneTx(
-      [
-        {
-          inputTxHash: block.transactions?.at(2)?.getHash(),
-          inputTxOutputIndex: 1,
-        },
-      ],
-      [output, refundOutput],
-      [],
-      [
-        ProtoStone.edicts({
-          protocolTag: TEST_PROTOCOL_TAG,
-          edicts: [
-            {
-              amount: u128(premineAmount),
-              id: new RuneId(u64(runeId.block), u32(runeId.tx)),
-              output: u32(5),
-            },
-          ],
-        }),
-        ProtoStone.message({
-          protocolTag: TEST_PROTOCOL_TAG,
-          pointer: 1,
-          refundPointer: 2,
-          calldata,
-        }),
-      ],
-      block,
-      2,
-    );
+    let { block, premineAmount } = await createMultipleProtomessageFixture({
+      protomessagePointer: 1, // address 2
+      protomessageRefundPointer: 2, // address 1
+    });
     program.setBlock(block.toHex());
-    console.log("indexing message block");
-    await program.run("_start");
+    await program.run("_start"); // default behavior is to refund to refundPointer (address 1)
     await expectRunesBalances(TEST_BTC_ADDRESS1, 1).isZero();
     await expectRunesBalances(TEST_BTC_ADDRESS2, 2).isZero();
     await expectProtoRunesBalances(
@@ -174,48 +188,15 @@ describe("protomessage", () => {
       TEST_BTC_ADDRESS1,
       1,
       TEST_PROTOCOL_TAG,
-    ).equals(premineAmount);
+    ).equals([premineAmount, premineAmount]);
   });
 
   it("should test depositAll", async () => {
-    let { block, output, refundOutput, runeId } =
-      await createProtoruneFixture();
-    const calldata = Buffer.from("testing 12345");
-
-    // constructing tx 3: protomessage
-    // right now, address 2 has all the protorunes. we want to depositAll
-    block = constructProtostoneTx(
-      [
-        {
-          inputTxHash: block.transactions?.at(2)?.getHash(),
-          inputTxOutputIndex: 1,
-        },
-      ],
-      [output, refundOutput],
-      [],
-      [
-        ProtoStone.edicts({
-          protocolTag: TEST_PROTOCOL_TAG,
-          edicts: [
-            {
-              amount: u128(premineAmount),
-              id: new RuneId(u64(runeId.block), u32(runeId.tx)),
-              output: u32(5),
-            },
-          ],
-        }),
-        ProtoStone.message({
-          protocolTag: TEST_PROTOCOL_TAG,
-          pointer: 1, // address 2
-          refundPointer: 2, // address 1
-          calldata,
-        }),
-      ],
-      block,
-      2,
-    );
+    let { block, runeId, premineAmount } = await createProtomessageFixture({
+      protomessagePointer: 2, // address 1
+      protomessageRefundPointer: 1, // address 2
+    });
     program.setBlock(block.toHex());
-    console.log("indexing message block");
     await program.run("testProtomessageDepositAll"); // calls depositAll
     await expectRunesBalances(TEST_BTC_ADDRESS1, 1).isZero();
     await expectRunesBalances(TEST_BTC_ADDRESS2, 2).isZero();
@@ -224,7 +205,6 @@ describe("protomessage", () => {
       2,
       TEST_PROTOCOL_TAG,
     ).isZero();
-    // console.log(formatKv(program.kv));
     await expectProtoRunesBalances(
       TEST_BTC_ADDRESS1,
       1,
@@ -234,55 +214,50 @@ describe("protomessage", () => {
       height: Number(runeId.block),
       txindex: runeId.tx,
     });
+    expect(runtimeStats.balances.length).to.equal(1);
+    expect(runtimeStats.balances[0].balance).to.equal(premineAmount);
+  });
+  it("should test depositAll multiple protoburns", async () => {
+    let { block, runeId1, premineAmount } =
+      await createMultipleProtomessageFixture({
+        protomessagePointer: 2, // address 1
+        protomessageRefundPointer: 1, // address 2
+      });
+    program.setBlock(block.toHex());
+    await program.run("testProtomessageDepositAll"); // calls depositAll
+    await expectRunesBalances(TEST_BTC_ADDRESS1, 1).isZero();
+    await expectRunesBalances(TEST_BTC_ADDRESS2, 2).isZero();
+    await expectProtoRunesBalances(
+      TEST_BTC_ADDRESS2,
+      2,
+      TEST_PROTOCOL_TAG,
+    ).isZero();
+    await expectProtoRunesBalances(
+      TEST_BTC_ADDRESS1,
+      1,
+      TEST_PROTOCOL_TAG,
+    ).equals([premineAmount]);
+    const runtimeStats = await runtime(program, TEST_PROTOCOL_TAG, {
+      height: Number(runeId1.block),
+      txindex: runeId1.tx,
+    });
+    expect(runtimeStats.balances.length).to.equal(1);
     expect(runtimeStats.balances[0].balance).to.equal(premineAmount);
   });
   it("should test forwardAll", async () => {
-    let { block, output, refundOutput, runeId } =
-      await createProtoruneFixture();
-    const calldata = Buffer.from("testing 12345");
-
-    // constructing tx 3: protomessage
-    // right now, address 2 has all the protorunes. we want to forward everything to the pointer
-    block = constructProtostoneTx(
-      [
-        {
-          inputTxHash: block.transactions?.at(2)?.getHash(),
-          inputTxOutputIndex: 1,
-        },
-      ],
-      [output, refundOutput],
-      [],
-      [
-        ProtoStone.edicts({
-          protocolTag: TEST_PROTOCOL_TAG,
-          edicts: [
-            {
-              amount: u128(premineAmount),
-              id: new RuneId(u64(runeId.block), u32(runeId.tx)),
-              output: u32(5),
-            },
-          ],
-        }),
-        ProtoStone.message({
-          protocolTag: TEST_PROTOCOL_TAG,
-          pointer: 2, // address 1
-          refundPointer: 1, // address 2
-          calldata,
-        }),
-      ],
-      block,
-      2,
-    );
+    let { block, runeId, premineAmount } = await createProtomessageFixture({
+      protomessagePointer: 2, // address 1
+      protomessageRefundPointer: 1, // address 2
+    });
     program.setBlock(block.toHex());
-    console.log("indexing message block");
-    await program.run("testProtomessageForwardAll"); // calls forwardAll
+    await program.run("testProtomessageForwardAll"); // calls forwardAll, forwarding all protorunes to address 1
     await expectRunesBalances(TEST_BTC_ADDRESS1, 1).isZero();
     await expectRunesBalances(TEST_BTC_ADDRESS2, 2).isZero();
     await expectProtoRunesBalances(
       TEST_BTC_ADDRESS1,
       1,
       TEST_PROTOCOL_TAG,
-    ).equals(premineAmount);
+    ).equals([premineAmount]);
     await expectProtoRunesBalances(
       TEST_BTC_ADDRESS2,
       2,
@@ -294,4 +269,79 @@ describe("protomessage", () => {
     });
     expect(runtimeStats.balances.length).to.equal(0);
   });
+  it("should test a mixture of deposit, forward, and refund", async () => {
+    let { block, runeId, premineAmount } = await createProtomessageFixture({
+      protomessagePointer: 2, // address 1
+      protomessageRefundPointer: 1, // address 2
+    });
+    program.setBlock(block.toHex());
+    await program.run("testSimpleProtorune");
+    await expectRunesBalances(TEST_BTC_ADDRESS1, 1).isZero();
+    await expectRunesBalances(TEST_BTC_ADDRESS2, 2).isZero();
+    await expectProtoRunesBalances(
+      TEST_BTC_ADDRESS1,
+      1,
+      TEST_PROTOCOL_TAG,
+    ).equals([premineAmount / 2n]);
+    await expectProtoRunesBalances(
+      TEST_BTC_ADDRESS2,
+      2,
+      TEST_PROTOCOL_TAG,
+    ).equals([premineAmount / 4n]);
+    const runtimeStats = await runtime(program, TEST_PROTOCOL_TAG, {
+      height: Number(runeId.block),
+      txindex: runeId.tx,
+    });
+    expect(runtimeStats.balances[0].balance).to.equal(premineAmount / 4n);
+  });
+  it("should test refunding existing forwards and deposits", async () => {
+    let { block, runeId, premineAmount } = await createProtomessageFixture({
+      protomessagePointer: 2, // address 1
+      protomessageRefundPointer: 1, // address 2
+    });
+    program.setBlock(block.toHex());
+    await program.run("testRefundProtorune");
+    await expectRunesBalances(TEST_BTC_ADDRESS1, 1).isZero();
+    await expectRunesBalances(TEST_BTC_ADDRESS2, 2).isZero();
+    await expectProtoRunesBalances(
+      TEST_BTC_ADDRESS1,
+      1,
+      TEST_PROTOCOL_TAG,
+    ).equals([premineAmount / 8n]);
+    await expectProtoRunesBalances(
+      TEST_BTC_ADDRESS2,
+      2,
+      TEST_PROTOCOL_TAG,
+    ).equals([(7n * premineAmount) / 8n]);
+    const runtimeStats = await runtime(program, TEST_PROTOCOL_TAG, {
+      height: Number(runeId.block),
+      txindex: runeId.tx,
+    });
+    expect(runtimeStats.balances[0].balance).to.equal([premineAmount / 8n]);
+  });
+  // it("two inputs to a protomessage should both be transferred", async () => {
+  //   let { block, runeId } = await createProtomessageFixture({
+  //     protomessagePointer: 2, // address 1
+  //     protomessageRefundPointer: 1, // address 2
+  //   });
+  //   program.setBlock(block.toHex());
+  //   await program.run("testRefundProtorune");
+  //   await expectRunesBalances(TEST_BTC_ADDRESS1, 1).isZero();
+  //   await expectRunesBalances(TEST_BTC_ADDRESS2, 2).isZero();
+  //   await expectProtoRunesBalances(
+  //     TEST_BTC_ADDRESS1,
+  //     1,
+  //     TEST_PROTOCOL_TAG,
+  //   ).equals(premineAmount / 8n);
+  //   await expectProtoRunesBalances(
+  //     TEST_BTC_ADDRESS2,
+  //     2,
+  //     TEST_PROTOCOL_TAG,
+  //   ).equals((7n * premineAmount) / 8n);
+  //   const runtimeStats = await runtime(program, TEST_PROTOCOL_TAG, {
+  //     height: Number(runeId.block),
+  //     txindex: runeId.tx,
+  //   });
+  //   expect(runtimeStats.balances[0].balance).to.equal(premineAmount / 8n);
+  // });
 });
