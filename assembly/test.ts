@@ -36,8 +36,40 @@ class ForwardAllContext extends MessageContext {
   }
 }
 
+// forwards half of each rune, deposits 1/4, refunds 1/4
+class SimpleMessageContext extends MessageContext {
+  handle(): bool {
+    this.runes.map<IncomingRune>((rune) => {
+      const initAmount = rune.amount;
+      rune.forward(u128.div(initAmount, u128.from(2)));
+      rune.deposit(u128.div(initAmount, u128.from(4)));
+      // no action for the rest, by default should be refunded
+      return rune;
+    });
+    return true;
+  }
+}
+
+// tests refunding existing deposts and forwards
+class RefundMessageContext extends MessageContext {
+  handle(): bool {
+    this.runes.map<IncomingRune>((rune) => {
+      const initAmount = rune.amount;
+      rune.forward(u128.div(initAmount, u128.from(2)));
+      rune.deposit(u128.div(initAmount, u128.from(4)));
+      rune.refund(u128.div(initAmount, u128.from(8)));
+      rune.refund(u128.div(initAmount, u128.from(4)));
+      rune.refundDeposit(u128.div(initAmount, u128.from(8)));
+      return rune;
+    });
+    return true;
+  }
+}
+
 class DepositAllProtorune extends Protorune<DepositAllContext> {}
 class ForwardAllProtorune extends Protorune<ForwardAllContext> {}
+class SimpleProtorune extends Protorune<SimpleMessageContext> {}
+class RefundProtorune extends Protorune<RefundMessageContext> {}
 
 function _test_ProtoruneRuneId(runeId: ProtoruneRuneId): void {
   console.log(runeId.block.toString());
@@ -133,6 +165,37 @@ export function testProtomessageForwardAll(): void {
     new SpendablesIndex().indexBlock(height, block);
   }
   new ForwardAllProtorune().indexBlock(height, block);
+  _flush();
+}
+
+export function testSimpleProtorune(): void {
+  const data = input();
+  const box = Box.from(data);
+  const height = parsePrimitive<u32>(box);
+  if (height < GENESIS - 6) {
+    _flush();
+    return;
+  }
+  const block = new Block(box);
+  if (height >= GENESIS) {
+    new SpendablesIndex().indexBlock(height, block);
+  }
+  new SimpleProtorune().indexBlock(height, block);
+  _flush();
+}
+export function testRefundProtorune(): void {
+  const data = input();
+  const box = Box.from(data);
+  const height = parsePrimitive<u32>(box);
+  if (height < GENESIS - 6) {
+    _flush();
+    return;
+  }
+  const block = new Block(box);
+  if (height >= GENESIS) {
+    new SpendablesIndex().indexBlock(height, block);
+  }
+  new RefundProtorune().indexBlock(height, block);
   _flush();
 }
 
