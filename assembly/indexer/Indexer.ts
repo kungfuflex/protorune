@@ -17,6 +17,16 @@ import { RunesIndex } from "metashrew-runes/assembly/indexer";
 
 import { Protoburn } from "./Protoburn";
 
+function uniq<T>(v: Array<T>): Array<T> {
+  const seen = new Map<T, bool>();
+  const result = new Array<T>(0);
+  for (let i = 0; i < v.length; i++) {
+    if (!seen.has(v[i])) result.push(v[i]);
+    seen.set(v[i], true);
+  }
+  return result;
+}
+
 class BurnCycle {
   public max: i32;
   public cycles: Map<string, i32>;
@@ -106,7 +116,29 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
     for (let i = 0; i < protoburns.length; i++) {
       burnSheets[i] = new ProtoruneBalanceSheet();
     }
+    const pullSet = new Map<u32, bool>();
+    for (let i = 0; i < protoburns.length; i++) {
+      if (protoburns[i].from.length > 0) {
+        const from = uniq(protoburns[i].from);
+        for (let j = 0; j < from.length; j++) {
+          if (!pullSet.has(from[j]) && from[j] < <u32>edicts.length) {
+	    const index = <i32>from[j];
+            pullSet.set(from[j], true);
+            if (edicts[index].output === u128.from(runestoneOutputIndex)) {
+              const rune = edicts[index].runeId().toBytes();
+              const remaining = runestoneBalanceSheet.get(rune);
+              const toApply = min(remaining, edicts[index].amount);
+              if (toApply.isZero()) continue;
+              runestoneBalanceSheet.decrease(rune, toApply);
+              burnSheets[i].increase(rune, toApply);
+              
+	    }
+	  }
+	}
+      }
+    }
     for (let i = 0; i < edicts.length; i++) {
+      if (pullSet.has(i)) continue;
       if (edicts[i].output === u128.from(runestoneOutputIndex)) {
         const rune = edicts[i].runeId().toBytes();
         const cycle = cycles.peek(rune);

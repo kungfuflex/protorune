@@ -8,11 +8,13 @@ import { console } from "metashrew-as/assembly/utils/logging";
 export class Protoburn {
   public protocolTag: u128;
   public pointer: u32;
+  public from: Array<u32>;
   public table: ProtoruneTable;
   constructor(data: Array<u128>) {
     const protocolTag = data[0];
     this.pointer = data[1].toU32();
     this.protocolTag = protocolTag;
+    this.from = data.slice(2).map<u32>((v) => v.toU32());
     this.table = ProtoruneTable.for(protocolTag);
   }
 
