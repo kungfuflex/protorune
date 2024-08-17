@@ -6,9 +6,10 @@ import { Box } from "metashrew-as/assembly/utils/box";
 import { console } from "metashrew-as/assembly/utils/logging";
 
 export class ProtoruneRuneId extends RuneId {
+  static readonly MAX_LEB_SIZE_BYTES: u32 = 31;
   decode(): Array<u128> {
     const fieldData = new Array<u128>(2);
-    fieldData[0] = this.block;
+    fieldData[0] = u128.shr(this.block, 8);
     fieldData[1] = this.tx;
     const input = Box.from(concatByteArrayTruncateZeros(fieldData));
     const result: Array<u128> = new Array<u128>();
@@ -32,23 +33,42 @@ export class ProtoruneRuneId extends RuneId {
       ),
     );
     const result = new ProtoruneRuneId(0, 0);
-    if (data.byteLength > 32) return result;
+    console.log("this.Max " + this.MAX_LEB_SIZE_BYTES.toString())
+    if (<u32>data.byteLength > this.MAX_LEB_SIZE_BYTES) return result;
 
-    // adds left padding of 0 bytes until the data is 32 bytes
+    // adds left padding of 0 bytes until the data is 31 bytes
     const padded = new ArrayBuffer(32);
-    memory.copy(
-      changetype<usize>(padded) + <usize>(32 - data.byteLength),
-      changetype<usize>(data),
-      data.byteLength,
-    );
+    if (data.byteLength <= 16) {
+      memory.copy(
+        changetype<usize>(padded) + <usize>(32 - data.byteLength),
+        changetype<usize>(data),
+        data.byteLength,
+      );
+    } else {
+      memory.copy(
+        changetype<usize>(padded) + <usize>(16),
+        changetype<usize>(data) + <usize>(data.byteLength - 16),
+        16,
+      );
+      memory.copy(
+        changetype<usize>(padded) + <usize>(31 - data.byteLength),
+        changetype<usize>(data),
+        data.byteLength - 16,
+      );
+    }
+
+    const blockArray = Uint8Array.wrap(Box.from(padded).shrinkBack(16).toArrayBuffer())
+    blockArray[15] = 0x7f
     result.block = u128.fromBytes(
-      Uint8Array.wrap(Box.from(padded).shrinkBack(16).toArrayBuffer()),
+      blockArray,
       true // bigEndian is true, since we pushed the bytes to the highest memory addresses, we only want those to be processed, and the 0s should be higher significance so the encoded values are increasing in size and not so huge
-    );
+    ); // left shift is to ensure that the high byte is 0, which will take the value of 0x7f so the block number is nonzero
+    console.log("block " + result.block.toString())
     result.tx = u128.fromBytes(
       Uint8Array.wrap(Box.from(padded).shrinkFront(16).toArrayBuffer()),
       true
     );
+    console.log("tx " + result.tx.toString())
     return result;
   }
   static from(v: RuneId): ProtoruneRuneId {

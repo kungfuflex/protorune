@@ -37,7 +37,7 @@ describe("protoruneRuneId", () => {
         const program = buildProgram(DEBUG_WASM);
         await program.run("test_ProtoruneRuneId1");
         const kv = formatKv(program.kv);
-        expect(kv["/test/protorune/runeid/block"]).to.equal("0x00000000000000000000000000000000");
+        expect(kv["/test/protorune/runeid/block"]).to.equal("0x7f000000000000000000000000000000");
         expect(kv["/test/protorune/runeid/tx"]).to.equal("0x64320000000000000000000000000000");
         expect(kv["/test/protorune/runeid/decoded/0"]).to.equal("0x32000000000000000000000000000000");
         expect(kv["/test/protorune/runeid/decoded/1"]).to.equal("0x64000000000000000000000000000000");
@@ -46,7 +46,7 @@ describe("protoruneRuneId", () => {
         const program = buildProgram(DEBUG_WASM);
         await program.run("test_ProtoruneRuneId2");
         const kv = formatKv(program.kv);
-        expect(kv["/test/protorune/runeid/block"]).to.equal("0x00000000000000000000000000000000");
+        expect(kv["/test/protorune/runeid/block"]).to.equal("0x7f000000000000000000000000000000");
         expect(kv["/test/protorune/runeid/tx"]).to.equal("0x03dceb948017ebe18000000000000000");
         expect(kv["/test/protorune/runeid/decoded/0"]).to.equal("0x80f0fa02000000000000000000000000");
         expect(kv["/test/protorune/runeid/decoded/1"]).to.equal("0x00ca9a3b000000000000000000000000");
@@ -56,7 +56,7 @@ describe("protoruneRuneId", () => {
         await program.run("test_ProtoruneRuneId3");
         const kv = formatKv(program.kv);
         console.log(kv)
-        expect(kv["/test/protorune/runeid/block"]).to.equal("0x00000000000000000000000000000000");
+        expect(kv["/test/protorune/runeid/block"]).to.equal("0x7f000000000000000000000000000000");
         expect(kv["/test/protorune/runeid/tx"]).to.equal("0x05cba0de8003dceb948017ebe1800000");
         expect(kv["/test/protorune/runeid/decoded/0"]).to.equal("0x80f0fa02000000000000000000000000");
         expect(kv["/test/protorune/runeid/decoded/1"]).to.equal("0x00ca9a3b000000000000000000000000");
@@ -67,7 +67,7 @@ describe("protoruneRuneId", () => {
         await program.run("test_ProtoruneRuneId4");
         const kv = formatKv(program.kv);
         console.log(kv)
-        expect(kv["/test/protorune/runeid/block"]).to.equal("0xebe18000000000000000000000000000");
+        expect(kv["/test/protorune/runeid/block"]).to.equal("0x7febe180000000000000000000000000");
         expect(kv["/test/protorune/runeid/tx"]).to.equal("0x07b9d6a88005cba0de8003dceb948017");
         expect(kv["/test/protorune/runeid/decoded/0"]).to.equal("0x80f0fa02000000000000000000000000");
         expect(kv["/test/protorune/runeid/decoded/1"]).to.equal("0x00ca9a3b000000000000000000000000");
