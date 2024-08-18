@@ -82,8 +82,8 @@ export class ProtostoneTable {
         (v: Protostone) =>
           new Protoburn([
             v.fields.get(ProtoruneField.BURN)[0],
-            v.fields.get(ProtoruneField.POINTER)[0],
-          ]),
+            v.fields.get(ProtoruneField.POINTER)[0]
+	  ].concat(v.fields.has(ProtoruneField.FROM) ? v.fields.get(ProtoruneField.FROM) : []))
       );
   }
   messages(): Array<ProtoMessage> {

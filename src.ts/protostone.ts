@@ -7,6 +7,7 @@ import leb128 from "leb128";
 
 export type ProtoBurn = {
   pointer: Option<u32>;
+  from?: Array<u32>;
 };
 
 export type ProtoMessage = {
@@ -58,7 +59,10 @@ export class ProtoStone {
     edicts,
   }: {
     protocolTag: bigint;
-    burn?: { pointer: number };
+    burn?: {
+      pointer: number;
+      from?: Array<u32>;
+    };
     message?: {
       calldata: Buffer;
 
@@ -72,6 +76,7 @@ export class ProtoStone {
     if (burn) {
       this.burn = {
         pointer: Some<u32>(u32(burn.pointer)),
+        from: burn.from
       };
     }
     if (message && message.calldata) {
@@ -141,6 +146,12 @@ export class ProtoStone {
       payloads.push(
         Tag.encodeOptionInt(Tag.POINTER, this.burn.pointer.map(u128)),
       );
+      if (this.burn.from) {
+        payloads.push(
+          Tag.encode(Tag.FROM, this.burn.from.map(u128)),
+        );
+      }
+
       payloads.push(
         Tag.encodeOptionInt(Tag.BURN, Some<u128>(this.protocolTag)),
       );
@@ -202,6 +213,7 @@ export class ProtoStone {
   }: {
     protocolTag: bigint;
     pointer: number;
+    from?: Array<u32>;
     edicts?: Edict[];
   }): ProtoStone {
     return new ProtoStone({ burn, protocolTag, edicts });
