@@ -29066,6 +29066,20 @@
   end
   i32.const 0
  )
+ (func $~lib/metashrew-as/assembly/indexer/atomic/AtomicTransaction#getValue<u32> (param $0 i32) (param $1 i32) (result i32)
+  local.get $0
+  local.get $1
+  call $~lib/metashrew-as/assembly/indexer/atomic/AtomicTransaction#get
+  local.set $0
+  i32.const 4
+  call $~lib/arraybuffer/ArrayBuffer#constructor
+  local.tee $1
+  local.get $0
+  i32.load align=1
+  i32.store align=1
+  local.get $1
+  i32.load
+ )
  (func $~lib/metashrew-as/assembly/indexer/atomic/AtomicTransaction#set (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
   local.get $1
@@ -29103,13 +29117,9 @@
   call $~lib/util/hash/HASH<~lib/string/String>
   call $"~lib/map/Map<~lib/string/String,~lib/arraybuffer/ArrayBuffer>#find"
   if (result i32)
-   i32.const 0
    local.get $0
    local.get $2
-   call $~lib/metashrew-as/assembly/indexer/atomic/AtomicTransaction#get
-   i32.load align=1
-   i32.store align=1
-   i32.const 0
+   call $~lib/metashrew-as/assembly/indexer/atomic/AtomicTransaction#getValue<u32>
   else
    local.get $2
    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#getValue<u32>
@@ -29251,6 +29261,9 @@
  )
  (func $assembly/indexer/ProtoruneBalanceSheet/ProtoruneBalanceSheet.loadFromAtomicTx (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  (local $5 i32)
   i32.const 1
   global.set $~argumentsLength
   local.get $0
@@ -29258,7 +29271,7 @@
   i32.const 0
   call $~lib/string/String.UTF8.encode@varargs
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
-  local.set $2
+  local.set $3
   i32.const 1
   global.set $~argumentsLength
   local.get $0
@@ -29266,23 +29279,48 @@
   i32.const 0
   call $~lib/string/String.UTF8.encode@varargs
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
-  drop
+  local.set $5
   i32.const 1
   global.set $~argumentsLength
-  i32.const 0
   local.get $1
-  local.get $2
+  local.get $3
   i32.const 6304
   i32.const 0
   call $~lib/string/String.UTF8.encode@varargs
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
-  call $~lib/metashrew-as/assembly/indexer/atomic/AtomicTransaction#get
-  i32.load align=1
-  i32.store align=1
+  call $~lib/metashrew-as/assembly/indexer/atomic/AtomicTransaction#getValue<u32>
+  local.set $0
   i32.const 12
   i32.const 54
   call $~lib/rt/stub/__new
   call $~lib/metashrew-runes/assembly/indexer/BalanceSheet/BalanceSheet#constructor
+  local.set $4
+  loop $for-loop|0
+   local.get $0
+   local.get $2
+   i32.gt_u
+   if
+    local.get $4
+    local.get $1
+    local.get $3
+    local.get $2
+    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#selectIndex
+    call $~lib/metashrew-as/assembly/indexer/atomic/AtomicTransaction#get
+    local.get $1
+    local.get $5
+    local.get $2
+    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#selectIndex
+    call $~lib/metashrew-as/assembly/indexer/atomic/AtomicTransaction#get
+    call $~lib/metashrew-runes/assembly/utils/fromArrayBuffer
+    call $~lib/metashrew-runes/assembly/indexer/BalanceSheet/BalanceSheet#set
+    local.get $2
+    i32.const 1
+    i32.add
+    local.set $2
+    br $for-loop|0
+   end
+  end
+  local.get $4
  )
  (func $assembly/indexer/protomessage/MessageContext/MessageContext#run (param $0 i32)
   (local $1 i32)
@@ -29844,7 +29882,7 @@
    i32.load
    call $"~lib/map/Map<~lib/string/String,~lib/arraybuffer/ArrayBuffer>#clear"
   end
-  block $__inlined_func$assembly/indexer/protomessage/MessageContext/MessageContext#checkBalances$194 (result i32)
+  block $__inlined_func$assembly/indexer/protomessage/MessageContext/MessageContext#checkBalances$192 (result i32)
    i32.const 0
    local.set $3
    local.get $0
@@ -29931,7 +29969,7 @@
    i32.load
    i32.load offset=12
    i32.ne
-   br_if $__inlined_func$assembly/indexer/protomessage/MessageContext/MessageContext#checkBalances$194
+   br_if $__inlined_func$assembly/indexer/protomessage/MessageContext/MessageContext#checkBalances$192
    drop
    loop $for-loop|00
     local.get $3
@@ -29973,7 +30011,7 @@
       i32.const 0
      end
      i32.eqz
-     br_if $__inlined_func$assembly/indexer/protomessage/MessageContext/MessageContext#checkBalances$194
+     br_if $__inlined_func$assembly/indexer/protomessage/MessageContext/MessageContext#checkBalances$192
      drop
      local.get $3
      i32.const 1

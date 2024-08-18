@@ -40906,12 +40906,15 @@
   call $~lib/metashrew-as/assembly/indexer/atomic/AtomicTransaction#get
   local.set $value
   i32.const 0
+  i32.const 4
+  call $~lib/arraybuffer/ArrayBuffer#constructor
   local.set $container
   local.get $container
   local.get $value
   i32.const 4
   memory.copy
   local.get $container
+  i32.load
   return
  )
  (func $~lib/metashrew-as/assembly/indexer/atomic/AtomicTransaction#get:tempKeys (param $this i32) (result i32)
