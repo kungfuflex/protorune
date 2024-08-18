@@ -3,6 +3,7 @@ import { Option } from "@magiceden-oss/runestone-lib/dist/src/monads";
 import { Edict } from "@magiceden-oss/runestone-lib/dist/src/edict";
 export type ProtoBurn = {
     pointer: Option<u32>;
+    from?: Array<u32>;
 };
 export type ProtoMessage = {
     calldata: u128[];
@@ -25,6 +26,7 @@ export declare class ProtoStone {
         protocolTag: bigint;
         burn?: {
             pointer: number;
+            from?: Array<u32>;
         };
         message?: {
             calldata: Buffer;
@@ -37,6 +39,7 @@ export declare class ProtoStone {
     static burn({ protocolTag, edicts, ...burn }: {
         protocolTag: bigint;
         pointer: number;
+        from?: Array<u32>;
         edicts?: Edict[];
     }): ProtoStone;
     static message({ protocolTag, edicts, ...message }: {

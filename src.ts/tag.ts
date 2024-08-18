@@ -16,6 +16,7 @@ export enum Tag {
   SPLIT = 85,
   POINTER = 91,
   REFUND = 93,
+  FROM = 95,
   CENOTAPH = 126,
   NOP = 127,
 }

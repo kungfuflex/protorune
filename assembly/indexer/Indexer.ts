@@ -122,7 +122,7 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
         const from = uniq(protoburns[i].from);
         for (let j = 0; j < from.length; j++) {
           if (!pullSet.has(from[j]) && from[j] < <u32>edicts.length) {
-	    const index = <i32>from[j];
+            const index = <i32>from[j];
             pullSet.set(from[j], true);
             if (edicts[index].output === u128.from(runestoneOutputIndex)) {
               const rune = edicts[index].runeId().toBytes();
@@ -131,10 +131,10 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
               if (toApply.isZero()) continue;
               runestoneBalanceSheet.decrease(rune, toApply);
               burnSheets[i].increase(rune, toApply);
-              
-	    }
-	  }
-	}
+
+            }
+          }
+        }
       }
     }
     for (let i = 0; i < edicts.length; i++) {
@@ -196,4 +196,4 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
   }
 }
 
-export class DefaultProtorune extends Protorune<MessageContext> {}
+export class DefaultProtorune extends Protorune<MessageContext> { }
