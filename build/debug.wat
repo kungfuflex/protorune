@@ -38249,6 +38249,8 @@
    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#append
   end
  )
+ (func $assembly/indexer/Protoburn/Protoburn#hookBurn (param $this i32) (param $rune i32) (param $amount i32)
+ )
  (func $assembly/indexer/Protoburn/Protoburn#process (param $this i32) (param $balanceSheet i32) (param $outpoint i32)
   (local $i i32)
   (local $runeId i32)
@@ -38330,6 +38332,13 @@
     call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
     i32.const 0
     call $assembly/indexer/ProtoruneBalanceSheet/ProtoruneBalanceSheet#saveIndex
+    local.get $this
+    local.get $runeId
+    local.get $balanceSheet
+    call $~lib/metashrew-runes/assembly/indexer/BalanceSheet/BalanceSheet#get:balances
+    local.get $i
+    call $~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>#__get
+    call $assembly/indexer/Protoburn/Protoburn#hookBurn
     local.get $i
     i32.const 1
     i32.add
@@ -38338,7 +38347,7 @@
    end
   end
  )
- (func $assembly/indexer/Indexer/Protorune<assembly/indexer/protomessage/MessageContext/MessageContext>#processProtoburns (param $this i32) (param $unallocatedTo i32) (param $balancesByOutput i32) (param $txid i32) (param $runestoneOutputIndex i32) (param $runestone i32) (param $edicts i32) (param $protoburns i32)
+ (func $assembly/indexer/Indexer/Protorune<assembly/indexer/protomessage/MessageContext/MessageContext>#processProtoburns<assembly/indexer/Protoburn/Protoburn> (param $this i32) (param $unallocatedTo i32) (param $balancesByOutput i32) (param $txid i32) (param $runestoneOutputIndex i32) (param $runestone i32) (param $edicts i32) (param $protoburns i32)
   (local $runestoneBalanceSheet i32)
   (local $burns i32)
   (local $burnSheets i32)
@@ -41697,7 +41706,7 @@
   local.get $context
   call $assembly/indexer/protomessage/MessageContext/MessageContext#run
  )
- (func $assembly/indexer/Indexer/Protorune<assembly/indexer/protomessage/MessageContext/MessageContext>#processProtostones (param $this i32) (param $protostones i32) (param $block i32) (param $height i64) (param $tx i32) (param $txid i32) (param $txindex i32)
+ (func $assembly/indexer/Indexer/Protorune<assembly/indexer/protomessage/MessageContext/MessageContext>#processProtostones<assembly/indexer/Protostone/Protostone> (param $this i32) (param $protostones i32) (param $block i32) (param $height i64) (param $tx i32) (param $txid i32) (param $txindex i32)
   (local $i i32)
   (local $protostone i32)
   i32.const 0
@@ -41835,7 +41844,7 @@
    local.get $runestone
    local.get $edicts
    local.get $burns
-   call $assembly/indexer/Indexer/Protorune<assembly/indexer/protomessage/MessageContext/MessageContext>#processProtoburns
+   call $assembly/indexer/Indexer/Protorune<assembly/indexer/protomessage/MessageContext/MessageContext>#processProtoburns<assembly/indexer/Protoburn/Protoburn>
   end
   local.get $this
   local.get $protostones
@@ -41846,7 +41855,7 @@
   local.get $tx
   local.get $txid
   local.get $i
-  call $assembly/indexer/Indexer/Protorune<assembly/indexer/protomessage/MessageContext/MessageContext>#processProtostones
+  call $assembly/indexer/Indexer/Protorune<assembly/indexer/protomessage/MessageContext/MessageContext>#processProtostones<assembly/indexer/Protostone/Protostone>
   local.get $runestone
   return
  )
@@ -41858,7 +41867,7 @@
   local.get $this
   i32.load8_u offset=1
  )
- (func $assembly/indexer/Indexer/Protorune<assembly/test/DepositAllContext>#processProtoburns (param $this i32) (param $unallocatedTo i32) (param $balancesByOutput i32) (param $txid i32) (param $runestoneOutputIndex i32) (param $runestone i32) (param $edicts i32) (param $protoburns i32)
+ (func $assembly/indexer/Indexer/Protorune<assembly/test/DepositAllContext>#processProtoburns<assembly/indexer/Protoburn/Protoburn> (param $this i32) (param $unallocatedTo i32) (param $balancesByOutput i32) (param $txid i32) (param $runestoneOutputIndex i32) (param $runestone i32) (param $edicts i32) (param $protoburns i32)
   (local $runestoneBalanceSheet i32)
   (local $burns i32)
   (local $burnSheets i32)
@@ -42392,7 +42401,7 @@
   local.get $context
   call $assembly/indexer/protomessage/MessageContext/MessageContext#run
  )
- (func $assembly/indexer/Indexer/Protorune<assembly/test/DepositAllContext>#processProtostones (param $this i32) (param $protostones i32) (param $block i32) (param $height i64) (param $tx i32) (param $txid i32) (param $txindex i32)
+ (func $assembly/indexer/Indexer/Protorune<assembly/test/DepositAllContext>#processProtostones<assembly/indexer/Protostone/Protostone> (param $this i32) (param $protostones i32) (param $block i32) (param $height i64) (param $tx i32) (param $txid i32) (param $txindex i32)
   (local $i i32)
   (local $protostone i32)
   i32.const 0
@@ -42530,7 +42539,7 @@
    local.get $runestone
    local.get $edicts
    local.get $burns
-   call $assembly/indexer/Indexer/Protorune<assembly/test/DepositAllContext>#processProtoburns
+   call $assembly/indexer/Indexer/Protorune<assembly/test/DepositAllContext>#processProtoburns<assembly/indexer/Protoburn/Protoburn>
   end
   local.get $this
   local.get $protostones
@@ -42541,7 +42550,7 @@
   local.get $tx
   local.get $txid
   local.get $i
-  call $assembly/indexer/Indexer/Protorune<assembly/test/DepositAllContext>#processProtostones
+  call $assembly/indexer/Indexer/Protorune<assembly/test/DepositAllContext>#processProtostones<assembly/indexer/Protostone/Protostone>
   local.get $runestone
   return
  )
@@ -42553,7 +42562,7 @@
   local.get $this
   i32.load8_u offset=1
  )
- (func $assembly/indexer/Indexer/Protorune<assembly/test/ForwardAllContext>#processProtoburns (param $this i32) (param $unallocatedTo i32) (param $balancesByOutput i32) (param $txid i32) (param $runestoneOutputIndex i32) (param $runestone i32) (param $edicts i32) (param $protoburns i32)
+ (func $assembly/indexer/Indexer/Protorune<assembly/test/ForwardAllContext>#processProtoburns<assembly/indexer/Protoburn/Protoburn> (param $this i32) (param $unallocatedTo i32) (param $balancesByOutput i32) (param $txid i32) (param $runestoneOutputIndex i32) (param $runestone i32) (param $edicts i32) (param $protoburns i32)
   (local $runestoneBalanceSheet i32)
   (local $burns i32)
   (local $burnSheets i32)
@@ -43087,7 +43096,7 @@
   local.get $context
   call $assembly/indexer/protomessage/MessageContext/MessageContext#run
  )
- (func $assembly/indexer/Indexer/Protorune<assembly/test/ForwardAllContext>#processProtostones (param $this i32) (param $protostones i32) (param $block i32) (param $height i64) (param $tx i32) (param $txid i32) (param $txindex i32)
+ (func $assembly/indexer/Indexer/Protorune<assembly/test/ForwardAllContext>#processProtostones<assembly/indexer/Protostone/Protostone> (param $this i32) (param $protostones i32) (param $block i32) (param $height i64) (param $tx i32) (param $txid i32) (param $txindex i32)
   (local $i i32)
   (local $protostone i32)
   i32.const 0
@@ -43225,7 +43234,7 @@
    local.get $runestone
    local.get $edicts
    local.get $burns
-   call $assembly/indexer/Indexer/Protorune<assembly/test/ForwardAllContext>#processProtoburns
+   call $assembly/indexer/Indexer/Protorune<assembly/test/ForwardAllContext>#processProtoburns<assembly/indexer/Protoburn/Protoburn>
   end
   local.get $this
   local.get $protostones
@@ -43236,7 +43245,7 @@
   local.get $tx
   local.get $txid
   local.get $i
-  call $assembly/indexer/Indexer/Protorune<assembly/test/ForwardAllContext>#processProtostones
+  call $assembly/indexer/Indexer/Protorune<assembly/test/ForwardAllContext>#processProtostones<assembly/indexer/Protostone/Protostone>
   local.get $runestone
   return
  )
