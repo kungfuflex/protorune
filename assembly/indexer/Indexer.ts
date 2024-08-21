@@ -96,14 +96,14 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
     this.processProtostones(protostones.flat(), block, height, tx, txid, i);
     return changetype<RunestoneMessage>(runestone);
   }
-  processProtoburns(
+  processProtoburns<S extends Protoburn>(
     unallocatedTo: u32,
     balancesByOutput: Map<u32, ProtoruneBalanceSheet>,
     txid: ArrayBuffer,
     runestoneOutputIndex: i32,
     runestone: Protostone,
     edicts: Array<Edict>,
-    protoburns: Array<Protoburn>,
+    protoburns: Array<S>,
   ): void {
     const runestoneBalanceSheet = new ProtoruneBalanceSheet();
     (balancesByOutput.has(runestoneOutputIndex)
@@ -168,8 +168,8 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
       );
     }
   }
-  processProtostones(
-    protostones: Array<Protostone>,
+  processProtostones<S extends Protostone>(
+    protostones: Array<S>,
     block: RunesBlock,
     height: u64,
     tx: RunesTransaction,

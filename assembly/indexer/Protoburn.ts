@@ -18,6 +18,8 @@ export class Protoburn {
     this.table = ProtoruneTable.for(protocolTag);
   }
 
+  hookBurn(rune: ArrayBuffer, amount: u128): void {}
+
   process(balanceSheet: ProtoruneBalanceSheet, outpoint: ArrayBuffer): void {
     for (let i = 0; i < balanceSheet.runes.length; i++) {
       const runeId = balanceSheet.runes[i];
@@ -31,6 +33,7 @@ export class Protoburn {
       this.table.SYMBOL.select(name).set(base.SYMBOL.select(name).get());
       this.table.ETCHINGS.append(name);
       balanceSheet.saveIndex(i, this.table.OUTPOINT_TO_RUNES.select(outpoint));
+      this.hookBurn(runeId, balanceSheet.balances[i]);
     }
   }
 }
