@@ -18,11 +18,10 @@ import {
   createMultipleProtoruneFixture,
   createProtomessageFixture,
   createProtoruneFixture,
-  TEST_PROTOCOL_TAG,
 } from "./utils/fixtures";
 import { expectBalances } from "./utils/matchers";
 
-// const TEST_PROTOCOL_TAG = parseInt("0x112233445566778899aabbccddeeff10", 16);
+export const TEST_PROTOCOL_TAG = BigInt("0x400000000000000000");
 
 describe("protomessage", () => {
   let program: ReturnType<typeof buildProgram>;
@@ -40,7 +39,10 @@ describe("protomessage", () => {
   ) => expectBalances(program, address, index, protorunesbyaddress, protocol);
 
   it("should test fixture initial values before protoburn", async () => {
-    let { block, premineAmount } = await createProtoruneFixture(true);
+    let { block, premineAmount } = await createProtoruneFixture(
+      TEST_PROTOCOL_TAG,
+      true,
+    );
     program.setBlock(block.toHex());
     await program.run("_start");
     await expectRunesBalances(TEST_BTC_ADDRESS1, 1).equals([premineAmount]);
@@ -57,7 +59,8 @@ describe("protomessage", () => {
     ).isZero();
   });
   it("should test fixture initial values protoburn", async () => {
-    let { block, premineAmount } = await createProtoruneFixture();
+    let { block, premineAmount } =
+      await createProtoruneFixture(TEST_PROTOCOL_TAG);
     program.setBlock(block.toHex());
     await program.run("_start");
     await expectRunesBalances(TEST_BTC_ADDRESS1, 1).isZero();
@@ -75,6 +78,7 @@ describe("protomessage", () => {
   });
   it("should test fixture initial values before multiple protoburn", async () => {
     let { block, premineAmount } = await createMultipleProtoruneFixture(
+      TEST_PROTOCOL_TAG,
       /*omitBurn=*/ true,
     );
     program.setBlock(block.toHex());
@@ -96,7 +100,8 @@ describe("protomessage", () => {
     ).isZero();
   });
   it("should test fixture initial values multiple protoburn", async () => {
-    let { block, premineAmount } = await createMultipleProtoruneFixture();
+    let { block, premineAmount } =
+      await createMultipleProtoruneFixture(TEST_PROTOCOL_TAG);
     program.setBlock(block.toHex());
     await program.run("_start");
     await expectRunesBalances(TEST_BTC_ADDRESS1, 1).isZero();
@@ -114,7 +119,7 @@ describe("protomessage", () => {
   });
   it("should index protomessage in the same tx as protoburn", async () => {
     let { runeId1, block, output, refundOutput, inputs, premineAmount } =
-      await createMultipleProtoruneFixture(true);
+      await createMultipleProtoruneFixture(TEST_PROTOCOL_TAG, true);
     const amount = premineAmount / 3n;
     const refundAmount = premineAmount - amount;
 
@@ -172,6 +177,7 @@ describe("protomessage", () => {
   });
   it("should index protomessage only", async () => {
     let { block, premineAmount } = await createMultipleProtomessageFixture({
+      protocolTag: TEST_PROTOCOL_TAG,
       protomessagePointer: 1, // address 2
       protomessageRefundPointer: 2, // address 1
     });
@@ -193,6 +199,7 @@ describe("protomessage", () => {
 
   it("should test depositAll", async () => {
     let { block, runeId, premineAmount } = await createProtomessageFixture({
+      protocolTag: TEST_PROTOCOL_TAG,
       protomessagePointer: 2, // address 1
       protomessageRefundPointer: 1, // address 2
     });
@@ -220,6 +227,7 @@ describe("protomessage", () => {
   it("should test depositAll multiple protoburns", async () => {
     let { block, runeId1, premineAmount } =
       await createMultipleProtomessageFixture({
+        protocolTag: TEST_PROTOCOL_TAG,
         protomessagePointer: 2, // address 1
         protomessageRefundPointer: 1, // address 2
       });
@@ -246,6 +254,7 @@ describe("protomessage", () => {
   });
   it("should test forwardAll", async () => {
     let { block, runeId, premineAmount } = await createProtomessageFixture({
+      protocolTag: TEST_PROTOCOL_TAG,
       protomessagePointer: 2, // address 1
       protomessageRefundPointer: 1, // address 2
     });
@@ -271,6 +280,7 @@ describe("protomessage", () => {
   });
   it("should test a mixture of deposit, forward, and refund", async () => {
     let { block, runeId, premineAmount } = await createProtomessageFixture({
+      protocolTag: TEST_PROTOCOL_TAG,
       protomessagePointer: 2, // address 1
       protomessageRefundPointer: 1, // address 2
     });
@@ -296,6 +306,7 @@ describe("protomessage", () => {
   });
   it("should test refunding existing forwards and deposits", async () => {
     let { block, runeId, premineAmount } = await createProtomessageFixture({
+      protocolTag: TEST_PROTOCOL_TAG,
       protomessagePointer: 2, // address 1
       protomessageRefundPointer: 1, // address 2
     });

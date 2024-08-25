@@ -1,5 +1,4 @@
 import bitcoinjs = require("bitcoinjs-lib");
-export declare const TEST_PROTOCOL_TAG: bigint;
 /**
  * Fixture creates a block with 3 transactions:
  *  - tx 1: coinbase that transfers all bitcoins to ADDRESS1
@@ -36,7 +35,7 @@ export declare const TEST_PROTOCOL_TAG: bigint;
  *    - 0 runes
  *    - 2100000005000000 protorunes
  */
-export declare function createProtoruneFixture(omitBurn?: boolean, premineAmount?: bigint, { skip, }?: {
+export declare function createProtoruneFixture(protocolTag: bigint, omitBurn?: boolean, premineAmount?: bigint, { skip, }?: {
     skip?: number;
 }, _block?: bitcoinjs.Block): Promise<{
     input: {
@@ -59,7 +58,8 @@ export declare function createProtoruneFixture(omitBurn?: boolean, premineAmount
     premineAmount: bigint;
     pointerToReceiveRunes: number;
 }>;
-export declare function createProtomessageFixture({ protomessagePointer, protomessageRefundPointer, }: {
+export declare function createProtomessageFixture({ protocolTag, protomessagePointer, protomessageRefundPointer, }: {
+    protocolTag: bigint;
     protomessagePointer: number;
     protomessageRefundPointer: number;
 }): Promise<{
@@ -110,7 +110,7 @@ export declare function createProtomessageFixture({ protomessagePointer, protome
  *    - 2100000005000000 protorune1
  *    - 2100000005000000 protorune2
  */
-export declare function createMultipleProtoruneFixture(omitBurn?: boolean, premineAmount?: bigint, { skip, }?: {
+export declare function createMultipleProtoruneFixture(protocolTag: bigint, omitBurn?: boolean, premineAmount?: bigint, { skip, }?: {
     skip?: number;
 }, _block?: bitcoinjs.Block): Promise<{
     inputs: {
@@ -157,7 +157,8 @@ export declare function createMultipleProtoruneFixture(omitBurn?: boolean, premi
  * @param _block
  * @returns
  */
-export declare function createMultipleProtomessageFixture({ protomessagePointer, protomessageRefundPointer, }: {
+export declare function createMultipleProtomessageFixture({ protocolTag, protomessagePointer, protomessageRefundPointer, }: {
+    protocolTag: bigint;
     protomessagePointer: number;
     protomessageRefundPointer: number;
 }): Promise<{

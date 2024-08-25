@@ -22,7 +22,6 @@ import { ProtoStone } from "../../src.ts/protostone";
 import { u128, u64, u32 } from "@magiceden-oss/runestone-lib/dist/src/integer";
 import { RuneId } from "@magiceden-oss/runestone-lib/dist/src/runeid";
 
-export const TEST_PROTOCOL_TAG = BigInt("0x400000000000000000");
 /**
  * Fixture creates a block with 3 transactions:
  *  - tx 1: coinbase that transfers all bitcoins to ADDRESS1
@@ -60,6 +59,7 @@ export const TEST_PROTOCOL_TAG = BigInt("0x400000000000000000");
  *    - 2100000005000000 protorunes
  */
 export async function createProtoruneFixture(
+  protocolTag: bigint,
   omitBurn: boolean = false,
   premineAmount: bigint = 2100000005000000n,
   {
@@ -140,7 +140,7 @@ export async function createProtoruneFixture(
       ],
       /*outputIndexToReceiveProtorunes=*/ 1, //this goes to ADDRESS2
       [output, refundOutput], // 0 is script, 1 is address 2 output, 2 is address 1 output
-      TEST_PROTOCOL_TAG,
+      protocolTag,
       block,
       /*runeTransferPointer=*/ 0,
     );
@@ -157,9 +157,11 @@ export async function createProtoruneFixture(
 }
 
 export async function createProtomessageFixture({
+  protocolTag,
   protomessagePointer,
   protomessageRefundPointer,
 }: {
+  protocolTag: bigint;
   protomessagePointer: number;
   protomessageRefundPointer: number;
 }) {
@@ -172,7 +174,7 @@ export async function createProtomessageFixture({
     premineAmount,
   } =
     // this fixture always assumes a protoburn and default values
-    await createProtoruneFixture();
+    await createProtoruneFixture(protocolTag);
 
   const calldata = Buffer.from("testing 12345");
 
@@ -189,7 +191,7 @@ export async function createProtomessageFixture({
     [],
     [
       ProtoStone.edicts({
-        protocolTag: TEST_PROTOCOL_TAG,
+        protocolTag: protocolTag,
         edicts: [
           {
             amount: u128(premineAmount),
@@ -199,7 +201,7 @@ export async function createProtomessageFixture({
         ],
       }),
       ProtoStone.message({
-        protocolTag: TEST_PROTOCOL_TAG,
+        protocolTag: protocolTag,
         pointer: protomessagePointer,
         refundPointer: protomessageRefundPointer,
         calldata,
@@ -253,6 +255,7 @@ export async function createProtomessageFixture({
  *    - 2100000005000000 protorune2
  */
 export async function createMultipleProtoruneFixture(
+  protocolTag: bigint,
   omitBurn: boolean = false,
   premineAmount: bigint = 2100000005000000n,
   {
@@ -358,7 +361,7 @@ export async function createMultipleProtoruneFixture(
       ],
       /*outputIndexToReceiveProtorunes=*/ 1, //this goes to ADDRESS2
       [output, refundOutput], // 0 is script, 1 is address 2 output, 2 is address 1 output
-      TEST_PROTOCOL_TAG,
+      protocolTag,
       block,
       /*runeTransferPointer=*/ 0,
     );
@@ -396,9 +399,11 @@ export async function createMultipleProtoruneFixture(
  * @returns
  */
 export async function createMultipleProtomessageFixture({
+  protocolTag,
   protomessagePointer,
   protomessageRefundPointer,
 }: {
+  protocolTag: bigint;
   protomessagePointer: number;
   protomessageRefundPointer: number;
 }) {
@@ -411,7 +416,7 @@ export async function createMultipleProtomessageFixture({
     premineAmount,
   } =
     // this fixture always assumes a protoburn and default values
-    await createMultipleProtoruneFixture();
+    await createMultipleProtoruneFixture(protocolTag);
 
   const calldata = Buffer.from("testing 12345");
 
@@ -428,7 +433,7 @@ export async function createMultipleProtomessageFixture({
     [],
     [
       ProtoStone.edicts({
-        protocolTag: TEST_PROTOCOL_TAG,
+        protocolTag: protocolTag,
         edicts: [
           {
             amount: u128(premineAmount),
@@ -438,7 +443,7 @@ export async function createMultipleProtomessageFixture({
         ],
       }),
       ProtoStone.message({
-        protocolTag: TEST_PROTOCOL_TAG,
+        protocolTag: protocolTag,
         pointer: protomessagePointer,
         refundPointer: protomessageRefundPointer,
         calldata,
