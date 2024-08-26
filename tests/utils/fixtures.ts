@@ -379,7 +379,8 @@ export async function createMultipleProtoruneFixture(
 }
 
 /**
- * This fixture creates the following balances
+ * This fixture uses the createMultipleProtoruneFixture and transfers the
+ *
  *  - ADDRESS1 balances
  *    - 1 sat
  *    - 0 runes
@@ -402,24 +403,44 @@ export async function createMultipleProtomessageFixture({
   protocolTag,
   protomessagePointer,
   protomessageRefundPointer,
+  calldata,
+  amount1,
+  amount2,
 }: {
   protocolTag: bigint;
   protomessagePointer: number;
   protomessageRefundPointer: number;
+  calldata: Buffer;
+  amount1: bigint;
+  amount2: bigint;
 }) {
   let {
     block,
     output,
     refundOutput,
     runeId1,
+    runeId2,
     pointerToReceiveRunes,
     premineAmount,
   } =
     // this fixture always assumes a protoburn and default values
     await createMultipleProtoruneFixture(protocolTag);
 
-  const calldata = Buffer.from("testing 12345");
-
+  const edicts = [];
+  if (amount1) {
+    edicts.push({
+      amount: u128(amount1),
+      id: new RuneId(u64(runeId1.block), u32(runeId1.tx)),
+      output: u32(5),
+    });
+  }
+  if (amount2) {
+    edicts.push({
+      amount: u128(amount2),
+      id: new RuneId(u64(runeId2.block), u32(runeId2.tx)),
+      output: u32(5),
+    });
+  }
   // constructing tx 4: protomessage
   // right now, address 2 has all the protorunes. we want to forward everything to the pointer
   block = constructProtostoneTx(
@@ -434,13 +455,7 @@ export async function createMultipleProtomessageFixture({
     [
       ProtoStone.edicts({
         protocolTag: protocolTag,
-        edicts: [
-          {
-            amount: u128(premineAmount),
-            id: new RuneId(u64(runeId1.block), u32(runeId1.tx)),
-            output: u32(5),
-          },
-        ],
+        edicts: edicts,
       }),
       ProtoStone.message({
         protocolTag: protocolTag,

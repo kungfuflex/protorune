@@ -175,11 +175,19 @@ describe("protomessage", () => {
       TEST_PROTOCOL_TAG,
     ).equals([amount]);
   });
-  it("should index protomessage only", async () => {
+  it("should index protomessage only -- refund goes to the default protostone pointer", async () => {
+    const amount1 = 100000n;
+    // createMultipleProtomessageFixture hard codes the default protostone pointer to be address 1
+    // this means unused protorunes in the input will go to address 1
+    // the used protorunes go to the refund pointer, which is address 1
+    // since the input contains the full amount of protorune 1 and 2, all protorunes transfer to address 1
     let { block, premineAmount } = await createMultipleProtomessageFixture({
       protocolTag: TEST_PROTOCOL_TAG,
       protomessagePointer: 1, // address 2
       protomessageRefundPointer: 2, // address 1
+      calldata: Buffer.from("test calldata"),
+      amount1: amount1,
+      amount2: 0n,
     });
     program.setBlock(block.toHex());
     await program.run("_start"); // default behavior is to refund to refundPointer (address 1)
@@ -195,6 +203,35 @@ describe("protomessage", () => {
       1,
       TEST_PROTOCOL_TAG,
     ).equals([premineAmount, premineAmount]);
+  });
+  it("should index protomessage only -- refund doesn not go to default protostone pointer", async () => {
+    const amount1 = 100000n;
+    // createMultipleProtomessageFixture hard codes the default protostone pointer to be address 1
+    // this means unused protorunes in the input will go to address 1
+    // the used protorunes go to the refund pointer, which is address 2
+    // protorune 2 is unused, will transfer to address 1. unused protorune 1 will also go to address 1
+    let { block, premineAmount } = await createMultipleProtomessageFixture({
+      protocolTag: TEST_PROTOCOL_TAG,
+      protomessagePointer: 2, // address 1
+      protomessageRefundPointer: 1, // address 2
+      calldata: Buffer.from("test calldata"),
+      amount1: amount1,
+      amount2: 0n,
+    });
+    program.setBlock(block.toHex());
+    await program.run("_start"); // default behavior is to refund to refundPointer (address 1)
+    await expectRunesBalances(TEST_BTC_ADDRESS1, 1).isZero();
+    await expectRunesBalances(TEST_BTC_ADDRESS2, 2).isZero();
+    await expectProtoRunesBalances(
+      TEST_BTC_ADDRESS2,
+      2,
+      TEST_PROTOCOL_TAG,
+    ).equals([amount1]);
+    await expectProtoRunesBalances(
+      TEST_BTC_ADDRESS1,
+      1,
+      TEST_PROTOCOL_TAG,
+    ).equals([premineAmount - amount1, premineAmount]);
   });
 
   it("should test depositAll", async () => {
@@ -225,11 +262,15 @@ describe("protomessage", () => {
     expect(runtimeStats.balances[0].balance).to.equal(premineAmount);
   });
   it("should test depositAll multiple protoburns", async () => {
+    const amount1 = 100000n;
     let { block, runeId1, premineAmount } =
       await createMultipleProtomessageFixture({
         protocolTag: TEST_PROTOCOL_TAG,
         protomessagePointer: 2, // address 1
         protomessageRefundPointer: 1, // address 2
+        calldata: Buffer.from("test calldata"),
+        amount1: amount1,
+        amount2: 0n,
       });
     program.setBlock(block.toHex());
     await program.run("testProtomessageDepositAll"); // calls depositAll
@@ -250,7 +291,7 @@ describe("protomessage", () => {
       txindex: runeId1.tx,
     });
     expect(runtimeStats.balances.length).to.equal(1);
-    expect(runtimeStats.balances[0].balance).to.equal(premineAmount);
+    expect(runtimeStats.balances[0].balance).to.equal(amount1);
   });
   it("should test forwardAll", async () => {
     let { block, runeId, premineAmount } = await createProtomessageFixture({
