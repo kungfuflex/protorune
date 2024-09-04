@@ -3,8 +3,7 @@ import { readULEB128ToU128 } from "metashrew-runes/assembly/leb128";
 import { toArrayBuffer } from "metashrew-runes/assembly/utils";
 import { u128 } from "as-bignum/assembly";
 import { reverse } from "metashrew-as/assembly/utils";
-import { console } from "metashrew-as/assembly/utils/logging"
-
+import { console } from "metashrew-as/assembly/utils/logging";
 
 export function alignArrayBuffer(v: ArrayBuffer): Box {
   const box = Box.from(v);
@@ -48,7 +47,7 @@ export function concatByteArrayTruncateZeros(v: Array<u128>): ArrayBuffer {
       } else {
         result.push(alignU128ToArrayBuffer(value));
         foundFirstNonZero = true; // Mark the first nonzero element
-        continue
+        continue;
       }
     }
     result.push(Box.from(reverse(toArrayBuffer(value))));
@@ -87,19 +86,19 @@ export function fieldToArrayBuffer15Bytes(data: Array<u128>): ArrayBuffer {
 export function toLEB128(data: u128): ArrayBuffer {
   let result: Array<u8> = [];
   let tempValue = data;
-  const sevenBitMask = u128.from(0x7F);
+  const sevenBitMask = u128.from(0x7f);
   const continuationBit = u128.from(0x80);
   // Encode the u128 value using LEB128
   while (tempValue > sevenBitMask) {
     // Extract 7 bits and add continuation bit (0x80)
-    const extracted: u128 = ((tempValue & sevenBitMask) | continuationBit)
+    const extracted: u128 = (tempValue & sevenBitMask) | continuationBit;
     result.push(<u8>extracted.lo);
     // Shift the value right by 7 bits for the next byte
-    tempValue = tempValue >> <i32>7;
+    tempValue = tempValue >> (<i32>7);
   }
 
   // Add the final byte without continuation bit
-  const lastByte = <u8>((tempValue & sevenBitMask).lo)
+  const lastByte = <u8>(tempValue & sevenBitMask).lo;
   result.push(lastByte);
 
   const final = changetype<ArrayBuffer>(StaticArray.fromArray<u8>(result));
@@ -111,6 +110,8 @@ export function logArrayBuffer(arr: ArrayBuffer): void {
   const tempArray = Uint8Array.wrap(arr);
   console.log("Got arraybuffer of size " + tempArray.length.toString());
   tempArray.forEach((val, i) => {
-    console.log("byte[" + i.toString() + "] = " + val.toString());
-  })
+    console.log(
+      `byte[${i}] = 0x${val.toString(16).padStart(2, "0")} (${String.fromCharCode(val)})`,
+    );
+  });
 }

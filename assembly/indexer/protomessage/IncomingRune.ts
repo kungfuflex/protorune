@@ -6,6 +6,7 @@ import { ProtoruneTable } from "../tables/protorune";
 import { fromArrayBuffer, toArrayBuffer } from "metashrew-runes/assembly/utils";
 import { console } from "metashrew-as/assembly/utils";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils/hex";
+import { logArrayBuffer } from "../../utils";
 
 export class IncomingRune {
   runeId: RuneId;
@@ -38,6 +39,12 @@ export class IncomingRune {
       this.refundDeposit(this.depositAmount)
     );
   }
+  /**
+   * Refunds an amount from the pointer. If nothing has been forwarded,
+   * (ie this context pointer balance is 0), then returns false
+   * @param value amount to refund
+   * @returns true if refund value successful, false if not refunded
+   */
   refund(value: u128): bool {
     const refundPtr = this.table.OUTPOINT_TO_RUNES.select(
       this.context.refund_pointer.toArrayBuffer(),
@@ -46,15 +53,17 @@ export class IncomingRune {
       this.context.pointer.toArrayBuffer(),
     ).keyword("/balances");
     if (this.pointer_index == -1) return false;
-    const index = ptr.selectIndex(this.pointer_index).unwrap();
-    const currentValue = fromArrayBuffer(this.context.runtime.get(index));
+    const pointerIndex = ptr.selectIndex(this.pointer_index).unwrap();
+    const currentValue = fromArrayBuffer(
+      this.context.runtime.get(pointerIndex),
+    );
     if (value > currentValue || currentValue + value > this.initialAmount)
       return false;
     const newValue: u128 = currentValue - value;
     if (newValue > u128.Zero) {
-      this.context.runtime.set(index, toArrayBuffer(newValue));
+      this.context.runtime.set(pointerIndex, toArrayBuffer(newValue));
     } else {
-      this.context.runtime.set(index, new ArrayBuffer(0));
+      this.context.runtime.set(pointerIndex, new ArrayBuffer(0));
     }
     let toSet: ArrayBuffer;
     toSet = refundPtr.selectIndex(this.refund_pointer_index).unwrap();
@@ -62,6 +71,12 @@ export class IncomingRune {
     this.context.runtime.set(toSet, toArrayBuffer(value));
     return true;
   }
+  /**
+   * Refunds an amount from the RUNTIME Balance. If nothing has been deposited,
+   * (ie this RUNTIME is 0), then returns false
+   * @param value amount to refund
+   * @returns true if refund value successful, false if not refunded
+   */
   refundDeposit(value: u128): bool {
     if (this.refund_pointer_index == -1) return false;
     const refundPtr = this.table.OUTPOINT_TO_RUNES.select(
@@ -101,17 +116,19 @@ export class IncomingRune {
       this.context.pointer.toArrayBuffer(),
     ).keyword("/runes");
     if (this.refund_pointer_index == -1) return false;
-    const index = refundPtr.selectIndex(this.refund_pointer_index).unwrap();
+    const refundIndex = refundPtr
+      .selectIndex(this.refund_pointer_index)
+      .unwrap();
     const runeName = this.context.runtime.get(
       refundRunesPtr.selectIndex(this.refund_pointer_index).unwrap(),
     );
-    const currentValue = fromArrayBuffer(this.context.runtime.get(index));
+    const currentValue = fromArrayBuffer(this.context.runtime.get(refundIndex));
     if (value > this.amount || value > currentValue) return false;
     const newValue: u128 = currentValue - value;
     if (newValue > u128.Zero) {
-      this.context.runtime.set(index, toArrayBuffer(newValue));
+      this.context.runtime.set(refundIndex, toArrayBuffer(newValue));
     } else {
-      this.context.runtime.set(index, new ArrayBuffer(0));
+      this.context.runtime.set(refundIndex, new ArrayBuffer(0));
     }
     let toSet: ArrayBuffer;
     if (this.pointer_index == -1) {
@@ -139,17 +156,19 @@ export class IncomingRune {
       this.context.refund_pointer.toArrayBuffer(),
     ).keyword("/runes");
     if (this.refund_pointer_index == -1) return false;
-    const index = refundPtr.selectIndex(this.refund_pointer_index).unwrap();
+    const refundIndex = refundPtr
+      .selectIndex(this.refund_pointer_index)
+      .unwrap();
     const runeId = this.context.runtime.get(
       runePtr.selectIndex(this.refund_pointer_index).unwrap(),
     );
-    const currentValue = fromArrayBuffer(this.context.runtime.get(index));
+    const currentValue = fromArrayBuffer(this.context.runtime.get(refundIndex));
     if (value > this.amount || value > currentValue) return false;
     const newValue: u128 = currentValue - value;
     if (newValue > u128.Zero) {
-      this.context.runtime.set(index, toArrayBuffer(newValue));
+      this.context.runtime.set(refundIndex, toArrayBuffer(newValue));
     } else {
-      this.context.runtime.set(index, new ArrayBuffer(0));
+      this.context.runtime.set(refundIndex, new ArrayBuffer(0));
     }
     let toSet = this.context.table.RUNTIME_BALANCE.select(runeId);
     this.context.runtimeBalance.increase(runeId, value);
