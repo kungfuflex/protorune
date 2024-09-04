@@ -114,7 +114,7 @@ export async function createProtoruneFixture(
   };
 
 
-  const amount = premineAmount / 2n;
+  const amount = premineAmount;
 
   const output = {
     address: TEST_BTC_ADDRESS2,
