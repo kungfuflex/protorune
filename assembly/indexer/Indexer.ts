@@ -131,7 +131,6 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
               if (toApply.isZero()) continue;
               runestoneBalanceSheet.decrease(rune, toApply);
               burnSheets[i].increase(rune, toApply);
-
             }
           }
         }
@@ -162,6 +161,7 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
       }
     }
     for (let i = 0; i < protoburns.length; i++) {
+      console.log(nameof(protoburns[i]));
       protoburns[i].process(
         burnSheets[i],
         OutPoint.from(txid, protoburns[i].pointer).toArrayBuffer(),
@@ -196,4 +196,4 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
   }
 }
 
-export class DefaultProtorune extends Protorune<MessageContext> { }
+export class DefaultProtorune extends Protorune<MessageContext> {}

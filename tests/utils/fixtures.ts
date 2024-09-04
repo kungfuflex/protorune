@@ -69,7 +69,7 @@ export async function createProtoruneFixture(
   } = {
     skip: 0,
   },
-  _block?: bitcoinjs.Block,
+  _block?: bitcoinjs.Block
 ) {
   const outputs = [
     {
@@ -100,7 +100,7 @@ export async function createProtoruneFixture(
       undefined /*name */,
       undefined /*symbol */,
       undefined /* block */,
-      skip,
+      skip
     );
   const runeId = {
     block: 840000n,
@@ -113,7 +113,9 @@ export async function createProtoruneFixture(
     inputTxOutputIndex: pointerToReceiveRunes, // index of output in the input tx that has the runes. In this case it is the default pointer of the mint
   };
 
+
   const amount = premineAmount / 2n;
+
   const output = {
     address: TEST_BTC_ADDRESS2,
     btcAmount: 1, //this can be implied to be 1 since runes usually are just inscribed on a satoshi
@@ -142,7 +144,7 @@ export async function createProtoruneFixture(
       [output, refundOutput], // 0 is script, 1 is address 2 output, 2 is address 1 output
       protocolTag,
       block,
-      /*runeTransferPointer=*/ 0,
+      /*runeTransferPointer=*/ 2
     );
   }
   return {
