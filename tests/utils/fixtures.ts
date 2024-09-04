@@ -80,7 +80,7 @@ export async function createProtoruneFixture(
     TEST_PROTOCOL_TAG: BigInt("0x400000000000000000"),
     skip: 0,
   },
-  _block?: bitcoinjs.Block,
+  _block?: bitcoinjs.Block
 ) {
   const outputs = [
     {
@@ -109,7 +109,7 @@ export async function createProtoruneFixture(
       undefined /*name */,
       undefined /*symbol */,
       undefined /* block */,
-      skip,
+      skip
     );
   const input = {
     inputTxHash: block.transactions
@@ -117,7 +117,7 @@ export async function createProtoruneFixture(
       ?.getHash(), // 0 is coinbase, 1 is the mint
     inputTxOutputIndex: pointer1, // index of output in the input tx that has the runes. In this case it is the default pointer of the mint
   };
-  const amount = premineAmount / 2n;
+  const amount = premineAmount;
   const outputIndexToReceiveProtorunes = 2; // 0 is the runestone, 1 is protoburn, 2 is ADDRESS2
   const output = {
     address: TEST_BTC_ADDRESS2,
@@ -147,7 +147,7 @@ export async function createProtoruneFixture(
       [output, refundOutput], // 0 is script, 1 is address 2 output, 2 is address 1 output
       TEST_PROTOCOL_TAG,
       block,
-      /*runeTransferPointer=*/ 0,
+      /*runeTransferPointer=*/ 2
     );
   }
   return {
