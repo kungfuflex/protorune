@@ -12,7 +12,7 @@
     "sourceMap": true,
     "outDir": "./lib",
     "declaration": true,
-    "types": ["node"]
+    "types": ["node", "mocha"]
   },
   "include": ["./src.ts/*", "./tests/utils/*.ts"]
 }
