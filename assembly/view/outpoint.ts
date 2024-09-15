@@ -21,13 +21,14 @@ import { u128 } from "as-bignum/assembly";
 import { fromArrayBuffer, fieldToName } from "metashrew-runes/assembly/utils";
 import { console } from "metashrew-as/assembly/utils/logging";
 import { encodeHexFromBuffer } from "metashrew-as/assembly/utils";
+import { readULEB128ToU128 } from "metashrew-runes/assembly/leb128";
 
 export function txindexForOutpoint(outpoint: ArrayBuffer): u32 {
   const box = Box.from(outpoint);
   box.len -= 4;
   const txid = box.toArrayBuffer();
   const ptr = HEIGHT_TO_TRANSACTION_IDS.selectValue<u32>(
-    OUTPOINT_TO_HEIGHT.select(outpoint).getValue<u32>(),
+    OUTPOINT_TO_HEIGHT.select(outpoint).getValue<u32>()
   );
   const length = ptr.length();
   for (let i = 0; i < <i32>length; i++) {
@@ -35,7 +36,7 @@ export function txindexForOutpoint(outpoint: ArrayBuffer): u32 {
       memory.compare(
         changetype<usize>(txid),
         changetype<usize>(ptr.selectIndex(i).get()),
-        txid.byteLength,
+        txid.byteLength
       ) === 0
     )
       return i;
@@ -44,7 +45,7 @@ export function txindexForOutpoint(outpoint: ArrayBuffer): u32 {
 }
 
 export function balanceSheetToProtobuf(
-  sheet: BalanceSheet,
+  sheet: BalanceSheet
 ): protobuf.BalanceSheet {
   const runes = sheet.runes.reduce<Array<protobuf.Rune>>((a, d, i, init) => {
     const _runeId = RuneId.fromBytesU128(d);
@@ -57,7 +58,7 @@ export function balanceSheetToProtobuf(
     runeId.txindex = _runeId.tx.toU32();
     rune.runeId = runeId;
     rune.name = Uint8Array.wrap(
-      String.UTF8.encode(fieldToName(fromArrayBuffer(name))),
+      String.UTF8.encode(fieldToName(fromArrayBuffer(name)))
     ).reduce<Array<u8>>((a, d) => {
       a.push(d);
       return a;
@@ -83,7 +84,7 @@ export function balanceSheetToProtobuf(
 
 export function balanceSheetToProtobufForProtocol(
   sheet: BalanceSheet,
-  table: ProtoruneTable,
+  table: ProtoruneTable
 ): protobuf.BalanceSheet {
   const runes = new Array<protobuf.Rune>();
   for (let i = 0; i < sheet.runes.length; i++) {
@@ -98,7 +99,7 @@ export function balanceSheetToProtobufForProtocol(
     runeId.txindex = _runeId.tx.toU32();
     rune.runeId = runeId;
     rune.name = Uint8Array.wrap(
-      String.UTF8.encode(fieldToName(fromArrayBuffer(name))),
+      String.UTF8.encode(fieldToName(fromArrayBuffer(name)))
     ).reduce<Array<u8>>((a, d) => {
       a.push(d);
       return a;
@@ -121,7 +122,7 @@ export function balanceSheetToProtobufForProtocol(
   return balanceSheet;
 }
 export function outpointBase(
-  inp: protobuf.Outpoint,
+  inp: protobuf.Outpoint
 ): protobuf.OutpointResponse {
   const txid = changetype<Uint8Array>(inp.txid).buffer;
   const pos = inp.vout;
@@ -129,7 +130,7 @@ export function outpointBase(
 
   const op = OUTPOINT_TO_RUNES.select(outpoint);
   const output = new Output(
-    Box.from(OUTPOINT_TO_OUTPUT.select(outpoint).get()),
+    Box.from(OUTPOINT_TO_OUTPUT.select(outpoint).get())
   );
   const balanceSheet = balanceSheetToProtobuf(BalanceSheet.load(op));
 
@@ -143,17 +144,18 @@ export function outpointBase(
   return message;
 }
 export function outpointBaseForProtocol(
-  inp: protobuf_protorune.OutpointWithProtocol,
+  inp: protobuf_protorune.OutpointWithProtocol
 ): protobuf.OutpointResponse {
   const txid = changetype<Uint8Array>(inp.txid).buffer;
   const pos = inp.vout;
   const outpoint = OutPoint.from(txid, pos).toArrayBuffer();
-  const table = ProtoruneTable.for_str(
-    String.UTF8.decode(changetype<Uint8Array>(inp.protocol).buffer),
-  );
+  const protocol_tag_bytes = changetype<Uint8Array>(inp.protocol).buffer;
+  let protocol_tag = u128.from(0);
+  readULEB128ToU128(Box.from(protocol_tag_bytes), protocol_tag);
+  const table = ProtoruneTable.for(protocol_tag);
   const op = table.OUTPOINT_TO_RUNES.select(outpoint);
   const output = new Output(
-    Box.from(OUTPOINT_TO_OUTPUT.select(outpoint).get()),
+    Box.from(OUTPOINT_TO_OUTPUT.select(outpoint).get())
   );
   const balanceSheet = balanceSheetToProtobuf(BalanceSheet.load(op));
 

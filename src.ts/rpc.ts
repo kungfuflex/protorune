@@ -17,7 +17,7 @@ export class ProtorunesRpc extends MetashrewRunes {
   }> {
     const buffer = protowallet.encodeProtorunesWalletInput(
       address,
-      protocolTag,
+      protocolTag
     );
     const byteString = await this._call({
       method: "protorunesbyaddress",

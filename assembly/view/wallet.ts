@@ -14,10 +14,12 @@ import { console } from "metashrew-as/assembly/utils/logging";
 import { input } from "metashrew-as/assembly/indexer";
 import { OUTPOINT_TO_RUNES } from "metashrew-runes/assembly/indexer/constants";
 import { ProtoruneTable } from "../indexer/tables/protorune";
+import { readULEB128ToU128 } from "metashrew-runes/assembly/leb128";
+import { u128 } from "as-bignum/assembly";
 
 export function wallet_test(): ArrayBuffer {
   const address = String.UTF8.encode(
-    "bc1pl35wn7k578zg55exz799m6v6pnu563wg34t7yg7jsnmxpmvw5fdscdsmvu",
+    "bc1pl35wn7k578zg55exz799m6v6pnu563wg34t7yg7jsnmxpmvw5fdscdsmvu"
   );
   const outpoint =
     "a92ba4aab6ac3fe26667665ca6bcd75eff2cd05963ab665d259a31113ae831a401000000";
@@ -37,7 +39,7 @@ export function runesbyaddress(): ArrayBuffer {
   for (let i = 0; i < _outpoints.length; i++) {
     const inp = new protobuf.Outpoint();
     inp.txid = changetype<Array<u8>>(
-      Uint8Array.wrap(_outpoints[i].slice(0, 32)),
+      Uint8Array.wrap(_outpoints[i].slice(0, 32))
     );
     inp.vout = parsePrimitive<u32>(Box.from(_outpoints[i].slice(32)));
     const op = outpointBase(inp);
@@ -45,7 +47,7 @@ export function runesbyaddress(): ArrayBuffer {
       continue;
     }
     balanceSheets.push(
-      ProtoruneBalanceSheet.load(OUTPOINT_TO_RUNES.select(_outpoints[i])),
+      ProtoruneBalanceSheet.load(OUTPOINT_TO_RUNES.select(_outpoints[i]))
     );
     outpoints.push(op);
   }
@@ -58,12 +60,12 @@ export function runesbyaddress(): ArrayBuffer {
         r: ProtoruneBalanceSheet,
         v: ProtoruneBalanceSheet,
         i: i32,
-        ary: Array<ProtoruneBalanceSheet>,
+        ary: Array<ProtoruneBalanceSheet>
       ) => {
         return ProtoruneBalanceSheet.merge(r, v);
       },
-      new ProtoruneBalanceSheet(),
-    ),
+      new ProtoruneBalanceSheet()
+    )
   );
 
   return message.encode();
@@ -71,13 +73,16 @@ export function runesbyaddress(): ArrayBuffer {
 
 export function protorunesbyaddress(): ArrayBuffer {
   const request = protoruneProtobuf.ProtorunesWalletRequest.decode(
-    input().slice(4),
+    input().slice(4)
   );
   const address = changetype<Uint8Array>(request.wallet).buffer;
-  const protocol_tag = changetype<Uint8Array>(request.protocol_tag).buffer;
-  const protorune_pointer = ProtoruneTable.for_str(
-    String.UTF8.decode(protocol_tag),
-  );
+
+  const protocol_tag_bytes = changetype<Uint8Array>(
+    request.protocol_tag
+  ).buffer;
+  let protocol_tag = u128.from(0);
+  readULEB128ToU128(Box.from(protocol_tag_bytes), protocol_tag);
+  const protorune_pointer = ProtoruneTable.for(protocol_tag);
 
   const _outpoints = new SpendablesIndex().findOutpointsForAddress(address);
   const outpoints = new Array<protobuf.OutpointResponse>();
@@ -85,7 +90,7 @@ export function protorunesbyaddress(): ArrayBuffer {
   for (let i = 0; i < _outpoints.length; i++) {
     const inp = new protoruneProtobuf.OutpointWithProtocol();
     inp.txid = changetype<Array<u8>>(
-      Uint8Array.wrap(_outpoints[i].slice(0, 32)),
+      Uint8Array.wrap(_outpoints[i].slice(0, 32))
     );
     inp.vout = parsePrimitive<u32>(Box.from(_outpoints[i].slice(32)));
     inp.protocol = request.protocol_tag;
@@ -95,8 +100,8 @@ export function protorunesbyaddress(): ArrayBuffer {
     }
     balanceSheets.push(
       ProtoruneBalanceSheet.load(
-        protorune_pointer.OUTPOINT_TO_RUNES.select(_outpoints[i]),
-      ),
+        protorune_pointer.OUTPOINT_TO_RUNES.select(_outpoints[i])
+      )
     );
     outpoints.push(op);
   }
@@ -109,12 +114,12 @@ export function protorunesbyaddress(): ArrayBuffer {
         r: ProtoruneBalanceSheet,
         v: ProtoruneBalanceSheet,
         i: i32,
-        ary: Array<ProtoruneBalanceSheet>,
+        ary: Array<ProtoruneBalanceSheet>
       ) => {
         return ProtoruneBalanceSheet.merge(r, v);
       },
-      new ProtoruneBalanceSheet(),
-    ),
+      new ProtoruneBalanceSheet()
+    )
   );
 
   return message.encode();

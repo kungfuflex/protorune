@@ -41,9 +41,9 @@ describe("subprotocol protorunes", () => {
     program.setBlockHeight(840000);
   });
 
-  it("should etch runes if optional etching is enabled", async () => {
-    const fixtures = await createProtoruneFixture();
-    let block = fixtures.block;
-    //@TODO: create protostone encoded with runestone etch
-  });
+  // it("should etch runes if optional etching is enabled", async () => {
+  //   const fixtures = await createProtoruneFixture();
+  //   let block = fixtures.block;
+  //   //@TODO: create protostone encoded with runestone etch
+  // });
 });

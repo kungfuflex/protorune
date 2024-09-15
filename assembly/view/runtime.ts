@@ -8,20 +8,23 @@ import { encodeHexFromBuffer } from "metashrew-as/assembly/utils/hex";
 import { console } from "metashrew-as/assembly/utils/logging";
 import { ProtoruneBalanceSheet } from "../indexer/ProtoruneBalanceSheet";
 import { balanceSheetToProtobufForProtocol } from "./outpoint";
+import { readULEB128ToU128 } from "metashrew-runes/assembly/leb128";
+import { Box } from "metashrew-as/assembly/utils";
 
 export function runtime(): ArrayBuffer {
   const inp = protobuf.RuntimeInput.decode(input().slice(4));
 
-  const protocol = String.UTF8.decode(
-    changetype<Uint8Array>(inp.protocol_tag).buffer,
-  );
-  const table = ProtoruneTable.for_str(protocol);
+  const protocol_tag_bytes = changetype<Uint8Array>(inp.protocol_tag).buffer;
+  let protocol_tag = u128.from(0);
+  readULEB128ToU128(Box.from(protocol_tag_bytes), protocol_tag);
+
+  const table = ProtoruneTable.for(protocol_tag);
 
   const message = new protobuf.Runtime();
 
   const bal = ProtoruneBalanceSheet.load(table.RUNTIME_BALANCE);
   const sheet = changetype<protobuf.BalanceSheet>(
-    balanceSheetToProtobufForProtocol(bal, table),
+    balanceSheetToProtobufForProtocol(bal, table)
   );
   message.balances = sheet;
 
