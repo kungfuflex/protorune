@@ -138,7 +138,8 @@ export declare function createMultipleProtoruneFixture(protocolTag: bigint, omit
     pointerToReceiveRunes: number;
 }>;
 /**
- * This fixture creates the following balances
+ * This fixture uses the createMultipleProtoruneFixture and transfers the
+ *
  *  - ADDRESS1 balances
  *    - 1 sat
  *    - 0 runes
@@ -157,10 +158,13 @@ export declare function createMultipleProtoruneFixture(protocolTag: bigint, omit
  * @param _block
  * @returns
  */
-export declare function createMultipleProtomessageFixture({ protocolTag, protomessagePointer, protomessageRefundPointer, }: {
+export declare function createMultipleProtomessageFixture({ protocolTag, protomessagePointer, protomessageRefundPointer, calldata, amount1, amount2, }: {
     protocolTag: bigint;
     protomessagePointer: number;
     protomessageRefundPointer: number;
+    calldata: Buffer;
+    amount1: bigint;
+    amount2: bigint;
 }): Promise<{
     block: bitcoinjs.Block;
     runeId1: {
