@@ -178,6 +178,7 @@ export class Protorune<T extends MessageContext> extends RunesIndex {
   ): void {
     for (let i = 0; i < protostones.length; i++) {
       const protostone = protostones[i];
+      if (protostone.protocolTag != changetype<T>(0).protocolTag()) continue;
       if (protostone.isMessage()) {
         protostone
           .toMessage(tx.outs.length + 1 + i)

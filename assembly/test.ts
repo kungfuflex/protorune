@@ -55,11 +55,22 @@ class RefundMessageContext extends MessageContext {
   handle(): bool {
     this.runes.map<IncomingRune>((rune) => {
       const initAmount = rune.amount;
-      rune.forward(u128.div(initAmount, u128.from(2)));
-      rune.deposit(u128.div(initAmount, u128.from(4)));
-      rune.refund(u128.div(initAmount, u128.from(8)));
-      rune.refund(u128.div(initAmount, u128.from(4)));
-      rune.refundDeposit(u128.div(initAmount, u128.from(8)));
+      const forward1 = rune.forward(u128.div(initAmount, u128.from(2)));
+      // forward amount / 2
+      console.log("forward1: " + forward1.toString());
+      const deposit1 = rune.deposit(u128.div(initAmount, u128.from(4)));
+      console.log("deposit1: " + deposit1.toString());
+      //deposit amount / 4
+      const refund1 = rune.refund(u128.div(initAmount, u128.from(8)));
+      console.log("refund1: " + refund1.toString());
+      //refund amount / 8
+      const refund2 = rune.refund(u128.div(initAmount, u128.from(4)));
+      console.log("refund2: " + refund2.toString());
+      //refund amount / 4
+
+      //total forwarded => amount /4
+      //total refunded => 3*amount /4
+      rune.refundDeposit(u128.div(initAmount, u128.from(4)));
       return rune;
     });
     return true;

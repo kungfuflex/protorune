@@ -58,6 +58,7 @@ export class MessageContext {
     const sheet = ProtoruneBalanceSheet.load(
       table.OUTPOINT_TO_RUNES.select(outpoint.toArrayBuffer()),
     );
+    console.log(sheet.inspect());
     this.sheets.set(index, sheet);
     this.sheets.set(
       pointer,
@@ -93,22 +94,38 @@ export class MessageContext {
       this.table.OUTPOINT_TO_RUNES.select(this.refund_pointer.toArrayBuffer()),
       this.runtime,
     );
-    ProtoruneBalanceSheet.loadFromAtomicTx(
+    console.log("refund sheet");
+    console.log(checkingSheet.inspect());
+    const forwardSheet = ProtoruneBalanceSheet.loadFromAtomicTx(
       this.table.OUTPOINT_TO_RUNES.select(this.pointer.toArrayBuffer()),
       this.runtime,
-    ).pipe(checkingSheet);
-    ProtoruneBalanceSheet.loadFromAtomicTx(
+    );
+    console.log("forward sheet");
+    console.log(forwardSheet.inspect());
+    forwardSheet.pipe(checkingSheet);
+    const outpointSheet = ProtoruneBalanceSheet.loadFromAtomicTx(
       this.table.OUTPOINT_TO_RUNES.select(this.outpoint.toArrayBuffer()),
       this.runtime,
-    ).pipe(checkingSheet);
+    );
+    outpointSheet.pipe(checkingSheet);
     this.runtimeBalance.pipe(checkingSheet);
+    console.log("runtime balance");
+    console.log(this.runtimeBalance.inspect());
     if (this.baseSheet.runes.length != checkingSheet.runes.length) return false;
     for (let i = 0; i < this.baseSheet.runes.length; i++) {
       if (
         this.baseSheet.get(this.baseSheet.runes[i]) !=
         checkingSheet.get(this.baseSheet.runes[i])
-      )
+      ) {
+        console.log(
+          (
+            this.baseSheet.get(this.baseSheet.runes[i]) -
+            checkingSheet.get(this.baseSheet.runes[i])
+          ).toString(),
+        );
+        console.log("context invalid");
         return false;
+      }
     }
     return true;
   }
