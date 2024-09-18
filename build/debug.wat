@@ -19640,6 +19640,15 @@
   local.get $height
   global.get $~lib/metashrew-runes/assembly/indexer/constants/index/GENESIS
   i64.extend_i32_u
+  i64.lt_u
+  if
+   local.get $nameU128
+   call $~lib/metashrew-runes/assembly/utils/toArrayBuffer
+   return
+  end
+  local.get $height
+  global.get $~lib/metashrew-runes/assembly/indexer/constants/index/GENESIS
+  i64.extend_i32_u
   i64.sub
   global.get $~lib/metashrew-runes/assembly/indexer/constants/index/HEIGHT_INTERVAL
   i64.div_u
