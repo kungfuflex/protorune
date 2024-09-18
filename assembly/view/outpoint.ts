@@ -145,7 +145,7 @@ export function outpointBase(
   return message;
 }
 
-export function protorunesbyoutpoipnt(): ArrayBuffer {
+export function protorunesbyoutpoint(): ArrayBuffer {
   const data = Box.from(input());
   parsePrimitive<u32>(data);
   return _protorunesbyoutpoint(protobuf_protorune.OutpointWithProtocol.decode(data.toArrayBuffer())).encode();

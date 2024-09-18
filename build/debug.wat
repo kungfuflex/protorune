@@ -323,7 +323,7 @@
  (export "balanceSheetToProtobuf" (func $assembly/view/outpoint/balanceSheetToProtobuf))
  (export "balanceSheetToProtobufForProtocol" (func $assembly/view/outpoint/balanceSheetToProtobufForProtocol))
  (export "outpointBase" (func $assembly/view/outpoint/outpointBase))
- (export "protorunesbyoutpoipnt" (func $assembly/view/outpoint/protorunesbyoutpoipnt))
+ (export "protorunesbyoutpoint" (func $assembly/view/outpoint/protorunesbyoutpoint))
  (export "_protorunesbyoutpoint" (func $assembly/view/outpoint/_protorunesbyoutpoint))
  (export "outpoint" (func $assembly/view/outpoint/outpoint))
  (export "runes" (func $assembly/view/runes/runes))
@@ -28744,7 +28744,7 @@
   call $~lib/staticarray/StaticArray.fromArray<u8>
   return
  )
- (func $assembly/view/outpoint/protorunesbyoutpoipnt (result i32)
+ (func $assembly/view/outpoint/protorunesbyoutpoint (result i32)
   (local $data i32)
   call $~lib/metashrew-as/assembly/indexer/index/input
   call $~lib/metashrew-as/assembly/utils/box/Box.from

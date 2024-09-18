@@ -388,7 +388,7 @@
  (export "balanceSheetToProtobuf" (func $assembly/view/outpoint/balanceSheetToProtobuf))
  (export "balanceSheetToProtobufForProtocol" (func $assembly/view/outpoint/balanceSheetToProtobufForProtocol))
  (export "outpointBase" (func $assembly/view/outpoint/outpointBase))
- (export "protorunesbyoutpoipnt" (func $assembly/view/outpoint/protorunesbyoutpoipnt))
+ (export "protorunesbyoutpoint" (func $assembly/view/outpoint/protorunesbyoutpoint))
  (export "_protorunesbyoutpoint" (func $assembly/view/outpoint/_protorunesbyoutpoint))
  (export "outpoint" (func $assembly/view/outpoint/outpoint))
  (export "runes" (func $assembly/view/runes/runes))
@@ -22118,7 +22118,7 @@
   end
   local.get $4
  )
- (func $assembly/view/outpoint/protorunesbyoutpoipnt (result i32)
+ (func $assembly/view/outpoint/protorunesbyoutpoint (result i32)
   (local $0 i32)
   (local $1 i32)
   (local $2 i32)
