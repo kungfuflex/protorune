@@ -132,9 +132,9 @@
   integrity sha512-Vvn3zZrhQZkkBE8LSuW3em98c0FwgO4nxzv6OdSxPKJIEKY2bGbHn+mhGIPerzI4twdxaP8/0+06HBpwf345Lw==
 
 "@scure/base@^1.1.1":
-  version "1.1.8"
-  resolved "https://registry.yarnpkg.com/@scure/base/-/base-1.1.8.tgz#8f23646c352f020c83bca750a82789e246d42b50"
-  integrity sha512-6CyAclxj3Nb0XT7GHK6K4zK6k2xJm6E4Ft0Ohjt4WgegiFUHEtFb2CGzmPmGBwoIhrLsqNLYfLr04Y1GePrzZg==
+  version "1.1.9"
+  resolved "https://registry.yarnpkg.com/@scure/base/-/base-1.1.9.tgz#e5e142fbbfe251091f9c5f1dd4c834ac04c3dbd1"
+  integrity sha512-8YKhl8GHiNI/pU2VMaofa2Tor7PJRAjwQLBBuilkJ9L5+13yVbC7JO/wS7piioAvPSwR3JKM1IJ/u4xQzbcXKg==
 
 "@tsconfig/node10@^1.0.7":
   version "1.0.11"
@@ -1439,7 +1439,7 @@ memorystream@^0.3.1:
 
 "metashrew-as@https://github.com/sandshrewmetaprotocols/metashrew-as":
   version "0.1.0"
-  resolved "https://github.com/sandshrewmetaprotocols/metashrew-as#0b75f54b2330ddfecc54f72e49e993ecc28a3b81"
+  resolved "https://github.com/sandshrewmetaprotocols/metashrew-as#e811235a496dcd3398e7ced1b8ba0f440400f857"
   dependencies:
     as-bignum "^0.3.1"
     fast-sha256-as "https://github.com/sandshrewmetaprotocols/fast-sha256-as"

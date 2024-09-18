@@ -4,6 +4,7 @@
   "scripts": {
     "asbuild:debug": "asc assembly/index.ts --target debug --enable threads --config asconfig.json",
     "asbuild:release": "asc assembly/index.ts --target release --config asconfig.json",
+    "asbuild:regtest": "asc assembly/index-regtest.ts --target debug --config asconfig.json",
     "build:as": "npm-run-all asbuild:debug asbuild:release",
     "build": "npm-run-all build:protoc build:as build:ts",
     "build:debug:preloader": "npm run asbuild:preloader --sharedMemory",
