@@ -1,5 +1,6 @@
 import { Box } from "metashrew-as/assembly/utils/box";
 import { input } from "metashrew-as/assembly/indexer/index";
+import { arrayToArrayBuffer } from "metashrew-as/assembly/blockdata/address";
 import { BalanceSheet } from "metashrew-runes/assembly/indexer/BalanceSheet";
 import { RuneId } from "metashrew-runes/assembly/indexer/RuneId";
 import {
@@ -20,7 +21,7 @@ import { protorune as protobuf_protorune } from "../proto/protorune";
 import { u128 } from "as-bignum/assembly";
 import { fromArrayBuffer, fieldToName } from "metashrew-runes/assembly/utils";
 import { console } from "metashrew-as/assembly/utils/logging";
-import { encodeHexFromBuffer } from "metashrew-as/assembly/utils";
+import { parsePrimitive, encodeHexFromBuffer } from "metashrew-as/assembly/utils";
 import { readULEB128ToU128 } from "metashrew-runes/assembly/leb128";
 
 export function txindexForOutpoint(outpoint: ArrayBuffer): u32 {
@@ -143,7 +144,13 @@ export function outpointBase(
   message.txindex = txindexForOutpoint(outpoint);
   return message;
 }
-export function protorunesbyoutpoint(
+
+export function protorunesbyoutpoipnt(): ArrayBuffer {
+  const data = Box.from(input());
+  parsePrimitive<u32>(data);
+  return _protorunesbyoutpoint(protobuf_protorune.OutpointWithProtocol.decode(data.toArrayBuffer())).encode();
+}
+export function _protorunesbyoutpoint(
   inp: protobuf_protorune.OutpointWithProtocol
 ): protobuf.OutpointResponse {
   const txid = changetype<Uint8Array>(inp.txid).buffer;
