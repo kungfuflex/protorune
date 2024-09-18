@@ -388,7 +388,7 @@
  (export "balanceSheetToProtobuf" (func $assembly/view/outpoint/balanceSheetToProtobuf))
  (export "balanceSheetToProtobufForProtocol" (func $assembly/view/outpoint/balanceSheetToProtobufForProtocol))
  (export "outpointBase" (func $assembly/view/outpoint/outpointBase))
- (export "outpointBaseForProtocol" (func $assembly/view/outpoint/outpointBaseForProtocol))
+ (export "protorunesbyoutpoint" (func $assembly/view/outpoint/protorunesbyoutpoint))
  (export "outpoint" (func $assembly/view/outpoint/outpoint))
  (export "runes" (func $assembly/view/runes/runes))
  (export "wallet_test" (func $assembly/view/wallet/wallet_test))
@@ -12522,6 +12522,14 @@
    local.get $5
    i64.store offset=8
   end
+  local.get $1
+  i64.const 840000
+  i64.lt_u
+  if
+   local.get $0
+   call $~lib/metashrew-runes/assembly/utils/toArrayBuffer
+   return
+  end
   local.get $0
   local.set $2
   global.get $~lib/metashrew-runes/assembly/indexer/constants/index/MINIMUM_NAME
@@ -19254,7 +19262,7 @@
   i32.store offset=40
   local.get $1
  )
- (func $assembly/view/outpoint/outpointBaseForProtocol (param $0 i32) (result i32)
+ (func $assembly/view/outpoint/protorunesbyoutpoint (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -24509,7 +24517,7 @@
     i32.load offset=4
     i32.store offset=8
     local.get $0
-    call $assembly/view/outpoint/outpointBaseForProtocol
+    call $assembly/view/outpoint/protorunesbyoutpoint
     local.tee $0
     i32.load
     i32.load

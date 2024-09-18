@@ -323,7 +323,7 @@
  (export "balanceSheetToProtobuf" (func $assembly/view/outpoint/balanceSheetToProtobuf))
  (export "balanceSheetToProtobufForProtocol" (func $assembly/view/outpoint/balanceSheetToProtobufForProtocol))
  (export "outpointBase" (func $assembly/view/outpoint/outpointBase))
- (export "outpointBaseForProtocol" (func $assembly/view/outpoint/outpointBaseForProtocol))
+ (export "protorunesbyoutpoint" (func $assembly/view/outpoint/protorunesbyoutpoint))
  (export "outpoint" (func $assembly/view/outpoint/outpoint))
  (export "runes" (func $assembly/view/runes/runes))
  (export "wallet_test" (func $assembly/view/wallet/wallet_test))
@@ -19640,6 +19640,15 @@
   local.get $height
   global.get $~lib/metashrew-runes/assembly/indexer/constants/index/GENESIS
   i64.extend_i32_u
+  i64.lt_u
+  if
+   local.get $nameU128
+   call $~lib/metashrew-runes/assembly/utils/toArrayBuffer
+   return
+  end
+  local.get $height
+  global.get $~lib/metashrew-runes/assembly/indexer/constants/index/GENESIS
+  i64.extend_i32_u
   i64.sub
   global.get $~lib/metashrew-runes/assembly/indexer/constants/index/HEIGHT_INTERVAL
   i64.div_u
@@ -24794,7 +24803,7 @@
   local.get $this
   i32.load offset=4
  )
- (func $assembly/view/outpoint/outpointBaseForProtocol (param $inp i32) (result i32)
+ (func $assembly/view/outpoint/protorunesbyoutpoint (param $inp i32) (result i32)
   (local $txid i32)
   (local $pos i32)
   (local $outpoint i32)
@@ -32271,7 +32280,7 @@
      call $assembly/proto/protorune/protorune.ProtorunesWalletRequest#get:protocol_tag
      call $assembly/proto/protorune/protorune.OutpointWithProtocol#set:protocol
      local.get $inp
-     call $assembly/view/outpoint/outpointBaseForProtocol
+     call $assembly/view/outpoint/protorunesbyoutpoint
      local.set $op
      local.get $op
      call $~lib/metashrew-runes/assembly/proto/metashrew-runes/metashrew_runes.OutpointResponse#get:balances

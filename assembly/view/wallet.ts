@@ -2,7 +2,7 @@ import { SpendablesIndex } from "metashrew-spendables/assembly/indexer";
 import {
   balanceSheetToProtobuf,
   outpointBase,
-  outpointBaseForProtocol,
+  protorunesbyoutpoint
 } from "./outpoint";
 import { ProtoruneBalanceSheet } from "../indexer/ProtoruneBalanceSheet";
 import { metashrew_runes as protobuf } from "metashrew-runes/assembly/proto/metashrew-runes";
@@ -94,7 +94,7 @@ export function protorunesbyaddress(): ArrayBuffer {
     );
     inp.vout = parsePrimitive<u32>(Box.from(_outpoints[i].slice(32)));
     inp.protocol = request.protocol_tag;
-    const op = outpointBaseForProtocol(inp);
+    const op = protorunesbyoutpoint(inp);
     if (op.balances.entries.length == 0) {
       continue;
     }

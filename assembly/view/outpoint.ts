@@ -143,7 +143,7 @@ export function outpointBase(
   message.txindex = txindexForOutpoint(outpoint);
   return message;
 }
-export function outpointBaseForProtocol(
+export function protorunesbyoutpoint(
   inp: protobuf_protorune.OutpointWithProtocol
 ): protobuf.OutpointResponse {
   const txid = changetype<Uint8Array>(inp.txid).buffer;
