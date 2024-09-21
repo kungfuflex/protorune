@@ -130,11 +130,11 @@ export const constructProtomessageBlock = (
   },
   protocolTag: bigint,
   message: {
-    calldata: Buffer;
+    calldata: u128[];
     pointer: number;
     refundPointer: number;
   },
-  block?: bitcoinjs.Block,
+  block?: bitcoinjs.Block
 ): bitcoinjs.Block => {
   if (block == undefined) {
     block = buildDefaultBlock();
@@ -183,7 +183,7 @@ export const constructProtomessageBlock = (
         value: 0,
       },
       ...blockOutputs,
-    ],
+    ]
   );
   block.transactions?.push(transaction);
   return block;

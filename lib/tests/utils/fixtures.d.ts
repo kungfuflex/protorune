@@ -1,4 +1,5 @@
 import bitcoinjs = require("bitcoinjs-lib");
+import { u128 } from "@magiceden-oss/runestone-lib/dist/src/integer";
 /**
  * Fixture creates a block with 3 transactions:
  *  - tx 1: coinbase that transfers all bitcoins to ADDRESS1
@@ -162,7 +163,7 @@ export declare function createMultipleProtomessageFixture({ protocolTag, protome
     protocolTag: bigint;
     protomessagePointer: number;
     protomessageRefundPointer: number;
-    calldata: Buffer;
+    calldata: u128[];
     amount1: bigint;
     amount2: bigint;
 }): Promise<{
