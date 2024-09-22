@@ -19,7 +19,6 @@ import {
   constructProtostoneTx,
 } from "./protoburn";
 import { ProtoStone } from "../../src.ts/protostone";
-import { bufferToU128Array } from "../../src.ts/utils/buffer";
 import { u128, u64, u32 } from "@magiceden-oss/runestone-lib/dist/src/integer";
 import { RuneId } from "@magiceden-oss/runestone-lib/dist/src/runeid";
 
@@ -114,6 +113,7 @@ export async function createProtoruneFixture(
     inputTxOutputIndex: pointerToReceiveRunes, // index of output in the input tx that has the runes. In this case it is the default pointer of the mint
   };
 
+
   const amount = premineAmount;
 
   const output = {
@@ -162,14 +162,10 @@ export async function createProtomessageFixture({
   protocolTag,
   protomessagePointer,
   protomessageRefundPointer,
-  calldata,
-  amount,
 }: {
   protocolTag: bigint;
   protomessagePointer: number;
   protomessageRefundPointer: number;
-  calldata: u128[];
-  amount?: bigint;
 }) {
   let {
     block,
@@ -182,9 +178,7 @@ export async function createProtomessageFixture({
     // this fixture always assumes a protoburn and default values
     await createProtoruneFixture(protocolTag);
 
-  if (typeof amount === "undefined") {
-    amount = premineAmount;
-  }
+  const calldata = Buffer.from("testing 12345");
 
   // constructing tx 3: protomessage
   // right now, address 2 has all the protorunes. we want to forward everything to the pointer
@@ -202,7 +196,7 @@ export async function createProtomessageFixture({
         protocolTag: protocolTag,
         edicts: [
           {
-            amount: u128(amount),
+            amount: u128(premineAmount),
             id: new RuneId(u64(runeId.block), u32(runeId.tx)),
             output: u32(5),
           },
@@ -216,7 +210,7 @@ export async function createProtomessageFixture({
       }),
     ],
     block,
-    2 // leftover protorunes go to output2, which is ADDRESS 1
+    2, // leftover protorunes go to output2, which is ADDRESS 1
   );
 
   return { block, runeId, premineAmount };
@@ -273,7 +267,7 @@ export async function createMultipleProtoruneFixture(
   } = {
     skip: 0,
   },
-  _block?: bitcoinjs.Block
+  _block?: bitcoinjs.Block,
 ) {
   const outputs = [
     {
@@ -304,7 +298,7 @@ export async function createMultipleProtoruneFixture(
       undefined /*name */,
       undefined /*symbol */,
       undefined /* block */,
-      skip
+      skip,
     );
   const runeId1 = {
     block: 840000n,
@@ -320,7 +314,7 @@ export async function createMultipleProtoruneFixture(
     "GENESIS•RUNE•TWO" /*name */,
     "H" /*symbol */,
     block /* block */,
-    skip
+    skip,
   );
   const runeId2 = {
     block: 840000n,
@@ -371,7 +365,7 @@ export async function createMultipleProtoruneFixture(
       [output, refundOutput], // 0 is script, 1 is address 2 output, 2 is address 1 output
       protocolTag,
       block,
-      /*runeTransferPointer=*/ 0
+      /*runeTransferPointer=*/ 0,
     );
   }
   return {
@@ -418,7 +412,7 @@ export async function createMultipleProtomessageFixture({
   protocolTag: bigint;
   protomessagePointer: number;
   protomessageRefundPointer: number;
-  calldata: u128[];
+  calldata: Buffer;
   amount1: bigint;
   amount2: bigint;
 }) {
@@ -473,7 +467,7 @@ export async function createMultipleProtomessageFixture({
       }),
     ],
     block,
-    2 // leftover protorunes go to output2, which is ADDRESS 1
+    2, // leftover protorunes go to output2, which is ADDRESS 1
   );
 
   return { block, runeId1, premineAmount };

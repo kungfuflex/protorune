@@ -25,8 +25,8 @@ export function readULEB128(v) {
   const { length } = leb128.unsigned.encode(
     Buffer.from(
       ((s) => (s.length % 2 === 1 ? "0" + s : s))(BigInt(decoded).toString(16)),
-      "hex"
-    )
+      "hex",
+    ),
   );
   return {
     value: decoded,
@@ -64,7 +64,7 @@ export class ProtoStone {
       from?: Array<u32>;
     };
     message?: {
-      calldata: u128[];
+      calldata: Buffer;
 
       pointer: number;
       refundPointer: number;
@@ -76,12 +76,25 @@ export class ProtoStone {
     if (burn) {
       this.burn = {
         pointer: Some<u32>(u32(burn.pointer)),
-        from: burn.from,
+        from: burn.from
       };
     }
     if (message && message.calldata) {
+      const ary = Uint8Array.from(message.calldata);
+      const res: u128[] = [];
+
+      for (let i = 0; i < ary.byteLength; i += 16) {
+        const last = i + 16;
+        res.push(
+          u128(
+            BigInt(
+              `0x${Buffer.from(ary.slice(i, last > ary.byteLength ? ary.byteLength : last)).toString("hex")}`,
+            ),
+          ),
+        );
+      }
       this.message = {
-        calldata: message.calldata,
+        calldata: res,
         pointer: Some<u32>(u32(message.pointer)),
         refundPointer: Some<u32>(u32(message.refundPointer)),
       };
@@ -131,22 +144,24 @@ export class ProtoStone {
     let payloads: Buffer[] = [];
     if (this.burn) {
       payloads.push(
-        Tag.encodeOptionInt(Tag.POINTER, this.burn.pointer.map(u128))
+        Tag.encodeOptionInt(Tag.POINTER, this.burn.pointer.map(u128)),
       );
       if (this.burn.from) {
-        payloads.push(Tag.encode(Tag.FROM, this.burn.from.map(u128)));
+        payloads.push(
+          Tag.encode(Tag.FROM, this.burn.from.map(u128)),
+        );
       }
 
       payloads.push(
-        Tag.encodeOptionInt(Tag.BURN, Some<u128>(this.protocolTag))
+        Tag.encodeOptionInt(Tag.BURN, Some<u128>(this.protocolTag)),
       );
     } else if (this.message) {
       // payloads.push(u128.encodeVarInt(this.protocolTag));
       payloads.push(
-        Tag.encodeOptionInt(Tag.POINTER, this.message.pointer.map(u128))
+        Tag.encodeOptionInt(Tag.POINTER, this.message.pointer.map(u128)),
       );
       payloads.push(
-        Tag.encodeOptionInt(Tag.REFUND, this.message.refundPointer.map(u128))
+        Tag.encodeOptionInt(Tag.REFUND, this.message.refundPointer.map(u128)),
       );
       payloads.push(Tag.encode(Tag.MESSAGE, this.message.calldata));
     }
@@ -154,7 +169,7 @@ export class ProtoStone {
       payloads.push(u128.encodeVarInt(u128(Tag.BODY)));
 
       const edicts = [...this.edicts].sort((x, y) =>
-        Number(x.id.block - y.id.block || x.id.tx - y.id.tx)
+        Number(x.id.block - y.id.block || x.id.tx - y.id.tx),
       );
 
       let previous = new RuneId(u64(0), u32(0));
@@ -172,21 +187,21 @@ export class ProtoStone {
     // pushing the protocol_id and len first as per the spec
     const length_payload = payloads.reduce(
       (r, v) => r + decodeList(v).length,
-      0
+      0,
     );
     const prefix = [
       toBuffer(
         payloads.reduce((r, v) => r || decodeList(v)[0] === 83n, false)
           ? u128(13)
-          : u128(this.protocolTag)
+          : u128(this.protocolTag),
       ),
       toBuffer(u128(length_payload)),
     ];
     const result = prefix.concat(
       payloads.reduce(
         (r, v) => r.concat(decodeList(v).map((v) => toBuffer(v))),
-        prefix.slice(2)
-      )
+        prefix.slice(2),
+      ),
     );
     return result;
   }
@@ -209,7 +224,7 @@ export class ProtoStone {
     edicts,
     ...message
   }: {
-    calldata: u128[];
+    calldata: Buffer;
     protocolTag: bigint;
     pointer: number;
     refundPointer: number;

@@ -29,7 +29,7 @@ export declare class ProtoStone {
             from?: Array<u32>;
         };
         message?: {
-            calldata: u128[];
+            calldata: Buffer;
             pointer: number;
             refundPointer: number;
         };
@@ -43,7 +43,7 @@ export declare class ProtoStone {
         edicts?: Edict[];
     }): ProtoStone;
     static message({ protocolTag, edicts, ...message }: {
-        calldata: u128[];
+        calldata: Buffer;
         protocolTag: bigint;
         pointer: number;
         refundPointer: number;
