@@ -146,6 +146,7 @@
  (global $assembly/indexer/tables/protorune/PROTOCOLS_TO_INDEX (mut i32) (i32.const 0))
  (global $assembly/constants/PROTOCOL_FIELD i64 (i64.const 16383))
  (global $assembly/indexer/ProtoruneRuneId/ProtoruneRuneId.MAX_LEB_SIZE_BYTES i32 (i32.const 31))
+ (global $assembly/indexer/protomessage/ProtoMessage/CALLDATA_MAGIC i32 (i32.const 1))
  (global $~lib/metashrew-spendables/assembly/tables/OUTPOINTS_FOR_ADDRESS (mut i32) (i32.const 0))
  (global $~lib/metashrew-spendables/assembly/tables/OUTPOINT_SPENDABLE_BY (mut i32) (i32.const 0))
  (global $~lib/metashrew-spendables/assembly/tables/OUTPOINT_TO_OUTPUT (mut i32) (i32.const 0))
@@ -40045,8 +40046,132 @@
   call $assembly/indexer/protomessage/ProtoMessage/ProtoMessage#set:protocolTag
   local.get $this
  )
+ (func $~lib/typedarray/Uint8Array#subarray (param $this i32) (param $begin i32) (param $end i32) (result i32)
+  (local $array i32)
+  (local $begin|4 i32)
+  (local $end|5 i32)
+  (local $len i32)
+  (local $7 i32)
+  (local $8 i32)
+  (local $9 i32)
+  (local $10 i32)
+  (local $11 i32)
+  (local $12 i32)
+  (local $13 i32)
+  (local $14 i32)
+  (local $15 i32)
+  (local $16 i32)
+  (local $out i32)
+  (local $buf i32)
+  block $"~lib/typedarray/SUBARRAY<~lib/typedarray/Uint8Array,u8>|inlined.0" (result i32)
+   local.get $this
+   local.set $array
+   local.get $begin
+   local.set $begin|4
+   local.get $end
+   local.set $end|5
+   local.get $array
+   call $~lib/typedarray/Uint8Array#get:length
+   local.set $len
+   local.get $begin|4
+   i32.const 0
+   i32.lt_s
+   if (result i32)
+    local.get $len
+    local.get $begin|4
+    i32.add
+    local.tee $7
+    i32.const 0
+    local.tee $8
+    local.get $7
+    local.get $8
+    i32.gt_s
+    select
+   else
+    local.get $begin|4
+    local.tee $9
+    local.get $len
+    local.tee $10
+    local.get $9
+    local.get $10
+    i32.lt_s
+    select
+   end
+   local.set $begin|4
+   local.get $end|5
+   i32.const 0
+   i32.lt_s
+   if (result i32)
+    local.get $len
+    local.get $end|5
+    i32.add
+    local.tee $11
+    i32.const 0
+    local.tee $12
+    local.get $11
+    local.get $12
+    i32.gt_s
+    select
+   else
+    local.get $end|5
+    local.tee $13
+    local.get $len
+    local.tee $14
+    local.get $13
+    local.get $14
+    i32.lt_s
+    select
+   end
+   local.set $end|5
+   local.get $end|5
+   local.tee $15
+   local.get $begin|4
+   local.tee $16
+   local.get $15
+   local.get $16
+   i32.gt_s
+   select
+   local.set $end|5
+   i32.const 12
+   i32.const 15
+   call $~lib/rt/stub/__new
+   local.set $out
+   local.get $array
+   call $~lib/arraybuffer/ArrayBufferView#get:buffer
+   local.set $buf
+   local.get $out
+   local.get $buf
+   i32.store
+   local.get $out
+   local.get $buf
+   i32.const 0
+   call $~lib/rt/stub/__link
+   local.get $out
+   local.get $array
+   call $~lib/arraybuffer/ArrayBufferView#get:dataStart
+   local.get $begin|4
+   i32.const 0
+   i32.shl
+   i32.add
+   i32.store offset=4
+   local.get $out
+   local.get $end|5
+   local.get $begin|4
+   i32.sub
+   i32.const 0
+   i32.shl
+   i32.store offset=8
+   local.get $out
+   br $"~lib/typedarray/SUBARRAY<~lib/typedarray/Uint8Array,u8>|inlined.0"
+  end
+  return
+ )
  (func $assembly/indexer/protomessage/ProtoMessage/ProtoMessage.from (param $protostone i32) (param $vout i32) (result i32)
   (local $calldata i32)
+  (local $wrap i32)
+  (local $leadingByte i32)
+  (local $endingMagicIndex i32)
+  (local $i i32)
   local.get $protostone
   call $assembly/indexer/Protostone/Protostone#get:fields
   global.get $assembly/indexer/fields/ProtoruneField/ProtoruneField.MESSAGE
@@ -40079,6 +40204,115 @@
   global.get $assembly/indexer/fields/ProtoruneField/ProtoruneField.MESSAGE
   call $"~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#get"
   call $~lib/metashrew-runes/assembly/utils/fieldToArrayBuffer
+  local.set $calldata
+  local.get $calldata
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 0
+  call $~lib/typedarray/Uint8Array.wrap@varargs
+  local.set $wrap
+  local.get $wrap
+  i32.const 0
+  call $~lib/typedarray/Uint8Array#__get
+  local.set $leadingByte
+  local.get $leadingByte
+  global.get $assembly/indexer/protomessage/ProtoMessage/CALLDATA_MAGIC
+  i32.ne
+  if
+   i32.const 0
+   i32.const 0
+   call $~lib/arraybuffer/ArrayBuffer#constructor
+   local.set $calldata
+   i32.const 0
+   local.get $vout
+   local.get $protostone
+   call $assembly/indexer/Protostone/Protostone#get:fields
+   global.get $assembly/indexer/fields/ProtoruneField/ProtoruneField.POINTER
+   call $"~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#get"
+   call $~lib/metashrew-runes/assembly/utils/fieldTo<u32>
+   local.get $protostone
+   call $assembly/indexer/Protostone/Protostone#get:fields
+   global.get $assembly/indexer/fields/ProtoruneField/ProtoruneField.REFUND
+   call $"~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#get"
+   call $~lib/metashrew-runes/assembly/utils/fieldTo<u32>
+   local.get $calldata
+   local.get $protostone
+   call $assembly/indexer/Protostone/Protostone#get:protocolTag
+   call $assembly/indexer/protomessage/ProtoMessage/ProtoMessage#constructor
+   return
+  end
+  i32.const -1
+  local.set $endingMagicIndex
+  local.get $wrap
+  call $~lib/typedarray/Uint8Array#get:length
+  i32.const 1
+  i32.sub
+  local.set $i
+  block $for-break0
+   loop $for-loop|0
+    local.get $i
+    i32.const 0
+    i32.ge_s
+    if
+     local.get $wrap
+     local.get $i
+     call $~lib/typedarray/Uint8Array#__get
+     global.get $assembly/indexer/protomessage/ProtoMessage/CALLDATA_MAGIC
+     i32.eq
+     if
+      local.get $i
+      local.set $endingMagicIndex
+      br $for-break0
+     end
+     local.get $i
+     i32.const 1
+     i32.sub
+     local.set $i
+     br $for-loop|0
+    end
+   end
+  end
+  local.get $endingMagicIndex
+  i32.const -1
+  i32.eq
+  if (result i32)
+   i32.const 1
+  else
+   local.get $endingMagicIndex
+   i32.const 0
+   i32.eq
+  end
+  if
+   i32.const 0
+   i32.const 0
+   call $~lib/arraybuffer/ArrayBuffer#constructor
+   local.set $calldata
+   i32.const 0
+   local.get $vout
+   local.get $protostone
+   call $assembly/indexer/Protostone/Protostone#get:fields
+   global.get $assembly/indexer/fields/ProtoruneField/ProtoruneField.POINTER
+   call $"~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#get"
+   call $~lib/metashrew-runes/assembly/utils/fieldTo<u32>
+   local.get $protostone
+   call $assembly/indexer/Protostone/Protostone#get:fields
+   global.get $assembly/indexer/fields/ProtoruneField/ProtoruneField.REFUND
+   call $"~lib/map/Map<u64,~lib/array/Array<~lib/as-bignum/assembly/integer/u128/u128>>#get"
+   call $~lib/metashrew-runes/assembly/utils/fieldTo<u32>
+   local.get $calldata
+   local.get $protostone
+   call $assembly/indexer/Protostone/Protostone#get:protocolTag
+   call $assembly/indexer/protomessage/ProtoMessage/ProtoMessage#constructor
+   return
+  end
+  local.get $wrap
+  i32.const 1
+  local.get $endingMagicIndex
+  i32.const 1
+  i32.sub
+  call $~lib/typedarray/Uint8Array#subarray
+  call $~lib/arraybuffer/ArrayBufferView#get:buffer
   local.set $calldata
   i32.const 0
   local.get $vout
