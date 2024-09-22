@@ -87,12 +87,16 @@ export class ProtoMessage {
     // Verify ending magic number
     let endingMagicIndex = -1;
     for (let i = wrap.length - 1; i >= 0; i--) {
-      if (wrap[i] == CALLDATA_MAGIC) {
+      if (wrap[i] != 0) {
         endingMagicIndex = i;
         break;
       }
     }
-    if (endingMagicIndex == -1 || endingMagicIndex == 0) {
+    if (
+      endingMagicIndex == -1 ||
+      endingMagicIndex == 0 ||
+      wrap[endingMagicIndex] != CALLDATA_MAGIC
+    ) {
       calldata = new ArrayBuffer(0);
       return new ProtoMessage(
         vout,

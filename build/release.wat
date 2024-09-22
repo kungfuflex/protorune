@@ -29477,7 +29477,6 @@
   (local $4 i32)
   (local $5 i32)
   (local $6 i32)
-  (local $7 i32)
   local.get $0
   i32.load
   local.tee $2
@@ -29633,74 +29632,81 @@
   block $folding-inner0
    local.get $2
    call $~lib/typedarray/Uint8Array.wrap@varargs
-   local.tee $6
+   local.tee $5
    i32.const 0
    call $~lib/typedarray/Uint8Array#__get
    i32.const 1
    i32.ne
    br_if $folding-inner0
    i32.const -1
-   local.set $3
-   local.get $6
+   local.set $2
+   local.get $5
    i32.load offset=8
    i32.const 1
    i32.sub
-   local.set $2
+   local.set $3
    loop $for-loop|0
-    local.get $2
+    local.get $3
     i32.const 0
     i32.ge_s
     if
      block $for-break0
-      local.get $6
-      local.get $2
+      local.get $5
+      local.get $3
       call $~lib/typedarray/Uint8Array#__get
-      i32.const 1
-      i32.eq
       if
-       local.get $2
-       local.set $3
+       local.get $3
+       local.set $2
        br $for-break0
       end
-      local.get $2
+      local.get $3
       i32.const 1
       i32.sub
-      local.set $2
+      local.set $3
       br $for-loop|0
      end
     end
    end
-   local.get $3
+   local.get $2
    i32.eqz
-   local.get $3
+   local.get $2
    i32.const -1
    i32.eq
    i32.or
+   if (result i32)
+    i32.const 1
+   else
+    local.get $5
+    local.get $2
+    call $~lib/typedarray/Uint8Array#__get
+    i32.const 1
+    i32.ne
+   end
    br_if $folding-inner0
-   local.get $6
+   local.get $5
    i32.load offset=8
-   local.set $5
+   local.set $4
    i32.const 12
    i32.const 15
    call $~lib/rt/stub/__new
-   local.tee $7
-   local.get $6
+   local.tee $6
+   local.get $5
    i32.load
    i32.store
-   local.get $7
+   local.get $6
    i32.const 1
-   local.get $5
-   local.get $5
+   local.get $4
+   local.get $4
    i32.const 1
    i32.gt_s
    select
-   local.tee $4
-   local.get $6
+   local.tee $3
+   local.get $5
    i32.load offset=4
    i32.add
    i32.store offset=4
-   local.get $7
-   local.get $3
+   local.get $6
+   local.get $2
    i32.const 1
    i32.sub
    local.tee $2
@@ -29708,7 +29714,7 @@
    i32.lt_s
    if (result i32)
     local.get $2
-    local.get $5
+    local.get $4
     i32.add
     local.tee $2
     i32.const 0
@@ -29718,22 +29724,22 @@
     select
    else
     local.get $2
-    local.get $5
+    local.get $4
     local.get $2
-    local.get $5
+    local.get $4
     i32.lt_s
     select
    end
    local.tee $2
-   local.get $4
+   local.get $3
    local.get $2
-   local.get $4
+   local.get $3
    i32.gt_s
    select
-   local.get $4
+   local.get $3
    i32.sub
    i32.store offset=8
-   local.get $7
+   local.get $6
    i32.load
    local.set $2
    local.get $1

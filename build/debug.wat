@@ -40258,8 +40258,8 @@
      local.get $wrap
      local.get $i
      call $~lib/typedarray/Uint8Array#__get
-     global.get $assembly/indexer/protomessage/ProtoMessage/CALLDATA_MAGIC
-     i32.eq
+     i32.const 0
+     i32.ne
      if
       local.get $i
       local.set $endingMagicIndex
@@ -40282,6 +40282,15 @@
    local.get $endingMagicIndex
    i32.const 0
    i32.eq
+  end
+  if (result i32)
+   i32.const 1
+  else
+   local.get $wrap
+   local.get $endingMagicIndex
+   call $~lib/typedarray/Uint8Array#__get
+   global.get $assembly/indexer/protomessage/ProtoMessage/CALLDATA_MAGIC
+   i32.ne
   end
   if
    i32.const 0
