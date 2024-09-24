@@ -39813,46 +39813,6 @@
   local.get $refund_pointer
   i32.store offset=12
  )
- (func $~lib/metashrew-runes/assembly/utils/stripNullRight (param $data i32) (result i32)
-  (local $box i32)
-  local.get $data
-  call $~lib/metashrew-as/assembly/utils/box/Box.from
-  local.set $box
-  block $while-break|0
-   loop $while-continue|0
-    local.get $box
-    call $~lib/metashrew-as/assembly/utils/box/Box#get:len
-    i32.const 0
-    i32.gt_u
-    if
-     local.get $box
-     call $~lib/metashrew-as/assembly/utils/box/Box#get:start
-     local.get $box
-     call $~lib/metashrew-as/assembly/utils/box/Box#get:len
-     i32.add
-     i32.const 1
-     i32.sub
-     i32.load8_u
-     i32.const 0
-     i32.eq
-     if
-      local.get $box
-      local.get $box
-      call $~lib/metashrew-as/assembly/utils/box/Box#get:len
-      i32.const 1
-      i32.sub
-      call $~lib/metashrew-as/assembly/utils/box/Box#set:len
-     else
-      br $while-break|0
-     end
-     br $while-continue|0
-    end
-   end
-  end
-  local.get $box
-  call $~lib/metashrew-as/assembly/utils/box/Box#toArrayBuffer
-  return
- )
  (func $~lib/util/bytes/REVERSE<u8> (param $ptr i32) (param $len i32)
   (local $i i32)
   (local $tail i32)
@@ -40029,7 +39989,6 @@
   local.get $refund_pointer
   call $assembly/indexer/protomessage/ProtoMessage/ProtoMessage#set:refund_pointer
   local.get $_calldata
-  call $~lib/metashrew-runes/assembly/utils/stripNullRight
   i32.const 0
   i32.const 1
   global.set $~argumentsLength
@@ -40045,126 +40004,6 @@
   local.get $protocolTag
   call $assembly/indexer/protomessage/ProtoMessage/ProtoMessage#set:protocolTag
   local.get $this
- )
- (func $~lib/typedarray/Uint8Array#subarray (param $this i32) (param $begin i32) (param $end i32) (result i32)
-  (local $array i32)
-  (local $begin|4 i32)
-  (local $end|5 i32)
-  (local $len i32)
-  (local $7 i32)
-  (local $8 i32)
-  (local $9 i32)
-  (local $10 i32)
-  (local $11 i32)
-  (local $12 i32)
-  (local $13 i32)
-  (local $14 i32)
-  (local $15 i32)
-  (local $16 i32)
-  (local $out i32)
-  (local $buf i32)
-  block $"~lib/typedarray/SUBARRAY<~lib/typedarray/Uint8Array,u8>|inlined.0" (result i32)
-   local.get $this
-   local.set $array
-   local.get $begin
-   local.set $begin|4
-   local.get $end
-   local.set $end|5
-   local.get $array
-   call $~lib/typedarray/Uint8Array#get:length
-   local.set $len
-   local.get $begin|4
-   i32.const 0
-   i32.lt_s
-   if (result i32)
-    local.get $len
-    local.get $begin|4
-    i32.add
-    local.tee $7
-    i32.const 0
-    local.tee $8
-    local.get $7
-    local.get $8
-    i32.gt_s
-    select
-   else
-    local.get $begin|4
-    local.tee $9
-    local.get $len
-    local.tee $10
-    local.get $9
-    local.get $10
-    i32.lt_s
-    select
-   end
-   local.set $begin|4
-   local.get $end|5
-   i32.const 0
-   i32.lt_s
-   if (result i32)
-    local.get $len
-    local.get $end|5
-    i32.add
-    local.tee $11
-    i32.const 0
-    local.tee $12
-    local.get $11
-    local.get $12
-    i32.gt_s
-    select
-   else
-    local.get $end|5
-    local.tee $13
-    local.get $len
-    local.tee $14
-    local.get $13
-    local.get $14
-    i32.lt_s
-    select
-   end
-   local.set $end|5
-   local.get $end|5
-   local.tee $15
-   local.get $begin|4
-   local.tee $16
-   local.get $15
-   local.get $16
-   i32.gt_s
-   select
-   local.set $end|5
-   i32.const 12
-   i32.const 15
-   call $~lib/rt/stub/__new
-   local.set $out
-   local.get $array
-   call $~lib/arraybuffer/ArrayBufferView#get:buffer
-   local.set $buf
-   local.get $out
-   local.get $buf
-   i32.store
-   local.get $out
-   local.get $buf
-   i32.const 0
-   call $~lib/rt/stub/__link
-   local.get $out
-   local.get $array
-   call $~lib/arraybuffer/ArrayBufferView#get:dataStart
-   local.get $begin|4
-   i32.const 0
-   i32.shl
-   i32.add
-   i32.store offset=4
-   local.get $out
-   local.get $end|5
-   local.get $begin|4
-   i32.sub
-   i32.const 0
-   i32.shl
-   i32.store offset=8
-   local.get $out
-   br $"~lib/typedarray/SUBARRAY<~lib/typedarray/Uint8Array,u8>|inlined.0"
-  end
-  return
  )
  (func $assembly/indexer/protomessage/ProtoMessage/ProtoMessage.from (param $protostone i32) (param $vout i32) (result i32)
   (local $calldata i32)
@@ -40315,13 +40154,10 @@
    call $assembly/indexer/protomessage/ProtoMessage/ProtoMessage#constructor
    return
   end
-  local.get $wrap
+  local.get $calldata
   i32.const 1
   local.get $endingMagicIndex
-  i32.const 1
-  i32.sub
-  call $~lib/typedarray/Uint8Array#subarray
-  call $~lib/arraybuffer/ArrayBufferView#get:buffer
+  call $~lib/arraybuffer/ArrayBuffer#slice
   local.set $calldata
   i32.const 0
   local.get $vout

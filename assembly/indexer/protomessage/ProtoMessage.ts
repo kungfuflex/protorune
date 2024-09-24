@@ -30,8 +30,7 @@ export class ProtoMessage {
     this.vout = vout;
     this.pointer = pointer;
     this.refund_pointer = refund_pointer;
-    const calldata = Uint8Array.wrap(stripNullRight(_calldata)).reverse()
-      .buffer;
+    const calldata = Uint8Array.wrap(_calldata).reverse().buffer;
     this.calldata = calldata;
     this.protocolTag = protocolTag;
   }
@@ -108,7 +107,7 @@ export class ProtoMessage {
     }
 
     // strip leading magic number and ending magic number
-    calldata = wrap.subarray(1, endingMagicIndex - 1).buffer;
+    calldata = calldata.slice(1, endingMagicIndex);
 
     return new ProtoMessage(
       vout,
